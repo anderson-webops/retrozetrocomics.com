@@ -7,8 +7,6 @@ const activeLink = ref("Home");
 
 const links = ref([
 	{ name: "Home", path: "/" },
-	{ name: "Projects", path: "/projects" },
-	{ name: "Experience", path: "/experience" },
 	{ name: "About", path: "/about" },
 	{ name: "Contact", path: "/contact" },
 ]);
@@ -28,9 +26,9 @@ function setActiveLink(linkName: string) {
 		<nav class="flex-container">
 			<div class="logo-container">
 				<RouterLink to="/">
-					<img alt="Jacob Anderson Logo" class="logo" src="../assets/images/Logo 1 Saywa.png">
+					<img alt="RetroZetro Comics Logo" class="logo" src="../assets/images/Original_Icon.png">
 				</RouterLink>
-				<span class="site-name">Jacob Anderson</span>
+				<span class="site-name">RetroZetro Comics</span>
 			</div>
 			<div class="hamburger" @click="toggleMenu">
 				<div :class="{ open: isExpanded }" class="bar"></div>

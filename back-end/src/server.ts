@@ -24,6 +24,6 @@ app.use(cookieSession({
 	maxAge: 24 * 60 * 60 * 1000,
 }));
 
-const PORT: number | string = process.env.PORT || 3006;
+const PORT: number | string = process.env.PORT || 3008;
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}!`));
 

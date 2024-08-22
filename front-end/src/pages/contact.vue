@@ -12,7 +12,7 @@ function handleSubmit() {
 	// eslint-disable-next-line no-console
 	console.log("Form submitted:", form.value);
 	// eslint-disable-next-line no-alert
-	alert("Message sent! We'll get back to you soon.");
+	alert("Message sent! Not really this doesn't do anything yet. We'll get back to you soon?");
 	
 	// Reset form after submission
 	form.value.name = "";

@@ -7,11 +7,11 @@ const isDark = ref(false); // Simplified dark mode toggle
 
 // Dynamically setting the page head
 useHead({
-	title: "Jacob Anderson",
+	title: "RetroZetro Comics",
 	meta: [
 		{
 			name: "Personal Website",
-			content: "This is the personal website of Jacob Anderson",
+			content: "This is the website for RetroZetro Comics",
 		},
 		{
 			name: "theme-color",
