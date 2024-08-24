@@ -23,8 +23,9 @@ function handleSubmit() {
 
 <template>
 	<div class="page">
-		<h1>Contact Me</h1>
 		<div class="item">
+			<h1>Contact Me</h1>
+			
 			<p>If you have any questions or feedback, please feel free to reach out to us through the form below.</p>
 			
 			<form @submit.prevent="handleSubmit">
