@@ -7,10 +7,10 @@ export const useMainStore = defineStore("main", {
 			character: [
 				{
 					name: "Zetro",
-					about: "Hi, I'm Zetro! Welcome to my website for my web-comics!"
-				}
-			]
-		}
+					about: "Hi, I'm Zetro! Welcome to my website for my web-comics!",
+				},
+			],
+		},
 	}),
 	
 	// Define actions for fetching or mutating the state

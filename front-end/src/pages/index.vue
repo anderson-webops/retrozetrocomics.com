@@ -1,15 +1,15 @@
 <script lang="ts" setup>
 import About from "~/pages/about.vue";
-//import Projects from "~/pages/projects.vue";
-//import Experience from "~/pages/experience.vue";
+// import Projects from "~/pages/projects.vue";
+// import Experience from "~/pages/experience.vue";
 </script>
 
 <template>
 	<div class="page">
 		<About class="about" />
 		<div class="projects-experience">
-<!--			<Projects class="projects" />-->
-<!--			<Experience class="experience" />-->
+			<!--			<Projects class="projects" /> -->
+			<!--			<Experience class="experience" /> -->
 		</div>
 	</div>
 </template>
@@ -38,7 +38,7 @@ import About from "~/pages/about.vue";
 	.projects-experience {
 		flex-direction: column;
 	}
-	
+
 	.projects,
 	.experience {
 		width: 100%;
@@ -55,7 +55,7 @@ import About from "~/pages/about.vue";
 }
 </route>
 
-<!--<route lang="yaml">-->
-<!--meta:-->
-<!--layout: home-->
-<!--</route>-->
+<!-- <route lang="yaml"> -->
+<!-- meta: -->
+<!-- layout: home -->
+<!-- </route> -->

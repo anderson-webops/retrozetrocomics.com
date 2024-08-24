@@ -31,9 +31,9 @@ function setActiveLink(linkName: string) {
 				<span class="site-name">RetroZetro Comics</span>
 			</div>
 			<div class="hamburger" @click="toggleMenu">
-				<div :class="{ open: isExpanded }" class="bar"></div>
-				<div :class="{ open: isExpanded }" class="bar"></div>
-				<div :class="{ open: isExpanded }" class="bar"></div>
+				<div :class="{ open: isExpanded }" class="bar" />
+				<div :class="{ open: isExpanded }" class="bar" />
+				<div :class="{ open: isExpanded }" class="bar" />
 			</div>
 			<ul :class="{ expanded: isExpanded }" class="nav-links">
 				<li
@@ -56,8 +56,6 @@ function setActiveLink(linkName: string) {
 	justify-content: space-between;
 	align-items: center;
 	padding: 10px 20px;
-	background-color: #fff;
-	border-bottom: 1px solid #ccc;
 	position: relative;
 }
 
@@ -127,7 +125,7 @@ function setActiveLink(linkName: string) {
 	.hamburger {
 		display: flex;
 	}
-	
+
 	.nav-links {
 		display: none;
 		flex-direction: column;
@@ -140,11 +138,11 @@ function setActiveLink(linkName: string) {
 		border-top: 1px solid #ccc;
 		border-bottom: 1px solid #ccc;
 	}
-	
+
 	.nav-links.expanded {
 		display: flex;
 	}
-	
+
 	.nav-links li {
 		margin: 10px 0;
 		text-align: center;

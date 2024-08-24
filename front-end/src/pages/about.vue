@@ -11,7 +11,7 @@ const about = computed(() => store.characters.character[0].about); // Accessing 
 		<img v-if="$route.path !== '/'" alt="RetroZetro Comics Logo" class="logo" src="../assets/images/Original_Icon.png">
 		<img
 			v-if="$route.path === '/'" alt="Zetro's Profiles" class="profile-pic"
-			src="../assets/images/Zetro.jpg"
+			src="../assets/images/Zetro2.jpg"
 		>
 		<h1>About RetroZetro Comics</h1>
 		<div class="item">
@@ -20,7 +20,7 @@ const about = computed(() => store.characters.character[0].about); // Accessing 
 	</div>
 	
 	<!-- Do not show Education Component on home page -->
-<!--	<EducationComponent v-if="$route.path !== '/'" />-->
+<!--	<EducationComponent v-if="$route.path !== '/'" /> -->
 </template>
 
 <style scoped>
@@ -33,9 +33,9 @@ const about = computed(() => store.characters.character[0].about); // Accessing 
 
 .profile-pic {
 	display: block;
-	border-radius: 50%;
+	border-radius: 5%;
 	width: 150px;
-	height: 150px;
+	height: 100%;
 	object-fit: cover;
 	margin: 20px auto;
 }
@@ -49,7 +49,7 @@ const about = computed(() => store.characters.character[0].about); // Accessing 
 }
 </route>
 
-<!--<route lang="yaml">-->
-<!--meta:-->
-<!--layout: default-->
-<!--</route>-->
+<!-- <route lang="yaml"> -->
+<!-- meta: -->
+<!-- layout: default -->
+<!-- </route> -->
