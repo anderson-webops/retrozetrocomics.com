@@ -3,18 +3,18 @@ import { computed } from "vue";
 import { useMainStore } from "~/stores"; // Ensure this points to your configured Pinia store
 
 const store = useMainStore();
-const about = computed(() => store.characters.character[0].about); // Accessing 'about' directly from the Pinia store
+const about = computed(() => store.characters.description); // Accessing 'about' directly from the Pinia store
 </script>
 
 <template>
 	<div class="page">
-		<img v-if="$route.path !== '/'" alt="RetroZetro Comics Logo" class="logo" src="../assets/images/Original_Icon.png">
-		<img
-			v-if="$route.path === '/'" alt="Zetro's Profiles" class="profile-pic"
-			src="../assets/images/Zetro2.jpg"
-		>
-		<h1>About RetroZetro Comics</h1>
+		<img alt="RetroZetro Comics Logo" class="logo" src="../assets/images/Original_Icon.png"> <!-- v-if="$route.path !== '/'" -->
+		<!--		<img -->
+		<!--			v-if="$route.path === '/'" alt="Zetro's Profiles" class="profile-pic" -->
+		<!--			src="../assets/images/Zetro2.jpg" -->
+		<!--		> -->
 		<div class="item">
+			<h1>About RetroZetro Comics</h1>
 			<p>{{ about }}</p>
 		</div>
 	</div>

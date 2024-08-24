@@ -12,7 +12,7 @@ body,
 
 /* Dark Mode */
 html.dark {
-	background: #1e1e2f; /* Dark purple background for dark mode */
+	background: inherit; /* Dark purple background for dark mode */
 	color-scheme: dark;
 	color: #fff; /* White text for dark mode */
 }
@@ -22,7 +22,7 @@ html.dark {
 }
 
 #nprogress .bar {
-	background: #ffda44; /* Bright yellow progress bar */
+	background: #ff914d; /* Nice orange progress bar */
 	opacity: 0.75;
 	position: fixed;
 	z-index: 1031;
@@ -37,16 +37,16 @@ html.dark {
 **************/
 
 header {
-	background-color: #8853bf; /* Rich purple header */
-	border-bottom: 1px solid #ffda44; /* Yellow border */
+	background-color: #b38cdc; /* Lighter purple header */
+	border-bottom: 1px solid #ff914d; /* Orange border */
 	color: #fff; /* White text for header */
 }
 
 body {
-	background-color: #fdf2e9; /* Light yellow background */
+	background-color: #f48527; /* Light orange background */
 	font-size: 110%;
 	margin: 0;
-	color: #4c2a85; /* Deep purple text color */
+	color: #603985; /* Slightly lighter purple text color */
 }
 
 .content {
@@ -56,9 +56,9 @@ body {
 footer {
 	margin-bottom: 20px;
 	padding: 20px;
-	background-color: #8853bf; /* Matching the header color */
+	background-color: #b38cdc; /* Matching the header color */
 	color: #fff; /* White text for footer */
-	border: 1px solid #ffda44; /* Yellow border */
+	border: 1px solid #ff914d; /* Orange border */
 	border-radius: 5px;
 	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
 }
@@ -72,7 +72,7 @@ h1, h2 {
 	text-align: center;
 	padding-bottom: 5px;
 	margin: 0;
-	color: #ffda44; /* Bright yellow text for headings */
+	color: #ff914d; /* Nice orange text for headings */
 }
 
 h1 {
@@ -84,17 +84,17 @@ h2 {
 }
 
 .page {
-	background-color: #fdf2e9; /* Light yellow background for pages */
+	background-color: inherit; /* Light orange background for pages */
 }
 
 .item {
 	margin-bottom: 20px;
 	padding: 20px;
-	background-color: #fff;
-	border: 1px solid #ffda44; /* Yellow border */
+	background-color: #fff; /*#fff;*/
+	border: 1px solid #ff914d; /* Orange border */
 	border-radius: 5px;
 	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
-	color: #4c2a85; /* Deep purple text */
+	color: #603985; /* Lighter purple text */
 	
 	display: flex;
 	flex-direction: column;

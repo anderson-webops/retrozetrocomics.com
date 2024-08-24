@@ -1,49 +1,19 @@
 <script lang="ts" setup>
+import Characters from "~/pages/characters.vue";
 import About from "~/pages/about.vue";
-// import Projects from "~/pages/projects.vue";
-// import Experience from "~/pages/experience.vue";
 </script>
 
 <template>
 	<div class="page">
-		<About class="about" />
-		<div class="projects-experience">
-			<!--			<Projects class="projects" /> -->
-			<!--			<Experience class="experience" /> -->
-		</div>
+		<About class="about" /> 
+		<Characters />
 	</div>
 </template>
 
 <style scoped>
 .about {
 	width: 100%;
-}
-
-.projects-experience {
-	display: flex;
-	flex-direction: row;
-	width: 100%;
-}
-
-.projects,
-.experience {
-	width: 50%;
-}
-
-.projects {
-	margin-right: 10px;
-}
-
-@media (max-width: 600px) {
-	.projects-experience {
-		flex-direction: column;
-	}
-
-	.projects,
-	.experience {
-		width: 100%;
-		margin: 0;
-	}
+	margin-bottom: 40px; /* Add some space below the About section */
 }
 </style>
 

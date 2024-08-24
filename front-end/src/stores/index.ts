@@ -4,10 +4,31 @@ import { defineStore } from "pinia";
 export const useMainStore = defineStore("main", {
 	state: () => ({
 		characters: {
+			description: "Welcome to my website for my web-comics!",
 			character: [
 				{
 					name: "Zetro",
-					about: "Hi, I'm Zetro! Welcome to my website for my web-comics!",
+					description: "Hi, I'm Zetro!",
+					image: "/src/assets/images/Zetro2.jpg",
+					imgAlt: "Zetro",
+				},
+				{
+					name: "Kazay",
+					description: "Hi, I'm Kazay!",
+					image: "/src/assets/images/Kazay.jpg",
+					imgAlt: "Kazay",
+				},
+				{
+					name: "Exo",
+					description: "Hi, I'm Exo!",
+					image: "/src/assets/images/Exo.jpg",
+					imgAlt: "Exo",
+				},
+				{
+					name: "Shaman",
+					description: "Hi, I'm Shaman!",
+					image: "/src/assets/images/Shaman.jpg",
+					imgAlt: "Shaman",
 				},
 			],
 		},
