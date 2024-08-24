@@ -8,7 +8,7 @@ const about = computed(() => store.characters.description); // Accessing 'about'
 
 <template>
 	<div class="page">
-		<img alt="RetroZetro Comics Logo" class="logo" src="../assets/images/Original_Icon.png"> <!-- v-if="$route.path !== '/'" -->
+		<img alt="RetroZetro Comics Logo" class="logo" src="https://retrozetrocomics.s3.amazonaws.com/images/Original_Icon.png"> <!-- v-if="$route.path !== '/'" -->
 		<!--		<img -->
 		<!--			v-if="$route.path === '/'" alt="Zetro's Profiles" class="profile-pic" -->
 		<!--			src="../assets/images/Zetro2.jpg" -->
