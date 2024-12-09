@@ -1,16 +1,16 @@
-import { ViteSSG } from "vite-ssg";
-import { setupLayouts } from "virtual:generated-layouts";
-import { routes } from "vue-router/auto-routes";
+import type { UserModule } from "~/types.ts";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faFacebook, faGithub, faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import App from "./App.vue";
+import { setupLayouts } from "virtual:generated-layouts";
+import { ViteSSG } from "vite-ssg";
+import { routes } from "vue-router/auto-routes";
 
+import App from "./App.vue";
 // Assuming you have styles defined in these files
 import "@unocss/reset/tailwind.css";
 import "./styles/main.css";
 import "uno.css";
-import type { UserModule } from "~/types.ts";
 
 // FontAwesome library setup
 library.add(faFacebook, faGithub, faInstagram);

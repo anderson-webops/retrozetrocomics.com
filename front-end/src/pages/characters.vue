@@ -1,6 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed } from "vue";
 import { useMainStore } from "~/stores";
+
 
 const store = useMainStore();
 const characters = computed(() => store.characters);

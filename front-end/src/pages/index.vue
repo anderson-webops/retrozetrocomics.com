@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import Characters from "~/pages/characters.vue";
 import About from "~/pages/about.vue";
+import Characters from "~/pages/characters.vue";
 </script>
 
 <template>
 	<div class="page">
-		<About class="about" /> 
+		<About class="about" />
 		<Characters />
 	</div>
 </template>

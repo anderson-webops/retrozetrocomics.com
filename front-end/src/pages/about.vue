@@ -8,7 +8,10 @@ const about = computed(() => store.characters.description); // Accessing 'about'
 
 <template>
 	<div class="page">
-		<img alt="RetroZetro Comics Logo" class="logo" src="https://retrozetrocomics.s3.amazonaws.com/images/Original_Icon.png">
+		<img
+			alt="RetroZetro Comics Logo" class="logo"
+			src="https://retrozetrocomics.s3.amazonaws.com/images/Original_Icon.png"
+		>
 		<div class="item">
 			<h1>About RetroZetro Comics</h1>
 			<p>{{ about }}</p>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { ref } from "vue";
 import { useHead } from "@vueuse/head";
+import { ref } from "vue";
 
 
 const isDark = ref(false); // Simplified dark mode toggle

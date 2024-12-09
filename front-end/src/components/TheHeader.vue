@@ -26,7 +26,10 @@ function setActiveLink(linkName: string) {
 		<nav class="flex-container">
 			<div class="logo-container">
 				<RouterLink to="/">
-					<img alt="RetroZetro Comics Logo" class="logo" src="https://retrozetrocomics.s3.amazonaws.com/images/Original_Icon.png">
+					<img
+						alt="RetroZetro Comics Logo" class="logo"
+						src="https://retrozetrocomics.s3.amazonaws.com/images/Original_Icon.png"
+					>
 				</RouterLink>
 				<span class="site-name">RetroZetro Comics</span>
 			</div>
