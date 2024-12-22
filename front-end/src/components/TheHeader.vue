@@ -24,15 +24,6 @@ function setActiveLink(linkName: string) {
 <template>
 	<header>
 		<nav class="flex-container">
-			<div class="logo-container">
-				<RouterLink to="/">
-					<img
-						alt="RetroZetro Comics Logo" class="logo"
-						src="https://retrozetrocomics.s3.amazonaws.com/images/Original_Icon.png"
-					>
-				</RouterLink>
-				<span class="site-name">RetroZetro Comics</span>
-			</div>
 			<div class="hamburger" @click="toggleMenu">
 				<div :class="{ open: isExpanded }" class="bar" />
 				<div :class="{ open: isExpanded }" class="bar" />
@@ -56,27 +47,10 @@ function setActiveLink(linkName: string) {
 <style scoped>
 .flex-container {
 	display: flex;
-	justify-content: space-between;
+	justify-content: center;
 	align-items: center;
 	padding: 10px 20px;
 	position: relative;
-}
-
-.logo-container {
-	display: flex;
-	align-items: center;
-}
-
-.logo {
-	width: 50px;
-	height: auto;
-	margin-right: 10px;
-}
-
-.site-name {
-	font-size: 1.5em;
-	font-weight: bold;
-	color: #333;
 }
 
 .nav-links {

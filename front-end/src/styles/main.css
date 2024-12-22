@@ -54,7 +54,7 @@ body {
 }
 
 footer {
-	margin-bottom: 20px;
+	/*margin-bottom: 20px;*/
 	padding: 20px;
 	background-color: #b38cdc; /* Matching the header color */
 	color: #fff; /* White text for footer */
