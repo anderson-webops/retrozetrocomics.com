@@ -7,6 +7,7 @@ const activeLink = ref("Home");
 
 const links = ref([
 	{ name: "Home", path: "/" },
+	{ name: "Characters", path: "/characters" },
 	{ name: "About", path: "/about" },
 	{ name: "Contact", path: "/contact" },
 ]);

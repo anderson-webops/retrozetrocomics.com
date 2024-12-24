@@ -1,20 +1,14 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import { useMainStore } from "~/stores"; // Ensure this points to your configured Pinia store
+import { useMainStore } from "~/stores";
 
 const store = useMainStore();
-const about = computed(() => store.characters.description); // Accessing 'about' directly from the Pinia store
 </script>
 
 <template>
 	<div class="page">
-		<img
-			v-if="$route.path !== '/'" alt="RetroZetro Comics Logo" class="logo"
-			src="https://retrozetrocomics.s3.amazonaws.com/images/Original_Icon.png"
-		>
+		<WelcomeSection :name="store.about.title" :message="store.about.description" />
 		<div class="item">
-			<h1>About RetroZetro Comics</h1>
-			<p>{{ about }}</p>
+			<h1>Information will go here in the future (about the project, the author, etc.)</h1>
 		</div>
 	</div>
 </template>
