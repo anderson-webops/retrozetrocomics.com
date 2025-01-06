@@ -24,7 +24,7 @@ function setActiveLink(linkName: string) {
 
 <template>
 	<header>
-		<nav class="flex-container">
+		<nav class="flex justify-center items-center px-20 py-4 relative">
 			<div class="hamburger" @click="toggleMenu">
 				<div :class="{ open: isExpanded }" class="bar" />
 				<div :class="{ open: isExpanded }" class="bar" />

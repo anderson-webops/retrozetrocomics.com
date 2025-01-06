@@ -25,7 +25,7 @@ const store = useMainStore();
 }
 </route>
 
-<!-- <route lang="yaml"> -->
-<!-- meta: -->
-<!-- layout: home -->
-<!-- </route> -->
+<!-- <route lang="yaml">
+meta:
+layout: home
+</route> -->

@@ -1,42 +1,40 @@
 <script lang="ts" setup>
-
+import SideAdvertisement from "~/components/SideAdvertisement.vue";
 </script>
 
 <template>
 	<main class="text-center text-gray-700 dark:text-gray-200">
-		<div id="title-plate" class="grid-container">
+		<!-- Title Plate Section -->
+		<div
+			id="title-plate"
+			class="grid grid-cols-[200px_1fr_200px] gap-[10px] w-full"
+		>
 			<div id="mock-ad-1" class="mx-10" />
-			<div class="centering">
+			<div class="flex items-center justify-center">
 				<TitlePlate />
 			</div>
 			<div id="mock-ad-2" class="mx-10" />
 		</div>
-		<div class="grid-container">
-			<AdvertisementPanel />
-			<div id="center-plate" class="centering">
+		
+		<!-- Main Content Section -->
+		<div class="grid grid-cols-[200px_1fr_200px] gap-[10px] w-full">
+			<SideAdvertisement />
+			
+			<!-- Center Plate -->
+			<div
+				id="center-plate"
+				class="bg-[#603985] border-[20px] border-solid border-black"
+			>
 				<TheHeader />
 				<RouterView class="px-4 py-5" />
 				<TheFooter />
 			</div>
-			<AdvertisementPanel />
+			
+			<SideAdvertisement />
 		</div>
 	</main>
 </template>
 
 <style scoped>
-.grid-container {
-	display: grid;
-	grid-template-columns: 200px 1fr 200px;
-	gap: 10px;
-	width: 100%;
-}
 
-#center-plate {
-	background-color: #603985;
-	border: 20px solid black;
-}
-
-/*.centering {
-	margin: 0 10%;
-}*/
 </style>
