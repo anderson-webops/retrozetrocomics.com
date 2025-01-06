@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { useMainStore } from "~/stores";
 
+
 const store = useMainStore();
 </script>
 
 <template>
 	<div class="page">
-		<WelcomeSection :name="store.about.title" :message="store.about.description" />
+		<WelcomeSection :message="store.about.description" :name="store.about.title" />
 		<div class="item">
 			<h1>Information will go here in the future (about the project, the author, etc.)</h1>
 		</div>

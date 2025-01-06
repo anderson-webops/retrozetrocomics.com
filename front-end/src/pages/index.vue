@@ -2,6 +2,7 @@
 import Comics from "~/components/TheComics.vue";
 import { useMainStore } from "~/stores";
 
+
 const store = useMainStore();
 </script>
 

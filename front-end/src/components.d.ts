@@ -7,8 +7,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    Characters: typeof import('./components/characters.vue')['default']
-    Comics: typeof import('./components/comics.vue')['default']
+    AdvertisementPanel: typeof import('./components/AdvertisementPanel.vue')['default']
+    Characters: typeof import("./components/characters.vue")["default"]
+    Comics: typeof import("./components/comics.vue")["default"]
     EducationComponent: typeof import("./components/EducationComponent.vue")["default"]
     EventsComponent: typeof import("./components/EventsComponent.vue")["default"]
     MapComponent: typeof import("./components/MapComponent.vue")["default"]

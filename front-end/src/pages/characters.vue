@@ -3,6 +3,7 @@
 import Characters from "~/components/TheCharacters.vue"; // Ensure this points to your configured Pinia store
 import { useMainStore } from "~/stores";
 
+
 const store = useMainStore();
 </script>
 
