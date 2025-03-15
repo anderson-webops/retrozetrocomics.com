@@ -10,8 +10,8 @@
 		"build": "tsc",
 		"watch": "tsc -w",
 		"dev": "nodemon --exec ts-node src/server.ts",
-		"lint": "eslint src/**/*.ts",
-		"lint-fix": "eslint src/**/*.ts --fix"
+		"lint": "eslint --config package.json src/**/*.ts",
+		"lint-fix": "eslint --config package.json src/**/*.ts --fix"
 	},
 	"dependencies": {
 		"@types/cookie-parser": "^1.4.8",
