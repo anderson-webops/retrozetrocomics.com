@@ -29,8 +29,8 @@
 		"@fortawesome/fontawesome-svg-core": "^6.7.2",
 		"@fortawesome/free-brands-svg-icons": "^6.7.2",
 		"@fortawesome/vue-fontawesome": "^3.0.8",
-		"@unhead/vue": "^1.11.20",
-		"@unocss/reset": "^66.0.0",
+		"@unhead/vue": "^2.0.0-rc.13",
+		"@unocss/reset": "^66.1.0-beta.5",
 		"@vueuse/core": "^13.0.0",
 		"@vueuse/head": "^2.0.0",
 		"beasties": "^0.2.0",
@@ -54,9 +54,9 @@
 		"@types/nprogress": "^0.2.3",
 		"@typescript-eslint/eslint-plugin": "^8.26.1",
 		"@typescript-eslint/parser": "^8.26.1",
-		"@unocss/eslint-config": "^66.0.0",
+		"@unocss/eslint-config": "^66.1.0-beta.5",
 		"@vitejs/plugin-vue": "^5.2.1",
-		"@vue-macros/volar": "^0.30.15",
+		"@vue-macros/volar": "^3.0.0-beta.5",
 		"@vue/test-utils": "^2.4.6",
 		"cross-env": "^7.0.3",
 		"cypress": "^14.2.0",
@@ -73,7 +73,7 @@
 		"simple-git-hooks": "^2.11.1",
 		"taze": "^19.0.2",
 		"typescript": "^5.8.2",
-		"unocss": "^66.0.0",
+		"unocss": "^66.1.0-beta.5",
 		"unplugin-auto-import": "^19.1.1",
 		"unplugin-vue-components": "^28.4.1",
 		"unplugin-vue-macros": "^2.14.5",
@@ -89,7 +89,7 @@
 		"vite-ssg": "^25.2.0",
 		"vite-ssg-sitemap": "^0.8.1",
 		"vitest": "^3.0.8",
-		"vue-tsc": "^2.1.10"
+		"vue-tsc": "^2.2.8"
 	},
 	"simple-git-hooks": {
 		"pre-commit": "npx lint-staged"
