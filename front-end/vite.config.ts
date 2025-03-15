@@ -14,7 +14,7 @@ import { defineConfig } from "vite";
 import Pages from "vite-plugin-pages";
 import { VitePWA } from "vite-plugin-pwa";
 import VueDevTools from "vite-plugin-vue-devtools";
-import Layouts from "vite-plugin-vue-layouts";
+import Layouts from "vite-plugin-vue-layouts-next";
 import WebfontDownload from "vite-plugin-webfont-dl";
 import generateSitemap from "vite-ssg-sitemap";
 
