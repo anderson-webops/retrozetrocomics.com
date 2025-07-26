@@ -3,6 +3,7 @@
 **/.node_modules*.nosync
 **/package-lock.json
 **/dist
+**/.env
 
 .vite-ssg-dist
 .vite-ssg-temp
