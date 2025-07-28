@@ -1,25 +1,30 @@
 <script lang="ts" setup>
 import { useMainStore } from "~/stores";
 
-
 const store = useMainStore();
 </script>
 
 <template>
-	<div class="page">
-		<WelcomeSection :message="store.about.description" :name="store.about.title" />
-		<div class="item">
-			<h1>Information will go here in the future (about the project, the author, etc.)</h1>
-		</div>
-	</div>
+  <div class="page">
+    <WelcomeSection
+      :message="store.about.description"
+      :name="store.about.title"
+    />
+    <div class="item">
+      <h1>
+        Information will go here in the future (about the project, the author,
+        etc.)
+      </h1>
+    </div>
+  </div>
 </template>
 
 <style scoped>
 .logo {
-	display: block;
-	width: 150px; /* Adjust size as needed */
-	height: auto;
-	margin: 0 auto 20px;
+  display: block;
+  width: 150px; /* Adjust size as needed */
+  height: auto;
+  margin: 0 auto 20px;
 }
 </style>
 

@@ -2,20 +2,17 @@
 import Comics from "~/components/TheComics.vue";
 import { useMainStore } from "~/stores";
 
-
 const store = useMainStore();
 </script>
 
 <template>
-	<div class="page">
-		<WelcomeSection :message="store.comics.description" />
-		<Comics />
-	</div>
+  <div class="page">
+    <WelcomeSection :message="store.comics.description" />
+    <Comics />
+  </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
 
 <route>
 {
