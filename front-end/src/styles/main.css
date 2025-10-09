@@ -5,16 +5,16 @@
 html,
 body,
 #app {
-	height: 100%;
-	margin: 0;
-	padding: 0;
+        height: 100%;
+        margin: 0;
+        padding: 0;
 }
 
 /* Dark Mode */
 html.dark {
-	background: inherit; /* Dark purple background for dark mode */
-	color-scheme: dark;
-	color: #fff; /* White text for dark mode */
+        background: inherit; /* Dark purple background for dark mode */
+        color-scheme: dark;
+        color: #fff; /* White text for dark mode */
 }
 
 #nprogress {
@@ -32,76 +32,49 @@ html.dark {
 	height: 2px;
 }
 
-/**************
-*   General   *
-**************/
-
-header {
-	background-color: #b38cdc; /* Lighter purple header */
-	border-bottom: 1px solid #ff914d; /* Orange border */
-	color: #fff; /* White text for header */
+:root {
+        --rz-ink: #fdf7ff;
+        --rz-ink-soft: rgba(255, 239, 227, 0.82);
+        --rz-purple-900: #120422;
+        --rz-purple-700: #3a1369;
+        --rz-purple-500: #6d3ca8;
+        --rz-orange-400: #ff914d;
+        --rz-orange-300: #ffb86b;
+        --rz-shadow: rgba(8, 2, 20, 0.65);
 }
 
 body {
-	background-color: #f48527; /* Light orange background */
-	font-size: 110%;
-	margin: 0;
-	color: #603985; /* Slightly lighter purple text color */
+        font-family: "Poppins", "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+        font-size: 110%;
+        line-height: 1.65;
+        margin: 0;
+        color: var(--rz-ink);
+        background:
+                radial-gradient(circle at 15% 20%, rgba(255, 155, 86, 0.24), transparent 60%),
+                radial-gradient(circle at 85% 25%, rgba(117, 76, 194, 0.3), transparent 55%),
+                linear-gradient(175deg, var(--rz-purple-700), var(--rz-purple-900));
+        min-height: 100vh;
 }
 
-.content {
-	margin: 20px;
+a {
+        color: inherit;
 }
 
-footer {
-	/*margin-bottom: 20px;*/
-	padding: 20px;
-	background-color: #b38cdc; /* Matching the header color */
-	color: #fff; /* White text for footer */
-	border: 1px solid #ff914d; /* Orange border */
-	border-radius: 5px;
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+a:hover,
+a:focus {
+        color: var(--rz-orange-300);
 }
 
-/******************
-*   Router View   *
-******************/
-
-h1, h2 {
-	font-weight: bold;
-	text-align: center;
-	padding-bottom: 5px;
-	margin: 0;
-	color: #333; /* Nice orange text for headings */
+h1,
+h2,
+h3,
+h4 {
+        font-family: "Poppins", "Segoe UI", sans-serif;
+        color: var(--rz-ink);
 }
 
-h1 {
-	font-size: 200%;
-}
-
-h2 {
-	font-size: 150%;
-}
-
-.page {
-	background-color: inherit; /* Light orange background for pages */
-}
-
-.item {
-	margin-bottom: 20px;
-	padding: 20px;
-	background-color: #fff; /*#fff;*/
-	border: 1px solid #ff914d; /* Orange border */
-	border-radius: 5px;
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
-	color: #603985; /* Lighter purple text */
-	
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-}
-
-.item p {
-	margin-top: 10px;
+img {
+        max-width: 100%;
+        height: auto;
+        display: block;
 }

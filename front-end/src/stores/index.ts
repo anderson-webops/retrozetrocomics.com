@@ -32,31 +32,36 @@ export const useMainStore = defineStore("main", {
       ],
     },
     comics: {
-      description: "Welcome to my website for my web-comics!",
+      description:
+        "Each issue riffs on retro-futurism, arcade energy, and comic-book grit to spin a connected universe of heroes finding their way.",
       comic: [
         {
-          name: "Zetro",
-          description: "",
-          image: "",
-          imgAlt: "Comic about Zetro",
+          name: "Zetro: Neon Outlaw",
+          description:
+            "Zetro drifts through synth-lit skylanes, taking on chrome cartels while hunting down the signal that shattered his past.",
+          image: "https://retrozetrocomics.s3.amazonaws.com/images/Zetro2.jpg",
+          imgAlt: "Cover art showing Zetro charging forward with glowing blades",
         },
         {
-          name: "Kazay",
-          description: "",
-          image: "",
-          imgAlt: "Comic about Kazay",
+          name: "Kazay: Pulse Driver",
+          description:
+            "Kazay tunes her hover-cycle to outrun city sentries and crack a mystery that could reboot the whole resistance network.",
+          image: "https://retrozetrocomics.s3.amazonaws.com/images/Kazay.jpg",
+          imgAlt: "Cover art showing Kazay racing across neon highways",
         },
         {
-          name: "Exo",
-          description: "",
-          image: "",
-          imgAlt: "Comic about Exo",
+          name: "Exo: Signal Ghost",
+          description:
+            "An exiled psion navigates the void between worlds, decoding dream-frequencies that hint at a cosmic jailbreak.",
+          image: "https://retrozetrocomics.s3.amazonaws.com/images/Exo.jpg",
+          imgAlt: "Cover art showing Exo channeling cosmic energy",
         },
         {
-          name: "Shaman",
-          description: "",
-          image: "",
-          imgAlt: "Comic about Shaman",
+          name: "Shaman: Rift Walker",
+          description:
+            "Shaman stitches reality with retro vinyl spells, rescuing stray memories before the time storm rewinds everything.",
+          image: "https://retrozetrocomics.s3.amazonaws.com/images/Shaman.jpg",
+          imgAlt: "Cover art showing Shaman weaving glowing runes",
         },
       ],
     },
