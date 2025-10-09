@@ -35,28 +35,32 @@ export const useMainStore = defineStore("main", {
       description: "Welcome to my website for my web-comics!",
       comic: [
         {
-          name: "Zetro",
-          description: "",
-          image: "",
-          imgAlt: "Comic about Zetro",
+          name: "Zetro: Pulse Runner",
+          description:
+            "Zetro tears across the neon megacity to sabotage the syndicate that rewired his memories. A high-velocity chase with synth-charged panels.",
+          image: "https://retrozetrocomics.s3.amazonaws.com/images/Zetro2.jpg",
+          imgAlt: "Cover art for Zetro: Pulse Runner",
         },
         {
-          name: "Kazay",
-          description: "",
-          image: "",
-          imgAlt: "Comic about Kazay",
+          name: "Kazay: Ember Priestess",
+          description:
+            "The desert stars align as Kazay communes with ancient circuitry spirits to avert a solar catastrophe and free her tribe from corporate warlords.",
+          image: "https://retrozetrocomics.s3.amazonaws.com/images/Kazay.jpg",
+          imgAlt: "Cover art for Kazay: Ember Priestess",
         },
         {
-          name: "Exo",
-          description: "",
-          image: "",
-          imgAlt: "Comic about Exo",
+          name: "Exo: Drift Protocol",
+          description:
+            "Exo awakens in deep orbit with a fractured AI companion and a ticking antimatter core. Survival hinges on solving a cosmic riddle first.",
+          image: "https://retrozetrocomics.s3.amazonaws.com/images/Exo.jpg",
+          imgAlt: "Cover art for Exo: Drift Protocol",
         },
         {
-          name: "Shaman",
-          description: "",
-          image: "",
-          imgAlt: "Comic about Shaman",
+          name: "Shaman: Echo of the Void",
+          description:
+            "Shaman steps through a sonic portal to negotiate with void-born deities before their dissonance tears reality apart.",
+          image: "https://retrozetrocomics.s3.amazonaws.com/images/Shaman.jpg",
+          imgAlt: "Cover art for Shaman: Echo of the Void",
         },
       ],
     },
