@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 
 const isExpanded = ref(false);
 const activeLink = ref("Home");
@@ -11,32 +12,65 @@ const links = ref([
   { name: "Contact", path: "/contact" },
 ]);
 
+const route = useRoute();
+
 function toggleMenu() {
   isExpanded.value = !isExpanded.value;
 }
 
 function setActiveLink(linkName: string) {
   activeLink.value = linkName;
-  isExpanded.value = false; // Close the menu after a link is clicked
+  isExpanded.value = false;
 }
+
+function syncActiveLink() {
+  const match = links.value.find((link) => link.path === route.path);
+  if (match) activeLink.value = match.name;
+}
+
+onMounted(syncActiveLink);
+
+watch(
+  () => route.path,
+  () => {
+    syncActiveLink();
+    isExpanded.value = false;
+  },
+);
 </script>
 
 <template>
-  <header>
-    <nav class="flex justify-center items-center px-20 py-4 relative">
-      <div class="hamburger" @click="toggleMenu">
-        <div :class="{ open: isExpanded }" class="bar" />
-        <div :class="{ open: isExpanded }" class="bar" />
-        <div :class="{ open: isExpanded }" class="bar" />
-      </div>
-      <ul :class="{ expanded: isExpanded }" class="nav-links">
+  <header class="header-shell">
+    <nav class="nav">
+      <RouterLink class="brand" to="/">
+        <span class="brand__title">RetroZetro Comics</span>
+        <span class="brand__tagline">Synthwave Stories &amp; Neon Adventures</span>
+      </RouterLink>
+
+      <button
+        aria-controls="primary-navigation"
+        :aria-expanded="isExpanded"
+        class="hamburger"
+        type="button"
+        @click="toggleMenu"
+      >
+        <span class="sr-only">Toggle navigation</span>
+        <span :class="{ open: isExpanded }" class="bar" />
+        <span :class="{ open: isExpanded }" class="bar" />
+        <span :class="{ open: isExpanded }" class="bar" />
+      </button>
+
+      <ul
+        id="primary-navigation"
+        :class="{ expanded: isExpanded }"
+        class="nav-links"
+      >
         <li
           v-for="link in links"
           :key="link.path"
           :class="{ active: activeLink === link.name }"
-          @click="setActiveLink(link.name)"
         >
-          <RouterLink :to="link.path" class="nav-link">
+          <RouterLink :to="link.path" class="nav-link" @click="setActiveLink(link.name)">
             {{ link.name }}
           </RouterLink>
         </li>
@@ -46,49 +80,105 @@ function setActiveLink(linkName: string) {
 </template>
 
 <style scoped>
-.flex-container {
+.header-shell {
+  background: linear-gradient(120deg, #4d2c6c, #703f99);
+  border-bottom: 4px solid #ff914d;
+  box-shadow: 0 6px 16px rgba(17, 6, 29, 0.45);
+}
+
+.nav {
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 10px 20px;
-  position: relative;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin: 0 auto;
+  max-width: 960px;
+  padding: 1.25rem 2rem;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #fff;
+}
+
+.brand__title {
+  font-family: "Orbitron", "Rajdhani", "Exo 2", sans-serif;
+  font-size: clamp(1.2rem, 3vw, 1.75rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.brand__tagline {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.08em;
+  margin-top: 0.35rem;
 }
 
 .nav-links {
   display: flex;
-  gap: 30px;
+  align-items: center;
+  gap: 1.5rem;
   list-style: none;
-  margin: 10px;
+  margin: 0;
   padding: 0;
 }
 
-.nav-link {
-  text-decoration: none;
-  color: #333;
-  font-size: 1em;
-  padding: 0 10px;
+.nav-links li {
+  position: relative;
 }
 
-.nav-link:hover {
-  color: #007bff;
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  font-weight: 600;
+  color: #ffe9d6;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link:hover,
+.nav-links li.active .nav-link {
+  background: #ff914d;
+  color: #2e1342;
+  box-shadow: 0 4px 12px rgba(255, 145, 77, 0.45);
 }
 
 .hamburger {
   display: none;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
   cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.hamburger:hover {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .bar {
-  width: 25px;
+  display: block;
+  width: 24px;
   height: 3px;
-  background-color: #333;
-  margin: 4px 0;
-  transition: 0.4s;
+  background-color: #ffe9d6;
+  border-radius: 999px;
+  transition: transform 0.35s ease, opacity 0.35s ease;
 }
 
 .bar.open:nth-child(1) {
-  transform: rotate(-45deg) translate(-5px, 6px);
+  transform: translateY(6px) rotate(45deg);
 }
 
 .bar.open:nth-child(2) {
@@ -96,10 +186,26 @@ function setActiveLink(linkName: string) {
 }
 
 .bar.open:nth-child(3) {
-  transform: rotate(45deg) translate(-5px, -6px);
+  transform: translateY(-6px) rotate(-45deg);
 }
 
-@media (max-width: 768px) {
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 880px) {
+  .nav {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
   .hamburger {
     display: flex;
   }
@@ -108,13 +214,11 @@ function setActiveLink(linkName: string) {
     display: none;
     flex-direction: column;
     width: 100%;
-    background-color: #fff;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    padding: 20px;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
+    background: rgba(24, 11, 36, 0.92);
+    border: 1px solid rgba(255, 145, 77, 0.45);
+    border-radius: 1rem;
+    padding: 1rem;
+    backdrop-filter: blur(6px);
   }
 
   .nav-links.expanded {
@@ -122,8 +226,11 @@ function setActiveLink(linkName: string) {
   }
 
   .nav-links li {
-    margin: 10px 0;
-    text-align: center;
+    width: 100%;
+  }
+
+  .nav-link {
+    width: 100%;
   }
 }
 </style>
