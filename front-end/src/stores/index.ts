@@ -32,31 +32,45 @@ export const useMainStore = defineStore("main", {
 			]
 		},
 		comics: {
-			description: "Welcome to my website for my web-comics!",
+			description:
+				"Welcome to RetroZetro Comics – the home of neon-soaked adventures, cosmic rivals, and heart-sized heroes." +
+				" Explore brand new storylines, behind-the-panels art, and community exclusives updated every week!",
 			comic: [
 				{
-					name: "Zetro",
-					description: "",
-					image: "",
-					imgAlt: "Comic about Zetro"
+					name: "RetroZetro: Issue #01",
+					description:
+						"Zetro is pulled back into the Synth City underground to stop a corrupt AI that weaponised nostalgia. Full issue preview plus creator commentary!",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/RetroZetro_Issue1.jpg",
+					imgAlt: "Cover artwork for RetroZetro Issue 1 featuring Zetro leaping through neon city lights",
+					release: "Now Streaming",
+					cta: "Read Issue"
 				},
 				{
-					name: "Kazay",
-					description: "",
-					image: "",
-					imgAlt: "Comic about Kazay"
+					name: "Kazay: Rogue Frequencies",
+					description:
+						"Kazay must outsmart frequency smugglers who sell stolen soundscapes to the highest bidder. Includes 6-page preview and sketchbook pages.",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/Kazay_Comic.jpg",
+					imgAlt: "Kazay surrounded by floating speakers and orange energy waves",
+					release: "Weekly Update",
+					cta: "Preview Story"
 				},
 				{
-					name: "Exo",
-					description: "",
-					image: "",
-					imgAlt: "Comic about Exo"
+					name: "Exo: Orbit Breaker",
+					description:
+						"A high-speed chase across shattered moons as Exo races to rescue a colony ship. Motion-comic cutscenes and creator notes inside.",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/Exo_Comic.jpg",
+					imgAlt: "Exo rocketing past debris with a blazing plasma trail",
+					release: "Early Access",
+					cta: "Watch Trailer"
 				},
 				{
-					name: "Shaman",
-					description: "",
-					image: "",
-					imgAlt: "Comic about Shaman"
+					name: "Shaman: Aurora Divide",
+					description:
+						"Shaman channels interstellar spirits to heal a planet split by war. Read the first chapter plus download a limited-edition wallpaper.",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/Shaman_Comic.jpg",
+					imgAlt: "Shaman levitating between purple and orange aurora streams",
+					release: "Collector Drop",
+					cta: "Claim Bonus"
 				}
 			]
 		},

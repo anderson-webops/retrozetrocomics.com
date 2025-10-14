@@ -5,6 +5,7 @@ import {
 	faGithub,
 	faInstagram
 } from "@fortawesome/free-brands-svg-icons";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { setupLayouts } from "virtual:generated-layouts";
 import { ViteSSG } from "vite-ssg";
@@ -17,7 +18,7 @@ import "./styles/main.css";
 import "uno.css";
 
 // FontAwesome library setup
-library.add(faFacebook, faGithub, faInstagram);
+library.add(faFacebook, faGithub, faInstagram, faEnvelope);
 
 // https://github.com/antfu/vite-ssg
 export const createApp = ViteSSG(
