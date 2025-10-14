@@ -7,60 +7,158 @@ const comics = computed(() => store.comics);
 </script>
 
 <template>
-	<div class="page">
-		<div class="items-container">
-			<div
+	<section class="showcase" aria-labelledby="comic-showcase">
+		<header class="showcase__intro">
+			<h2 id="comic-showcase">Featured Issues</h2>
+			<p>
+				Flip through the latest stories from the RetroZetro universe.
+				New chapters spark to life every week—keep scrolling to find
+				your next adventure.
+			</p>
+		</header>
+
+		<div class="showcase__grid">
+			<article
 				v-for="(item, index) in comics.comic"
 				:key="index"
-				class="item"
+				class="showcase__card"
 			>
-				<h3>{{ item.name }}</h3>
-				<img :alt="item.imgAlt" :src="item.image" class="item-image" />
-				<p>{{ item.description }}</p>
-			</div>
+				<div class="showcase__art">
+					<img :alt="item.imgAlt" :src="item.image" loading="lazy" />
+				</div>
+				<div class="showcase__content">
+					<h3>{{ item.name }}</h3>
+					<p>{{ item.description }}</p>
+				</div>
+			</article>
 		</div>
-	</div>
+	</section>
 </template>
 
 <style scoped>
-.items-container {
+.showcase {
 	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-around; /* Centers the items and spaces them evenly */
-	gap: 20px; /* Adjust the gap between items */
+	flex-direction: column;
+	gap: 2.5rem;
+	padding: 0 0 3rem;
+}
+
+.showcase__intro {
+	text-align: center;
+	color: #f9f5ff;
+	background: linear-gradient(
+		135deg,
+		rgba(96, 57, 133, 0.95),
+		rgba(244, 133, 39, 0.9)
+	);
+	border-radius: 24px;
+	padding: 2.5rem 2rem;
+	box-shadow: 0 30px 50px rgba(29, 16, 43, 0.35);
+	border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.showcase__intro h2 {
+	font-size: 2.25rem;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	margin-bottom: 0.75rem;
+}
+
+.showcase__intro p {
+	max-width: 640px;
+	margin: 0 auto;
+	font-size: 1.05rem;
+	line-height: 1.7;
+}
+
+.showcase__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 1.75rem;
+}
+
+.showcase__card {
+	display: flex;
+	flex-direction: column;
+	background:
+		radial-gradient(
+			circle at top,
+			rgba(255, 145, 77, 0.15),
+			transparent 55%
+		),
+		rgba(22, 8, 41, 0.8);
+	border-radius: 20px;
+	border: 1px solid rgba(255, 145, 77, 0.35);
+	box-shadow: 0 18px 32px rgba(24, 8, 40, 0.45);
+	overflow: hidden;
+	min-height: 360px;
+	transition:
+		transform 240ms ease,
+		box-shadow 240ms ease;
+}
+
+.showcase__card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 24px 44px rgba(22, 8, 41, 0.55);
+}
+
+.showcase__art {
+	position: relative;
+	aspect-ratio: 3 / 4;
+	overflow: hidden;
+	background: rgba(255, 255, 255, 0.06);
+}
+
+.showcase__art::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, transparent 55%, rgba(22, 8, 41, 0.68));
+	pointer-events: none;
+}
+
+.showcase__art img {
 	width: 100%;
-	max-width: 1200px; /* Adjust based on your preference */
-	margin: 0 auto; /* Center the container */
+	height: 100%;
+	object-fit: cover;
+	display: block;
 }
 
-.item {
-	width: 100%;
-	max-width: 350px; /* Set a maximum width for each item */
-	background-color: #fff; /* White background */
-	border: 1px solid #ff914d; /* Orange border */
-	border-radius: 10px; /* Slightly more rounded corners */
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Slightly larger shadow for a subtle 3D effect */
-	padding: 20px; /* Padding inside each item */
-	text-align: center; /* Center text and images */
+.showcase__content {
+	padding: 1.75rem 1.5rem 2.25rem;
+	color: #f9e9ff;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
 }
 
-.item-image {
-	width: 100%;
-	height: auto;
-	border-radius: 5px; /* Rounded corners for images */
-	margin-bottom: 15px; /* Space between image and description */
+.showcase__content h3 {
+	font-size: 1.35rem;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: #ffb36d;
 }
 
-.item h3 {
-	font-size: 1.5rem;
-	color: #603985; /* Lighter purple text */
-	margin-bottom: 10px;
+.showcase__content p {
+	margin: 0;
+	line-height: 1.65;
+	color: #fbe5ff;
 }
 
-.item p {
-	margin-top: 10px;
-	font-size: 1rem;
-	color: #603985; /* Lighter purple text */
+@media (max-width: 600px) {
+	.showcase__intro {
+		padding: 2rem 1.5rem;
+	}
+
+	.showcase__intro h2 {
+		font-size: 1.85rem;
+	}
+
+	.showcase__card {
+		min-height: 320px;
+	}
 }
 </style>
 

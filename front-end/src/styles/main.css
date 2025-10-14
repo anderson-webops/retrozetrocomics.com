@@ -5,103 +5,96 @@
 html,
 body,
 #app {
-	height: 100%;
-	margin: 0;
-	padding: 0;
+        height: 100%;
+        margin: 0;
+        padding: 0;
 }
 
 /* Dark Mode */
 html.dark {
-	background: inherit; /* Dark purple background for dark mode */
-	color-scheme: dark;
-	color: #fff; /* White text for dark mode */
+        background: #0d0418;
+        color-scheme: dark;
+        color: #f3eaff;
 }
 
 #nprogress {
-	pointer-events: none;
+        pointer-events: none;
 }
 
 #nprogress .bar {
-	background: #ff914d; /* Nice orange progress bar */
-	opacity: 0.75;
-	position: fixed;
-	z-index: 1031;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 2px;
+        background: #ff914d;
+        opacity: 0.75;
+        position: fixed;
+        z-index: 1031;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
 }
 
 /**************
 *   General   *
 **************/
 
-header {
-	background-color: #b38cdc; /* Lighter purple header */
-	border-bottom: 1px solid #ff914d; /* Orange border */
-	color: #fff; /* White text for header */
-}
-
 body {
-	background-color: #f48527; /* Light orange background */
-	font-size: 110%;
-	margin: 0;
-	color: #603985; /* Slightly lighter purple text color */
+        background-color: #18071f;
+        font-size: 110%;
+        color: #f4eaff;
+        font-family: "Poppins", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+                "Helvetica Neue", sans-serif;
 }
 
 .content {
-	margin: 20px;
+        margin: 20px;
 }
 
 footer {
-	/*margin-bottom: 20px;*/
-	padding: 20px;
-	background-color: #b38cdc; /* Matching the header color */
-	color: #fff; /* White text for footer */
-	border: 1px solid #ff914d; /* Orange border */
-	border-radius: 5px;
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+        margin: 0;
+        padding: 2.5rem 2rem;
+        background: linear-gradient(135deg, rgba(96, 57, 133, 0.9), rgba(244, 133, 39, 0.8));
+        color: #fff;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        display: grid;
+        gap: 0.75rem;
+        text-align: center;
+        letter-spacing: 0.08em;
 }
 
 /******************
 *   Router View   *
 ******************/
 
-h1, h2 {
-	font-weight: bold;
-	text-align: center;
-	padding-bottom: 5px;
-	margin: 0;
-	color: #333; /* Nice orange text for headings */
-}
-
-h1 {
-	font-size: 200%;
-}
-
-h2 {
-	font-size: 150%;
+h1,
+h2,
+h3 {
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: inherit;
+        margin: 0;
 }
 
 .page {
-	background-color: inherit; /* Light orange background for pages */
+        background-color: transparent;
 }
 
 .item {
-	margin-bottom: 20px;
-	padding: 20px;
-	background-color: #fff; /*#fff;*/
-	border: 1px solid #ff914d; /* Orange border */
-	border-radius: 5px;
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
-	color: #603985; /* Lighter purple text */
-	
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
+        margin-bottom: 20px;
+        padding: 20px;
+        background: rgba(20, 5, 31, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        box-shadow: 0 16px 28px rgba(8, 3, 16, 0.45);
+        color: #f4eaff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 0.75rem;
 }
 
 .item p {
-	margin-top: 10px;
+        margin: 0;
+        line-height: 1.7;
 }
