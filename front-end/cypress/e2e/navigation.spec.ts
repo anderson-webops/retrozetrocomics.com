@@ -2,7 +2,7 @@
 /// <reference types="cypress" />
 
 /**
- * Basic smoke-test for Jacobdanderson
+ * Basic smoke-test for Retrozetro
  *
  * Things we prove:
  *   1. Home page renders and shows the H1 banner.
@@ -20,7 +20,7 @@ context("Navigation & page smoke-tests", () => {
   
   it("loads the home page", () => {
     cy.url().should("eq", `${Cypress.config().baseUrl}/`);
-    cy.contains("Jacob").should("exist"); // <h1>
+    cy.contains("Retro").should("exist"); // <h1>
   });
   
   it("header links work", () => {
