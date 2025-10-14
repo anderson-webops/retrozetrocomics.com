@@ -8,22 +8,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AdvertisementPanel: typeof import('./components/SideAdvertisement.vue')['default']
-    Characters: typeof import("./components/characters.vue")["default"]
-    Comics: typeof import("./components/comics.vue")["default"]
-    EducationComponent: typeof import("./components/EducationComponent.vue")["default"]
-    EventsComponent: typeof import("./components/EventsComponent.vue")["default"]
-    MapComponent: typeof import("./components/MapComponent.vue")["default"]
-    README: typeof import("./components/README.md")["default"]
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SideAdvertisement: typeof import('./components/SideAdvertisement.vue')['default']
     TheCharacters: typeof import('./components/TheCharacters.vue')['default']
     TheComics: typeof import('./components/TheComics.vue')['default']
-    TheCounter: typeof import("./components/TheCounter.vue")["default"]
     TheFooter: typeof import('./components/TheFooter.vue')['default']
     TheHeader: typeof import('./components/TheHeader.vue')['default']
-    TheInput: typeof import("./components/TheInput.vue")["default"]
     TitlePlate: typeof import('./components/TitlePlate.vue')['default']
     WelcomeSection: typeof import('./components/WelcomeSection.vue')['default']
   }

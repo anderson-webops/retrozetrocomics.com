@@ -1,49 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0" name="viewport" />
-	<title>
-		RetroZetro Comics
-	</title>
-	
-	<!-- Favicons -->
-	<link href="./src/assets/Favicons/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180">
-	<link href="./src/assets/Favicons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
-	<link href="./src/assets/Favicons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
-	<link href="./src/assets/Favicons/site.webmanifest" rel="manifest">
+  <meta charset="utf-8" />
+  <meta
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    name="viewport"
+  />
+  <title>Classes</title>
+  
+  <!-- Favicons -->
+	<link href="https://retrozetrocomics.s3.us-east-1.amazonaws.com/Favicons/apple-touch-icon.png"
+	      rel="apple-touch-icon"
+	      sizes="180x180">
+	<link href="https://retrozetrocomics.s3.us-east-1.amazonaws.com/Favicons/favicon-32x32.png" rel="icon"
+	      sizes="32x32"
+	      type="image/png">
+	<link href="https://retrozetrocomics.s3.us-east-1.amazonaws.com/Favicons/favicon-16x16.png" rel="icon"
+	      sizes="16x16"
+	      type="image/png">
+  <!--  <link href="https://retrozetrocomics.s3.us-east-1.amazonaws.com/Favicons/site.webmanifest" rel="manifest">-->
 	<link color="#5bbad5" href="" rel="mask-icon">
-	
-	<!-- Meta Tags -->
-	<meta content="#da532c" name="msapplication-TileColor">
-	<meta content="#ffffff" name="theme-color">
-	<meta content="Retro Zetro creates some rad comics" name="description" />
-	<meta content="index,follow" name="robots" />
-	
-	<script>
-		;(function () {
-			const prefersDark =
-				window.matchMedia &&
-				window.matchMedia("(prefers-color-scheme: dark)").matches;
-			const setting = localStorage.getItem("vueuse-color-scheme") || "auto";
-			if (setting === "dark" || (prefersDark && setting !== "light"))
-				document.documentElement.classList.toggle("dark", true);
-		})();
-	</script>
-	
-	<!-- Google AdSense Directive -->
-	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4342594327430874" crossorigin="anonymous"></script>
-	
-	<!-- Auto AD Placement Directive -->
-<!--	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4342594327430874" crossorigin="anonymous"></script>-->
+  
+  <meta content="#da532c" name="msapplication-TileColor" />
+  <meta content="#ffffff" name="theme-color" />
+  <meta
+    content="My personal website"
+    name="description"
+  />
+  <meta content="index,follow" name="robots" />
+  
+  <script>
+    (function() {
+      const prefersDark =
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const setting =
+        localStorage.getItem("vueuse-color-scheme") || "auto";
+      if (setting === "dark" || (prefersDark && setting !== "light"))
+        document.documentElement.classList.toggle("dark", true);
+    })();
+  </script>
 </head>
 
 <body class="font-sans">
 <div id="app"></div>
 <script src="./src/main.ts" type="module"></script>
 <noscript>
-	This website requires JavaScript to function properly. Please enable
-	JavaScript to continue.
+  This website requires JavaScript to function properly. Please enable
+  JavaScript to continue.
 </noscript>
 </body>
 </html>

@@ -5,125 +5,125 @@ const isExpanded = ref(false);
 const activeLink = ref("Home");
 
 const links = ref([
-  { name: "Home", path: "/" },
-  { name: "Characters", path: "/characters" },
-  { name: "About", path: "/about" },
-  { name: "Contact", path: "/contact" },
+	{ name: "Home", path: "/" },
+	{ name: "Characters", path: "/characters" },
+	{ name: "About", path: "/about" },
+	{ name: "Contact", path: "/contact" }
 ]);
 
 function toggleMenu() {
-  isExpanded.value = !isExpanded.value;
+	isExpanded.value = !isExpanded.value;
 }
 
 function setActiveLink(linkName: string) {
-  activeLink.value = linkName;
-  isExpanded.value = false; // Close the menu after a link is clicked
+	activeLink.value = linkName;
+	isExpanded.value = false; // Close the menu after a link is clicked
 }
 </script>
 
 <template>
-  <header>
-    <nav class="flex justify-center items-center px-20 py-4 relative">
-      <div class="hamburger" @click="toggleMenu">
-        <div :class="{ open: isExpanded }" class="bar" />
-        <div :class="{ open: isExpanded }" class="bar" />
-        <div :class="{ open: isExpanded }" class="bar" />
-      </div>
-      <ul :class="{ expanded: isExpanded }" class="nav-links">
-        <li
-          v-for="link in links"
-          :key="link.path"
-          :class="{ active: activeLink === link.name }"
-          @click="setActiveLink(link.name)"
-        >
-          <RouterLink :to="link.path" class="nav-link">
-            {{ link.name }}
-          </RouterLink>
-        </li>
-      </ul>
-    </nav>
-  </header>
+	<header>
+		<nav class="flex justify-center items-center px-20 py-4 relative">
+			<div class="hamburger" @click="toggleMenu">
+				<div :class="{ open: isExpanded }" class="bar" />
+				<div :class="{ open: isExpanded }" class="bar" />
+				<div :class="{ open: isExpanded }" class="bar" />
+			</div>
+			<ul :class="{ expanded: isExpanded }" class="nav-links">
+				<li
+					v-for="link in links"
+					:key="link.path"
+					:class="{ active: activeLink === link.name }"
+					@click="setActiveLink(link.name)"
+				>
+					<RouterLink :to="link.path" class="nav-link">
+						{{ link.name }}
+					</RouterLink>
+				</li>
+			</ul>
+		</nav>
+	</header>
 </template>
 
 <style scoped>
-.flex-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px 20px;
-  position: relative;
-}
+/*.flex-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 10px 20px;
+	position: relative;
+}*/
 
 .nav-links {
-  display: flex;
-  gap: 30px;
-  list-style: none;
-  margin: 10px;
-  padding: 0;
+	display: flex;
+	gap: 30px;
+	list-style: none;
+	margin: 10px;
+	padding: 0;
 }
 
 .nav-link {
-  text-decoration: none;
-  color: #333;
-  font-size: 1em;
-  padding: 0 10px;
+	text-decoration: none;
+	color: #333;
+	font-size: 1em;
+	padding: 0 10px;
 }
 
 .nav-link:hover {
-  color: #007bff;
+	color: #007bff;
 }
 
 .hamburger {
-  display: none;
-  flex-direction: column;
-  cursor: pointer;
+	display: none;
+	flex-direction: column;
+	cursor: pointer;
 }
 
 .bar {
-  width: 25px;
-  height: 3px;
-  background-color: #333;
-  margin: 4px 0;
-  transition: 0.4s;
+	width: 25px;
+	height: 3px;
+	background-color: #333;
+	margin: 4px 0;
+	transition: 0.4s;
 }
 
 .bar.open:nth-child(1) {
-  transform: rotate(-45deg) translate(-5px, 6px);
+	transform: rotate(-45deg) translate(-5px, 6px);
 }
 
 .bar.open:nth-child(2) {
-  opacity: 0;
+	opacity: 0;
 }
 
 .bar.open:nth-child(3) {
-  transform: rotate(45deg) translate(-5px, -6px);
+	transform: rotate(45deg) translate(-5px, -6px);
 }
 
 @media (max-width: 768px) {
-  .hamburger {
-    display: flex;
-  }
+	.hamburger {
+		display: flex;
+	}
 
-  .nav-links {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    background-color: #fff;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    padding: 20px;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-  }
+	.nav-links {
+		display: none;
+		flex-direction: column;
+		width: 100%;
+		background-color: #fff;
+		position: absolute;
+		top: 60px;
+		left: 0;
+		padding: 20px;
+		border-top: 1px solid #ccc;
+		border-bottom: 1px solid #ccc;
+	}
 
-  .nav-links.expanded {
-    display: flex;
-  }
+	.nav-links.expanded {
+		display: flex;
+	}
 
-  .nav-links li {
-    margin: 10px 0;
-    text-align: center;
-  }
+	.nav-links li {
+		margin: 10px 0;
+		text-align: center;
+	}
 }
 </style>
