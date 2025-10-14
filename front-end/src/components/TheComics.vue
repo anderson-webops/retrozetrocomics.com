@@ -7,60 +7,158 @@ const comics = computed(() => store.comics);
 </script>
 
 <template>
-	<div class="page">
+	<section aria-labelledby="latest-comics" class="comics">
+		<div class="section-head">
+			<p class="kicker">Latest Issues</p>
+			<h3 id="latest-comics">Fresh from the RetroZetro presses</h3>
+			<p class="lede">
+				From cosmic capers to neon-noir mysteries, crack open a panel
+				and explore what the crew has been up to this week.
+			</p>
+		</div>
 		<div class="items-container">
-			<div
+			<article
 				v-for="(item, index) in comics.comic"
 				:key="index"
 				class="item"
 			>
-				<h3>{{ item.name }}</h3>
-				<img :alt="item.imgAlt" :src="item.image" class="item-image" />
-				<p>{{ item.description }}</p>
-			</div>
+				<div class="card">
+					<div class="cover">
+						<img
+							:alt="item.imgAlt"
+							:src="item.image"
+							loading="lazy"
+						/>
+						<span class="badge">#{ index + 1 }</span>
+					</div>
+					<div class="meta">
+						<h4>{{ item.name }}</h4>
+						<p>{{ item.description }}</p>
+					</div>
+				</div>
+			</article>
 		</div>
-	</div>
+	</section>
 </template>
 
 <style scoped>
+.comics {
+	display: grid;
+	gap: 2.5rem;
+}
+
+.section-head {
+	text-align: center;
+	color: rgba(255, 244, 255, 0.92);
+	display: grid;
+	gap: 0.75rem;
+}
+
+.kicker {
+	margin: 0;
+	font-size: 0.75rem;
+	letter-spacing: 0.35em;
+	text-transform: uppercase;
+	color: rgba(255, 178, 92, 0.8);
+	font-weight: 700;
+}
+
+h3 {
+	margin: 0;
+	font-family: "Baloo 2", system-ui;
+	font-size: clamp(1.6rem, 2.2vw + 1rem, 2.3rem);
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.lede {
+	margin: 0;
+	max-width: 640px;
+	justify-self: center;
+	line-height: 1.7;
+	font-size: 1.05rem;
+	color: rgba(252, 237, 255, 0.78);
+}
+
 .items-container {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-around; /* Centers the items and spaces them evenly */
-	gap: 20px; /* Adjust the gap between items */
-	width: 100%;
-	max-width: 1200px; /* Adjust based on your preference */
-	margin: 0 auto; /* Center the container */
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 1.75rem;
 }
 
 .item {
+	display: flex;
+}
+
+.card {
+	display: grid;
+	grid-template-rows: auto 1fr;
+	border-radius: 22px;
+	background: rgba(27, 8, 49, 0.9);
+	border: 1px solid rgba(255, 178, 92, 0.4);
+	overflow: hidden;
+	box-shadow: 0 18px 30px rgba(11, 2, 32, 0.4);
 	width: 100%;
-	max-width: 350px; /* Set a maximum width for each item */
-	background-color: #fff; /* White background */
-	border: 1px solid #ff914d; /* Orange border */
-	border-radius: 10px; /* Slightly more rounded corners */
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Slightly larger shadow for a subtle 3D effect */
-	padding: 20px; /* Padding inside each item */
-	text-align: center; /* Center text and images */
+	transition:
+		transform 0.25s ease,
+		box-shadow 0.25s ease;
 }
 
-.item-image {
+.card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 28px 45px rgba(11, 2, 32, 0.5);
+}
+
+.cover {
+	position: relative;
+	background: linear-gradient(
+		135deg,
+		rgba(255, 139, 68, 0.7),
+		rgba(96, 57, 133, 0.75)
+	);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 240px;
+}
+
+.cover img {
 	width: 100%;
-	height: auto;
-	border-radius: 5px; /* Rounded corners for images */
-	margin-bottom: 15px; /* Space between image and description */
+	height: 100%;
+	object-fit: cover;
 }
 
-.item h3 {
-	font-size: 1.5rem;
-	color: #603985; /* Lighter purple text */
-	margin-bottom: 10px;
+.badge {
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	padding: 0.35rem 0.7rem;
+	border-radius: 999px;
+	background: rgba(20, 6, 45, 0.85);
+	color: #ffcc8d;
+	font-weight: 700;
+	font-size: 0.85rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 }
 
-.item p {
-	margin-top: 10px;
-	font-size: 1rem;
-	color: #603985; /* Lighter purple text */
+.meta {
+	padding: 1.25rem 1.35rem 1.5rem;
+	display: grid;
+	gap: 0.85rem;
+	color: rgba(255, 244, 255, 0.92);
+}
+
+.meta h4 {
+	margin: 0;
+	font-size: 1.35rem;
+	letter-spacing: 0.03em;
+}
+
+.meta p {
+	margin: 0;
+	line-height: 1.65;
+	color: rgba(252, 237, 255, 0.75);
 }
 </style>
 
