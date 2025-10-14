@@ -1,4 +1,3 @@
-//noinspection ES6UnusedImports,JSUnusedGlobalSymbols,JSClassNamingConvention
 /* eslint-disable */
 /* prettier-ignore */
 // @ts-nocheck

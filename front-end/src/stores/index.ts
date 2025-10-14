@@ -32,31 +32,36 @@ export const useMainStore = defineStore("main", {
 			]
 		},
 		comics: {
-			description: "Welcome to my website for my web-comics!",
+			description:
+				"Catch up with the latest adventures from the RetroZetro squad—fresh pages drop every Friday!",
 			comic: [
 				{
-					name: "Zetro",
-					description: "",
-					image: "",
-					imgAlt: "Comic about Zetro"
+					name: "Zetro: Neon Skies",
+					description:
+						"Zetro races across the glowing skyline to recover the star-core before it melts the city into plasma.",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/Zetro2.jpg",
+					imgAlt: "Zetro overlooking the city"
 				},
 				{
-					name: "Kazay",
-					description: "",
-					image: "",
-					imgAlt: "Comic about Kazay"
+					name: "Kazay: Heart of the Forest",
+					description:
+						"Kazay and her hover-companion brave ancient ruins where every vine hides a secret guardian.",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/Kazay.jpg",
+					imgAlt: "Kazay standing in a lush forest"
 				},
 				{
-					name: "Exo",
-					description: "",
-					image: "",
-					imgAlt: "Comic about Exo"
+					name: "Exo: Circuit Breaker",
+					description:
+						"Exo dives into the digital ether, rewiring reality to stop a rogue AI from erasing the archives.",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/Exo.jpg",
+					imgAlt: "Exo surrounded by holographic circuitry"
 				},
 				{
-					name: "Shaman",
-					description: "",
-					image: "",
-					imgAlt: "Comic about Shaman"
+					name: "Shaman: Emberlight",
+					description:
+						"Shaman channels ancient starfire to shield the caravan from cosmic shades hungry for memories.",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/Shaman.jpg",
+					imgAlt: "Shaman casting a blazing spell"
 				}
 			]
 		},
