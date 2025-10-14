@@ -1,15 +1,18 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
 
 const isExpanded = ref(false);
-const activeLink = ref("Home");
+const route = useRoute();
 
-const links = ref([
+const links = [
 	{ name: "Home", path: "/" },
 	{ name: "Characters", path: "/characters" },
 	{ name: "About", path: "/about" },
 	{ name: "Contact", path: "/contact" }
-]);
+];
+
+const activeLink = ref(links[0].name);
 
 function toggleMenu() {
 	isExpanded.value = !isExpanded.value;
@@ -17,26 +20,49 @@ function toggleMenu() {
 
 function setActiveLink(linkName: string) {
 	activeLink.value = linkName;
-	isExpanded.value = false; // Close the menu after a link is clicked
+	isExpanded.value = false;
 }
+
+watch(
+	() => route.path,
+	path => {
+		const match = links.find(link => link.path === path);
+		activeLink.value = match?.name ?? links[0].name;
+	},
+	{ immediate: true }
+);
 </script>
 
 <template>
-	<header>
-		<nav class="flex justify-center items-center px-20 py-4 relative">
-			<div class="hamburger" @click="toggleMenu">
-				<div :class="{ open: isExpanded }" class="bar" />
-				<div :class="{ open: isExpanded }" class="bar" />
-				<div :class="{ open: isExpanded }" class="bar" />
-			</div>
-			<ul :class="{ expanded: isExpanded }" class="nav-links">
+	<header class="site-header">
+		<nav class="nav">
+			<button
+				aria-controls="primary-navigation"
+				:aria-expanded="isExpanded"
+				class="nav__toggle"
+				:class="[{ 'nav__toggle--open': isExpanded }]"
+				type="button"
+				@click="toggleMenu"
+			>
+				<span class="nav__toggle-line" />
+				<span class="nav__toggle-line" />
+				<span class="nav__toggle-line" />
+				<span class="sr-only">Toggle navigation</span>
+			</button>
+
+			<ul
+				id="primary-navigation"
+				:class="{ 'nav__links--expanded': isExpanded }"
+				class="nav__links"
+			>
 				<li
 					v-for="link in links"
 					:key="link.path"
-					:class="{ active: activeLink === link.name }"
+					class="nav__item"
+					:class="[{ 'nav__item--active': activeLink === link.name }]"
 					@click="setActiveLink(link.name)"
 				>
-					<RouterLink :to="link.path" class="nav-link">
+					<RouterLink class="nav__link" :to="link.path">
 						{{ link.name }}
 					</RouterLink>
 				</li>
@@ -46,84 +72,162 @@ function setActiveLink(linkName: string) {
 </template>
 
 <style scoped>
-/*.flex-container {
+.site-header {
+	background: linear-gradient(
+		120deg,
+		rgba(255, 145, 77, 0.22),
+		rgba(96, 57, 133, 0.55)
+	);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	box-shadow: 0 12px 24px rgba(7, 0, 18, 0.35);
+}
+
+.nav {
 	display: flex;
-	justify-content: center;
 	align-items: center;
-	padding: 10px 20px;
+	justify-content: center;
+	padding: clamp(0.75rem, 2vw, 1.25rem) clamp(1rem, 5vw, 3rem);
 	position: relative;
-}*/
-
-.nav-links {
-	display: flex;
-	gap: 30px;
-	list-style: none;
-	margin: 10px;
-	padding: 0;
 }
 
-.nav-link {
-	text-decoration: none;
-	color: #333;
-	font-size: 1em;
-	padding: 0 10px;
-}
-
-.nav-link:hover {
-	color: #007bff;
-}
-
-.hamburger {
+.nav__toggle {
+	position: absolute;
+	left: clamp(1rem, 5vw, 3rem);
 	display: none;
 	flex-direction: column;
+	gap: 0.3rem;
+	background: transparent;
+	border: none;
 	cursor: pointer;
+	padding: 0.4rem;
 }
 
-.bar {
-	width: 25px;
-	height: 3px;
-	background-color: #333;
-	margin: 4px 0;
-	transition: 0.4s;
+.nav__toggle-line {
+	width: 24px;
+	height: 2px;
+	background: #fbe5ff;
+	border-radius: 2px;
+	transition:
+		transform 0.3s ease,
+		opacity 0.3s ease;
 }
 
-.bar.open:nth-child(1) {
-	transform: rotate(-45deg) translate(-5px, 6px);
+.nav__toggle--open .nav__toggle-line:nth-child(1) {
+	transform: translateY(6px) rotate(45deg);
 }
 
-.bar.open:nth-child(2) {
+.nav__toggle--open .nav__toggle-line:nth-child(2) {
 	opacity: 0;
 }
 
-.bar.open:nth-child(3) {
-	transform: rotate(45deg) translate(-5px, -6px);
+.nav__toggle--open .nav__toggle-line:nth-child(3) {
+	transform: translateY(-6px) rotate(-45deg);
+}
+
+.nav__links {
+	display: flex;
+	gap: clamp(1rem, 3vw, 2.5rem);
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.28em;
+}
+
+.nav__item {
+	position: relative;
+}
+
+.nav__link {
+	color: rgba(255, 255, 255, 0.7);
+	text-decoration: none;
+	font-weight: 600;
+	font-size: 0.75rem;
+	padding-bottom: 0.4rem;
+	transition: color 0.2s ease;
+}
+
+.nav__item::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 3px;
+	border-radius: 3px;
+	background: linear-gradient(90deg, #ff914d, #9255f2);
+	transform: scaleX(0);
+	transform-origin: center;
+	transition: transform 0.25s ease;
+}
+
+.nav__item--active .nav__link,
+.nav__link:hover,
+.nav__link:focus-visible {
+	color: #ffffff;
+}
+
+.nav__item--active::after,
+.nav__item:hover::after,
+.nav__item:focus-within::after {
+	transform: scaleX(1);
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
 }
 
 @media (max-width: 768px) {
-	.hamburger {
-		display: flex;
+	.nav {
+		justify-content: flex-end;
 	}
 
-	.nav-links {
-		display: none;
-		flex-direction: column;
-		width: 100%;
-		background-color: #fff;
+	.nav__toggle {
+		display: inline-flex;
+	}
+
+	.nav__links {
 		position: absolute;
-		top: 60px;
-		left: 0;
-		padding: 20px;
-		border-top: 1px solid #ccc;
-		border-bottom: 1px solid #ccc;
+		top: 100%;
+		right: clamp(1rem, 5vw, 3rem);
+		margin-top: 0.75rem;
+		background: rgba(15, 2, 24, 0.92);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 16px;
+		box-shadow: 0 18px 40px rgba(8, 0, 16, 0.45);
+		flex-direction: column;
+		padding: 1.2rem;
+		gap: 0.85rem;
+		min-width: 220px;
+		opacity: 0;
+		pointer-events: none;
+		transform: translateY(-10px);
+		transition:
+			opacity 0.2s ease,
+			transform 0.2s ease;
 	}
 
-	.nav-links.expanded {
-		display: flex;
+	.nav__links--expanded {
+		opacity: 1;
+		pointer-events: auto;
+		transform: translateY(0);
 	}
 
-	.nav-links li {
-		margin: 10px 0;
-		text-align: center;
+	.nav__item::after {
+		display: none;
+	}
+
+	.nav__link {
+		font-size: 0.85rem;
+		letter-spacing: 0.2em;
+		padding: 0;
 	}
 }
 </style>
