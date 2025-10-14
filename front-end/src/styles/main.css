@@ -37,16 +37,16 @@ html.dark {
 **************/
 
 header {
-	background-color: #b38cdc; /* Lighter purple header */
-	border-bottom: 1px solid #ff914d; /* Orange border */
-	color: #fff; /* White text for header */
+        background-color: transparent;
+        color: inherit;
 }
 
 body {
-	background-color: #f48527; /* Light orange background */
-	font-size: 110%;
-	margin: 0;
-	color: #603985; /* Slightly lighter purple text color */
+        background: radial-gradient(circle at top, #49216e, transparent 55%), #1a0d29;
+        font-size: 110%;
+        margin: 0;
+        color: #ffefe3;
+        font-family: "Poppins", "Segoe UI", sans-serif;
 }
 
 .content {
@@ -54,54 +54,13 @@ body {
 }
 
 footer {
-	/*margin-bottom: 20px;*/
-	padding: 20px;
-	background-color: #b38cdc; /* Matching the header color */
-	color: #fff; /* White text for footer */
-	border: 1px solid #ff914d; /* Orange border */
-	border-radius: 5px;
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+        padding: 0;
 }
 
 /******************
 *   Router View   *
 ******************/
 
-h1, h2 {
-	font-weight: bold;
-	text-align: center;
-	padding-bottom: 5px;
-	margin: 0;
-	color: #333; /* Nice orange text for headings */
-}
-
-h1 {
-	font-size: 200%;
-}
-
-h2 {
-	font-size: 150%;
-}
-
 .page {
-	background-color: inherit; /* Light orange background for pages */
-}
-
-.item {
-	margin-bottom: 20px;
-	padding: 20px;
-	background-color: #fff; /*#fff;*/
-	border: 1px solid #ff914d; /* Orange border */
-	border-radius: 5px;
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
-	color: #603985; /* Lighter purple text */
-	
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-}
-
-.item p {
-	margin-top: 10px;
+        background-color: transparent;
 }

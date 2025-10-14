@@ -32,30 +32,35 @@ export const useMainStore = defineStore("main", {
 			]
 		},
 		comics: {
-			description: "Welcome to my website for my web-comics!",
+			description:
+				"Plug into our neon anthology of space-faring rebels, glitchy synths, and heartfelt moments between friends who save the day in style.",
 			comic: [
 				{
 					name: "Zetro",
-					description: "",
-					image: "",
+					description:
+						"Issue #07 sends Zetro deep into the Prism District where a mysterious signal is rewriting memories. Expect vibrant chase sequences, holographic graffiti, and a synth guitar solo that splits the skyline.",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/Zetro2.jpg",
 					imgAlt: "Comic about Zetro"
 				},
 				{
 					name: "Kazay",
-					description: "",
-					image: "",
+					description:
+						"Kazay's latest chapter finds the cosmic courier stuck between rival hover-bike gangs. She'll outsmart them with gravity warps, neon smoke, and a daring drop into the cloud bazaar.",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/Kazay.jpg",
 					imgAlt: "Comic about Kazay"
 				},
 				{
 					name: "Exo",
-					description: "",
-					image: "",
+					description:
+						"The sentient suit Exo explores an abandoned moon arcade crawling with possessed plush bots. Atmospheric lighting, retro boss fights, and heartwarming humor keep this issue buzzing.",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/Exo.jpg",
 					imgAlt: "Comic about Exo"
 				},
 				{
 					name: "Shaman",
-					description: "",
-					image: "",
+					description:
+						"Shaman communes with astral spirits to stop a solar storm from erasing the night sky. Expect cosmic vistas, trance beats, and a finale that glows brighter than a meteor shower.",
+					image: "https://retrozetrocomics.s3.amazonaws.com/images/Shaman.jpg",
 					imgAlt: "Comic about Shaman"
 				}
 			]

@@ -6,13 +6,19 @@ const store = useMainStore();
 </script>
 
 <template>
-	<div class="page">
+	<div class="page home-page">
 		<WelcomeSection :message="store.comics.description" />
 		<Comics />
 	</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.home-page {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+</style>
 
 <route>
 {
