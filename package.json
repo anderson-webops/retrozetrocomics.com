@@ -26,13 +26,13 @@
 		"up": "taze major -I && npm run -w front-end up && npm run -w back-end up"
 	},
 	"devDependencies": {
-		"@antfu/eslint-config": "^5.4.1",
+		"@antfu/eslint-config": "^6.0.0",
 		"@typescript-eslint/eslint-plugin": "^8.46.1",
 		"@typescript-eslint/parser": "^8.46.1",
 		"eslint": "^9.37.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-prettier": "^5.5.4",
-		"eslint-plugin-vue": "^10.5.0",
+		"eslint-plugin-vue": "^10.5.1",
 		"globals": "^16.4.0",
 		"prettier": "^3.6.2",
 		"taze": "^19.7.0",
