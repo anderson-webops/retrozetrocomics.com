@@ -108,8 +108,8 @@ export default defineConfig({
 				"android-chrome-512x512.png"
 			],
 			manifest: {
-				name: "Classes",
-				short_name: "Classes",
+				name: "Retro Zetro Comics",
+				short_name: "RetroZetro",
 				theme_color: "#ffffff",
 				background_color: "#ffffff",
 				display: "standalone",
