@@ -34,7 +34,7 @@ async function main() {
 		keys: [SESSION_SECRET],
 		maxAge: 24 * 60 * 60 * 1000,
 		sameSite: "lax", // default, safe for dev & same-origin
-		secure: false // default in dev
+		secure: true // always enforce secure cookies
 	};
 
 	// Adjust for production
