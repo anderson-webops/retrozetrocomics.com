@@ -42,7 +42,16 @@ useHead({
           type: 'image/svg+xml',
           href: () => preferredDark.value ? '/favicon-dark.svg': '/favicon.svg',
         }, */
-	]
+	],
+	script: import.meta.env.PROD
+		? [
+				{
+					defer: true,
+					src: "https://analytics.retrozetrocomics.com/script.js",
+					"data-website-id": "568434bd-9bbe-44f9-9537-3bb0cb65f242"
+				}
+			]
+		: []
 });
 </script>
 
