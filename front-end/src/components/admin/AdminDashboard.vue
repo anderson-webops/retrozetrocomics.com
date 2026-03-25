@@ -143,10 +143,57 @@ onMounted(() => {
 
 			<section class="admin-panel">
 				<header>
+					<h2>Storage Readiness</h2>
+					<p>
+						The site still writes uploads to the server today, but
+						the media contract is now prepared for a later bucket
+						rollout.
+					</p>
+				</header>
+
+				<div class="storage-grid">
+					<article class="storage-card">
+						<span>Write driver</span>
+						<strong>{{
+							dashboard.storage.activeWriteDriver
+						}}</strong>
+					</article>
+					<article class="storage-card">
+						<span>Key prefix</span>
+						<strong>{{ dashboard.storage.keyPrefix }}</strong>
+					</article>
+					<article class="storage-card">
+						<span>Local base</span>
+						<strong>{{
+							dashboard.storage.localPublicBaseUrl
+						}}</strong>
+					</article>
+					<article class="storage-card">
+						<span>AWS target</span>
+						<strong>
+							{{
+								dashboard.storage.s3PublicBaseUrl ||
+								"Not configured yet"
+							}}
+						</strong>
+					</article>
+				</div>
+
+				<p class="storage-summary">
+					{{ dashboard.storage.switchSummary }}
+				</p>
+				<p class="storage-summary storage-summary--muted">
+					{{ dashboard.storage.nextStep }}
+				</p>
+			</section>
+
+			<section class="admin-panel">
+				<header>
 					<h2>Publish a New Post</h2>
 					<p>
-						Uploads are stored on the server now and the metadata is
-						ready for a future S3 storage adapter.
+						Uploads are stored on the server now, but each media
+						record already carries the provider and object key
+						needed for a future S3 adapter.
 					</p>
 				</header>
 
@@ -437,12 +484,52 @@ onMounted(() => {
 
 .publish-form,
 .review-list,
-.member-list {
+.member-list,
+.storage-grid {
 	display: grid;
 	gap: 1rem;
 	list-style: none;
 	margin: 1rem 0 0;
 	padding: 0;
+}
+
+.storage-grid {
+	grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.storage-card {
+	display: grid;
+	gap: 0.4rem;
+	padding: 1rem;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.storage-card span,
+.storage-summary {
+	margin: 0;
+}
+
+.storage-card span {
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	font-size: 0.76rem;
+	color: rgba(255, 255, 255, 0.6);
+}
+
+.storage-card strong {
+	color: #fff4e7;
+	line-height: 1.5;
+}
+
+.storage-summary {
+	margin-top: 1rem;
+	line-height: 1.7;
+	color: rgba(255, 255, 255, 0.78);
+}
+
+.storage-summary--muted {
+	color: rgba(255, 255, 255, 0.62);
 }
 
 .publish-form label {

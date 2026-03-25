@@ -8,8 +8,8 @@ import { getAuthenticatedAccount } from "../middleware/auth.js";
 import { Comment } from "../models/schemas/Comment.js";
 import { Post } from "../models/schemas/Post.js";
 import {
-	normalizeUploadedFiles
-
+	normalizeUploadedFiles,
+	presentMediaAssets
 } from "../services/storage.js";
 import { slugify } from "../utils/slugify.js";
 
@@ -41,7 +41,7 @@ function serializePost(
 		content: post.content,
 		createdAt: post.createdAt,
 		id: post.id,
-		media: post.media,
+		media: presentMediaAssets(post.media),
 		publishedAt: post.publishedAt,
 		slug: post.slug,
 		status: post.status,
@@ -137,7 +137,9 @@ export async function getPostBySlug(req: Request, res: Response) {
 				: { postId: post._id, status: "approved" };
 
 	const comments = await Comment.find(commentFilter).sort({ createdAt: -1 });
-	const approvedCount = comments.filter(comment => comment.status === "approved").length;
+	const approvedCount = comments.filter(
+		comment => comment.status === "approved"
+	).length;
 
 	return res.json({
 		post: serializePost(post, approvedCount),

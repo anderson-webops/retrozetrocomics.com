@@ -6,6 +6,7 @@ import { readAuthAccount } from "../middleware/auth.js";
 import { Comment } from "../models/schemas/Comment.js";
 import { Post } from "../models/schemas/Post.js";
 import { User } from "../models/schemas/User.js";
+import { getStorageStatus } from "../services/storage.js";
 
 const moderateCommentSchema = z.object({
 	moderationNote: z.string().trim().max(300).optional().default(""),
@@ -30,6 +31,7 @@ export async function getDashboard(_req: Request, res: Response) {
 			pendingCommentCount: pendingComments.length,
 			publishedPostCount: publishedPosts
 		},
+		storage: getStorageStatus(),
 		pendingComments: pendingComments.map(comment => ({
 			authorName: comment.authorName,
 			body: comment.body,

@@ -66,6 +66,20 @@ export interface DashboardMetrics {
 	publishedPostCount: number;
 }
 
+export interface DashboardStorage {
+	activeWriteDriver: string;
+	keyPrefix: string;
+	localPublicBaseUrl: string;
+	nextStep: string;
+	providerRoutingReady: boolean;
+	s3Bucket: string | null;
+	s3Configured: boolean;
+	s3PublicBaseUrl: string | null;
+	s3Region: string | null;
+	switchReady: boolean;
+	switchSummary: string;
+}
+
 export interface DashboardComment {
 	authorName: string;
 	body: string;
@@ -96,5 +110,6 @@ export interface DashboardData {
 	metrics: DashboardMetrics;
 	pendingComments: DashboardComment[];
 	posts: DashboardPost[];
+	storage: DashboardStorage;
 	users: DashboardUser[];
 }
