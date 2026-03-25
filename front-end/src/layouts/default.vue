@@ -1,5 +1,14 @@
 <script lang="ts" setup>
+import { onMounted } from "vue";
+
+import { useSessionStore } from "@/stores/session";
 import SideAdvertisement from "~/components/SideAdvertisement.vue";
+
+const session = useSessionStore();
+
+onMounted(() => {
+	void session.bootstrapSession();
+});
 </script>
 
 <template>
@@ -26,6 +35,8 @@ import SideAdvertisement from "~/components/SideAdvertisement.vue";
 
 			<SideAdvertisement class="content-grid__ad" />
 		</div>
+
+		<AccountManagement />
 	</main>
 </template>
 

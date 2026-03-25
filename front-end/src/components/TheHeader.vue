@@ -1,36 +1,36 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { useRoute } from "vue-router";
+
+import { useSessionStore } from "@/stores/session";
 
 const isExpanded = ref(false);
 const route = useRoute();
+const session = useSessionStore();
 
 const links = [
 	{ name: "Home", path: "/" },
+	{ name: "Studio", path: "/studio" },
 	{ name: "Characters", path: "/characters" },
 	{ name: "About", path: "/about" },
 	{ name: "Contact", path: "/contact" }
 ];
 
-const activeLink = ref(links[0].name);
-
 function toggleMenu() {
 	isExpanded.value = !isExpanded.value;
 }
 
-function setActiveLink(linkName: string) {
-	activeLink.value = linkName;
+function closeMenu() {
 	isExpanded.value = false;
 }
 
-watch(
-	() => route.path,
-	path => {
-		const match = links.find(link => link.path === path);
-		activeLink.value = match?.name ?? links[0].name;
-	},
-	{ immediate: true }
-);
+function isActive(path: string) {
+	if (path === "/") {
+		return route.path === path;
+	}
+
+	return route.path.startsWith(path);
+}
 </script>
 
 <template>
@@ -59,14 +59,54 @@ watch(
 					v-for="link in links"
 					:key="link.path"
 					class="nav__item"
-					:class="[{ 'nav__item--active': activeLink === link.name }]"
-					@click="setActiveLink(link.name)"
+					:class="[{ 'nav__item--active': isActive(link.path) }]"
 				>
-					<RouterLink class="nav__link" :to="link.path">
+					<RouterLink
+						class="nav__link"
+						:to="link.path"
+						@click="closeMenu"
+					>
 						{{ link.name }}
 					</RouterLink>
 				</li>
 			</ul>
+
+			<div class="nav__actions">
+				<RouterLink
+					v-if="session.isAdmin"
+					class="nav__action nav__action--ghost"
+					to="/studio/admin"
+				>
+					Admin
+				</RouterLink>
+				<p v-if="session.isAuthenticated" class="nav__welcome">
+					{{ session.account?.name }}
+				</p>
+				<button
+					v-if="!session.isAuthenticated"
+					class="nav__action nav__action--ghost"
+					type="button"
+					@click="session.openAuth('login')"
+				>
+					Login
+				</button>
+				<button
+					v-if="!session.isAuthenticated"
+					class="nav__action nav__action--primary"
+					type="button"
+					@click="session.openAuth('signup')"
+				>
+					Sign Up
+				</button>
+				<button
+					v-else
+					class="nav__action nav__action--primary"
+					type="button"
+					@click="session.logout()"
+				>
+					Logout
+				</button>
+			</div>
 		</nav>
 	</header>
 </template>
@@ -85,9 +125,10 @@ watch(
 .nav {
 	display: flex;
 	align-items: center;
-	justify-content: center;
+	justify-content: space-between;
 	padding: clamp(0.75rem, 2vw, 1.25rem) clamp(1rem, 5vw, 3rem);
 	position: relative;
+	gap: 1rem;
 }
 
 .nav__toggle {
@@ -132,6 +173,8 @@ watch(
 	margin: 0;
 	text-transform: uppercase;
 	letter-spacing: 0.28em;
+	flex: 1;
+	justify-content: center;
 }
 
 .nav__item {
@@ -173,6 +216,40 @@ watch(
 	transform: scaleX(1);
 }
 
+.nav__actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.65rem;
+}
+
+.nav__action {
+	border-radius: 999px;
+	padding: 0.62rem 1rem;
+	font-weight: 700;
+	text-decoration: none;
+	border: 1px solid transparent;
+	cursor: pointer;
+}
+
+.nav__action--ghost {
+	background: rgba(255, 255, 255, 0.06);
+	color: #f7e9ff;
+	border-color: rgba(255, 255, 255, 0.14);
+}
+
+.nav__action--primary {
+	background: linear-gradient(120deg, #ff914d, #7a4bb4);
+	color: #180124;
+}
+
+.nav__welcome {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.68);
+	font-size: 0.9rem;
+}
+
 .sr-only {
 	position: absolute;
 	width: 1px;
@@ -186,7 +263,8 @@ watch(
 
 @media (max-width: 768px) {
 	.nav {
-		justify-content: flex-end;
+		flex-wrap: wrap;
+		padding-top: 1rem;
 	}
 
 	.nav__toggle {
@@ -196,6 +274,7 @@ watch(
 	.nav__links {
 		position: absolute;
 		top: 100%;
+		left: clamp(1rem, 5vw, 3rem);
 		right: clamp(1rem, 5vw, 3rem);
 		margin-top: 0.75rem;
 		background: rgba(15, 2, 24, 0.92);
@@ -218,6 +297,12 @@ watch(
 		opacity: 1;
 		pointer-events: auto;
 		transform: translateY(0);
+	}
+
+	.nav__actions {
+		width: 100%;
+		justify-content: flex-start;
+		padding-top: 0.5rem;
 	}
 
 	.nav__item::after {

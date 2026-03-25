@@ -42,9 +42,8 @@ if (!name || !email || !password) {
 			name,
 			email,
 			password,
-			editAdmins: false,
-			saveEdit: "Edit",
-			role: "admin"
+			role: "admin",
+			status: "active"
 		});
 
 		await admin.save();

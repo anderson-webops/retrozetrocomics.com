@@ -1,13 +1,7 @@
 <script lang="ts" setup>
-const props = withDefaults(
-	defineProps<{
-		name?: string;
-		message?: string;
-	}>(),
-	{
-		name: "Home"
-	}
-);
+import { useSessionStore } from "@/stores/session";
+
+const session = useSessionStore();
 </script>
 
 <template>
@@ -18,38 +12,56 @@ const props = withDefaults(
 			</p>
 			<h1 id="welcome-title" class="welcome__title">RetroZetro Comics</h1>
 			<p class="welcome__description">
-				{{ props.message }}
+				New comics, storyboard experiments, and behind-the-scenes photo
+				dispatches now live in a single interactive studio feed. Members
+				can sign in to comment on open posts while admins moderate the
+				conversation.
 			</p>
 
 			<div class="welcome__actions">
 				<RouterLink
 					class="welcome__cta welcome__cta--primary"
+					to="/studio"
+				>
+					Enter the Studio
+				</RouterLink>
+				<button
+					v-if="!session.isAuthenticated"
+					class="welcome__cta welcome__cta--secondary"
+					type="button"
+					@click="session.openAuth('signup')"
+				>
+					Create Account
+				</button>
+				<RouterLink
+					v-else
+					class="welcome__cta welcome__cta--secondary"
 					to="/characters"
 				>
 					Meet the Crew
-				</RouterLink>
-				<RouterLink
-					class="welcome__cta welcome__cta--secondary"
-					to="/contact"
-				>
-					Join the Newsletter
 				</RouterLink>
 			</div>
 
 			<dl class="welcome__highlights">
 				<div>
 					<dt>New Releases</dt>
-					<dd>Fresh pages drop every Friday night.</dd>
+					<dd>
+						Comics, storyboards, and photos publish from one admin
+						console.
+					</dd>
 				</div>
 				<div>
 					<dt>Creator Extras</dt>
-					<dd>Sketchbooks, playlists, and lore deep dives.</dd>
+					<dd>
+						Follow the process with layout drafts and studio
+						snapshots.
+					</dd>
 				</div>
 				<div>
 					<dt>Community</dt>
 					<dd>
-						Vote on cover variants &amp; unlock exclusive
-						wallpapers.
+						Member comments are moderated so discussion stays
+						constructive.
 					</dd>
 				</div>
 			</dl>
@@ -126,6 +138,7 @@ const props = withDefaults(
 	border-radius: 999px;
 	font-weight: 700;
 	text-decoration: none;
+	border: none;
 	transition:
 		transform 0.2s ease,
 		box-shadow 0.2s ease,
@@ -148,6 +161,7 @@ const props = withDefaults(
 	background: rgba(255, 255, 255, 0.15);
 	border: 1px solid rgba(255, 255, 255, 0.3);
 	color: #fdf9ff;
+	cursor: pointer;
 }
 
 .welcome__cta--secondary:hover,

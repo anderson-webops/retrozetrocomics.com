@@ -12,6 +12,10 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AccountManagement: typeof import('./components/AccountManagement.vue')['default']
+    AdminDashboard: typeof import('./components/admin/AdminDashboard.vue')['default']
+    CommentPanel: typeof import('./components/posts/CommentPanel.vue')['default']
+    PostCard: typeof import('./components/posts/PostCard.vue')['default']
+    PostFeed: typeof import('./components/posts/PostFeed.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SideAdvertisement: typeof import('./components/SideAdvertisement.vue')['default']

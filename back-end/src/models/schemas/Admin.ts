@@ -1,33 +1,25 @@
-// src/models/schemas/Admin.ts
-
-import type { Model } from "mongoose";
-import type { IAdmin } from "../../types/entities/IAdmin.js";
+import type { HydratedDocument, InferSchemaType, Model } from "mongoose";
 import mongoose, { Schema } from "mongoose";
+
 import { passwordPlugin } from "../plugins/password.js";
 
-/**
- * Create Mongoose Schema for Admin
- */
-const adminSchema: Schema<IAdmin> = new Schema(
+const adminSchema = new Schema(
 	{
-		name: { type: String, required: true },
+		name: { type: String, required: true, trim: true },
 		email: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
-		// age: { type: String },
-		// state: { type: String },
 		password: { type: String, required: true },
-		editAdmins: { type: Boolean, default: false, required: true }, // Added required: true
-		saveEdit: { type: String, default: "Edit", required: true }, // Added required: true
-		role: { type: String, default: "admin" }
+		role: { type: String, default: "admin" },
+		status: {
+			type: String,
+			enum: ["active", "disabled"],
+			default: "active",
+			index: true
+		}
 	},
 	{ timestamps: true }
 );
 
-/**
- * Create and handle password hashing, comparison, and removal from JSON responses
- */
 adminSchema.plugin(passwordPlugin);
 
-/**
- * Create and export Admin model
- */
-export const Admin: Model<IAdmin> = mongoose.model<IAdmin>("Admin", adminSchema);
+export type AdminDocument = HydratedDocument<InferSchemaType<typeof adminSchema>>;
+export const Admin: Model<InferSchemaType<typeof adminSchema>> = mongoose.model("Admin", adminSchema);

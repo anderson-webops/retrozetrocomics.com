@@ -23,7 +23,7 @@ import generateSitemap from "vite-ssg-sitemap";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
 	resolve: {
 		alias: {
 			"~": `${path.resolve(__dirname, "src")}/`,
@@ -35,7 +35,8 @@ export default defineConfig({
 		/* 1️⃣  Router (must run before macros/layouts) */
 		VueRouter({
 			extensions: [".vue", ".md"],
-			dts: "src/typed-router.d.ts"
+			dts: "src/typed-router.d.ts",
+			watch: command === "serve" && !process.env.VITEST
 		}),
 
 		/* 2️⃣  VueMacros – this already injects @vitejs/plugin-vue */
@@ -196,7 +197,11 @@ export default defineConfig({
 				target: "http://localhost:3006",
 				changeOrigin: true,
 				rewrite: p => p.replace(/^\/api/, "") // strip /api
+			},
+			"/uploads": {
+				target: "http://localhost:3006",
+				changeOrigin: true
 			}
 		}
 	}
-});
+}));

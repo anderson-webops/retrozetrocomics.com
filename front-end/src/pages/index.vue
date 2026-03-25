@@ -1,13 +1,10 @@
 <script lang="ts" setup>
 import Comics from "~/components/TheComics.vue";
-import { useMainStore } from "~/stores";
-
-const store = useMainStore();
 </script>
 
 <template>
 	<div class="page">
-		<WelcomeSection :message="store.comics.description" />
+		<WelcomeSection />
 		<Comics />
 	</div>
 </template>

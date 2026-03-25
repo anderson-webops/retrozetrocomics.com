@@ -2,9 +2,10 @@
 import { mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
+
 import AccountManagement from "../src/components/AccountManagement.vue";
-import { useAppStore } from "../src/stores/app";
 import * as apiMod from "../src/api";
+import { useSessionStore } from "../src/stores/session";
 
 // Mock the axios client we export from "@/api"
 vi.mock("@/api", () => {
@@ -19,53 +20,45 @@ vi.mock("@/api", () => {
 });
 
 describe("AccountManagement.vue login (happy path)", () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
-    vi.clearAllMocks();
-  });
-  
-  it("logs in a user, updates the store, and closes the login modal", async () => {
-    const app = useAppStore();
-    // Open the login modal (component checks app.loginBlock)
-    app.setLoginBlock(true);
-    
-    // Mock /accounts/login result with a user
-    (apiMod.api.post as any).mockResolvedValueOnce({
-      data: {
-        currentUser: {
-          _id: "u123",
-          name: "User",
-          email: "user@example.com",
-          age: 20,
-          state: "GA"
-        }
-      }
-    });
-    
-    const wrapper = mount(AccountManagement);
-    
-    // Fill form and submit
-    await wrapper.get("#uname").setValue("user@example.com");
-    await wrapper.get("#psw1").setValue("secret");
-    await wrapper.get("form").trigger("submit.prevent");
-    
-    // Assert API call
-    expect(apiMod.api.post).toHaveBeenCalledWith(
-      "/accounts/login",
-      { email: "user@example.com", password: "secret" },
-      { withCredentials: true }
-    );
-    
-    // Store updated with currentUser and modal closed
-    expect(app.currentUser?.email).toBe("user@example.com");
-    expect(app.loginBlock).toBe(false);
-    
-    // Buttons reflect logged-in state (Logout visible, Login/Signup hidden)
-    // These live in TheHeader normally, but AccountManagement just closes the modal.
-    // So we assert modal visibility based on class toggling.
-    const modal = wrapper.find(".loginForm.modal");
-    expect(modal.exists()).toBe(true);
-    // When closed, the "showLogin" class should be absent:
-    expect(modal.classes()).not.toContain("showLogin");
-  });
+	beforeEach(() => {
+		setActivePinia(createPinia());
+		vi.clearAllMocks();
+	});
+
+	it("logs in a member, updates the session store, and closes the modal", async () => {
+		const session = useSessionStore();
+		session.openAuth("login");
+
+		(apiMod.api.post as any).mockResolvedValueOnce({
+			data: {
+				account: {
+					email: "user@example.com",
+					id: "u123",
+					name: "User",
+					role: "user",
+					status: "active"
+				}
+			}
+		});
+
+		const wrapper = mount(AccountManagement, {
+			global: {
+				stubs: {
+					teleport: true
+				}
+			}
+		});
+
+		await wrapper.get('input[type="email"]').setValue("user@example.com");
+		await wrapper.get('input[type="password"]').setValue("secret123");
+		await wrapper.get("form").trigger("submit.prevent");
+
+		expect(apiMod.api.post).toHaveBeenCalledWith("/auth/login", {
+			email: "user@example.com",
+			password: "secret123"
+		});
+
+		expect(session.account?.email).toBe("user@example.com");
+		expect(session.authModalOpen).toBe(false);
+	});
 });

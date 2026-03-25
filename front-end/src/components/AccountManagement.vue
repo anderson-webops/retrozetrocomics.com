@@ -1,546 +1,540 @@
-<!-- src/components/AccountManagement.vue -->
 <script lang="ts" setup>
-import type { AxiosError } from "axios";
 import { storeToRefs } from "pinia";
-import { computed, ref } from "vue";
-import { api } from "@/api";
-import { useAppStore } from "@/stores/app";
+import { reactive, ref, watch } from "vue";
 
-const app = useAppStore();
+import { useSessionStore } from "@/stores/session";
 
-// ─── LOGIN STATE & METHODS ──────────────────────────────────────────
-const { loginBlock, signupBlock } = storeToRefs(app);
+const session = useSessionStore();
+const { account, authModalMode, authModalOpen, authError, busy, captcha } =
+	storeToRefs(session);
 
-const loginEmail = ref("");
-const loginPassword = ref("");
-const errorLogin = ref("");
+const loginForm = reactive({
+	email: "",
+	password: ""
+});
 
-function changeLoginView(show: boolean) {
-	app.setLoginBlock(show);
+const signupForm = reactive({
+	captchaResponse: "",
+	email: "",
+	name: "",
+	password: "",
+	passwordConfirm: ""
+});
+
+const localError = ref("");
+
+const passwordsMatch = computed(
+	() => signupForm.password === signupForm.passwordConfirm
+);
+
+function resetForms() {
+	loginForm.email = "";
+	loginForm.password = "";
+	signupForm.captchaResponse = "";
+	signupForm.email = "";
+	signupForm.name = "";
+	signupForm.password = "";
+	signupForm.passwordConfirm = "";
+	localError.value = "";
 }
 
-async function loginTutor() {
-	errorLogin.value = "";
-	if (!loginEmail.value || !loginPassword.value) return;
+watch(authModalOpen, open => {
+	if (!open) {
+		resetForms();
+	}
+});
+
+watch(
+	() => [authModalOpen.value, authModalMode.value] as const,
+	async ([open, mode]) => {
+		if (open && mode === "signup" && !captcha.value) {
+			await session.refreshCaptcha();
+		}
+	}
+);
+
+async function submitLogin() {
+	localError.value = "";
 	try {
-		const { data } = await api.post(
-			"/accounts/login",
-			{
-				email: loginEmail.value,
-				password: loginPassword.value
-			},
-			{ withCredentials: true }
-		);
-		if (data.currentTutor) app.setCurrentTutor(data.currentTutor);
-		if (data.currentUser) app.setCurrentUser(data.currentUser);
-		if (data.currentAdmin) app.setCurrentAdmin(data.currentAdmin);
-		changeLoginView(false);
-	} catch (err: unknown) {
-		const e = err as AxiosError<{ message?: string }>;
-		errorLogin.value = `Login failed: ${
-			e.response?.data?.message ?? e.message ?? "Unknown error"
-		}`;
+		await session.login({
+			email: loginForm.email,
+			password: loginForm.password
+		});
+		resetForms();
+	} catch {
+		localError.value = authError.value || "Unable to sign in right now.";
 	}
 }
 
-// form state
-const signupType = ref<"tutor" | "user">("tutor");
-const name = ref("");
-const age = ref("");
-const state = ref("");
-const email = ref("");
-const password = ref("");
-const passwordRepeat = ref("");
-const error = ref("");
-
-// simple password‐match guard
-const passwordMatch = computed(() => password.value === passwordRepeat.value);
-
-// close / open (comes from your store)
-function changeSignupView(show: boolean) {
-	app.setSignupBlock(show);
-}
-
-// reset inputs after submission
-function resetData() {
-	name.value =
-		age.value =
-		state.value =
-		email.value =
-		password.value =
-		passwordRepeat.value =
-			"";
-	error.value = "";
-}
-
-// on submit, dispatch to the right endpoint
-async function addSignup() {
-	if (!passwordMatch.value) return;
+async function submitSignup() {
+	localError.value = "";
+	if (!passwordsMatch.value) {
+		localError.value = "Passwords do not match.";
+		return;
+	}
 
 	try {
-		// fire the right endpoint with credentials turned on
-		const res =
-			signupType.value === "tutor"
-				? await api.post(
-						"/tutors",
-						{
-							name: name.value,
-							age: age.value,
-							state: state.value,
-							email: email.value,
-							password: password.value
-						},
-						{ withCredentials: true }
-					)
-				: await api.post(
-						"/users",
-						{
-							name: name.value,
-							age: age.value,
-							state: state.value,
-							email: email.value,
-							password: password.value
-						},
-						{ withCredentials: true }
-					);
-
-		// immediately stash the newly-created user/tutor into Pinia
-		if (res.data.currentTutor) {
-			app.setCurrentTutor(res.data.currentTutor);
-		} else if (res.data.currentUser) {
-			app.setCurrentUser(res.data.currentUser);
-		}
-
-		resetData();
-		changeSignupView(false);
-	} catch (err: unknown) {
-		const e = err as AxiosError<{ message?: string }>;
-		errorLogin.value = `Error: ${
-			e.response?.data?.message ?? e.message ?? "Unknown error"
-		}`;
+		await session.signup({
+			captchaResponse: signupForm.captchaResponse,
+			email: signupForm.email,
+			name: signupForm.name,
+			password: signupForm.password
+		});
+		resetForms();
+	} catch {
+		localError.value = authError.value || "Unable to create your account.";
 	}
 }
 </script>
 
 <template>
-	<div>
-		<!----------------
-    -   Login Form   -
-    ----------------->
-
-		<!-- The Modal -->
-		<div :class="{ showLogin: loginBlock }" class="loginForm modal">
-			<!-- Modal Content -->
-			<form class="animate modal-content" @submit.prevent="loginTutor">
-				<span
-					class="close"
-					title="Close Modal"
-					@click="changeLoginView(false)"
-					>&times;</span
+	<Teleport to="body">
+		<div
+			v-if="authModalOpen"
+			class="auth-overlay"
+			role="presentation"
+			@click.self="session.closeAuth()"
+		>
+			<div
+				class="auth-modal"
+				aria-modal="true"
+				role="dialog"
+				:aria-labelledby="`auth-heading-${authModalMode}`"
+			>
+				<button
+					aria-label="Close account dialog"
+					class="auth-modal__close"
+					type="button"
+					@click="session.closeAuth()"
 				>
+					&times;
+				</button>
 
-				<div class="imgcontainer">
-					<img
-						alt="Avatar"
-						class="avatar"
-						src="https://www.w3schools.com/howto/img_avatar2.png"
-					/>
-				</div>
-
-				<div class="container">
-					<label for="uname"><b>Email</b></label>
-					<input
-						id="uname"
-						v-model="loginEmail"
-						placeholder="Enter Email"
-						required
-						type="email"
-					/>
-
-					<label for="psw1"><b>Password</b></label>
-					<input
-						id="psw1"
-						v-model="loginPassword"
-						placeholder="Enter Password"
-						required
-						type="password"
-					/>
-
-					<button class="button" type="submit">Login</button>
-					<label>
-						<!--						checked="checked" -->
-						<input
-							:checked="true"
-							name="remember"
-							type="checkbox"
-						/>
-						Remember me
-					</label>
-					<span class="signup"
-						>Don't have an account?
-						<a
-							href="#"
-							@click="
-								changeLoginView(false);
-								changeSignupView(true);
-							"
-							>Sign Up</a
-						></span
-					>
-				</div>
-
-				<div class="container" style="background-color: #f1f1f1">
-					<button
-						class="cancelbtn"
-						type="button"
-						@click="changeLoginView(false)"
-					>
-						Cancel
-					</button>
-					<p v-if="errorLogin" class="error loginError">
-						{{ errorLogin }}
+				<div class="auth-modal__hero">
+					<p class="auth-modal__eyebrow">Retroverse Access</p>
+					<h2 :id="`auth-heading-${authModalMode}`">
+						{{
+							authModalMode === "login"
+								? "Welcome back"
+								: "Join the community"
+						}}
+					</h2>
+					<p>
+						{{
+							authModalMode === "login"
+								? "Sign in to comment on new drops and keep up with the latest creator notes."
+								: "Create an account to comment on comics, storyboard drafts, and photo journals."
+						}}
 					</p>
-					<span class="psw">Forgot <a href="#">password?</a></span>
 				</div>
-			</form>
-		</div>
 
-		<!-- ─── The Sign-Up Modal ──────────────────────────────────────────────── -->
-		<div :class="{ showSignup: signupBlock }" class="modal signupForm">
-			<form class="modal-content animate" @submit.prevent="addSignup">
-				<span class="close" @click="changeSignupView(false)"
-					>&times;</span
+				<div class="auth-modal__switcher">
+					<button
+						class="auth-modal__switch"
+						:class="{
+							'auth-modal__switch--active':
+								authModalMode === 'login'
+						}"
+						type="button"
+						@click="session.openAuth('login')"
+					>
+						Login
+					</button>
+					<button
+						class="auth-modal__switch"
+						:class="{
+							'auth-modal__switch--active':
+								authModalMode === 'signup'
+						}"
+						type="button"
+						@click="session.openAuth('signup')"
+					>
+						Sign Up
+					</button>
+				</div>
+
+				<form
+					v-if="authModalMode === 'login'"
+					class="auth-form"
+					@submit.prevent="submitLogin"
 				>
+					<label>
+						<span>Email</span>
+						<input
+							v-model="loginForm.email"
+							autocomplete="email"
+							required
+							type="email"
+						/>
+					</label>
 
-				<div class="container">
-					<h1 class="mb-2">Sign Up</h1>
-					<p>Please fill in this form to create a new account.</p>
-					<hr />
+					<label>
+						<span>Password</span>
+						<input
+							v-model="loginForm.password"
+							autocomplete="current-password"
+							minlength="8"
+							required
+							type="password"
+						/>
+					</label>
 
-					<!-- ─── User Type Selector ────────────────────────────────────────── -->
-					<div class="mb-3">
+					<p v-if="localError || authError" class="auth-form__error">
+						{{ localError || authError }}
+					</p>
+
+					<button
+						class="auth-form__submit"
+						:disabled="busy"
+						type="submit"
+					>
+						{{ busy ? "Signing in..." : "Sign In" }}
+					</button>
+
+					<p class="auth-form__meta">
+						New here?
+						<button
+							class="auth-form__link"
+							type="button"
+							@click="session.openAuth('signup')"
+						>
+							Create an account
+						</button>
+					</p>
+				</form>
+
+				<form v-else class="auth-form" @submit.prevent="submitSignup">
+					<label>
+						<span>Name</span>
+						<input
+							v-model="signupForm.name"
+							autocomplete="name"
+							maxlength="80"
+							minlength="2"
+							required
+							type="text"
+						/>
+					</label>
+
+					<label>
+						<span>Email</span>
+						<input
+							v-model="signupForm.email"
+							autocomplete="email"
+							required
+							type="email"
+						/>
+					</label>
+
+					<div class="auth-form__grid">
 						<label>
+							<span>Password</span>
 							<input
-								v-model="signupType"
-								type="radio"
-								value="tutor"
+								v-model="signupForm.password"
+								autocomplete="new-password"
+								minlength="8"
+								required
+								type="password"
 							/>
-							Tutor
 						</label>
-						&ensp;
+
 						<label>
+							<span>Confirm Password</span>
 							<input
-								v-model="signupType"
-								type="radio"
-								value="user"
+								v-model="signupForm.passwordConfirm"
+								autocomplete="new-password"
+								minlength="8"
+								required
+								type="password"
 							/>
-							User
 						</label>
 					</div>
 
-					<!-- ─── Common Fields ─────────────────────────────────────────────── -->
-					<label for="name"><b>Name</b></label>
-					<input
-						id="name"
-						v-model="name"
-						placeholder="Enter Name"
-						required
-						type="text"
-					/>
+					<div class="captcha-block">
+						<div class="captcha-block__image">
+							<img
+								v-if="captcha"
+								:alt="`Captcha prompt ${captcha.prompt}`"
+								:src="captcha.imageDataUrl"
+							/>
+						</div>
+						<div class="captcha-block__body">
+							<p>Solve the challenge to finish signing up.</p>
+							<label>
+								<span>Captcha Answer</span>
+								<input
+									v-model="signupForm.captchaResponse"
+									inputmode="numeric"
+									required
+									type="text"
+								/>
+							</label>
+							<button
+								class="auth-form__link auth-form__link--button"
+								type="button"
+								@click="session.refreshCaptcha()"
+							>
+								Refresh captcha
+							</button>
+						</div>
+					</div>
 
-					<label for="age"><b>Age</b></label>
-					<input
-						id="age"
-						v-model="age"
-						placeholder="Enter Age"
-						required
-						type="text"
-					/>
-
-					<label for="state"><b>State</b></label>
-					<input
-						id="state"
-						v-model="state"
-						placeholder="Enter State"
-						required
-						type="text"
-					/>
-
-					<label for="email"><b>Email</b></label>
-					<input
-						id="email"
-						v-model="email"
-						placeholder="Enter Email"
-						required
-						type="email"
-					/>
-
-					<label for="psw2"><b>Password</b></label>
-					<input
-						id="psw2"
-						v-model="password"
-						placeholder="Enter Password"
-						required
-						type="password"
-					/>
-
-					<label for="psw-repeat"><b>Repeat Password</b></label>
-					<input
-						id="psw-repeat"
-						v-model="passwordRepeat"
-						placeholder="Repeat Password"
-						required
-						type="password"
-					/>
-
-					<button class="signup button" type="submit">
-						Sign Up as a
+					<p
+						v-if="localError || authError || !passwordsMatch"
+						class="auth-form__error"
+					>
 						{{
-							signupType.charAt(0).toUpperCase() +
-							signupType.slice(1)
+							localError ||
+							authError ||
+							(!passwordsMatch ? "Passwords do not match." : "")
 						}}
+					</p>
+
+					<button
+						class="auth-form__submit"
+						:disabled="busy"
+						type="submit"
+					>
+						{{ busy ? "Creating account..." : "Create Account" }}
 					</button>
 
-					<p v-if="!passwordMatch" class="passwordMatchError">
-						Passwords do not match.
+					<p class="auth-form__meta">
+						Already a member?
+						<button
+							class="auth-form__link"
+							type="button"
+							@click="session.openAuth('login')"
+						>
+							Sign in instead
+						</button>
 					</p>
-					<p v-if="error" class="error">
-						{{ error }}
-					</p>
+				</form>
+
+				<div v-if="account" class="auth-modal__status">
+					Signed in as {{ account.name }}.
 				</div>
-			</form>
+			</div>
 		</div>
-	</div>
+	</Teleport>
 </template>
 
 <style scoped>
-/*****************************
-*   Login and Signup Forms   *
-*****************************/
-
-/* The Modal (background) */
-.modal {
-	display: none;
+.auth-overlay {
 	position: fixed;
-	z-index: 1;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	overflow: auto;
-	background-color: rgba(0, 0, 0, 0.4);
-	padding-top: 50px;
+	inset: 0;
+	z-index: 90;
+	display: grid;
+	place-items: center;
+	padding: 1.25rem;
+	background: rgba(8, 0, 15, 0.74);
+	backdrop-filter: blur(12px);
 }
 
-/* Modal Content/Box */
-.modal-content {
-	background-color: #fefefe;
-	border: 1px solid #888;
-	width: 80%;
-	margin: auto;
+.auth-modal {
+	position: relative;
+	width: min(720px, 100%);
+	display: grid;
+	gap: 1.5rem;
+	padding: clamp(1.5rem, 4vw, 2.25rem);
+	border-radius: 24px;
+	background:
+		radial-gradient(
+			circle at top right,
+			rgba(255, 145, 77, 0.22),
+			transparent 38%
+		),
+		radial-gradient(
+			circle at bottom left,
+			rgba(122, 75, 180, 0.35),
+			transparent 45%
+		),
+		linear-gradient(165deg, rgba(26, 6, 40, 0.98), rgba(12, 2, 20, 0.98));
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	box-shadow: 0 26px 60px rgba(0, 0, 0, 0.4);
+	color: #f6e8ff;
 }
 
-.showSignup,
-.showLogin {
-	display: block !important;
-}
-
-div.loginForm span,
-div.signupForm span {
-	font-family: Optima, sans-serif;
-}
-
-/* The Close Button (x) */
-.close {
-	/* Position it in the top right corner outside of the modal */
+.auth-modal__close {
 	position: absolute;
-	right: 3%;
-	top: 3%;
-	color: #dc3545;
-	font-size: 35px;
-	font-weight: bold;
-}
-
-/* Close button on hover */
-.close:hover,
-.close:focus {
-	color: #f44336;
+	top: 1rem;
+	right: 1rem;
+	border: none;
+	background: transparent;
+	color: #ffb36f;
+	font-size: 2rem;
+	line-height: 1;
 	cursor: pointer;
 }
 
-/* Set a style for login and signup buttons */
-.button {
-	background-color: #4caf50;
-	color: white;
-	padding: 14px 20px;
-	margin: 8px 0;
+.auth-modal__hero {
+	display: grid;
+	gap: 0.55rem;
+}
+
+.auth-modal__hero h2 {
+	margin: 0;
+	font-size: clamp(2rem, 5vw, 2.6rem);
+}
+
+.auth-modal__hero p {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.76);
+	line-height: 1.65;
+}
+
+.auth-modal__eyebrow {
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.24em;
+	font-size: 0.78rem;
+	color: #ffb36f;
+}
+
+.auth-modal__switcher {
+	display: inline-grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	padding: 0.35rem;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.07);
+}
+
+.auth-modal__switch {
 	border: none;
+	border-radius: 999px;
+	background: transparent;
+	color: rgba(255, 255, 255, 0.65);
+	padding: 0.8rem 1rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
 	cursor: pointer;
+}
+
+.auth-modal__switch--active {
+	background: linear-gradient(120deg, #ff914d, #7a4bb4);
+	color: #1b0228;
+}
+
+.auth-form {
+	display: grid;
+	gap: 1rem;
+}
+
+.auth-form label {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.auth-form span {
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: rgba(255, 255, 255, 0.68);
+}
+
+.auth-form input {
 	width: 100%;
-	/*opacity: 0.9;*/ /*Optional, was on the signup button*/
+	padding: 0.95rem 1rem;
+	border-radius: 14px;
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	background: rgba(255, 255, 255, 0.06);
+	color: #fdf7ff;
 }
 
-/* Add padding to containers */
-.container {
-	padding: 16px;
+.auth-form__grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
 }
 
-/* Extra style for the cancel button (red) */
-.cancelbtn {
-	width: auto;
-	padding: 10px 18px;
-	background-color: #f44336;
+.captcha-block {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+	gap: 1rem;
+	padding: 1rem;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Add Zoom Animation */
-.animate {
-	-webkit-animation: animatezoom 0.6s;
-	animation: animatezoom 0.6s;
+.captcha-block__image {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.75rem;
+	border-radius: 16px;
+	background: rgba(12, 2, 20, 0.65);
 }
 
-.passwordMatchError {
-	color: red;
-	font-weight: bold;
-}
-
-p.loginError {
-	margin-left: 24%;
-}
-
-@-webkit-keyframes animatezoom {
-	from {
-		-webkit-transform: scale(0);
-	}
-	to {
-		-webkit-transform: scale(1);
-	}
-}
-
-@keyframes animatezoom {
-	from {
-		transform: scale(0);
-	}
-	to {
-		transform: scale(1);
-	}
-}
-
-/*****************
-*   Login Form   *
-*****************/
-
-/* Bordered form */
-div.loginForm form {
-	border: 3px solid #f1f1f1;
-}
-
-/* Full-width inputs */
-div.loginForm input[type="email"],
-div.loginForm input[type="password"] {
+.captcha-block__image img {
 	width: 100%;
-	padding: 12px 20px;
-	margin: 8px 0;
-	display: inline-block;
-	border: 1px solid #ccc;
-	box-sizing: border-box;
+	max-width: 260px;
+	display: block;
 }
 
-/* Add a hover effect for buttons */
-div.loginForm button:hover {
-	opacity: 0.8;
+.captcha-block__body {
+	display: grid;
+	gap: 0.75rem;
+	align-content: start;
 }
 
-/* Center the avatar image inside this container */
-div.loginForm .imgcontainer {
-	text-align: center;
-	margin: 24px 0 12px 0;
+.captcha-block__body p {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.74);
+	line-height: 1.6;
 }
 
-/* Avatar image */
-div.loginForm img.avatar {
-	width: 25% !important;
-	border-radius: 50%;
-}
-
-/* The "Forgot password" text */
-div.loginForm span.psw {
-	float: right;
-	padding-top: 16px;
-}
-
-div.loginForm span.signup {
-	float: right;
-	margin-right: 2px;
-}
-
-/* Change styles for span and cancel button on extra small screens */
-@media screen and (max-width: 300px) {
-	div.loginForm span.psw,
-	div.loginForm span.signup {
-		display: block;
-		float: none;
-	}
-
-	div.loginForm .cancelbtn {
-		width: 100%;
-	}
-}
-
-/******************
-*   Signup Form   *
-******************/
-
-/* Full-width input fields */
-div.signupForm input[type="text"],
-div.signupForm input[type="email"],
-div.signupForm input[type="password"] {
-	width: 100%;
-	padding: 15px;
-	margin: 5px 0 22px 0;
-	display: inline-block;
+.auth-form__submit {
 	border: none;
-	background: #f1f1f1;
+	border-radius: 999px;
+	padding: 0.9rem 1.2rem;
+	background: linear-gradient(120deg, #ff914d, #7a4bb4);
+	color: #160021;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.14em;
+	cursor: pointer;
 }
 
-div.signupForm input[type="text"]:focus,
-div.signupForm input[type="email"]:focus,
-div.signupForm input[type="password"]:focus {
-	background-color: #ddd;
-	outline: none;
+.auth-form__submit:disabled {
+	opacity: 0.65;
+	cursor: progress;
 }
 
-div.signupForm hr {
-	border: 1px solid #f1f1f1;
-	margin-bottom: 25px;
+.auth-form__error {
+	margin: 0;
+	color: #ffb8b8;
+	font-weight: 600;
 }
 
-div.signupForm button:hover {
-	opacity: 1;
+.auth-form__meta {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.68);
 }
 
-/* Clear floats *
-div.signupForm .clearfix::after {
-	content: "";
-	clear: both;
-	display: table;
+.auth-form__link {
+	border: none;
+	background: transparent;
+	color: #ffb36f;
+	font: inherit;
+	cursor: pointer;
+	padding: 0;
 }
 
-div.signupForm p.disclamer {
-	display: inline-block;
-	float: right;
+.auth-form__link--button {
+	justify-self: start;
+	font-weight: 700;
 }
 
-/* The "All ready have an account" text *
-div.signupForm span.account {
-	float: right;
-	padding-top: 16px;
-}*/
+.auth-modal__status {
+	color: rgba(255, 255, 255, 0.72);
+	font-size: 0.92rem;
+}
 
-/* Change styles for cancel button and signup button on extra small screens */
-@media screen and (max-width: 300px) {
-	div.signupForm .cancelbtn,
-	div.signupForm {
-		width: 100%;
+@media (max-width: 720px) {
+	.auth-form__grid,
+	.captcha-block {
+		grid-template-columns: 1fr;
 	}
 }
 </style>
