@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 840" role="img" aria-labelledby="title desc">
+  <title id="title">The List poster</title>
+  <desc id="desc">A stylized RetroZetro poster for The List with teal scan lines, amber text, and a central moon-base signal motif.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#08111f"/>
+      <stop offset="100%" stop-color="#132b49"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffcc73" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#ff7d44" stop-opacity="0.15"/>
+    </linearGradient>
+    <pattern id="scan" width="10" height="10" patternUnits="userSpaceOnUse">
+      <rect width="10" height="4" fill="rgba(255,255,255,0.02)"/>
+    </pattern>
+  </defs>
+
+  <rect width="640" height="840" fill="url(#bg)"/>
+  <rect width="640" height="840" fill="url(#scan)" opacity="0.3"/>
+  <circle cx="448" cy="168" r="118" fill="#0f3655" opacity="0.85"/>
+  <circle cx="448" cy="168" r="78" fill="#7ce1f6" opacity="0.17"/>
+  <path d="M182 638 L320 246 L458 638 Z" fill="url(#beam)" opacity="0.9"/>
+  <rect x="166" y="612" width="308" height="38" rx="19" fill="#091526" stroke="#7ce1f6" stroke-opacity="0.35"/>
+  <rect x="206" y="420" width="228" height="18" rx="9" fill="#7ce1f6" fill-opacity="0.16"/>
+  <rect x="184" y="454" width="272" height="18" rx="9" fill="#7ce1f6" fill-opacity="0.12"/>
+  <rect x="160" y="488" width="320" height="18" rx="9" fill="#7ce1f6" fill-opacity="0.09"/>
+  <text x="64" y="98" fill="#ffd27d" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="7">ARC 01</text>
+  <text x="64" y="284" fill="#fff4e7" font-family="Arial, Helvetica, sans-serif" font-size="108" font-weight="800" letter-spacing="2">THE</text>
+  <text x="64" y="380" fill="#fff4e7" font-family="Arial, Helvetica, sans-serif" font-size="118" font-weight="800" letter-spacing="2">LIST</text>
+  <text x="64" y="694" fill="#7ce1f6" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="6">EXO  RIMLAW  MOON BASE FILE</text>
+  <text x="64" y="748" fill="#dfe8f6" font-family="Arial, Helvetica, sans-serif" font-size="26">A missing mother. A missing friend. A false symbol.</text>
+</svg>

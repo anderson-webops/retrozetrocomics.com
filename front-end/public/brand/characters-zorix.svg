@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 840" role="img" aria-labelledby="title desc">
+  <title id="title">Zorix character poster</title>
+  <desc id="desc">A stylized character poster for Zorix using crimson light, a stark silhouette, and sharp geometric marks.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0b0811"/>
+      <stop offset="100%" stop-color="#24101d"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ff9459"/>
+      <stop offset="100%" stop-color="#ff5d73"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="640" height="840" fill="url(#bg)"/>
+  <circle cx="490" cy="162" r="122" fill="#ff5d73" opacity="0.12"/>
+  <path d="M318 184 C396 184 452 242 452 338 V604 C452 644 424 668 384 668 H252 C212 668 184 644 184 604 V338 C184 242 240 184 318 184 Z" fill="#090d16"/>
+  <path d="M208 312 L318 224 L428 312 L368 344 L318 304 L268 344 Z" fill="url(#edge)" opacity="0.92"/>
+  <rect x="228" y="404" width="180" height="14" rx="7" fill="#ff9459" fill-opacity="0.18"/>
+  <rect x="214" y="438" width="208" height="14" rx="7" fill="#ff9459" fill-opacity="0.12"/>
+  <path d="M222 660 L414 660" stroke="#ff5d73" stroke-opacity="0.4" stroke-width="6"/>
+  <path d="M146 724 L494 724" stroke="#fff4e7" stroke-opacity="0.2" stroke-width="2"/>
+  <text x="64" y="102" fill="#ffd27d" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="7">ANTAGONIST</text>
+  <text x="64" y="708" fill="#fff4e7" font-family="Arial, Helvetica, sans-serif" font-size="112" font-weight="800" letter-spacing="2">ZORIX</text>
+  <text x="64" y="774" fill="#ffb4bf" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="4">COOL  RUTHLESS  STRAIGHT TO THE POINT</text>
+</svg>

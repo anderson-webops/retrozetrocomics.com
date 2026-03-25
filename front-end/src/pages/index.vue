@@ -12,12 +12,13 @@ const store = useMainStore();
 
 		<section class="home-showcase">
 			<header class="home-showcase__header">
-				<p class="home-showcase__eyebrow">Story Lanes</p>
-				<h2>Built to feel full between major issue drops</h2>
+				<p class="home-showcase__eyebrow">Canon Files</p>
+				<h2>Active arcs, threat signals, and world entries</h2>
 				<p>
-					RetroZetro is no longer a single static landing page. It now
-					has room for finished issues, rough process reveals, photo
-					texture, and the next arcs waiting in the wings.
+					The site now carries the story material itself, not just the
+					publishing shell around it. Featured files can spotlight
+					major arcs, antagonists, and key worlds as the canon
+					expands.
 				</p>
 			</header>
 
@@ -180,6 +181,8 @@ const store = useMainStore();
 .home-showcase__copy h3 {
 	font-size: 1.4rem;
 	color: #0f1e35;
+	line-height: 1.08;
+	overflow-wrap: anywhere;
 }
 
 .home-showcase__copy span {

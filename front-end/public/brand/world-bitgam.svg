@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 840" role="img" aria-labelledby="title desc">
+  <title id="title">Bitgam world file poster</title>
+  <desc id="desc">A stylized world file for Bitgam featuring a warm planet surface, starfield, and archive labels.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#07111c"/>
+      <stop offset="100%" stop-color="#17364b"/>
+    </linearGradient>
+    <linearGradient id="planet" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ff9459"/>
+      <stop offset="100%" stop-color="#ffd27d"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="640" height="840" fill="url(#bg)"/>
+  <g fill="#fff4e7" opacity="0.55">
+    <circle cx="112" cy="132" r="3"/>
+    <circle cx="178" cy="86" r="2"/>
+    <circle cx="256" cy="154" r="2"/>
+    <circle cx="514" cy="118" r="3"/>
+    <circle cx="576" cy="192" r="2"/>
+    <circle cx="428" cy="84" r="2"/>
+  </g>
+  <circle cx="332" cy="412" r="184" fill="url(#planet)"/>
+  <path d="M190 424 C254 368 404 352 486 414" stroke="#c94f41" stroke-opacity="0.45" stroke-width="22" fill="none"/>
+  <path d="M168 486 C264 438 404 442 498 500" stroke="#b53c34" stroke-opacity="0.38" stroke-width="18" fill="none"/>
+  <path d="M210 324 C284 284 386 284 456 328" stroke="#fff4e7" stroke-opacity="0.18" stroke-width="10" fill="none"/>
+  <rect x="64" y="642" width="512" height="120" rx="26" fill="#091526" fill-opacity="0.76" stroke="#7ce1f6" stroke-opacity="0.18"/>
+  <text x="64" y="104" fill="#ffd27d" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="7">PLANET FILE</text>
+  <text x="64" y="690" fill="#fff4e7" font-family="Arial, Helvetica, sans-serif" font-size="108" font-weight="800" letter-spacing="2">BITGAM</text>
+  <text x="64" y="746" fill="#7ce1f6" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="5">FAZO HOMEWORLD  GAMBORUS  GREAT MANIFESTED</text>
+</svg>
