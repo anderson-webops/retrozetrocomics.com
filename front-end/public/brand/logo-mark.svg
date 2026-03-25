@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title desc">
+  <title id="title">RetroZetro Comics logo mark</title>
+  <desc id="desc">A retro cassette shaped logo with a starburst core.</desc>
+  <defs>
+    <linearGradient id="shell" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff9459" />
+      <stop offset="100%" stop-color="#ffcf7b" />
+    </linearGradient>
+    <linearGradient id="core" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#1f6a8a" />
+      <stop offset="100%" stop-color="#0b1529" />
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" rx="46" fill="#07111f" />
+  <rect x="28" y="38" width="184" height="164" rx="28" fill="url(#shell)" />
+  <rect x="46" y="58" width="148" height="124" rx="22" fill="url(#core)" />
+  <rect x="46" y="154" width="148" height="18" rx="9" fill="#ff9459" opacity=".85" />
+  <circle cx="85" cy="120" r="23" fill="#102038" stroke="#ffcf7b" stroke-width="8" />
+  <circle cx="155" cy="120" r="23" fill="#102038" stroke="#ffcf7b" stroke-width="8" />
+  <path d="M120 81l9 20 22 3-16 14 4 22-19-11-19 11 4-22-16-14 22-3z" fill="#7de3f6" />
+  <path d="M64 92h112" stroke="#ffcf7b" stroke-linecap="round" stroke-width="6" />
+  <path d="M88 177l-16 25m80-25l16 25" stroke="#ff9459" stroke-linecap="round" stroke-width="10" />
+</svg>

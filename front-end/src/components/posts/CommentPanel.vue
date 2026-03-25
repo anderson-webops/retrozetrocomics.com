@@ -151,9 +151,10 @@ async function submitComment() {
 	display: grid;
 	gap: 1.3rem;
 	padding: clamp(1.4rem, 4vw, 2rem);
-	border-radius: 22px;
-	background: rgba(255, 255, 255, 0.06);
-	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 24px;
+	background: rgba(255, 248, 239, 0.97);
+	border: 1px solid rgba(9, 21, 38, 0.08);
+	box-shadow: 0 18px 34px rgba(8, 13, 26, 0.12);
 }
 
 .comment-panel__header {
@@ -180,26 +181,25 @@ async function submitComment() {
 	text-transform: uppercase;
 	letter-spacing: 0.2em;
 	font-size: 0.76rem;
-	color: #ffb36f;
+	color: #ff7d44;
 	margin-bottom: 0.4rem !important;
 }
 
 .comment-panel__composer {
 	display: grid;
 	gap: 0.85rem;
-	padding: 1rem;
-	border-radius: 18px;
-	background: rgba(11, 1, 19, 0.36);
+	padding: 1.1rem;
+	border-radius: 20px;
+	background: #102038;
 }
 
 .comment-panel__input {
 	width: 100%;
-	border-radius: 16px;
+	border-radius: 18px;
 	border: 1px solid rgba(255, 255, 255, 0.12);
-	background: rgba(255, 255, 255, 0.05);
-	color: #fff2ff;
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff7ef;
 	padding: 1rem;
-	resize: vertical;
 }
 
 .comment-panel__composer-footer {
@@ -215,7 +215,7 @@ async function submitComment() {
 .comment-panel__message,
 .comment-panel__empty,
 .comment-panel__item-header p {
-	color: rgba(255, 255, 255, 0.72);
+	color: #52637e;
 	line-height: 1.6;
 }
 
@@ -224,8 +224,8 @@ async function submitComment() {
 	border: none;
 	border-radius: 999px;
 	padding: 0.75rem 1.15rem;
-	background: linear-gradient(120deg, #ff914d, #7a4bb4);
-	color: #160021;
+	background: linear-gradient(120deg, #ff9459, #ffd27d);
+	color: #08111f;
 	font-weight: 800;
 	cursor: pointer;
 }
@@ -247,8 +247,8 @@ async function submitComment() {
 	display: grid;
 	gap: 0.8rem;
 	padding: 1rem 1.1rem;
-	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.05);
+	border-radius: 20px;
+	background: rgba(9, 21, 38, 0.04);
 }
 
 .comment-panel__item-header {
@@ -260,13 +260,13 @@ async function submitComment() {
 }
 
 .comment-panel__item-header h3 {
-	color: #fff1df;
+	color: #102038;
 }
 
 .comment-panel__body {
 	white-space: pre-line;
 	line-height: 1.7;
-	color: #f5e9ff;
+	color: #31405a;
 }
 
 .comment-panel__status {
@@ -280,18 +280,18 @@ async function submitComment() {
 }
 
 .comment-panel__status--approved {
-	background: rgba(130, 229, 173, 0.15);
-	color: #b8ffd1;
+	background: rgba(130, 229, 173, 0.18);
+	color: #1f7b4a;
 }
 
 .comment-panel__status--pending {
-	background: rgba(255, 179, 111, 0.14);
-	color: #ffd8b0;
+	background: rgba(255, 179, 111, 0.2);
+	color: #9d5d1e;
 }
 
 .comment-panel__status--rejected,
 .comment-panel__status--hidden {
-	background: rgba(255, 143, 143, 0.14);
-	color: #ffcdcd;
+	background: rgba(255, 143, 143, 0.18);
+	color: #a14040;
 }
 </style>

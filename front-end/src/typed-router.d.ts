@@ -65,13 +65,6 @@ declare module 'vue-router/auto-routes' {
       { slug: ParamValue<false> },
       | never
     >,
-    '/README': RouteRecordInfo<
-      '/README',
-      '/README',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
     '/studio/': RouteRecordInfo<
       '/studio/',
       '/studio',
@@ -132,12 +125,6 @@ declare module 'vue-router/auto-routes' {
     'src/pages/posts/[slug].vue': {
       routes:
         | '/posts/[slug]'
-      views:
-        | never
-    }
-    'src/pages/README.md': {
-      routes:
-        | '/README'
       views:
         | never
     }

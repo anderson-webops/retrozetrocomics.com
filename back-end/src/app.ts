@@ -12,6 +12,7 @@ import { ensureUploadDirectories, uploadRoot } from "./services/storage.js";
 
 export function createApp() {
 	const app = express();
+	const apiRouter = express.Router();
 	const SESSION_SECRET = env.SESSION_SECRET;
 
 	if (!SESSION_SECRET) {
@@ -68,6 +69,15 @@ export function createApp() {
 	});
 
 	app.use("/uploads", express.static(uploadRoot));
+
+	apiRouter.use("/auth", authRouter);
+	apiRouter.use("/accounts", legacyAccountsRouter);
+	apiRouter.use("/posts", postsRouter);
+	apiRouter.use("/admin", adminRouter);
+
+	app.use("/api", apiRouter);
+
+	// Keep legacy mounts during the transition to the explicit /api contract.
 	app.use("/auth", authRouter);
 	app.use("/accounts", legacyAccountsRouter);
 	app.use("/posts", postsRouter);

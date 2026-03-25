@@ -1,20 +1,79 @@
 @import "./defaultStyles.css";
-@import "./tailwind.css";
 @import "./markdown.css";
+
+:root {
+	--font-body: "Avenir Next", "Trebuchet MS", "Gill Sans", sans-serif;
+	--font-display: "Copperplate", "Impact", "Haettenschweiler", fantasy;
+	--font-copy: "Palatino Linotype", "Book Antiqua", serif;
+	--surface-base: #07111f;
+	--surface-panel: rgba(255, 248, 239, 0.94);
+	--surface-panel-muted: rgba(255, 255, 255, 0.07);
+	--surface-panel-dark: rgba(7, 17, 31, 0.88);
+	--ink-strong: #091526;
+	--ink-muted: #40506a;
+	--ink-soft: rgba(239, 244, 255, 0.8);
+	--accent-sun: #ff9459;
+	--accent-gold: #ffd27d;
+	--accent-cyan: #7ce1f6;
+	--accent-line: rgba(255, 255, 255, 0.12);
+}
 
 html,
 body,
 #app {
 	height: 100%;
-	margin: 0;
-	padding: 0;
 }
 
-/* Dark Mode */
 html.dark {
-	background: inherit; /* Dark purple background for dark mode */
 	color-scheme: dark;
-	color: #fff; /* White text for dark mode */
+}
+
+body {
+	margin: 0;
+	background:
+		radial-gradient(
+			circle at top left,
+			rgba(255, 148, 89, 0.16),
+			transparent 28%
+		),
+		radial-gradient(
+			circle at bottom right,
+			rgba(124, 225, 246, 0.14),
+			transparent 26%
+		),
+		repeating-linear-gradient(
+			135deg,
+			rgba(255, 255, 255, 0.02) 0,
+			rgba(255, 255, 255, 0.02) 1px,
+			transparent 1px,
+			transparent 18px
+		),
+		var(--surface-base);
+	color: var(--ink-strong);
+	font-family: var(--font-body);
+	font-size: 16px;
+	line-height: 1.6;
+}
+
+body::before {
+	content: "";
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	background:
+		linear-gradient(
+			180deg,
+			rgba(255, 255, 255, 0.04),
+			transparent 18%,
+			transparent 82%,
+			rgba(255, 255, 255, 0.03)
+		);
+	mix-blend-mode: soft-light;
+}
+
+::selection {
+	background: rgba(255, 210, 125, 0.85);
+	color: #08111f;
 }
 
 #nprogress {
@@ -22,7 +81,7 @@ html.dark {
 }
 
 #nprogress .bar {
-	background: #ff914d; /* Nice orange progress bar */
+	background: var(--accent-sun);
 	opacity: 0.75;
 	position: fixed;
 	z-index: 1031;
@@ -32,76 +91,58 @@ html.dark {
 	height: 2px;
 }
 
-/**************
-*   General   *
-**************/
-
-header {
-	background-color: #b38cdc; /* Lighter purple header */
-	border-bottom: 1px solid #ff914d; /* Orange border */
-	color: #fff; /* White text for header */
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--font-display);
+	letter-spacing: 0.02em;
 }
 
-body {
-	background-color: #f48527; /* Light orange background */
-	font-size: 110%;
-	margin: 0;
-	color: #603985; /* Slightly lighter purple text color */
+a,
+button {
+	transition:
+		transform 0.2s ease,
+		box-shadow 0.2s ease,
+		background-color 0.2s ease,
+		border-color 0.2s ease,
+		color 0.2s ease;
 }
 
-.content {
-	margin: 20px;
+button {
+	border: none;
 }
 
-footer {
-	/*margin-bottom: 20px;*/
-	padding: 20px;
-	background-color: #b38cdc; /* Matching the header color */
-	color: #fff; /* White text for footer */
-	border: 1px solid #ff914d; /* Orange border */
-	border-radius: 5px;
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+a:hover,
+a:focus-visible,
+button:hover,
+button:focus-visible {
+	outline: none;
 }
 
-/******************
-*   Router View   *
-******************/
-
-h1, h2 {
-	font-weight: bold;
-	text-align: center;
-	padding-bottom: 5px;
-	margin: 0;
-	color: #333; /* Nice orange text for headings */
+img {
+	height: auto;
 }
 
-h1 {
-	font-size: 200%;
-}
-
-h2 {
-	font-size: 150%;
+textarea {
+	resize: vertical;
 }
 
 .page {
-	background-color: inherit; /* Light orange background for pages */
+	width: 100%;
 }
 
 .item {
-	margin-bottom: 20px;
-	padding: 20px;
-	background-color: #fff; /*#fff;*/
-	border: 1px solid #ff914d; /* Orange border */
-	border-radius: 5px;
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
-	color: #603985; /* Lighter purple text */
-	
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	justify-content: center;
+	gap: 1rem;
+	padding: 1.25rem;
+	border-radius: 18px;
+	background: var(--surface-panel);
+	border: 1px solid rgba(9, 21, 38, 0.08);
+	box-shadow: 0 18px 36px rgba(8, 13, 26, 0.12);
 }
 
 .item p {
-	margin-top: 10px;
+	color: var(--ink-muted);
 }

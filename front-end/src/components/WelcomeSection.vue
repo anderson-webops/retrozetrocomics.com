@@ -1,67 +1,135 @@
 <script lang="ts" setup>
+import type { PropType } from "vue";
 import { useSessionStore } from "@/stores/session";
 
+const props = defineProps({
+	actions: {
+		default: undefined,
+		type: Array as PropType<HeroAction[] | undefined>
+	},
+	eyebrow: {
+		default: "Your weekly broadcast from the Retroverse",
+		type: String
+	},
+	highlights: {
+		default: undefined,
+		type: Array as PropType<HeroHighlight[] | undefined>
+	},
+	imageAlt: {
+		default: "Stylised collage of RetroZetro heroes",
+		type: String
+	},
+	imageSrc: {
+		default: "/brand/hero-collage.svg",
+		type: String
+	},
+	message: {
+		default:
+			"New comics, storyboard experiments, and behind-the-scenes photo dispatches now live in a single interactive studio feed. Members can sign in to comment on open posts while admins moderate the conversation.",
+		type: String
+	},
+	title: {
+		default: "RetroZetro Comics",
+		type: String
+	}
+});
+
 const session = useSessionStore();
+
+interface HeroAction {
+	href?: string;
+	label: string;
+	mode?: "login" | "signup";
+	style?: "primary" | "secondary";
+	to?: string;
+}
+
+interface HeroHighlight {
+	description: string;
+	term: string;
+}
+
+const defaultActions: HeroAction[] = [
+	{ label: "Enter the Studio", style: "primary", to: "/studio" },
+	{ label: "Create Account", mode: "signup", style: "secondary" }
+];
+
+const defaultHighlights: HeroHighlight[] = [
+	{
+		description:
+			"Comics, storyboards, and photos publish from one admin console.",
+		term: "New Releases"
+	},
+	{
+		description:
+			"Follow the process with layout drafts and studio snapshots.",
+		term: "Creator Extras"
+	},
+	{
+		description:
+			"Member comments are moderated so discussion stays constructive.",
+		term: "Community"
+	}
+];
+
+const heroActions = computed(() => props.actions ?? defaultActions);
+const heroHighlights = computed(() => props.highlights ?? defaultHighlights);
+
+function handleAction(action: HeroAction) {
+	if (action.mode) {
+		session.openAuth(action.mode);
+	}
+}
 </script>
 
 <template>
 	<section aria-labelledby="welcome-title" class="welcome">
 		<div class="welcome__content">
 			<p class="welcome__eyebrow">
-				Your weekly broadcast from the Retroverse
+				{{ eyebrow }}
 			</p>
-			<h1 id="welcome-title" class="welcome__title">RetroZetro Comics</h1>
+			<h1 id="welcome-title" class="welcome__title">{{ title }}</h1>
 			<p class="welcome__description">
-				New comics, storyboard experiments, and behind-the-scenes photo
-				dispatches now live in a single interactive studio feed. Members
-				can sign in to comment on open posts while admins moderate the
-				conversation.
+				{{ message }}
 			</p>
 
 			<div class="welcome__actions">
-				<RouterLink
-					class="welcome__cta welcome__cta--primary"
-					to="/studio"
-				>
-					Enter the Studio
-				</RouterLink>
-				<button
-					v-if="!session.isAuthenticated"
-					class="welcome__cta welcome__cta--secondary"
-					type="button"
-					@click="session.openAuth('signup')"
-				>
-					Create Account
-				</button>
-				<RouterLink
-					v-else
-					class="welcome__cta welcome__cta--secondary"
-					to="/characters"
-				>
-					Meet the Crew
-				</RouterLink>
+				<template v-for="action in heroActions" :key="action.label">
+					<RouterLink
+						v-if="action.to"
+						class="welcome__cta"
+						:class="`welcome__cta--${action.style || 'primary'}`"
+						:to="action.to"
+					>
+						{{ action.label }}
+					</RouterLink>
+					<a
+						v-else-if="action.href"
+						class="welcome__cta"
+						:class="`welcome__cta--${action.style || 'primary'}`"
+						:href="action.href"
+						rel="noreferrer"
+						target="_blank"
+					>
+						{{ action.label }}
+					</a>
+					<button
+						v-else
+						class="welcome__cta"
+						:class="`welcome__cta--${action.style || 'primary'}`"
+						type="button"
+						@click="handleAction(action)"
+					>
+						{{ action.label }}
+					</button>
+				</template>
 			</div>
 
 			<dl class="welcome__highlights">
-				<div>
-					<dt>New Releases</dt>
+				<div v-for="highlight in heroHighlights" :key="highlight.term">
+					<dt>{{ highlight.term }}</dt>
 					<dd>
-						Comics, storyboards, and photos publish from one admin
-						console.
-					</dd>
-				</div>
-				<div>
-					<dt>Creator Extras</dt>
-					<dd>
-						Follow the process with layout drafts and studio
-						snapshots.
-					</dd>
-				</div>
-				<div>
-					<dt>Community</dt>
-					<dd>
-						Member comments are moderated so discussion stays
-						constructive.
+						{{ highlight.description }}
 					</dd>
 				</div>
 			</dl>
@@ -69,10 +137,7 @@ const session = useSessionStore();
 
 		<div class="welcome__poster" role="presentation">
 			<div class="welcome__poster-frame">
-				<img
-					alt="Stylised collage of RetroZetro heroes"
-					src="https://retrozetrocomics.s3.amazonaws.com/images/RetroZetro_Heroes.jpg"
-				/>
+				<img :alt="imageAlt" :src="imageSrc" />
 			</div>
 		</div>
 	</section>
@@ -85,13 +150,16 @@ const session = useSessionStore();
 	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 	align-items: center;
 	padding: 3.5rem clamp(1rem, 4vw, 3rem);
-	background: linear-gradient(
-		135deg,
-		rgba(96, 57, 133, 0.95),
-		rgba(255, 145, 77, 0.35)
-	);
+	background:
+		radial-gradient(
+			circle at top right,
+			rgba(255, 148, 89, 0.28),
+			transparent 34%
+		),
+		linear-gradient(135deg, rgba(9, 21, 38, 0.98), rgba(18, 38, 62, 0.95));
 	border-radius: 24px;
-	box-shadow: 0 24px 60px rgba(41, 16, 54, 0.35);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	box-shadow: 0 24px 60px rgba(10, 15, 28, 0.35);
 	color: #fdf9ff;
 }
 
@@ -102,26 +170,35 @@ const session = useSessionStore();
 }
 
 .welcome__eyebrow {
-	font-size: 0.95rem;
-	letter-spacing: 0.25em;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: fit-content;
+	padding: 0.42rem 0.8rem;
+	border-radius: 999px;
+	font-size: 0.82rem;
+	letter-spacing: 0.18em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.72);
+	color: #091526;
+	background: #ffd27d;
 	margin: 0;
 }
 
 .welcome__title {
-	font-size: clamp(2.5rem, 4vw, 3.5rem);
+	font-size: clamp(2.6rem, 5vw, 4.1rem);
 	font-weight: 800;
-	line-height: 1.05;
+	font-family: var(--font-display);
+	line-height: 0.98;
 	margin: 0;
+	color: #fff8ef;
 }
 
 .welcome__description {
-	font-size: 1.05rem;
-	line-height: 1.75;
-	max-width: 42ch;
+	font-size: 1.08rem;
+	line-height: 1.85;
+	max-width: 48ch;
 	margin: 0;
-	color: rgba(255, 255, 255, 0.9);
+	color: rgba(239, 244, 255, 0.88);
 }
 
 .welcome__actions {
@@ -139,6 +216,7 @@ const session = useSessionStore();
 	font-weight: 700;
 	text-decoration: none;
 	border: none;
+	font-family: var(--font-body);
 	transition:
 		transform 0.2s ease,
 		box-shadow 0.2s ease,
@@ -146,9 +224,10 @@ const session = useSessionStore();
 }
 
 .welcome__cta--primary {
-	background: #ff914d;
-	color: #2b0e3a;
-	box-shadow: 0 12px 24px rgba(255, 145, 77, 0.35);
+	background: #ff9459;
+	color: #0a1526;
+	box-shadow: 0 12px 24px rgba(255, 148, 89, 0.28);
+	cursor: pointer;
 }
 
 .welcome__cta--primary:hover,
@@ -158,9 +237,9 @@ const session = useSessionStore();
 }
 
 .welcome__cta--secondary {
-	background: rgba(255, 255, 255, 0.15);
-	border: 1px solid rgba(255, 255, 255, 0.3);
-	color: #fdf9ff;
+	background: rgba(255, 255, 255, 0.06);
+	border: 1px solid rgba(124, 225, 246, 0.32);
+	color: #eff4ff;
 	cursor: pointer;
 }
 
@@ -179,7 +258,7 @@ const session = useSessionStore();
 
 .welcome__highlights dt {
 	font-weight: 700;
-	color: #ffe3d0;
+	color: #ffd27d;
 	margin-bottom: 0.35rem;
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
@@ -188,8 +267,8 @@ const session = useSessionStore();
 
 .welcome__highlights dd {
 	margin: 0;
-	color: rgba(255, 255, 255, 0.86);
-	line-height: 1.6;
+	color: rgba(239, 244, 255, 0.82);
+	line-height: 1.7;
 }
 
 .welcome__poster {
@@ -201,13 +280,9 @@ const session = useSessionStore();
 	position: relative;
 	padding: 0.75rem;
 	border-radius: 22px;
-	background: linear-gradient(
-		140deg,
-		rgba(255, 145, 77, 0.5),
-		rgba(96, 57, 133, 0.8)
-	);
-	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-	max-width: 360px;
+	background: linear-gradient(140deg, rgba(255, 148, 89, 0.8), #ffd27d);
+	box-shadow: 0 20px 50px rgba(8, 13, 26, 0.3);
+	max-width: 420px;
 }
 
 .welcome__poster-frame::after {

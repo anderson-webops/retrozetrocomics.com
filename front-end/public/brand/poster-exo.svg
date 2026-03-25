@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" role="img" aria-labelledby="title">
+  <title id="title">Exo poster</title>
+  <rect width="800" height="1100" fill="#07111d" />
+  <rect x="52" y="52" width="696" height="996" rx="34" fill="#0d2038" stroke="#ffd680" stroke-width="12" />
+  <circle cx="400" cy="294" r="168" fill="#d0f5ff" />
+  <path d="M206 818c36-220 102-334 194-334 96 0 161 114 196 334" fill="#09111c" stroke="#7ce1f6" stroke-width="14" />
+  <path d="M262 168l64-80h148l64 80" fill="none" stroke="#ff9a62" stroke-linecap="round" stroke-width="14" />
+  <text x="400" y="154" fill="#7ce1f6" font-family="Verdana, sans-serif" font-size="34" text-anchor="middle">ORBIT BREAKER</text>
+  <text x="400" y="944" fill="#ffd680" font-family="Verdana, sans-serif" font-size="72" font-weight="700" text-anchor="middle">EXO</text>
+  <text x="400" y="1004" fill="#7ce1f6" font-family="Verdana, sans-serif" font-size="28" text-anchor="middle">No gravity, no mercy</text>
+</svg>

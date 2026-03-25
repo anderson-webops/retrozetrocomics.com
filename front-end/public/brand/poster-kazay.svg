@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" role="img" aria-labelledby="title">
+  <title id="title">Kazay poster</title>
+  <rect width="800" height="1100" fill="#101122" />
+  <rect x="52" y="52" width="696" height="996" rx="34" fill="#1b1730" stroke="#7ce1f6" stroke-width="12" />
+  <circle cx="400" cy="304" r="166" fill="#7ce1f6" />
+  <path d="M206 814c36-212 101-322 194-322 94 0 160 110 196 322" fill="#09101e" stroke="#ff9a62" stroke-width="14" />
+  <text x="400" y="154" fill="#ffd680" font-family="Verdana, sans-serif" font-size="34" text-anchor="middle">ROGUE FREQUENCIES</text>
+  <text x="400" y="944" fill="#7ce1f6" font-family="Verdana, sans-serif" font-size="72" font-weight="700" text-anchor="middle">KAZAY</text>
+  <text x="400" y="1004" fill="#ffd680" font-family="Verdana, sans-serif" font-size="28" text-anchor="middle">Nothing stays stolen forever</text>
+</svg>

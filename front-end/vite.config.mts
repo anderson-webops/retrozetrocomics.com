@@ -101,48 +101,48 @@ export default defineConfig(({ command }) => ({
 		VitePWA({
 			registerType: "autoUpdate",
 			includeAssets: [
-				"favicon.ico",
-				"favicon-16x16.png",
-				"favicon-32x32.png",
-				"apple-touch-icon.png",
-				"android-chrome-192x192.png",
-				"android-chrome-512x512.png"
+				"Favicons/favicon.ico",
+				"Favicons/favicon-16x16.png",
+				"Favicons/favicon-32x32.png",
+				"Favicons/apple-touch-icon.png",
+				"Favicons/android-chrome-192x192.png",
+				"Favicons/android-chrome-512x512.png"
 			],
 			manifest: {
 				name: "Retro Zetro Comics",
 				short_name: "RetroZetro",
-				theme_color: "#ffffff",
-				background_color: "#ffffff",
+				theme_color: "#091526",
+				background_color: "#07111f",
 				display: "standalone",
 				icons: [
 					{
-						src: "https://retrozetrocomics.s3.us-east-1.amazonaws.com/Favicons/android-chrome-192x192.png",
+						src: "/Favicons/android-chrome-192x192.png",
 						sizes: "192x192",
 						type: "image/png"
 					},
 					{
-						src: "https://retrozetrocomics.s3.us-east-1.amazonaws.com/Favicons/android-chrome-512x512.png",
+						src: "/Favicons/android-chrome-512x512.png",
 						sizes: "512x512",
 						type: "image/png"
 					},
 					{
-						src: "https://retrozetrocomics.s3.us-east-1.amazonaws.com/Favicons/apple-touch-icon.png",
+						src: "/Favicons/apple-touch-icon.png",
 						sizes: "180x180",
 						type: "image/png",
 						purpose: "apple-touch-icon"
 					},
 					{
-						src: "https://retrozetrocomics.s3.us-east-1.amazonaws.com/Favicons/favicon-32x32.png",
+						src: "/Favicons/favicon-32x32.png",
 						sizes: "32x32",
 						type: "image/png"
 					},
 					{
-						src: "https://retrozetrocomics.s3.us-east-1.amazonaws.com/Favicons/favicon-16x16.png",
+						src: "/Favicons/favicon-16x16.png",
 						sizes: "16x16",
 						type: "image/png"
 					},
 					{
-						src: "https://retrozetrocomics.s3.us-east-1.amazonaws.com/Favicons/favicon.ico",
+						src: "/Favicons/favicon.ico",
 						sizes: "48x48",
 						type: "image/x-icon"
 					}
@@ -195,8 +195,7 @@ export default defineConfig(({ command }) => ({
 		proxy: {
 			"/api": {
 				target: "http://localhost:3006",
-				changeOrigin: true,
-				rewrite: p => p.replace(/^\/api/, "") // strip /api
+				changeOrigin: true
 			},
 			"/uploads": {
 				target: "http://localhost:3006",

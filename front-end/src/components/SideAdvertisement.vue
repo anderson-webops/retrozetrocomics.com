@@ -1,11 +1,73 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+const props = withDefaults(
+	defineProps<{
+		variant?: "archive" | "community";
+	}>(),
+	{
+		variant: "archive"
+	}
+);
+
+const panels = {
+	archive: {
+		ctaLabel: "See full journal",
+		ctaTo: "/studio",
+		eyebrow: "Archive Guide",
+		items: [
+			{
+				label: "Archive Types",
+				value: "Comics, storyboard notes, and photo posts"
+			},
+			{
+				label: "Freshest Lane",
+				value: "Latest drops feed updates directly from live posts"
+			},
+			{
+				label: "Media Path",
+				value: "Hero and showcase art now ship locally with the site"
+			}
+		]
+	},
+	community: {
+		ctaLabel: "Admin console",
+		ctaTo: "/studio/admin",
+		eyebrow: "Community Rules",
+		items: [
+			{
+				label: "Comment Access",
+				value: "Members only, with one clear identity per account"
+			},
+			{
+				label: "Moderation Flow",
+				value: "Admins can approve, reject, hide, or suspend as needed"
+			},
+			{
+				label: "Signup Gate",
+				value: "Captcha stays in front of new account creation"
+			}
+		]
+	}
+} as const;
+
+const panel = computed(() => panels[props.variant]);
+</script>
 
 <template>
-	<aside aria-label="Advertisement" class="side-ad">
+	<aside aria-label="Studio quick facts" class="side-ad">
+		<p class="side-ad__eyebrow">{{ panel.eyebrow }}</p>
 		<div class="side-ad__frame">
-			<div class="vm-placement" data-id="5d821820f98d0e4b4cbd81f4" />
+			<div
+				v-for="item in panel.items"
+				:key="item.label"
+				class="side-ad__slot"
+			>
+				<strong>{{ item.label }}</strong>
+				<span>{{ item.value }}</span>
+			</div>
 		</div>
-		<p class="side-ad__label">Sponsored transmission</p>
+		<RouterLink class="side-ad__link" :to="panel.ctaTo">
+			{{ panel.ctaLabel }}
+		</RouterLink>
 	</aside>
 </template>
 
@@ -13,48 +75,82 @@
 .side-ad {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	gap: 0.65rem;
-	padding: 1rem;
-	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.04);
-	border: 1px dashed rgba(255, 255, 255, 0.15);
-	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+	align-items: flex-start;
+	gap: 0.75rem;
+	padding: 1.15rem;
+	border-radius: 20px;
+	background: rgba(9, 21, 38, 0.8);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 	min-height: 100%;
+}
+
+.side-ad__eyebrow {
+	margin: 0;
+	font-size: 0.76rem;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	font-weight: 700;
+	color: #ffd27d;
 }
 
 .side-ad__frame {
 	width: 100%;
-	min-height: 240px;
 	border-radius: 14px;
-	background: linear-gradient(
-		160deg,
-		rgba(255, 145, 77, 0.32),
-		rgba(96, 57, 133, 0.45)
-	);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0.75rem;
+	background:
+		radial-gradient(
+			circle at top right,
+			rgba(255, 148, 89, 0.2),
+			transparent 34%
+		),
+		linear-gradient(
+			160deg,
+			rgba(255, 255, 255, 0.04),
+			rgba(255, 255, 255, 0.02)
+		);
+	display: grid;
+	gap: 0.7rem;
+	padding: 0.9rem;
 }
 
-.side-ad__label {
-	font-size: 0.75rem;
-	letter-spacing: 0.22em;
-	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.55);
-	text-align: center;
+.side-ad__slot {
+	display: grid;
+	gap: 0.2rem;
+	padding: 0.9rem;
+	border-radius: 14px;
+	background: rgba(8, 17, 31, 0.38);
+}
+
+.side-ad__slot strong,
+.side-ad__slot span,
+.side-ad__link {
 	margin: 0;
+}
+
+.side-ad__slot strong {
+	color: #fff4e7;
+}
+
+.side-ad__slot span {
+	color: rgba(239, 244, 255, 0.7);
+	line-height: 1.6;
+}
+
+.side-ad__link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.72rem 1rem;
+	border-radius: 999px;
+	text-decoration: none;
+	font-weight: 700;
+	background: #ff9459;
+	color: #08111f;
 }
 
 @media (max-width: 1024px) {
 	.side-ad {
-		flex-direction: row;
-		justify-content: center;
-	}
-
-	.side-ad__frame {
-		min-height: 120px;
+		align-items: stretch;
 	}
 }
 </style>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" role="img" aria-labelledby="title">
+  <title id="title">RetroZetro issue poster</title>
+  <rect width="800" height="1100" fill="#08111f" />
+  <rect x="52" y="52" width="696" height="996" rx="34" fill="#101f34" stroke="#ff9a62" stroke-width="12" />
+  <circle cx="400" cy="310" r="170" fill="#ff9a62" />
+  <path d="M208 820c31-206 96-316 192-316 98 0 164 110 192 316" fill="#08111f" stroke="#ffd680" stroke-width="14" />
+  <text x="400" y="154" fill="#7ce1f6" font-family="Verdana, sans-serif" font-size="34" text-anchor="middle">ISSUE 01</text>
+  <text x="400" y="944" fill="#ffd680" font-family="Verdana, sans-serif" font-size="72" font-weight="700" text-anchor="middle">RETROZETRO</text>
+  <text x="400" y="1004" fill="#7ce1f6" font-family="Verdana, sans-serif" font-size="28" text-anchor="middle">Synth City is awake again</text>
+</svg>

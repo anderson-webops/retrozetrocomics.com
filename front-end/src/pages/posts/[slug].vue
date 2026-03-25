@@ -113,35 +113,55 @@ watch(
 <style scoped>
 .post-page {
 	display: grid;
-	gap: 1.6rem;
+	gap: 1.8rem;
 }
 
 .post-page__state {
 	margin: 0;
 	padding: 1rem 1.2rem;
 	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.06);
-	color: rgba(255, 255, 255, 0.8);
+	background: rgba(255, 248, 239, 0.96);
+	color: #42516b;
 }
 
 .post-page__state--error {
-	color: #ffd0d0;
+	color: #bf4b34;
 }
 
 .post-page__hero,
 .post-page__content {
 	display: grid;
-	gap: 0.8rem;
-	padding: clamp(1.6rem, 4vw, 2.5rem);
-	border-radius: 24px;
-	background: rgba(255, 255, 255, 0.06);
-	border: 1px solid rgba(255, 255, 255, 0.08);
+	gap: 0.9rem;
+	padding: clamp(1.6rem, 4vw, 2.6rem);
+	border-radius: 28px;
+}
+
+.post-page__hero {
+	background:
+		radial-gradient(
+			circle at top right,
+			rgba(255, 148, 89, 0.24),
+			transparent 34%
+		),
+		linear-gradient(140deg, rgba(9, 21, 38, 0.98), rgba(18, 38, 62, 0.95));
+	box-shadow: 0 24px 48px rgba(6, 10, 17, 0.28);
+}
+
+.post-page__content {
+	background: rgba(255, 248, 239, 0.97);
+	border: 1px solid rgba(9, 21, 38, 0.08);
+	box-shadow: 0 20px 36px rgba(8, 13, 26, 0.12);
 }
 
 .post-page__back {
 	justify-self: start;
+	display: inline-flex;
+	align-items: center;
+	padding: 0.68rem 0.95rem;
+	border-radius: 999px;
 	text-decoration: none;
-	color: #ffb36f;
+	background: rgba(255, 255, 255, 0.08);
+	color: #ffd27d;
 	font-weight: 700;
 }
 
@@ -166,8 +186,7 @@ watch(
 }
 
 .post-page__summary,
-.post-page__meta,
-.post-page__copy p {
+.post-page__meta {
 	color: rgba(255, 255, 255, 0.8);
 	line-height: 1.8;
 }
@@ -176,6 +195,14 @@ watch(
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1rem;
+}
+
+.post-page__meta span {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.42rem 0.75rem;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.08);
 	text-transform: uppercase;
 	letter-spacing: 0.1em;
 	font-size: 0.78rem;
@@ -190,14 +217,19 @@ watch(
 .post-page__gallery img {
 	width: 100%;
 	display: block;
-	border-radius: 22px;
+	border-radius: 24px;
 	object-fit: cover;
-	min-height: 220px;
-	box-shadow: 0 18px 32px rgba(6, 0, 12, 0.32);
+	min-height: 260px;
+	box-shadow: 0 18px 32px rgba(6, 10, 17, 0.24);
 }
 
 .post-page__copy p {
 	white-space: pre-line;
+	margin: 0;
+	font-family: var(--font-copy);
+	font-size: 1.08rem;
+	line-height: 1.95;
+	color: #2f4058;
 }
 
 .post-page__tags {
@@ -212,8 +244,8 @@ watch(
 .post-page__tags li {
 	padding: 0.42rem 0.76rem;
 	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.08);
-	color: #f0d7ff;
+	background: rgba(124, 225, 246, 0.16);
+	color: #1d4f6a;
 }
 </style>
 

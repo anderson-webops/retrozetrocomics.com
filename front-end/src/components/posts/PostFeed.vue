@@ -31,6 +31,26 @@ const posts = ref<PostSummary[]>([]);
 const loading = ref(false);
 const error = ref("");
 
+const filterDescriptions: Record<"all" | PostType, string> = {
+	all: "The live archive mixes finished comic pages, rough boards, and photo dispatches in one stream.",
+	comic: "Finished comic drops, chapter releases, and polished narrative pages.",
+	photo: "Reference textures, studio snapshots, and atmosphere captured off the page.",
+	storyboard:
+		"Shot plans, pacing experiments, and early visual problem-solving."
+};
+
+const activeFilterLabel = computed(
+	() =>
+		filters.find(filter => filter.value === activeType.value)?.label ||
+		"All"
+);
+
+const activeFilterDescription = computed(() =>
+	activeType.value
+		? filterDescriptions[activeType.value]
+		: filterDescriptions.all
+);
+
 async function loadPosts() {
 	loading.value = true;
 	error.value = "";
@@ -62,13 +82,30 @@ watch(activeType, () => {
 <template>
 	<section class="post-feed">
 		<header class="post-feed__header">
-			<div>
+			<div class="post-feed__intro">
 				<p class="post-feed__eyebrow">Creator Journal</p>
 				<h2>{{ title }}</h2>
 				<p>{{ subtitle }}</p>
+				<div class="post-feed__intel">
+					<div>
+						<span>Current lane</span>
+						<strong>{{ activeFilterLabel }}</strong>
+					</div>
+					<div>
+						<span>Discussion</span>
+						<strong>Members only on open posts</strong>
+					</div>
+					<div>
+						<span>Storage</span>
+						<strong>Served locally and ready for S3 later</strong>
+					</div>
+				</div>
 			</div>
 
 			<div class="post-feed__controls">
+				<p class="post-feed__filter-copy">
+					{{ activeFilterDescription }}
+				</p>
 				<div
 					class="post-feed__filters"
 					role="tablist"
@@ -103,7 +140,7 @@ watch(activeType, () => {
 			{{ error }}
 		</p>
 		<p v-else-if="loading" class="post-feed__state">
-			Loading studio posts...
+			Refreshing the journal feed...
 		</p>
 		<p v-else-if="!posts.length" class="post-feed__state">
 			The archive is empty for now. Once the first drop is published, it
@@ -119,30 +156,35 @@ watch(activeType, () => {
 <style scoped>
 .post-feed {
 	display: grid;
-	gap: 1.6rem;
-	padding: clamp(1.6rem, 4vw, 2.6rem);
-	border-radius: 24px;
+	gap: 1.8rem;
+	padding: clamp(1.6rem, 4vw, 2.8rem);
+	border-radius: 28px;
 	background:
 		radial-gradient(
-			circle at top left,
-			rgba(255, 145, 77, 0.16),
-			transparent 34%
+			circle at bottom right,
+			rgba(124, 225, 246, 0.16),
+			transparent 36%
 		),
 		radial-gradient(
-			circle at bottom right,
-			rgba(96, 57, 133, 0.3),
-			transparent 44%
+			circle at top left,
+			rgba(255, 148, 89, 0.2),
+			transparent 28%
 		),
-		rgba(255, 255, 255, 0.06);
-	border: 1px solid rgba(255, 255, 255, 0.09);
+		linear-gradient(
+			180deg,
+			rgba(255, 248, 239, 0.98),
+			rgba(244, 230, 214, 0.94)
+		);
+	border: 1px solid rgba(9, 21, 38, 0.08);
+	box-shadow: 0 24px 44px rgba(8, 13, 26, 0.16);
+	color: #091526;
 }
 
 .post-feed__header {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1rem;
-	justify-content: space-between;
-	align-items: end;
+	display: grid;
+	gap: 1.2rem;
+	grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+	align-items: start;
 }
 
 .post-feed__header h2,
@@ -150,13 +192,18 @@ watch(activeType, () => {
 	margin: 0;
 }
 
+.post-feed__intro {
+	display: grid;
+	gap: 0.85rem;
+}
+
 .post-feed__header h2 {
-	font-size: clamp(1.9rem, 4vw, 2.5rem);
-	color: #fff7f0;
+	font-size: clamp(2.1rem, 4vw, 3rem);
+	color: #0a1526;
 }
 
 .post-feed__header p {
-	color: rgba(255, 255, 255, 0.72);
+	color: #42516b;
 	line-height: 1.7;
 	max-width: 58ch;
 }
@@ -164,52 +211,95 @@ watch(activeType, () => {
 .post-feed__eyebrow {
 	margin-bottom: 0.45rem !important;
 	text-transform: uppercase;
-	letter-spacing: 0.25em;
+	letter-spacing: 0.18em;
 	font-size: 0.78rem;
-	color: #ffb36f !important;
+	font-weight: 800;
+	color: #ff7d44 !important;
+}
+
+.post-feed__intel {
+	display: grid;
+	gap: 0.85rem;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.post-feed__intel div {
+	display: grid;
+	gap: 0.25rem;
+	padding: 0.95rem 1rem;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.7);
+	border: 1px solid rgba(9, 21, 38, 0.08);
+}
+
+.post-feed__intel span {
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	font-size: 0.75rem;
+	font-weight: 800;
+	color: #5d6d87;
+}
+
+.post-feed__intel strong {
+	font-size: 0.95rem;
+	line-height: 1.5;
+	color: #102038;
 }
 
 .post-feed__controls {
 	display: grid;
-	gap: 0.75rem;
-	justify-items: end;
+	gap: 1rem;
+	padding: 1.1rem;
+	border-radius: 22px;
+	background: rgba(9, 21, 38, 0.92);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.post-feed__filter-copy {
+	max-width: none;
+	color: rgba(239, 244, 255, 0.78) !important;
 }
 
 .post-feed__filters {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: flex-end;
 	gap: 0.6rem;
 }
 
 .post-feed__filter,
 .post-feed__view-all {
 	border-radius: 999px;
-	padding: 0.7rem 1rem;
+	padding: 0.72rem 1rem;
 	font-weight: 700;
 	text-decoration: none;
-	border: 1px solid rgba(255, 255, 255, 0.16);
+	border: 1px solid rgba(255, 255, 255, 0.12);
 	background: rgba(255, 255, 255, 0.06);
-	color: #f5e9ff;
+	color: #f3f7ff;
 	cursor: pointer;
 }
 
 .post-feed__filter--active {
-	background: linear-gradient(120deg, #ff914d, #7a4bb4);
-	color: #1b0328;
+	background: linear-gradient(120deg, #ff9459, #ffd27d);
+	color: #08111f;
 	border-color: transparent;
+}
+
+.post-feed__view-all {
+	justify-content: center;
+	background: rgba(124, 225, 246, 0.12);
+	border-color: rgba(124, 225, 246, 0.28);
 }
 
 .post-feed__state {
 	margin: 0;
 	padding: 1rem 1.2rem;
-	border-radius: 16px;
-	background: rgba(255, 255, 255, 0.05);
-	color: rgba(255, 255, 255, 0.82);
+	border-radius: 18px;
+	background: rgba(9, 21, 38, 0.9);
+	color: rgba(239, 244, 255, 0.82);
 }
 
 .post-feed__state--error {
-	color: #ffd3d3;
+	color: #ffd1cc;
 }
 
 .post-feed__grid {
@@ -218,13 +308,15 @@ watch(activeType, () => {
 	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
-@media (max-width: 680px) {
-	.post-feed__controls {
-		justify-items: start;
+@media (max-width: 860px) {
+	.post-feed__header {
+		grid-template-columns: 1fr;
 	}
+}
 
-	.post-feed__filters {
-		justify-content: flex-start;
+@media (max-width: 680px) {
+	.post-feed__intel {
+		grid-template-columns: 1fr;
 	}
 }
 </style>

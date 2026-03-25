@@ -8,22 +8,29 @@
 				class="title-plate__logo"
 				to="/"
 			>
-				<img
-					alt="RetroZetro Comics Logo"
-					src="https://retrozetrocomics.s3.amazonaws.com/images/Original_Icon.png"
-				/>
+				<img alt="RetroZetro Comics Logo" src="/brand/logo-mark.svg" />
 			</RouterLink>
 			<div class="title-plate__text">
 				<span>RetroZetro Comics</span>
-				<p>VHS-flavoured stories beamed from the neon future.</p>
+				<p>
+					Comics, storyboard drops, and studio dispatches from the
+					neon future.
+				</p>
 			</div>
 		</div>
 
 		<div id="top-ad" class="title-plate__ad">
-			<div aria-hidden="true" class="title-plate__ad-frame">
-				<div class="vm-placement" data-id="5d821820f98d0e4b4cbd81f4" />
-			</div>
-			<small>Advertise with us</small>
+			<p class="title-plate__eyebrow">Transmission Board</p>
+			<ul class="title-plate__board">
+				<li>
+					Archive now supports comics, storyboards, and photo logs.
+				</li>
+				<li>Comments are member-only and moderated.</li>
+				<li>
+					Uploads live on the server and are staged for future AWS
+					storage.
+				</li>
+			</ul>
 		</div>
 	</header>
 </template>
@@ -34,21 +41,27 @@
 	flex-direction: column;
 	gap: 1.5rem;
 	padding: clamp(1.25rem, 3vw, 2rem);
-	background: linear-gradient(
-		110deg,
-		rgba(255, 145, 77, 0.28),
-		rgba(96, 57, 133, 0.6)
-	);
+	background:
+		radial-gradient(
+			circle at top right,
+			rgba(255, 148, 89, 0.26),
+			transparent 32%
+		),
+		linear-gradient(
+			110deg,
+			rgba(255, 217, 166, 0.98),
+			rgba(255, 242, 222, 0.92)
+		);
 	border-radius: 20px;
-	border: 1px solid rgba(255, 255, 255, 0.18);
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+	border: 1px solid rgba(8, 17, 31, 0.08);
+	box-shadow: 0 18px 36px rgba(8, 13, 26, 0.15);
 }
 
 .title-plate__brand {
 	display: flex;
 	gap: 1rem;
 	align-items: center;
-	color: #200529;
+	color: #08111f;
 }
 
 .title-plate__logo {
@@ -57,10 +70,9 @@
 	justify-content: center;
 	width: 96px;
 	height: 96px;
-	background: rgba(255, 255, 255, 0.15);
+	background: rgba(8, 17, 31, 0.04);
 	border-radius: 18px;
-	backdrop-filter: blur(4px);
-	box-shadow: 0 12px 20px rgba(34, 9, 47, 0.25);
+	box-shadow: 0 12px 20px rgba(8, 13, 26, 0.12);
 }
 
 .title-plate__logo img {
@@ -72,6 +84,7 @@
 	display: block;
 	font-size: clamp(1.6rem, 3vw, 2.2rem);
 	font-weight: 800;
+	font-family: var(--font-display);
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
 }
@@ -81,32 +94,35 @@
 	font-size: 0.95rem;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
-	color: #3b0f47;
+	color: #31405a;
 }
 
 .title-plate__ad {
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
-	align-items: center;
+	align-items: flex-start;
 }
 
-.title-plate__ad-frame {
-	width: min(100%, 460px);
-	min-height: 110px;
-	border-radius: 16px;
-	background: rgba(14, 0, 24, 0.4);
-	border: 1px dashed rgba(255, 255, 255, 0.3);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0.75rem;
-}
-
-.title-plate__ad small {
-	color: rgba(255, 255, 255, 0.65);
-	letter-spacing: 0.18em;
+.title-plate__eyebrow {
+	margin: 0;
 	text-transform: uppercase;
+	letter-spacing: 0.18em;
+	font-size: 0.78rem;
+	font-weight: 700;
+	color: #ff7d44;
+}
+
+.title-plate__board {
+	display: grid;
+	gap: 0.7rem;
+	list-style: none;
+	margin: 0;
+	padding: 1rem;
+	border-radius: 16px;
+	background: rgba(8, 17, 31, 0.06);
+	color: #102038;
+	line-height: 1.7;
 }
 
 @media (min-width: 768px) {
@@ -117,7 +133,8 @@
 	}
 
 	.title-plate__ad {
-		align-items: flex-end;
+		align-items: flex-start;
+		max-width: 420px;
 	}
 }
 </style>

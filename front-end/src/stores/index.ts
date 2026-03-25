@@ -2,100 +2,214 @@ import { defineStore } from "pinia";
 
 export const useMainStore = defineStore("main", {
 	state: () => ({
-		characters: {
-			description: "Here are some of my characters!",
-			character: [
+		home: {
+			storylines: [
 				{
-					name: "Zetro",
-					description: "Hi, I'm Zetro!",
-					image: "https://retrozetrocomics.s3.amazonaws.com/images/Zetro2.jpg",
-					imgAlt: "Zetro"
+					format: "Flagship comic line",
+					image: "/brand/poster-retrozetro.svg",
+					status: "Issue 01 in active build",
+					summary:
+						"Zetro drags a rusted neon city back into focus while old code, pirate broadcasts, and half-buried friendships all come online at once.",
+					title: "RetroZetro"
 				},
 				{
-					name: "Kazay",
-					description: "Hi, I'm Kazay!",
-					image: "https://retrozetrocomics.s3.amazonaws.com/images/Kazay.jpg",
-					imgAlt: "Kazay"
+					format: "Character-focused side arc",
+					image: "/brand/poster-kazay.svg",
+					status: "Audio-heavy storyboard phase",
+					summary:
+						"Kazay moves through frequency markets and stolen sound caches, chasing the one signal that can identify the traitor in the circuit.",
+					title: "Kazay: Rogue Frequencies"
 				},
 				{
-					name: "Exo",
-					description: "Hi, I'm Exo!",
-					image: "https://retrozetrocomics.s3.amazonaws.com/images/Exo.jpg",
-					imgAlt: "Exo"
+					format: "High-velocity action chapter",
+					image: "/brand/poster-exo.svg",
+					status: "Thumbnailing new chase beats",
+					summary:
+						"Exo turns a rescue run into a collision course with the empire's salvage fleet and learns what still survives in the dark between stations.",
+					title: "Exo: Orbit Breaker"
 				},
 				{
-					name: "Shaman",
-					description: "Hi, I'm Shaman!",
-					image: "https://retrozetrocomics.s3.amazonaws.com/images/Shaman.jpg",
-					imgAlt: "Shaman"
+					format: "Mystic worldbuilding thread",
+					image: "/brand/poster-shaman.svg",
+					status: "Lore and atmosphere pass",
+					summary:
+						"Shaman reads wounds left in the land itself, threading memory, ritual, and quiet resistance through a broken frontier.",
+					title: "Shaman: Aurora Divide"
+				}
+			],
+			studioNotes: [
+				{
+					body: "Finished comics, raw storyboard pages, and photo dispatches now share one publishing lane so the site feels alive between major issue drops.",
+					title: "A living archive"
+				},
+				{
+					body: "Each post can carry notes, process context, and attached media now, which means the site can keep growing without redesigning the content model again.",
+					title: "Built for expansion"
+				},
+				{
+					body: "Comments stay member-only and moderated, giving the owner a place to encourage discussion without opening the door to unmanaged noise.",
+					title: "Community with guardrails"
+				}
+			],
+			studioSignals: [
+				{
+					body: "Comics, storyboard studies, and photo logs now publish from one admin console.",
+					title: "One publishing surface"
+				},
+				{
+					body: "Uploads are stored on the server now and the storage shape is ready for a later S3 bucket adapter.",
+					title: "Storage path is staged"
+				},
+				{
+					body: "The front-end and backend both speak `/api` explicitly so deploys no longer depend on quiet rewrite magic.",
+					title: "Routing contract is explicit"
 				}
 			]
 		},
-		comics: {
+		characters: {
 			description:
-				"Welcome to RetroZetro Comics – the home of neon-soaked adventures, cosmic rivals, and heart-sized heroes." +
-				" Explore brand new storylines, behind-the-panels art, and community exclusives updated every week!",
-			comic: [
+				"Meet the core signal crew shaping the Retroverse: loud hearts, bad odds, and very specific talents.",
+			title: "Signal Crew",
+			character: [
 				{
-					name: "RetroZetro: Issue #01",
 					description:
-						"Zetro is pulled back into the Synth City underground to stop a corrupt AI that weaponised nostalgia. Full issue preview plus creator commentary!",
-					image: "https://retrozetrocomics.s3.amazonaws.com/images/RetroZetro_Issue1.jpg",
-					imgAlt: "Cover artwork for RetroZetro Issue 1 featuring Zetro leaping through neon city lights",
-					release: "Now Streaming",
-					cta: "Read Issue"
+						"Zetro keeps charging toward the mess with enough heart to rally a block and enough stubbornness to make every clean exit impossible.",
+					frequency: "Hope against bad circuitry",
+					image: "/brand/characters-zetro.svg",
+					imgAlt: "Poster portrait of Zetro in orange and cyan tones",
+					name: "Zetro",
+					role: "Lead hero",
+					specialty: "Frontline improvisation"
 				},
 				{
-					name: "Kazay: Rogue Frequencies",
 					description:
-						"Kazay must outsmart frequency smugglers who sell stolen soundscapes to the highest bidder. Includes 6-page preview and sketchbook pages.",
-					image: "https://retrozetrocomics.s3.amazonaws.com/images/Kazay_Comic.jpg",
-					imgAlt: "Kazay surrounded by floating speakers and orange energy waves",
-					release: "Weekly Update",
-					cta: "Preview Story"
+						"Kazay treats every room like a waveform to bend, slipping through systems and conversations before anyone notices what was taken.",
+					frequency: "Speed, style, and sabotage",
+					image: "/brand/characters-kazay.svg",
+					imgAlt: "Poster portrait of Kazay in cyan and amber tones",
+					name: "Kazay",
+					role: "Signal runner",
+					specialty: "Covert entry and extraction"
 				},
 				{
-					name: "Exo: Orbit Breaker",
 					description:
-						"A high-speed chase across shattered moons as Exo races to rescue a colony ship. Motion-comic cutscenes and creator notes inside.",
-					image: "https://retrozetrocomics.s3.amazonaws.com/images/Exo_Comic.jpg",
-					imgAlt: "Exo rocketing past debris with a blazing plasma trail",
-					release: "Early Access",
-					cta: "Watch Trailer"
+						"Exo hits like an emergency alarm and flies like one too, built for breakneck rescues, impact moves, and impossible recoveries.",
+					frequency: "Pressure and propulsion",
+					image: "/brand/characters-exo.svg",
+					imgAlt: "Poster portrait of Exo in pale blue and gold tones",
+					name: "Exo",
+					role: "Rescue bruiser",
+					specialty: "Orbital pursuit and lift"
 				},
 				{
-					name: "Shaman: Aurora Divide",
 					description:
-						"Shaman channels interstellar spirits to heal a planet split by war. Read the first chapter plus download a limited-edition wallpaper.",
-					image: "https://retrozetrocomics.s3.amazonaws.com/images/Shaman_Comic.jpg",
-					imgAlt: "Shaman levitating between purple and orange aurora streams",
-					release: "Collector Drop",
-					cta: "Claim Bonus"
+						"Shaman slows the room down, listens to what history left in the walls, and speaks only when the answer is worth carrying.",
+					frequency: "Memory, ritual, and repair",
+					image: "/brand/characters-shaman.svg",
+					imgAlt: "Poster portrait of Shaman in violet and gold tones",
+					name: "Shaman",
+					role: "Mystic anchor",
+					specialty: "Healing and spiritual cartography"
 				}
 			]
 		},
 		about: {
-			// description: "Welcome to my website!",
-			// sections: [
-			//	{
-			title: "About Me",
-			description: "I'm a comic artist!"
-			//	},
-			// ],
+			description:
+				"RetroZetro Comics is a creator-driven universe built to show the finished pages, the half-built ideas, and the making-of moments in the same place.",
+			milestones: [
+				{
+					body: "The visual language starts in VHS damage, synth haze, and hand-built poster energy, then gets sharpened until each story has its own pulse.",
+					label: "Phase 01",
+					title: "Build the look"
+				},
+				{
+					body: "The site is now structured to publish comics, storyboard fragments, and still photography without treating any of them like second-class content.",
+					label: "Phase 02",
+					title: "Make the archive breathe"
+				},
+				{
+					body: "Next up is moving storage to AWS-friendly plumbing and turning the studio feed into an even richer release cadence.",
+					label: "Phase 03",
+					title: "Scale the pipeline"
+				}
+			],
+			title: "Inside the Studio",
+			values: [
+				{
+					body: "The world should feel built, not implied. Every issue, note, and photograph should deepen the setting instead of existing as filler.",
+					title: "World-first storytelling"
+				},
+				{
+					body: "Readers should see the path from rough thumbnail to polished release. The process is part of the art, not something to hide.",
+					title: "Process on the page"
+				},
+				{
+					body: "The site should be ready for more than one format at a time so new ideas can be published when they are fresh.",
+					title: "Flexible publishing"
+				}
+			],
+			workflow: [
+				{
+					body: "Comics deliver the canonical narrative spine, where the finished pacing and issue-level stakes live.",
+					title: "Publish the canon"
+				},
+				{
+					body: "Storyboard posts let the owner test rhythms, shot language, and emotional turns before the final page package is locked.",
+					title: "Share the experiments"
+				},
+				{
+					body: "Photo posts create mood boards, travel textures, and studio context that keep the universe grounded in real surfaces.",
+					title: "Capture the atmosphere"
+				}
+			]
+		},
+		contact: {
+			channels: [
+				{
+					href: "mailto:retrozetrocomics@gmail.com",
+					label: "Creator inbox",
+					note: "Best route for commissions, collaboration, and press.",
+					value: "retrozetrocomics@gmail.com"
+				},
+				{
+					href: "https://www.github.com/Jacoba1100254352",
+					label: "Code and site work",
+					note: "For technical collaboration or implementation follow-up.",
+					value: "GitHub profile"
+				}
+			],
+			description:
+				"Use the studio contact page for commissions, collaboration ideas, convention invites, press questions, or production follow-ups.",
+			faq: [
+				{
+					answer: "Story collaboration, commissioned illustration, process interviews, and site feedback are all fair game.",
+					question: "What kinds of outreach are welcome?"
+				},
+				{
+					answer: "If you are writing about the work, include the project, outlet, deadline, and whether you need images, answers, or both.",
+					question: "What helps a press request get answered quickly?"
+				},
+				{
+					answer: "Not yet. The current site is focused on publication, archive growth, and community features, but the structure is ready to expand.",
+					question: "Is there merch or a storefront yet?"
+				}
+			],
+			inquiryTypes: [
+				"Commissioned character art",
+				"Podcast or interview requests",
+				"Convention programming",
+				"Technical feedback on the new site",
+				"General collaboration ideas"
+			],
+			title: "Contact the Studio"
 		}
 	}),
 
-	// Define actions for fetching or mutating the state
 	actions: {
-		// Example: Fetch user profile data from an API
-		fetchUserProfile() {
-			// Implementation for fetching user profile data
-		}
+		fetchUserProfile() {}
 	},
 
-	// Define getters to compute derived state or access specific parts of the state
 	getters: {
-		// Example getter for getting all project names
 		comicNames: state =>
 			state.characters.character.map(character => character.name)
 	}

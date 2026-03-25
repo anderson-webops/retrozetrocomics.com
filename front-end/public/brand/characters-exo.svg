@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-labelledby="title">
+  <title id="title">Exo portrait</title>
+  <rect width="800" height="1000" fill="#09121f" />
+  <rect x="40" y="40" width="720" height="920" rx="40" fill="#11243b" stroke="#ffd680" stroke-width="12" />
+  <circle cx="400" cy="300" r="150" fill="#c4f4ff" />
+  <path d="M212 720c35-194 98-288 193-288 96 0 160 94 194 288" fill="#08111c" stroke="#7ce1f6" stroke-width="12" />
+  <path d="M286 180l68-84h92l68 84" fill="none" stroke="#ff9a62" stroke-linecap="round" stroke-width="14" />
+  <text x="400" y="844" fill="#ffd680" font-family="Verdana, sans-serif" font-size="64" font-weight="700" text-anchor="middle">EXO</text>
+  <text x="400" y="902" fill="#7ce1f6" font-family="Verdana, sans-serif" font-size="26" text-anchor="middle">Orbital bruiser and rescue pilot</text>
+</svg>

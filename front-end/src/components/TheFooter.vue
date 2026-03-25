@@ -1,32 +1,45 @@
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { useSessionStore } from "@/stores/session";
+
+const session = useSessionStore();
 </script>
 
 <template>
 	<footer class="footer">
 		<div class="footer__brand">
+			<p class="footer__eyebrow">RetroZetro Comics</p>
 			<h2>Stay in the Retroverse</h2>
 			<p>
-				Beam the latest drops straight to your inbox. Expect
-				behind-the-scenes sketches, soundtrack playlists, and early-bird
-				merch alerts.
+				The site is now built to keep publishing between issue launches.
+				Check the archive for comics, storyboard notes, and photo logs,
+				then come back often as the next layers are added.
 			</p>
 		</div>
 
-		<form
-			aria-label="Subscribe to RetroZetro Comics updates"
-			class="footer__form"
-			@submit.prevent
-		>
-			<label class="sr-only" for="retro-email">Email address</label>
-			<input
-				id="retro-email"
-				autocomplete="email"
-				placeholder="you@example.com"
-				type="email"
-			/>
-			<button type="submit">Notify me</button>
-		</form>
+		<div class="footer__links">
+			<h3>Explore</h3>
+			<RouterLink to="/studio">Studio archive</RouterLink>
+			<RouterLink to="/characters">Characters</RouterLink>
+			<RouterLink to="/about">About the project</RouterLink>
+			<RouterLink to="/contact">Contact</RouterLink>
+		</div>
+
+		<div class="footer__cta">
+			<h3>Community</h3>
+			<p>
+				Comments open on selected posts for signed-in members and stay
+				moderated on the way through.
+			</p>
+			<button
+				v-if="!session.isAuthenticated"
+				type="button"
+				@click="session.openAuth('signup')"
+			>
+				Create account
+			</button>
+			<RouterLink v-else to="/studio">Open archive</RouterLink>
+		</div>
 
 		<nav aria-label="Social links" class="footer__social">
 			<a
@@ -49,78 +62,98 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 .footer {
 	display: grid;
 	gap: 1.5rem;
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-	align-items: center;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	align-items: start;
 	padding: clamp(1.75rem, 3vw, 2.5rem);
 	background: linear-gradient(
 		180deg,
-		rgba(96, 57, 133, 0.75),
-		rgba(20, 3, 31, 0.95)
+		rgba(10, 18, 31, 0.98),
+		rgba(18, 32, 52, 0.98)
 	);
 	border-top: 1px solid rgba(255, 255, 255, 0.12);
 	color: #f4eaff;
 	gap: clamp(1.5rem, 2.5vw, 2.5rem);
 }
 
+.footer__eyebrow {
+	margin: 0 0 0.5rem;
+	font-size: 0.76rem;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	font-weight: 700;
+	color: #ffd27d;
+}
+
 .footer__brand h2 {
 	margin: 0 0 0.75rem;
 	font-size: 1.5rem;
-	text-transform: uppercase;
-	letter-spacing: 0.18em;
+	font-family: var(--font-display);
+	line-height: 1;
 }
 
 .footer__brand p {
 	margin: 0;
-	line-height: 1.6;
+	line-height: 1.75;
 	color: rgba(255, 255, 255, 0.75);
 }
 
-.footer__form {
-	display: flex;
-	flex-wrap: wrap;
+.footer__links,
+.footer__cta {
+	display: grid;
 	gap: 0.75rem;
 }
 
-.footer__form input {
-	flex: 1 1 180px;
-	border-radius: 999px;
-	border: 1px solid rgba(255, 255, 255, 0.25);
-	background: rgba(15, 3, 26, 0.65);
-	color: #f4eaff;
-	padding: 0.75rem 1.25rem;
-	font-size: 0.95rem;
+.footer__links h3,
+.footer__cta h3,
+.footer__cta p {
+	margin: 0;
 }
 
-.footer__form input::placeholder {
-	color: rgba(255, 255, 255, 0.45);
-}
-
-.footer__form button {
-	border: none;
-	border-radius: 999px;
-	background: linear-gradient(120deg, #ff914d, #9255f2);
-	color: #160021;
-	font-weight: 700;
-	padding: 0.75rem 1.6rem;
+.footer__links h3,
+.footer__cta h3 {
+	color: #fff4e7;
 	text-transform: uppercase;
-	letter-spacing: 0.16em;
-	cursor: pointer;
-	transition:
-		transform 0.2s ease,
-		box-shadow 0.2s ease;
+	letter-spacing: 0.12em;
+	font-size: 0.9rem;
 }
 
-.footer__form button:hover,
-.footer__form button:focus-visible {
-	transform: translateY(-2px);
-	box-shadow: 0 12px 24px rgba(255, 145, 77, 0.4);
+.footer__links a,
+.footer__cta a,
+.footer__cta button {
+	color: rgba(239, 244, 255, 0.82);
+	text-decoration: none;
+	font-weight: 600;
+	background: transparent;
+	border: none;
+	padding: 0;
+	text-align: left;
+	cursor: pointer;
+	font: inherit;
+}
+
+.footer__cta p {
+	line-height: 1.7;
+	color: rgba(239, 244, 255, 0.72);
+}
+
+.footer__cta a,
+.footer__cta button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: fit-content;
+	padding: 0.75rem 1.1rem;
+	border-radius: 999px;
+	background: #ff9459;
+	color: #08111f;
+	font-weight: 800;
 }
 
 .footer__social {
 	display: flex;
 	gap: 1.25rem;
 	align-items: center;
-	justify-content: flex-end;
+	justify-content: flex-start;
 }
 
 .footer__social a {

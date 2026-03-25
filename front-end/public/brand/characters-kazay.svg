@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-labelledby="title">
+  <title id="title">Kazay portrait</title>
+  <rect width="800" height="1000" fill="#0a1421" />
+  <rect x="40" y="40" width="720" height="920" rx="40" fill="#1b1730" stroke="#7ce1f6" stroke-width="12" />
+  <circle cx="400" cy="306" r="150" fill="#7ce1f6" />
+  <path d="M212 718c34-188 97-280 194-280 96 0 159 92 194 280" fill="#081421" stroke="#ff9a62" stroke-width="12" />
+  <path d="M254 618c57 29 105 43 145 43s88-14 147-43" fill="none" stroke="#ffd680" stroke-linecap="round" stroke-width="12" />
+  <text x="400" y="844" fill="#7ce1f6" font-family="Verdana, sans-serif" font-size="64" font-weight="700" text-anchor="middle">KAZAY</text>
+  <text x="400" y="902" fill="#ffd680" font-family="Verdana, sans-serif" font-size="26" text-anchor="middle">Signal thief with perfect timing</text>
+</svg>
