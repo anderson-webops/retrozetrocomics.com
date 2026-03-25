@@ -170,12 +170,6 @@ export const useMainStore = defineStore("main", {
 					label: "Creator inbox",
 					note: "Best route for commissions, collaboration, and press.",
 					value: "retrozetrocomics@gmail.com"
-				},
-				{
-					href: "https://www.github.com/Jacoba1100254352",
-					label: "Code and site work",
-					note: "For technical collaboration or implementation follow-up.",
-					value: "GitHub profile"
 				}
 			],
 			description:

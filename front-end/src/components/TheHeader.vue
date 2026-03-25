@@ -118,8 +118,11 @@ function isActive(path: string) {
 		rgba(255, 145, 77, 0.22),
 		rgba(96, 57, 133, 0.55)
 	);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 24px;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 	box-shadow: 0 12px 24px rgba(7, 0, 18, 0.35);
+	overflow: hidden;
 }
 
 .nav {

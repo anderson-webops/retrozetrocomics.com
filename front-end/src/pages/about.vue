@@ -82,7 +82,7 @@ const highlights = computed(() =>
 .about-page__milestones {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .about-page__card,
@@ -96,6 +96,7 @@ const highlights = computed(() =>
 .about-page__milestone {
 	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid rgba(255, 255, 255, 0.08);
+	min-width: 0;
 }
 
 .about-page__section-header,
@@ -103,6 +104,7 @@ const highlights = computed(() =>
 .about-page__milestone {
 	display: grid;
 	gap: 0.6rem;
+	align-content: start;
 }
 
 .about-page__section-header h2,
@@ -122,11 +124,18 @@ const highlights = computed(() =>
 	color: #fff4e7;
 }
 
+.about-page__card h2 {
+	font-size: clamp(1.45rem, 2.8vw, 1.9rem);
+	line-height: 1.08;
+	overflow-wrap: anywhere;
+}
+
 .about-page__section-header p:last-child,
 .about-page__card p:last-child,
 .about-page__milestone p {
 	line-height: 1.8;
 	color: rgba(239, 244, 255, 0.76);
+	overflow-wrap: anywhere;
 }
 
 .about-page__eyebrow,

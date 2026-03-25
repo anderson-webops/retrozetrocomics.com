@@ -82,7 +82,6 @@ const panel = computed(() => panels[props.variant]);
 	background: rgba(9, 21, 38, 0.8);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-	min-height: 100%;
 }
 
 .side-ad__eyebrow {

@@ -41,15 +41,7 @@ const session = useSessionStore();
 			<RouterLink v-else to="/studio">Open archive</RouterLink>
 		</div>
 
-		<nav aria-label="Social links" class="footer__social">
-			<a
-				href="https://www.github.com/Jacoba1100254352"
-				rel="noreferrer"
-				target="_blank"
-			>
-				<FontAwesomeIcon :icon="['fab', 'github']" size="2x" />
-				<span class="sr-only">GitHub</span>
-			</a>
+		<nav aria-label="Contact links" class="footer__social">
 			<a href="mailto:retrozetrocomics@gmail.com">
 				<FontAwesomeIcon :icon="['fas', 'envelope']" size="2x" />
 				<span class="sr-only">Email</span>
@@ -151,7 +143,7 @@ const session = useSessionStore();
 
 .footer__social {
 	display: flex;
-	gap: 1.25rem;
+	gap: 0.9rem;
 	align-items: center;
 	justify-content: flex-start;
 }

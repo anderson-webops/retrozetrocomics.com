@@ -13,6 +13,8 @@ onMounted(() => {
 
 <template>
 	<main class="site-shell">
+		<TheHeader class="site-shell__header" />
+
 		<div id="title-plate" class="title-grid">
 			<aside class="title-grid__rail">
 				<p class="title-grid__eyebrow">Release Stack</p>
@@ -58,7 +60,6 @@ onMounted(() => {
 		<div class="content-grid">
 			<SideAdvertisement class="content-grid__ad" variant="archive" />
 			<div id="center-plate" class="center-plate">
-				<TheHeader />
 				<RouterView class="page-slot" />
 				<TheFooter />
 			</div>
@@ -90,6 +91,12 @@ onMounted(() => {
 		transparent;
 	color: #f7eaff;
 	font-family: var(--font-body);
+}
+
+.site-shell__header {
+	position: sticky;
+	top: clamp(0.5rem, 1.5vw, 1rem);
+	z-index: 30;
 }
 
 .title-grid {
@@ -174,7 +181,7 @@ onMounted(() => {
 	display: grid;
 	grid-template-columns: minmax(220px, 260px) 1fr minmax(220px, 260px);
 	gap: 1rem;
-	flex: 1;
+	align-items: start;
 }
 
 .content-grid__ad {
@@ -184,6 +191,7 @@ onMounted(() => {
 .center-plate {
 	display: flex;
 	flex-direction: column;
+	min-width: 0;
 	background: rgba(9, 21, 38, 0.86);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	border-radius: 28px;
