@@ -7,6 +7,8 @@ const props = withDefaults(
 		variant: "archive"
 	}
 );
+const route = useRoute();
+const isStudioJournalRoute = computed(() => route.path === "/studio");
 
 const panels = {
 	archive: {
@@ -50,6 +52,21 @@ const panels = {
 } as const;
 
 const panel = computed(() => panels[props.variant]);
+const archiveCta = computed(() => {
+	if (!isStudioJournalRoute.value) {
+		return {
+			isHashLink: false,
+			label: panel.value.ctaLabel,
+			to: panel.value.ctaTo
+		};
+	}
+
+	return {
+		hashHref: "#recent-drops",
+		isHashLink: true,
+		label: "Jump to latest drops"
+	};
+});
 </script>
 
 <template>
@@ -65,8 +82,15 @@ const panel = computed(() => panels[props.variant]);
 				<span>{{ item.value }}</span>
 			</div>
 		</div>
-		<RouterLink class="side-ad__link" :to="panel.ctaTo">
-			{{ panel.ctaLabel }}
+		<a
+			v-if="variant === 'archive' && archiveCta.isHashLink"
+			class="side-ad__link"
+			:href="archiveCta.hashHref"
+		>
+			{{ archiveCta.label }}
+		</a>
+		<RouterLink v-else class="side-ad__link" :to="panel.ctaTo">
+			{{ variant === "archive" ? archiveCta.label : panel.ctaLabel }}
 		</RouterLink>
 	</aside>
 </template>

@@ -5,6 +5,8 @@ import { useSessionStore } from "@/stores/session";
 import SideAdvertisement from "~/components/SideAdvertisement.vue";
 
 const session = useSessionStore();
+const route = useRoute();
+const isStudioJournalRoute = computed(() => route.path === "/studio");
 
 onMounted(() => {
 	void session.bootstrapSession();
@@ -28,9 +30,20 @@ onMounted(() => {
 						Photo dispatches for texture, reference, and atmosphere.
 					</li>
 				</ul>
-				<RouterLink class="title-grid__cta" to="/studio">
+				<RouterLink
+					v-if="!isStudioJournalRoute"
+					class="title-grid__cta"
+					to="/studio"
+				>
 					Browse the archive
 				</RouterLink>
+				<span
+					v-else
+					aria-current="page"
+					class="title-grid__cta title-grid__cta--current"
+				>
+					Archive open
+				</span>
 			</aside>
 			<div class="title-grid__center">
 				<TitlePlate />
@@ -154,6 +167,12 @@ onMounted(() => {
 	color: #08111f;
 	font-weight: 800;
 	text-decoration: none;
+}
+
+.title-grid__cta--current {
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff2df;
+	border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .title-grid__cta--button {

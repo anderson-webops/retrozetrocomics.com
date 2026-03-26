@@ -63,6 +63,7 @@ const archiveStats = [
 		</section>
 
 		<PostFeed
+			id="recent-drops"
 			:limit="24"
 			subtitle="Everything the owner publishes lands here, including comics, outlines, and studio notes, with comments enabled where the post invites discussion."
 			title="All Recent Drops"
@@ -176,6 +177,10 @@ const archiveStats = [
 	font-size: 1.25rem;
 	line-height: 1.4;
 	color: #102038;
+}
+
+#recent-drops {
+	scroll-margin-top: 1.5rem;
 }
 
 @media (max-width: 820px) {
