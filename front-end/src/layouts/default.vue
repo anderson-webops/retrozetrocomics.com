@@ -102,15 +102,13 @@ onMounted(() => {
 	align-content: start;
 	padding: 1.3rem;
 	border-radius: 20px;
-	background: rgba(255, 248, 239, 0.93);
-	border: 1px solid rgba(9, 21, 38, 0.08);
-	box-shadow: 0 18px 36px rgba(8, 13, 26, 0.12);
-	color: #08111f;
+	background: rgba(9, 21, 38, 0.8);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+	color: #eff4ff;
 }
 
 .title-grid__rail--dark {
-	background: rgba(9, 21, 38, 0.9);
-	border-color: rgba(255, 255, 255, 0.08);
 	color: #eff4ff;
 }
 
@@ -124,12 +122,13 @@ onMounted(() => {
 	letter-spacing: 0.18em;
 	font-size: 0.76rem;
 	font-weight: 800;
-	color: #ff7d44;
+	color: #ffd27d;
 }
 
 .title-grid__rail h2 {
 	font-size: 1.5rem;
 	line-height: 1.02;
+	color: #fff4e7;
 }
 
 .title-grid__list {
@@ -137,7 +136,7 @@ onMounted(() => {
 	gap: 0.75rem;
 	padding: 0;
 	line-height: 1.65;
-	color: #32415b;
+	color: rgba(239, 244, 255, 0.78);
 }
 
 .title-grid__rail--dark .title-grid__list {
