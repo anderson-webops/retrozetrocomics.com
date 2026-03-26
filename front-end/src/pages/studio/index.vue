@@ -77,9 +77,9 @@ const archiveStats = [
 	grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.9fr);
 	padding: clamp(1.8rem, 4vw, 2.8rem);
 	border-radius: 28px;
-	background: rgba(9, 21, 38, 0.84);
-	box-shadow: 0 24px 50px rgba(6, 10, 17, 0.28);
-	backdrop-filter: blur(10px);
+	background: transparent;
+	box-shadow: none;
+	backdrop-filter: none;
 }
 
 .studio-page__hero h1,

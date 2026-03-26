@@ -159,11 +159,11 @@ watch(activeType, () => {
 	gap: 1.8rem;
 	padding: clamp(1.6rem, 4vw, 2.8rem);
 	border-radius: 28px;
-	background: rgba(255, 248, 239, 0.95);
-	border: 1px solid rgba(9, 21, 38, 0.08);
-	box-shadow: 0 24px 44px rgba(8, 13, 26, 0.16);
-	color: #091526;
-	backdrop-filter: blur(10px);
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	color: #eff4ff;
+	backdrop-filter: none;
 }
 
 .post-feed__header {
@@ -185,11 +185,11 @@ watch(activeType, () => {
 
 .post-feed__header h2 {
 	font-size: clamp(2.1rem, 4vw, 3rem);
-	color: #0a1526;
+	color: #fff4e7;
 }
 
 .post-feed__header p {
-	color: #42516b;
+	color: rgba(239, 244, 255, 0.8);
 	line-height: 1.7;
 	max-width: 58ch;
 }
@@ -214,8 +214,8 @@ watch(activeType, () => {
 	gap: 0.25rem;
 	padding: 0.95rem 1rem;
 	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.7);
-	border: 1px solid rgba(9, 21, 38, 0.08);
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .post-feed__intel span {
@@ -223,13 +223,13 @@ watch(activeType, () => {
 	letter-spacing: 0.08em;
 	font-size: 0.75rem;
 	font-weight: 800;
-	color: #5d6d87;
+	color: rgba(239, 244, 255, 0.64);
 }
 
 .post-feed__intel strong {
 	font-size: 0.95rem;
 	line-height: 1.5;
-	color: #102038;
+	color: #fff4e7;
 }
 
 .post-feed__controls {

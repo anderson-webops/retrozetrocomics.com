@@ -113,13 +113,13 @@ function isActive(path: string) {
 
 <style scoped>
 .site-header {
-	background: rgba(9, 21, 38, 0.84);
-	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: transparent;
+	border: none;
 	border-radius: 24px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	box-shadow: 0 12px 24px rgba(7, 0, 18, 0.35);
+	border-bottom: none;
+	box-shadow: none;
 	overflow: hidden;
-	backdrop-filter: blur(10px);
+	backdrop-filter: none;
 }
 
 .nav {

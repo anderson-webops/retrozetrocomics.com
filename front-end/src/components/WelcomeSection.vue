@@ -161,12 +161,12 @@ function handleAction(action: HeroAction) {
 	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 	align-items: center;
 	padding: 3.5rem clamp(1rem, 4vw, 3rem);
-	background: rgba(9, 21, 38, 0.84);
+	background: transparent;
 	border-radius: 24px;
-	border: 1px solid rgba(255, 255, 255, 0.08);
-	box-shadow: 0 24px 60px rgba(10, 15, 28, 0.35);
+	border: none;
+	box-shadow: none;
 	color: #fdf9ff;
-	backdrop-filter: blur(10px);
+	backdrop-filter: none;
 }
 
 .welcome__content {
