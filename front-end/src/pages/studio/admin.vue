@@ -3,6 +3,15 @@ import { useSessionStore } from "@/stores/session";
 
 const session = useSessionStore();
 
+useHead({
+	meta: [
+		{
+			name: "robots",
+			content: "noindex,nofollow"
+		}
+	]
+});
+
 onMounted(() => {
 	void session.bootstrapSession();
 });

@@ -1,4 +1,11 @@
 <script lang="ts" setup>
+const defaultHeroImageAlt = "Stylised collage of RetroZetro heroes";
+const defaultHeroImagePath = "/brand/hero-collage.svg";
+const defaultSocialImageUrl = new URL(
+	defaultHeroImagePath,
+	"https://retrozetrocomics.com"
+).toString();
+
 useHead({
 	title: "RetroZetro Comics",
 	meta: [
@@ -10,6 +17,48 @@ useHead({
 		{
 			name: "theme-color",
 			content: "#091526"
+		},
+		{
+			property: "og:site_name",
+			content: "RetroZetro Comics"
+		},
+		{
+			property: "og:type",
+			content: "website"
+		},
+		{
+			property: "og:title",
+			content: "RetroZetro Comics"
+		},
+		{
+			property: "og:description",
+			content:
+				"RetroZetro Comics publishes comics, storyboard drops, and studio photo dispatches in one live archive."
+		},
+		{
+			property: "og:image",
+			content: defaultSocialImageUrl
+		},
+		{
+			property: "og:image:alt",
+			content: defaultHeroImageAlt
+		},
+		{
+			name: "twitter:card",
+			content: "summary_large_image"
+		},
+		{
+			name: "twitter:title",
+			content: "RetroZetro Comics"
+		},
+		{
+			name: "twitter:description",
+			content:
+				"RetroZetro Comics publishes comics, storyboard drops, and studio photo dispatches in one live archive."
+		},
+		{
+			name: "twitter:image",
+			content: defaultSocialImageUrl
 		}
 	],
 	link: [
@@ -34,6 +83,10 @@ useHead({
 			rel: "apple-touch-icon",
 			sizes: "180x180",
 			href: "/Favicons/apple-touch-icon.png"
+		},
+		{
+			rel: "image_src",
+			href: defaultHeroImagePath
 		}
 	],
 	script: import.meta.env.PROD

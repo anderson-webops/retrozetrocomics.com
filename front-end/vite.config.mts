@@ -21,6 +21,14 @@ import Layouts from "vite-plugin-vue-layouts-next";
 import generateSitemap from "vite-ssg-sitemap";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const siteHostname = "https://retrozetrocomics.com";
+const sitemapExcludedRoutes = [
+	"/posts",
+	"/posts/:slug",
+	"/studio/admin",
+	"/:all(.*)"
+];
+const staticRenderExcludedRoutes = ["/posts"];
 
 export default defineConfig(({ command }) => ({
 	resolve: {
@@ -124,8 +132,24 @@ export default defineConfig(({ command }) => ({
 		beastiesOptions: {
 			reduceInlineStyles: false
 		},
+		includedRoutes(paths) {
+			return paths.filter(
+				path => !staticRenderExcludedRoutes.includes(path)
+			);
+		},
 		onFinished() {
-			generateSitemap();
+			generateSitemap({
+				exclude: sitemapExcludedRoutes,
+				hostname: siteHostname,
+				readable: true,
+				robots: [
+					{
+						allow: "/",
+						disallow: ["/studio/admin"],
+						userAgent: "*"
+					}
+				]
+			});
 		}
 	},
 
