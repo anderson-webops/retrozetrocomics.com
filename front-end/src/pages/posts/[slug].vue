@@ -217,9 +217,11 @@ watch(
 .post-page__gallery img {
 	width: 100%;
 	display: block;
+	padding: 0.85rem;
 	border-radius: 24px;
-	object-fit: cover;
-	min-height: 260px;
+	height: min(75vh, 960px);
+	object-fit: contain;
+	background: rgba(9, 21, 38, 0.08);
 	box-shadow: 0 18px 32px rgba(6, 10, 17, 0.24);
 }
 
