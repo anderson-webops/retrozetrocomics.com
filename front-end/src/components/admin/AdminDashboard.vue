@@ -33,11 +33,17 @@ const restoredDraftHadFiles = ref(false);
 const saving = ref(false);
 const selectedPreviewMedia = ref<MediaAsset[]>([]);
 const showPreview = ref(false);
+const suspendConfirmationError = ref("");
+const suspendConfirmationInput = ref("");
+const suspendTarget = ref<DashboardUser | null>(null);
+const userActionLoadingId = ref("");
 const moderationNotes = reactive<Record<string, string>>({});
 const publishFileInput = ref<HTMLInputElement | null>(null);
+const suspendConfirmInput = ref<HTMLInputElement | null>(null);
 
 const NEW_POST_DRAFT_KEY = "retrozetro:drafts:posts:new";
 const EDIT_POST_DRAFT_KEY_PREFIX = "retrozetro:drafts:posts:edit";
+const SUSPEND_PHRASE_WHITESPACE = /\s+/g;
 
 type EditorPostStatus = "private" | "published";
 
@@ -198,6 +204,24 @@ const previewPost = computed(() => ({
 const selectedDocumentCount = computed(
 	() => postForm.media.filter(file => !file.type.startsWith("image/")).length
 );
+const suspendTargetLabel = computed(
+	() => suspendTarget.value?.name || suspendTarget.value?.email || "member"
+);
+const suspendConfirmationPhrase = computed(() =>
+	suspendTarget.value ? `confirm suspend ${suspendTargetLabel.value}` : ""
+);
+const suspendPhraseMatches = computed(
+	() =>
+		normalizeSuspendPhrase(suspendConfirmationInput.value) ===
+		normalizeSuspendPhrase(suspendConfirmationPhrase.value)
+);
+
+function normalizeSuspendPhrase(value: string) {
+	return value
+		.trim()
+		.replaceAll(SUSPEND_PHRASE_WHITESPACE, " ")
+		.toLowerCase();
+}
 
 function revokeSelectedPreviewUrls() {
 	selectedPreviewMedia.value.forEach(asset => {
@@ -395,12 +419,63 @@ async function moderate(
 	await loadDashboard();
 }
 
-async function toggleUser(user: DashboardUser) {
-	await updateUserStatus(
-		user.id,
-		user.status === "active" ? "suspended" : "active"
-	);
-	await loadDashboard();
+function closeSuspendConfirmation() {
+	suspendTarget.value = null;
+	suspendConfirmationInput.value = "";
+	suspendConfirmationError.value = "";
+}
+
+async function openSuspendConfirmation(user: DashboardUser) {
+	suspendTarget.value = user;
+	suspendConfirmationInput.value = "";
+	suspendConfirmationError.value = "";
+	await nextTick();
+	suspendConfirmInput.value?.focus();
+}
+
+async function reactivateUser(user: DashboardUser) {
+	userActionLoadingId.value = user.id;
+	error.value = "";
+
+	try {
+		await updateUserStatus(user.id, "active");
+		await loadDashboard();
+	} catch (statusError: any) {
+		error.value =
+			statusError?.response?.data?.message ||
+			statusError?.message ||
+			"Unable to update the user status.";
+	} finally {
+		userActionLoadingId.value = "";
+	}
+}
+
+async function confirmSuspendUser() {
+	if (!suspendTarget.value) return;
+
+	if (!suspendPhraseMatches.value) {
+		suspendConfirmationError.value = `Type "${suspendConfirmationPhrase.value}" to continue.`;
+		return;
+	}
+
+	userActionLoadingId.value = suspendTarget.value.id;
+	error.value = "";
+	suspendConfirmationError.value = "";
+
+	try {
+		await updateUserStatus(suspendTarget.value.id, "suspended");
+		await loadDashboard();
+		closeSuspendConfirmation();
+	} catch (statusError: any) {
+		const message =
+			statusError?.response?.data?.message ||
+			statusError?.message ||
+			"Unable to suspend the selected account.";
+		error.value = message;
+		suspendConfirmationError.value = message;
+	} finally {
+		userActionLoadingId.value = "";
+	}
 }
 
 onMounted(() => {
@@ -893,11 +968,27 @@ onBeforeUnmount(() => {
 								>
 									{{ user.status }}
 								</span>
-								<button type="button" @click="toggleUser(user)">
+								<button
+									type="button"
+									:class="{
+										'member-list__button--danger':
+											user.status === 'active'
+									}"
+									:disabled="userActionLoadingId === user.id"
+									@click="
+										user.status === 'active'
+											? openSuspendConfirmation(user)
+											: reactivateUser(user)
+									"
+								>
 									{{
-										user.status === "active"
-											? "Suspend"
-											: "Reactivate"
+										userActionLoadingId === user.id
+											? user.status === "active"
+												? "Suspending..."
+												: "Reactivating..."
+											: user.status === "active"
+												? "Suspend"
+												: "Reactivate"
 									}}
 								</button>
 							</div>
@@ -907,6 +998,73 @@ onBeforeUnmount(() => {
 			</div>
 		</template>
 	</section>
+
+	<Teleport to="body">
+		<div
+			v-if="suspendTarget"
+			class="admin-confirmation"
+			@click.self="closeSuspendConfirmation"
+		>
+			<form
+				class="admin-confirmation__dialog"
+				aria-modal="true"
+				role="dialog"
+				@submit.prevent="confirmSuspendUser"
+			>
+				<p class="admin-dashboard__eyebrow">Confirm Suspension</p>
+				<h2>Suspend {{ suspendTargetLabel }}?</h2>
+				<p>
+					This removes their ability to comment until they are
+					reactivated.
+				</p>
+				<p class="admin-confirmation__instruction">
+					Type <strong>{{ suspendConfirmationPhrase }}</strong> to
+					continue.
+				</p>
+				<label class="admin-confirmation__field">
+					<span>Confirmation phrase</span>
+					<input
+						ref="suspendConfirmInput"
+						v-model="suspendConfirmationInput"
+						:placeholder="suspendConfirmationPhrase"
+						autocomplete="off"
+						spellcheck="false"
+						type="text"
+					/>
+				</label>
+				<p
+					v-if="suspendConfirmationError"
+					class="admin-confirmation__error"
+				>
+					{{ suspendConfirmationError }}
+				</p>
+				<div class="admin-confirmation__actions">
+					<button
+						type="button"
+						class="admin-confirmation__cancel"
+						:disabled="userActionLoadingId === suspendTarget.id"
+						@click="closeSuspendConfirmation"
+					>
+						Cancel
+					</button>
+					<button
+						type="submit"
+						class="admin-confirmation__submit"
+						:disabled="
+							!suspendPhraseMatches ||
+							userActionLoadingId === suspendTarget.id
+						"
+					>
+						{{
+							userActionLoadingId === suspendTarget.id
+								? "Suspending..."
+								: "Confirm Suspend"
+						}}
+					</button>
+				</div>
+			</form>
+		</div>
+	</Teleport>
 </template>
 
 <style scoped>
@@ -1231,6 +1389,12 @@ onBeforeUnmount(() => {
 	cursor: pointer;
 }
 
+.member-list__controls button:disabled,
+.admin-confirmation__actions button:disabled {
+	cursor: not-allowed;
+	opacity: 0.62;
+}
+
 .publish-form__actions {
 	display: flex;
 	flex-wrap: wrap;
@@ -1361,6 +1525,105 @@ onBeforeUnmount(() => {
 .member-list__status--suspended {
 	background: rgba(255, 143, 143, 0.14);
 	color: #ffd0d0;
+}
+
+.member-list__button--danger {
+	background: linear-gradient(120deg, #ff8f8f, #ffb36f);
+}
+
+.admin-confirmation {
+	position: fixed;
+	inset: 0;
+	z-index: 80;
+	display: grid;
+	place-items: center;
+	padding: 1.25rem;
+	background: rgba(5, 8, 18, 0.72);
+	backdrop-filter: blur(10px);
+}
+
+.admin-confirmation__dialog {
+	display: grid;
+	gap: 1rem;
+	width: min(100%, 540px);
+	padding: 1.4rem;
+	border-radius: 24px;
+	background: linear-gradient(
+		180deg,
+		rgba(24, 31, 51, 0.98),
+		rgba(12, 17, 31, 0.98)
+	);
+	border: 1px solid rgba(255, 179, 111, 0.18);
+	box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+.admin-confirmation__dialog h2,
+.admin-confirmation__dialog p {
+	margin: 0;
+}
+
+.admin-confirmation__dialog h2 {
+	color: #fff3e5;
+	font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.admin-confirmation__dialog p {
+	line-height: 1.7;
+	color: rgba(255, 255, 255, 0.78);
+}
+
+.admin-confirmation__instruction strong {
+	color: #fff1df;
+}
+
+.admin-confirmation__field {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.admin-confirmation__field span {
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	font-size: 0.78rem;
+	color: rgba(255, 255, 255, 0.68);
+}
+
+.admin-confirmation__field input {
+	width: 100%;
+	border-radius: 14px;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	background: rgba(11, 1, 19, 0.42);
+	color: #f9efff;
+	padding: 0.85rem 0.95rem;
+}
+
+.admin-confirmation__error {
+	color: #ffd0d0 !important;
+}
+
+.admin-confirmation__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.8rem;
+	justify-content: flex-end;
+}
+
+.admin-confirmation__actions button {
+	border: none;
+	border-radius: 999px;
+	padding: 0.78rem 1.15rem;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.admin-confirmation__cancel {
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff2df;
+}
+
+.admin-confirmation__submit {
+	background: linear-gradient(120deg, #ff8f8f, #ffb36f);
+	color: #2b0716;
 }
 
 @media (max-width: 720px) {
