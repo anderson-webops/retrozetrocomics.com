@@ -4,33 +4,31 @@ import { useSessionStore } from "@/stores/session";
 const archiveLanes = [
 	{
 		copy: "Release-ready pages, chapter drops, and the core narrative spine.",
+		shortCopy: "Finished pages and chapters",
 		label: "Comics",
 		type: "comic"
 	},
 	{
 		copy: "Thumbnail passes, beat testing, and story architecture before final art.",
+		shortCopy: "Rough beats and shots",
 		label: "Storyboards",
 		type: "storyboard"
 	},
 	{
 		copy: "Plot maps, blog-style creator notes, and outline files that can stay private until they are ready.",
+		shortCopy: "Private notes and maps",
 		label: "Outlines",
 		type: "outline"
 	},
 	{
 		copy: "Real-world texture, mood, and process fragments from the studio.",
+		shortCopy: "Studio mood and texture",
 		label: "Photos",
 		type: "photo"
 	}
 ];
 
 const session = useSessionStore();
-
-const archiveStats = [
-	{ label: "Publishing Model", value: "Live owner feed" },
-	{ label: "Comment Access", value: "Members on open posts" },
-	{ label: "Storage Path", value: "Server now, S3-ready later" }
-];
 </script>
 
 <template>
@@ -106,12 +104,12 @@ const archiveStats = [
 
 			<div class="studio-page__hero-panel">
 				<p class="studio-page__eyebrow studio-page__eyebrow--panel">
-					Archive Status
+					Archive Lanes
 				</p>
 				<ul>
-					<li v-for="stat in archiveStats" :key="stat.label">
-						<span>{{ stat.label }}</span>
-						<strong>{{ stat.value }}</strong>
+					<li v-for="lane in archiveLanes" :key="lane.label">
+						<span>{{ lane.label }}</span>
+						<strong>{{ lane.shortCopy }}</strong>
 					</li>
 				</ul>
 			</div>

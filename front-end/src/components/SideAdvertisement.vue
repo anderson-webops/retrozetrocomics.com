@@ -17,16 +17,20 @@ const panels = {
 		eyebrow: "Archive Guide",
 		items: [
 			{
-				label: "Archive Types",
-				value: "Comics, storyboard notes, outlines, and photo posts"
+				label: "Comics",
+				value: "Final pages"
 			},
 			{
-				label: "Freshest Lane",
-				value: "Latest drops feed updates directly from live posts"
+				label: "Storyboards",
+				value: "Rough shots"
 			},
 			{
-				label: "Media Path",
-				value: "Hero and showcase art now ship locally with the site"
+				label: "Outlines",
+				value: "Plot notes"
+			},
+			{
+				label: "Photos",
+				value: "Studio texture"
 			}
 		]
 	},

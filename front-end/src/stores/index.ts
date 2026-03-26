@@ -58,12 +58,12 @@ export const useMainStore = defineStore("main", {
 					title: "One publishing surface"
 				},
 				{
-					body: "Uploads are stored on the server now and the storage shape is ready for a later S3 bucket adapter.",
-					title: "Storage path is staged"
+					body: "Outlines and creator notes can stay private until they are ready to move into the public canon.",
+					title: "Private drafting space"
 				},
 				{
-					body: "The front-end and backend both speak `/api` explicitly so deploys no longer depend on quiet rewrite magic.",
-					title: "Routing contract is explicit"
+					body: "Canon files, character boards, and current drops now connect more cleanly so the site reads like one world.",
+					title: "Connected story paths"
 				}
 			]
 		},

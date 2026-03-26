@@ -42,12 +42,6 @@ const filterDescriptions: Record<"all" | PostType, string> = {
 		"Shot plans, pacing experiments, and early visual problem-solving."
 };
 
-const activeFilterLabel = computed(
-	() =>
-		filters.find(filter => filter.value === activeType.value)?.label ||
-		"All"
-);
-
 const activeFilterDescription = computed(() =>
 	activeType.value
 		? filterDescriptions[activeType.value]
@@ -89,20 +83,6 @@ watch(activeType, () => {
 				<p class="post-feed__eyebrow">Creator Journal</p>
 				<h2>{{ title }}</h2>
 				<p>{{ subtitle }}</p>
-				<div class="post-feed__intel">
-					<div>
-						<span>Current lane</span>
-						<strong>{{ activeFilterLabel }}</strong>
-					</div>
-					<div>
-						<span>Discussion</span>
-						<strong>Members only on open posts</strong>
-					</div>
-					<div>
-						<span>Storage</span>
-						<strong>Served locally and ready for S3 later</strong>
-					</div>
-				</div>
 			</div>
 
 			<div class="post-feed__controls">
@@ -204,35 +184,6 @@ watch(activeType, () => {
 	font-size: 0.78rem;
 	font-weight: 800;
 	color: #ff7d44 !important;
-}
-
-.post-feed__intel {
-	display: grid;
-	gap: 0.85rem;
-	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-}
-
-.post-feed__intel div {
-	display: grid;
-	gap: 0.25rem;
-	padding: 0.95rem 1rem;
-	border-radius: 18px;
-	background: var(--surface-panel-soft);
-	border: 1px solid rgba(9, 21, 38, 0.08);
-}
-
-.post-feed__intel span {
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	font-size: 0.75rem;
-	font-weight: 800;
-	color: #5d6d87;
-}
-
-.post-feed__intel strong {
-	font-size: 0.95rem;
-	line-height: 1.5;
-	color: #102038;
 }
 
 .post-feed__controls {
