@@ -13,6 +13,29 @@ const post = computed(() => detail.value?.post || null);
 const gallery = computed(
 	() => post.value?.media.filter(asset => asset.kind === "image") || []
 );
+const typeLabel = computed(() => {
+	switch (post.value?.type) {
+		case "comic":
+			return "Comic";
+		case "outline":
+			return "Outline";
+		case "photo":
+			return "Photo";
+		case "storyboard":
+			return "Storyboard";
+		default:
+			return "Post";
+	}
+});
+const publishedLabel = computed(() => {
+	if (!post.value?.publishedAt) {
+		return post.value?.status === "published" ? "Coming Soon" : "Private";
+	}
+
+	return new Intl.DateTimeFormat("en-US", {
+		dateStyle: "long"
+	}).format(new Date(post.value.publishedAt));
+});
 
 async function loadPost() {
 	const slug = String(route.params.slug || "");
@@ -59,19 +82,11 @@ watch(
 				<RouterLink class="post-page__back" to="/studio">
 					Back to Studio
 				</RouterLink>
-				<p class="post-page__type">{{ post.type }}</p>
+				<p class="post-page__type">{{ typeLabel }}</p>
 				<h1>{{ post.title }}</h1>
 				<p class="post-page__summary">{{ post.summary }}</p>
 				<div class="post-page__meta">
-					<span>
-						{{
-							post.publishedAt
-								? new Intl.DateTimeFormat("en-US", {
-										dateStyle: "long"
-									}).format(new Date(post.publishedAt))
-								: "Draft"
-						}}
-					</span>
+					<span>{{ publishedLabel }}</span>
 					<span
 						>{{ post.commentCount }} comment{{
 							post.commentCount === 1 ? "" : "s"

@@ -9,6 +9,10 @@ const archiveLanes = [
 		label: "Storyboards"
 	},
 	{
+		copy: "Plot maps, blog-style creator notes, and outline files that can stay private until they are ready.",
+		label: "Outlines"
+	},
+	{
 		copy: "Real-world texture, mood, and process fragments from the studio.",
 		label: "Photos"
 	}
@@ -28,8 +32,9 @@ const archiveStats = [
 				<p class="studio-page__eyebrow">Open Archive</p>
 				<h1>Studio Journal</h1>
 				<p>
-					Browse finished comics, raw storyboard explorations, and
-					photo dispatches from the making of RetroZetro Comics.
+					Browse finished comics, raw storyboard explorations,
+					outlines, and photo dispatches from the making of RetroZetro
+					Comics.
 				</p>
 			</div>
 
@@ -59,7 +64,7 @@ const archiveStats = [
 
 		<PostFeed
 			:limit="24"
-			subtitle="Everything the owner publishes lands here, with comments enabled where the post invites discussion."
+			subtitle="Everything the owner publishes lands here, including comics, outlines, and studio notes, with comments enabled where the post invites discussion."
 			title="All Recent Drops"
 		/>
 	</div>

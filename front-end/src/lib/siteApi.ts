@@ -8,6 +8,34 @@ import type {
 
 import { api } from "@/api";
 
+export interface PostEditorPayload {
+	allowComments: boolean;
+	content: string;
+	media: File[];
+	status: PostStatus;
+	summary: string;
+	tags: string;
+	title: string;
+	type: PostType;
+}
+
+function appendPostEditorFormData(
+	formData: FormData,
+	payload: PostEditorPayload
+) {
+	formData.append("allowComments", String(payload.allowComments));
+	formData.append("content", payload.content);
+	formData.append("status", payload.status);
+	formData.append("summary", payload.summary);
+	formData.append("tags", payload.tags);
+	formData.append("title", payload.title);
+	formData.append("type", payload.type);
+
+	payload.media.forEach(file => {
+		formData.append("media", file);
+	});
+}
+
 export async function fetchPosts(
 	options: {
 		includeAll?: boolean;
@@ -48,30 +76,22 @@ export async function fetchDashboard() {
 	return data;
 }
 
-export async function createPost(payload: {
-	allowComments: boolean;
-	content: string;
-	media: File[];
-	status: PostStatus;
-	summary: string;
-	tags: string;
-	title: string;
-	type: PostType;
-}) {
+export async function createPost(payload: PostEditorPayload) {
 	const formData = new FormData();
-	formData.append("allowComments", String(payload.allowComments));
-	formData.append("content", payload.content);
-	formData.append("status", payload.status);
-	formData.append("summary", payload.summary);
-	formData.append("tags", payload.tags);
-	formData.append("title", payload.title);
-	formData.append("type", payload.type);
-
-	payload.media.forEach(file => {
-		formData.append("media", file);
-	});
+	appendPostEditorFormData(formData, payload);
 
 	const { data } = await api.post<{ post: PostSummary }>("/posts", formData);
+	return data.post;
+}
+
+export async function updatePost(postId: string, payload: PostEditorPayload) {
+	const formData = new FormData();
+	appendPostEditorFormData(formData, payload);
+
+	const { data } = await api.patch<{ post: PostSummary }>(
+		`/posts/${postId}`,
+		formData
+	);
 	return data.post;
 }
 

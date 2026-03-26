@@ -14,7 +14,7 @@ const props = withDefaults(
 		limit: 12,
 		showViewAll: false,
 		subtitle:
-			"Latest comics, creator notes, and photo diaries from the Retroverse.",
+			"Latest comics, creator notes, outlines, and photo diaries from the Retroverse.",
 		title: "Latest From The Studio"
 	}
 );
@@ -23,6 +23,7 @@ const filters: Array<{ label: string; value: PostType | null }> = [
 	{ label: "All", value: null },
 	{ label: "Comics", value: "comic" },
 	{ label: "Storyboards", value: "storyboard" },
+	{ label: "Outlines", value: "outline" },
 	{ label: "Photos", value: "photo" }
 ];
 
@@ -32,8 +33,10 @@ const loading = ref(false);
 const error = ref("");
 
 const filterDescriptions: Record<"all" | PostType, string> = {
-	all: "The live archive mixes finished comic pages, rough boards, and photo dispatches in one stream.",
+	all: "The live archive mixes finished comic pages, rough boards, working outlines, and photo dispatches in one stream.",
 	comic: "Finished comic drops, chapter releases, and polished narrative pages.",
+	outline:
+		"Open story files, plot maps, and owner notes that can stay private until they are ready for readers.",
 	photo: "Reference textures, studio snapshots, and atmosphere captured off the page.",
 	storyboard:
 		"Shot plans, pacing experiments, and early visual problem-solving."

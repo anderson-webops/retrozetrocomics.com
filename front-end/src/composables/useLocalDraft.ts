@@ -1,5 +1,5 @@
 import { watchDebounced } from "@vueuse/core";
-import { onScopeDispose, ref } from "vue";
+import { computed, onScopeDispose, ref, watch } from "vue";
 
 interface StoredLocalDraft<T> {
 	hasFiles: boolean;
@@ -10,13 +10,15 @@ interface StoredLocalDraft<T> {
 
 interface UseLocalDraftOptions<T> {
 	debounce?: number;
+	enabled?: boolean | (() => boolean);
 	isEmpty: (snapshot: T) => boolean;
 	source: () => T;
-	storageKey: string;
+	storageKey: string | (() => string);
 }
 
 export function useLocalDraft<T>({
 	debounce = 700,
+	enabled = true,
 	isEmpty,
 	source,
 	storageKey
@@ -27,11 +29,17 @@ export function useLocalDraft<T>({
 	const savedAt = ref<string | null>(null);
 
 	const isClient = typeof window !== "undefined";
+	const isAutosaveEnabled = computed(() =>
+		typeof enabled === "function" ? enabled() : enabled
+	);
+	const resolvedStorageKey = computed(() =>
+		typeof storageKey === "function" ? storageKey() : storageKey
+	);
 
-	function readDraft() {
+	function readDraft(targetStorageKey = resolvedStorageKey.value) {
 		if (!isClient) return null;
 
-		const raw = window.localStorage.getItem(storageKey);
+		const raw = window.localStorage.getItem(targetStorageKey);
 		if (!raw) return null;
 
 		try {
@@ -43,27 +51,27 @@ export function useLocalDraft<T>({
 				typeof parsed.hasFiles !== "boolean" ||
 				!parsed.value
 			) {
-				window.localStorage.removeItem(storageKey);
+				window.localStorage.removeItem(targetStorageKey);
 				return null;
 			}
 
 			return parsed;
 		} catch {
-			window.localStorage.removeItem(storageKey);
+			window.localStorage.removeItem(targetStorageKey);
 			return null;
 		}
 	}
 
-	function syncFromStorage() {
-		const stored = readDraft();
+	function syncFromStorage(targetStorageKey = resolvedStorageKey.value) {
+		const stored = readDraft(targetStorageKey);
 		available.value = Boolean(stored);
 		hasStoredFiles.value = stored?.hasFiles ?? false;
 		savedAt.value = stored?.savedAt ?? null;
 		return stored;
 	}
 
-	function clearDraft() {
-		if (isClient) window.localStorage.removeItem(storageKey);
+	function clearDraft(targetStorageKey = resolvedStorageKey.value) {
+		if (isClient) window.localStorage.removeItem(targetStorageKey);
 
 		available.value = false;
 		hasStoredFiles.value = false;
@@ -71,11 +79,14 @@ export function useLocalDraft<T>({
 		savedAt.value = null;
 	}
 
-	function saveNow(snapshot = source()) {
+	function saveNow(
+		snapshot = source(),
+		targetStorageKey = resolvedStorageKey.value
+	) {
 		if (!isClient) return;
 
 		if (isEmpty(snapshot)) {
-			clearDraft();
+			clearDraft(targetStorageKey);
 			return;
 		}
 
@@ -91,7 +102,7 @@ export function useLocalDraft<T>({
 			version: 1
 		};
 
-		window.localStorage.setItem(storageKey, JSON.stringify(record));
+		window.localStorage.setItem(targetStorageKey, JSON.stringify(record));
 		available.value = true;
 		hasStoredFiles.value = record.hasFiles;
 		restorePromptVisible.value = false;
@@ -109,15 +120,22 @@ export function useLocalDraft<T>({
 	}
 
 	const flushDraft = () => {
+		if (!isAutosaveEnabled.value) return;
 		saveNow();
 	};
 
 	syncFromStorage();
 	restorePromptVisible.value = available.value;
 
+	const stopKeyWatch = watch(resolvedStorageKey, () => {
+		syncFromStorage();
+		restorePromptVisible.value = available.value;
+	});
+
 	const stopWatching = watchDebounced(
 		source,
 		snapshot => {
+			if (!isAutosaveEnabled.value) return;
 			saveNow(snapshot);
 		},
 		{
@@ -147,6 +165,7 @@ export function useLocalDraft<T>({
 	}
 
 	onScopeDispose(() => {
+		stopKeyWatch();
 		stopWatching();
 	});
 

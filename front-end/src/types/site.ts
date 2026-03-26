@@ -1,7 +1,7 @@
 export type AccountRole = "admin" | "user";
 export type CommentStatus = "approved" | "hidden" | "pending" | "rejected";
-export type PostStatus = "draft" | "published";
-export type PostType = "comic" | "photo" | "storyboard";
+export type PostStatus = "draft" | "private" | "published";
+export type PostType = "comic" | "outline" | "photo" | "storyboard";
 
 export interface SiteAccount {
 	email: string;

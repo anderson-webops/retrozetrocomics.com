@@ -30,7 +30,7 @@ const props = defineProps({
 	},
 	message: {
 		default:
-			"New comics, storyboard experiments, and behind-the-scenes photo dispatches now live in a single interactive studio feed. Members can sign in to comment on open posts while admins moderate the conversation.",
+			"New comics, storyboard experiments, outlines, and behind-the-scenes photo dispatches now live in a single interactive studio feed. Members can sign in to comment on open posts while admins moderate the conversation.",
 		type: String
 	},
 	title: {
@@ -62,7 +62,7 @@ const defaultActions: HeroAction[] = [
 const defaultHighlights: HeroHighlight[] = [
 	{
 		description:
-			"Comics, storyboards, and photos publish from one admin console.",
+			"Comics, storyboards, outlines, and photos publish from one admin console.",
 		term: "New Releases"
 	},
 	{

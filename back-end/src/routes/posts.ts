@@ -4,7 +4,8 @@ import { createComment } from "../controllers/commentsController.js";
 import {
 	createPost,
 	getPostBySlug,
-	listPosts
+	listPosts,
+	updatePost
 } from "../controllers/postsController.js";
 import { requireAdmin, requireAuth } from "../middleware/auth.js";
 import { postUpload } from "../services/storage.js";
@@ -19,6 +20,12 @@ postsRouter.post(
 	asyncHandler(requireAdmin),
 	postUpload.array("media", 8),
 	asyncHandler(createPost)
+);
+postsRouter.patch(
+	"/:postId",
+	asyncHandler(requireAdmin),
+	postUpload.array("media", 8),
+	asyncHandler(updatePost)
 );
 postsRouter.post(
 	"/:postId/comments",

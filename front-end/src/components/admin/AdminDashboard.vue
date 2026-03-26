@@ -1,16 +1,31 @@
 <script lang="ts" setup>
-import type { DashboardData, DashboardUser, PostType } from "@/types/site";
+import type {
+	DashboardData,
+	DashboardPost,
+	DashboardUser,
+	MediaAsset,
+	PostStatus,
+	PostSummary,
+	PostType
+} from "@/types/site";
 
 import { useLocalDraft } from "@/composables/useLocalDraft";
 import {
 	createPost,
 	fetchDashboard,
+	fetchPost,
 	moderateComment,
+	updatePost,
 	updateUserStatus
 } from "@/lib/siteApi";
 
 const dashboard = ref<DashboardData | null>(null);
+const editorLoading = ref(false);
+const editingPostId = ref("");
+const editingPostSlug = ref("");
 const error = ref("");
+const existingMedia = ref<MediaAsset[]>([]);
+const isDraftAutosaveEnabled = ref(true);
 const loading = ref(false);
 const restoredDraftHadFiles = ref(false);
 const saving = ref(false);
@@ -18,12 +33,15 @@ const moderationNotes = reactive<Record<string, string>>({});
 const publishFileInput = ref<HTMLInputElement | null>(null);
 
 const NEW_POST_DRAFT_KEY = "retrozetro:drafts:posts:new";
+const EDIT_POST_DRAFT_KEY_PREFIX = "retrozetro:drafts:posts:edit";
+
+type EditorPostStatus = "private" | "published";
 
 const postForm = reactive<{
 	allowComments: boolean;
 	content: string;
 	media: File[];
-	status: "draft" | "published";
+	status: EditorPostStatus;
 	summary: string;
 	tags: string;
 	title: string;
@@ -43,12 +61,48 @@ interface LocalPostDraft {
 	allowComments: boolean;
 	content: string;
 	hasFiles: boolean;
-	status: "draft" | "published";
+	status: EditorPostStatus;
 	summary: string;
 	tags: string;
 	title: string;
 	type: PostType;
 }
+
+function emptyPostDraft(): LocalPostDraft {
+	return {
+		allowComments: true,
+		content: "",
+		hasFiles: false,
+		status: "published",
+		summary: "",
+		tags: "",
+		title: "",
+		type: "comic"
+	};
+}
+
+const editorMode = computed(() => (editingPostId.value ? "edit" : "create"));
+const editorModeLabel = computed(() =>
+	editorMode.value === "edit" ? "Edit Post" : "Publish a New Post"
+);
+const editorModeDescription = computed(() =>
+	editorMode.value === "edit"
+		? "Revise outlines, comic drops, or studio updates after publish, then move them between public and private visibility as needed."
+		: "Publish comics, storyboard notes, outlines, and photo dispatches. Keep a post private while you revise it, then make it public when it is ready."
+);
+const editorSubmitLabel = computed(() => {
+	if (saving.value) {
+		return editorMode.value === "edit" ? "Saving..." : "Publishing...";
+	}
+
+	return editorMode.value === "edit" ? "Save Changes" : "Publish Post";
+});
+const currentDraftKey = computed(() =>
+	editorMode.value === "edit" && editingPostId.value
+		? `${EDIT_POST_DRAFT_KEY_PREFIX}:${editingPostId.value}`
+		: NEW_POST_DRAFT_KEY
+);
+const postEditorBaseDraft = ref<LocalPostDraft>(emptyPostDraft());
 
 const postDraftSnapshot = computed<LocalPostDraft>(() => ({
 	allowComments: postForm.allowComments,
@@ -75,7 +129,8 @@ const localDraft = useLocalDraft<LocalPostDraft>({
 		);
 	},
 	source: () => postDraftSnapshot.value,
-	storageKey: NEW_POST_DRAFT_KEY
+	enabled: () => isDraftAutosaveEnabled.value,
+	storageKey: () => currentDraftKey.value
 });
 
 const savedLocallyLabel = computed(() => {
@@ -99,20 +154,6 @@ const filePersistenceWarning = computed(() => {
 	return "";
 });
 
-function resetPostForm() {
-	postForm.allowComments = true;
-	postForm.content = "";
-	postForm.media = [];
-	postForm.status = "published";
-	postForm.summary = "";
-	postForm.tags = "";
-	postForm.title = "";
-	postForm.type = "comic";
-	restoredDraftHadFiles.value = false;
-
-	if (publishFileInput.value) publishFileInput.value.value = "";
-}
-
 function applyLocalDraft(snapshot: LocalPostDraft) {
 	postForm.allowComments = snapshot.allowComments;
 	postForm.content = snapshot.content;
@@ -123,6 +164,38 @@ function applyLocalDraft(snapshot: LocalPostDraft) {
 	postForm.title = snapshot.title;
 	postForm.type = snapshot.type;
 	restoredDraftHadFiles.value = snapshot.hasFiles;
+
+	if (publishFileInput.value) {
+		publishFileInput.value.value = "";
+	}
+}
+
+function normalizeEditorStatus(status: PostStatus): EditorPostStatus {
+	return status === "published" ? "published" : "private";
+}
+
+function createDraftSnapshotFromPost(post: PostSummary): LocalPostDraft {
+	return {
+		allowComments: post.allowComments,
+		content: post.content,
+		hasFiles: false,
+		status: normalizeEditorStatus(post.status),
+		summary: post.summary,
+		tags: post.tags.join(", "),
+		title: post.title,
+		type: post.type
+	};
+}
+
+async function syncDraftAutosaveAfterEditorSwap() {
+	await nextTick();
+	isDraftAutosaveEnabled.value = !localDraft.restorePromptVisible.value;
+}
+
+function persistCurrentDraftIfSafe() {
+	if (isDraftAutosaveEnabled.value) {
+		localDraft.saveNow();
+	}
 }
 
 function restoreLocalDraft() {
@@ -130,11 +203,13 @@ function restoreLocalDraft() {
 	if (!snapshot) return;
 
 	applyLocalDraft(snapshot);
+	isDraftAutosaveEnabled.value = true;
 }
 
 function discardLocalDraft() {
 	localDraft.discardStoredDraft();
-	resetPostForm();
+	applyLocalDraft(postEditorBaseDraft.value);
+	isDraftAutosaveEnabled.value = true;
 }
 
 async function loadDashboard() {
@@ -158,20 +233,78 @@ function handleFileChange(event: Event) {
 	postForm.media = Array.from(input.files || []);
 }
 
-async function publishPost() {
+async function switchToNewPost(persistCurrentDraft = true) {
+	if (persistCurrentDraft) {
+		persistCurrentDraftIfSafe();
+	}
+
+	isDraftAutosaveEnabled.value = false;
+	editingPostId.value = "";
+	editingPostSlug.value = "";
+	existingMedia.value = [];
+	postEditorBaseDraft.value = emptyPostDraft();
+	applyLocalDraft(postEditorBaseDraft.value);
+	await syncDraftAutosaveAfterEditorSwap();
+}
+
+async function startNewPost() {
+	await switchToNewPost();
+}
+
+async function editPost(post: DashboardPost) {
+	persistCurrentDraftIfSafe();
+	editorLoading.value = true;
+	error.value = "";
+	isDraftAutosaveEnabled.value = false;
+
+	try {
+		const detail = await fetchPost(post.slug);
+		const draftSnapshot = createDraftSnapshotFromPost(detail.post);
+		editingPostId.value = detail.post.id;
+		editingPostSlug.value = detail.post.slug;
+		existingMedia.value = detail.post.media;
+		postEditorBaseDraft.value = draftSnapshot;
+		applyLocalDraft(draftSnapshot);
+		await syncDraftAutosaveAfterEditorSwap();
+	} catch (loadError: any) {
+		error.value =
+			loadError?.response?.data?.message ||
+			loadError?.message ||
+			"Unable to load the selected post.";
+	} finally {
+		editorLoading.value = false;
+	}
+}
+
+async function savePost() {
 	saving.value = true;
 	error.value = "";
 
 	try {
-		await createPost(postForm);
+		const payload = {
+			...postForm,
+			status: postForm.status
+		};
+		const savedPost = editingPostId.value
+			? await updatePost(editingPostId.value, payload)
+			: await createPost(payload);
+
 		localDraft.clearDraft();
-		resetPostForm();
+		existingMedia.value = savedPost.media;
+		postEditorBaseDraft.value = createDraftSnapshotFromPost(savedPost);
+		applyLocalDraft(postEditorBaseDraft.value);
+		isDraftAutosaveEnabled.value = true;
+
+		if (!editingPostId.value) {
+			await switchToNewPost(false);
+		}
+
 		await loadDashboard();
 	} catch (saveError: any) {
 		error.value =
 			saveError?.response?.data?.message ||
 			saveError?.message ||
-			"Unable to publish the post.";
+			"Unable to save the post.";
 	} finally {
 		saving.value = false;
 	}
@@ -282,15 +415,31 @@ onMounted(() => {
 
 			<section class="admin-panel">
 				<header>
-					<h2>Publish a New Post</h2>
+					<h2>{{ editorModeLabel }}</h2>
 					<p>
-						Uploads are stored on the server now, but each media
-						record already carries the provider and object key
-						needed for a future S3 adapter.
+						{{ editorModeDescription }}
 					</p>
 				</header>
 
-				<form class="publish-form" @submit.prevent="publishPost">
+				<form class="publish-form" @submit.prevent="savePost">
+					<div
+						v-if="editorMode === 'edit'"
+						class="publish-form__editor-state"
+					>
+						<div>
+							<p class="publish-form__draft-eyebrow">
+								Editing Live Record
+							</p>
+							<p>
+								Slug:
+								<strong>{{ editingPostSlug }}</strong>
+							</p>
+						</div>
+						<button type="button" @click="startNewPost">
+							Start a new post
+						</button>
+					</div>
+
 					<div
 						v-if="localDraft.restorePromptVisible"
 						class="publish-form__draft-banner"
@@ -341,6 +490,7 @@ onMounted(() => {
 							<select v-model="postForm.type">
 								<option value="comic">Comic</option>
 								<option value="storyboard">Storyboard</option>
+								<option value="outline">Outline</option>
 								<option value="photo">Photo</option>
 							</select>
 						</label>
@@ -376,10 +526,10 @@ onMounted(() => {
 						</label>
 
 						<label>
-							<span>Status</span>
+							<span>Visibility</span>
 							<select v-model="postForm.status">
-								<option value="published">Published</option>
-								<option value="draft">Draft</option>
+								<option value="published">Public</option>
+								<option value="private">Private</option>
 							</select>
 						</label>
 					</div>
@@ -401,6 +551,36 @@ onMounted(() => {
 							@change="handleFileChange"
 						/>
 					</label>
+
+					<div
+						v-if="editorLoading"
+						class="publish-form__uploads publish-form__uploads--count"
+					>
+						Loading the selected post...
+					</div>
+					<div
+						v-else-if="
+							editorMode === 'edit' && existingMedia.length
+						"
+						class="publish-form__existing-media"
+					>
+						<p class="publish-form__existing-title">
+							Attached media
+						</p>
+						<ul>
+							<li
+								v-for="asset in existingMedia"
+								:key="asset.storageKey"
+							>
+								<span>{{ asset.originalName }}</span>
+								<small>{{ asset.kind }}</small>
+							</li>
+						</ul>
+						<p class="publish-form__existing-note">
+							Existing files stay attached. Any new files selected
+							here will be added to the post on save.
+						</p>
+					</div>
 
 					<p
 						v-if="savedLocallyLabel"
@@ -428,15 +608,74 @@ onMounted(() => {
 
 					<button
 						class="publish-form__submit"
-						:disabled="saving"
+						:disabled="saving || editorLoading"
 						type="submit"
 					>
-						{{ saving ? "Saving..." : "Publish Post" }}
+						{{ editorSubmitLabel }}
 					</button>
 				</form>
 			</section>
 
 			<div class="admin-dashboard__columns">
+				<section class="admin-panel">
+					<header>
+						<h2>Recent Posts</h2>
+						<p>
+							Open an existing comic, storyboard, outline, or
+							photo post to revise it or move it between public
+							and private visibility.
+						</p>
+					</header>
+
+					<ul v-if="dashboard.posts.length" class="post-list">
+						<li
+							v-for="post in dashboard.posts"
+							:key="post.id"
+							class="post-list__item"
+						>
+							<div class="post-list__copy">
+								<div class="post-list__meta">
+									<span>{{
+										post.type.charAt(0).toUpperCase() +
+										post.type.slice(1)
+									}}</span>
+									<span
+										class="post-list__status"
+										:class="`post-list__status--${post.status === 'draft' ? 'private' : post.status}`"
+									>
+										{{
+											post.status === "published"
+												? "Public"
+												: "Private"
+										}}
+									</span>
+								</div>
+								<h3>{{ post.title }}</h3>
+								<small>
+									{{
+										post.publishedAt
+											? new Intl.DateTimeFormat("en-US", {
+													dateStyle: "medium"
+												}).format(
+													new Date(post.publishedAt)
+												)
+											: "Not published yet"
+									}}
+								</small>
+							</div>
+							<div class="post-list__actions">
+								<button type="button" @click="editPost(post)">
+									Edit
+								</button>
+								<RouterLink :to="`/posts/${post.slug}`">
+									Open page
+								</RouterLink>
+							</div>
+						</li>
+					</ul>
+					<p v-else class="admin-panel__empty">No posts exist yet.</p>
+				</section>
+
 				<section class="admin-panel">
 					<header>
 						<h2>Pending Comments</h2>
@@ -627,6 +866,7 @@ onMounted(() => {
 .publish-form,
 .review-list,
 .member-list,
+.post-list,
 .storage-grid {
 	display: grid;
 	gap: 1rem;
@@ -679,6 +919,27 @@ onMounted(() => {
 	gap: 0.45rem;
 }
 
+.publish-form__editor-state {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: center;
+	justify-content: space-between;
+	padding: 1rem;
+	border-radius: 18px;
+	background: rgba(124, 225, 246, 0.12);
+	border: 1px solid rgba(124, 225, 246, 0.22);
+}
+
+.publish-form__editor-state p {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.82);
+}
+
+.publish-form__editor-state strong {
+	color: #fff5e7;
+}
+
 .publish-form__draft-banner {
 	display: grid;
 	gap: 1rem;
@@ -709,20 +970,30 @@ onMounted(() => {
 }
 
 .publish-form__draft-actions button,
-.publish-form__draft-discard {
+.publish-form__draft-discard,
+.publish-form__editor-state button,
+.post-list__actions button,
+.post-list__actions a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	border: none;
 	border-radius: 999px;
 	padding: 0.72rem 1rem;
 	font-weight: 800;
 	cursor: pointer;
+	text-decoration: none;
 }
 
-.publish-form__draft-actions button {
+.publish-form__draft-actions button,
+.publish-form__editor-state button,
+.post-list__actions button {
 	background: linear-gradient(120deg, #ff914d, #ffd27d);
 	color: #1b0328;
 }
 
-.publish-form__draft-discard {
+.publish-form__draft-discard,
+.post-list__actions a {
 	background: rgba(255, 255, 255, 0.08);
 	color: #fff2df;
 }
@@ -773,6 +1044,52 @@ onMounted(() => {
 	color: rgba(255, 255, 255, 0.7);
 }
 
+.publish-form__existing-media {
+	display: grid;
+	gap: 0.8rem;
+	padding: 1rem;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.publish-form__existing-title,
+.publish-form__existing-note,
+.publish-form__existing-media ul {
+	margin: 0;
+}
+
+.publish-form__existing-title {
+	color: #fff4e7;
+	font-weight: 700;
+}
+
+.publish-form__existing-media ul {
+	display: grid;
+	gap: 0.65rem;
+	list-style: none;
+	padding: 0;
+}
+
+.publish-form__existing-media li {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.65rem;
+	align-items: center;
+	justify-content: space-between;
+	color: rgba(255, 255, 255, 0.76);
+}
+
+.publish-form__existing-media small {
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.publish-form__existing-note {
+	color: rgba(255, 255, 255, 0.56);
+	line-height: 1.6;
+}
+
 .publish-form__uploads--count {
 	color: rgba(255, 255, 255, 0.6);
 }
@@ -800,7 +1117,8 @@ onMounted(() => {
 }
 
 .review-list__item,
-.member-list__item {
+.member-list__item,
+.post-list__item {
 	display: grid;
 	gap: 0.85rem;
 	padding: 1rem;
@@ -809,7 +1127,8 @@ onMounted(() => {
 }
 
 .review-list__actions,
-.member-list__controls {
+.member-list__controls,
+.post-list__actions {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.65rem;
@@ -818,13 +1137,60 @@ onMounted(() => {
 }
 
 .review-list__copy h3,
-.member-list__item h3 {
+.member-list__item h3,
+.post-list__copy h3 {
 	color: #fff1df;
 }
 
 .review-list__copy small,
-.member-list__item small {
+.member-list__item small,
+.post-list__copy small {
 	color: rgba(255, 255, 255, 0.56);
+}
+
+.post-list__copy,
+.post-list__meta {
+	display: grid;
+	gap: 0.5rem;
+}
+
+.post-list__copy h3 {
+	margin: 0;
+}
+
+.post-list__meta {
+	grid-auto-flow: column;
+	justify-content: start;
+	align-items: center;
+	gap: 0.65rem;
+}
+
+.post-list__meta > span:first-child {
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	font-size: 0.74rem;
+	color: rgba(255, 255, 255, 0.55);
+}
+
+.post-list__status {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.3rem 0.7rem;
+	border-radius: 999px;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	font-size: 0.72rem;
+	font-weight: 700;
+}
+
+.post-list__status--published {
+	background: rgba(130, 229, 173, 0.14);
+	color: #b9ffd1;
+}
+
+.post-list__status--private {
+	background: rgba(255, 210, 125, 0.14);
+	color: #ffe1a0;
 }
 
 .member-list__status {

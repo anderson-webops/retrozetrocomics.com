@@ -1,4 +1,4 @@
-import { effectScope, nextTick, reactive } from "vue";
+import { effectScope, nextTick, reactive, ref } from "vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useLocalDraft } from "../src/composables/useLocalDraft";
 
@@ -145,6 +145,88 @@ describe("useLocalDraft()", () => {
 		vi.advanceTimersByTime(900);
 		await Promise.resolve();
 		expect(storage.getItem("retrozetro:test:drafts:new-post")).toBeNull();
+
+		scope.stop();
+	});
+
+	it("switches draft namespaces without overwriting the stored draft on key change", async () => {
+		let draftKey!: { value: string };
+		let form!: {
+			content: string;
+			hasFiles: boolean;
+			title: string;
+		};
+		let autosaveEnabled!: { value: boolean };
+		let draft!: ReturnType<typeof useLocalDraft<{
+			content: string;
+			hasFiles: boolean;
+			title: string;
+		}>>;
+
+		storage.setItem(
+			"retrozetro:test:drafts:edit:post-42",
+			JSON.stringify({
+				hasFiles: false,
+				savedAt: "2026-03-26T12:00:00.000Z",
+				value: {
+					content: "Recovered edit copy",
+					hasFiles: false,
+					title: "Recovered Outline"
+				},
+				version: 1
+			})
+		);
+
+		const scope = effectScope();
+
+		scope.run(() => {
+			form = reactive({
+				content: "",
+				hasFiles: false,
+				title: ""
+			});
+			draftKey = ref("retrozetro:test:drafts:new-post");
+			autosaveEnabled = ref(true);
+
+			draft = useLocalDraft({
+				enabled: () => autosaveEnabled.value,
+				isEmpty(snapshot) {
+					return !snapshot.title && !snapshot.content && !snapshot.hasFiles;
+				},
+				source: () => ({
+					content: form.content,
+					hasFiles: form.hasFiles,
+					title: form.title
+				}),
+				storageKey: () => draftKey.value
+			});
+		});
+
+		form.title = "New Post";
+		form.content = "Fresh draft";
+
+		await nextTick();
+		vi.advanceTimersByTime(900);
+		await Promise.resolve();
+		expect(storage.getItem("retrozetro:test:drafts:new-post")).toBeTruthy();
+
+		autosaveEnabled.value = false;
+		draftKey.value = "retrozetro:test:drafts:edit:post-42";
+		form.title = "Server copy";
+		form.content = "Current published version";
+
+		await nextTick();
+		vi.advanceTimersByTime(900);
+		await Promise.resolve();
+
+		expect(draft.restorePromptVisible.value).toBe(true);
+
+		const restored = draft.restoreDraft();
+		expect(restored).toEqual({
+			content: "Recovered edit copy",
+			hasFiles: false,
+			title: "Recovered Outline"
+		});
 
 		scope.stop();
 	});

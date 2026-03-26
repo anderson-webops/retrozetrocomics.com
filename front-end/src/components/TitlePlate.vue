@@ -18,8 +18,8 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 			<div class="title-plate__text">
 				<span>RetroZetro Comics</span>
 				<p>
-					Comics, storyboard drops, and studio dispatches from the
-					neon future.
+					Comics, outline files, storyboard drops, and studio
+					dispatches from the neon future.
 				</p>
 			</div>
 		</div>
@@ -28,7 +28,8 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 			<p class="title-plate__eyebrow">Transmission Board</p>
 			<ul class="title-plate__board">
 				<li>
-					Archive now supports comics, storyboards, and photo logs.
+					Archive now supports comics, storyboards, outlines, and
+					photo logs.
 				</li>
 				<li>Comments are member-only and moderated.</li>
 				<li>

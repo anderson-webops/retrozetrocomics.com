@@ -22,13 +22,13 @@ const postSchema = new Schema(
 		slug: { type: String, required: true, unique: true, index: true },
 		type: {
 			type: String,
-			enum: ["comic", "storyboard", "photo"],
+			enum: ["comic", "storyboard", "photo", "outline"],
 			required: true,
 			index: true
 		},
 		status: {
 			type: String,
-			enum: ["draft", "published"],
+			enum: ["draft", "private", "published"],
 			default: "published",
 			index: true
 		},

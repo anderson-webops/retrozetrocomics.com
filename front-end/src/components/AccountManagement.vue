@@ -123,7 +123,7 @@ async function submitSignup() {
 						{{
 							authModalMode === "login"
 								? "Sign in to comment on new drops and keep up with the latest creator notes."
-								: "Create an account to comment on comics, storyboard drafts, and photo journals."
+								: "Create an account to comment on comics, outlines, storyboard drafts, and photo journals."
 						}}
 					</p>
 				</div>

@@ -16,7 +16,7 @@ const panels = {
 		items: [
 			{
 				label: "Archive Types",
-				value: "Comics, storyboard notes, and photo posts"
+				value: "Comics, storyboard notes, outlines, and photo posts"
 			},
 			{
 				label: "Freshest Lane",

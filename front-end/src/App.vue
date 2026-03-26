@@ -48,7 +48,7 @@ useHead(() => ({
 		{
 			name: "description",
 			content:
-				"RetroZetro Comics publishes comics, storyboard drops, and studio photo dispatches in one live archive."
+				"RetroZetro Comics publishes comics, outline files, storyboard drops, and studio photo dispatches in one live archive."
 		},
 		{
 			name: "theme-color",
@@ -69,7 +69,7 @@ useHead(() => ({
 		{
 			property: "og:description",
 			content:
-				"RetroZetro Comics publishes comics, storyboard drops, and studio photo dispatches in one live archive."
+				"RetroZetro Comics publishes comics, outline files, storyboard drops, and studio photo dispatches in one live archive."
 		},
 		{
 			property: "og:image",
@@ -90,7 +90,7 @@ useHead(() => ({
 		{
 			name: "twitter:description",
 			content:
-				"RetroZetro Comics publishes comics, storyboard drops, and studio photo dispatches in one live archive."
+				"RetroZetro Comics publishes comics, outline files, storyboard drops, and studio photo dispatches in one live archive."
 		},
 		{
 			name: "twitter:image",

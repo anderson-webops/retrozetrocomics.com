@@ -13,19 +13,22 @@ import {
 } from "../services/storage.js";
 import { slugify } from "../utils/slugify.js";
 
-const postTypeSchema = z.enum(["comic", "storyboard", "photo"]);
-const createPostSchema = z.object({
+const postTypeSchema = z.enum(["comic", "storyboard", "photo", "outline"]);
+const postStatusSchema = z.enum(["draft", "private", "published"]);
+const postInputSchema = z.object({
 	allowComments: z
 		.string()
 		.optional()
 		.transform(value => value !== "false"),
 	content: z.string().trim().min(12),
-	status: z.enum(["draft", "published"]).default("published"),
+	status: postStatusSchema.default("published"),
 	summary: z.string().trim().min(12).max(220),
 	tags: z.string().optional().default(""),
 	title: z.string().trim().min(4).max(120),
 	type: postTypeSchema
 });
+
+type ParsedPostInput = z.infer<typeof postInputSchema>;
 
 function serializePost(
 	post: PostDocument | null,
@@ -91,6 +94,53 @@ async function createUniqueSlug(title: string) {
 	return slug;
 }
 
+function normalizeTags(value: string) {
+	return value
+		.split(",")
+		.map(tag => tag.trim())
+		.filter(Boolean);
+}
+
+function normalizeExistingMedia(post?: PostDocument | null) {
+	if (!post) {
+		return [];
+	}
+
+	return post.media.map((asset) => {
+		const maybeSubdocument = asset as typeof asset & {
+			toObject?: () => typeof asset;
+		};
+		return typeof maybeSubdocument.toObject === "function"
+			? maybeSubdocument.toObject()
+			: asset;
+	});
+}
+
+function buildPostValues(
+	postInput: ParsedPostInput,
+	files: UploadedFile[],
+	existingPost?: PostDocument | null
+) {
+	const normalizedFiles = normalizeUploadedFiles(files);
+	const existingMedia = normalizeExistingMedia(existingPost);
+	const publishedAt
+		= postInput.status === "published"
+			? existingPost?.publishedAt || new Date()
+			: existingPost?.publishedAt || null;
+
+	return {
+		allowComments: postInput.allowComments,
+		content: postInput.content,
+		media: existingPost ? [...existingMedia, ...normalizedFiles] : normalizedFiles,
+		publishedAt,
+		status: postInput.status,
+		summary: postInput.summary,
+		tags: normalizeTags(postInput.tags),
+		title: postInput.title,
+		type: postInput.type
+	};
+}
+
 export async function listPosts(req: Request, res: Response) {
 	const viewer = await getAuthenticatedAccount(req);
 	const requestedType = postTypeSchema.safeParse(req.query.type);
@@ -151,12 +201,12 @@ export async function getPostBySlug(req: Request, res: Response) {
 			isOwnComment: viewer ? String(comment.authorId) === viewer.id : false,
 			status: comment.status
 		})),
-		viewerCanComment: Boolean(viewer) && post.allowComments
+		viewerCanComment: Boolean(viewer) && post.allowComments && post.status === "published"
 	});
 }
 
 export async function createPost(req: Request, res: Response) {
-	const parsed = createPostSchema.safeParse(req.body);
+	const parsed = postInputSchema.safeParse(req.body);
 	if (!parsed.success) {
 		return res.status(400).json({
 			message: parsed.error.issues[0]?.message || "Invalid post payload"
@@ -172,26 +222,54 @@ export async function createPost(req: Request, res: Response) {
 		? ((req as any).files as UploadedFile[])
 		: [];
 	const slug = await createUniqueSlug(parsed.data.title);
-	const tags = parsed.data.tags
-		.split(",")
-		.map(tag => tag.trim())
-		.filter(Boolean);
 
 	const post = await Post.create({
-		allowComments: parsed.data.allowComments,
-		content: parsed.data.content,
 		createdBy: viewer.id,
-		media: normalizeUploadedFiles(files),
-		publishedAt: parsed.data.status === "published" ? new Date() : undefined,
 		slug,
-		status: parsed.data.status,
-		summary: parsed.data.summary,
-		tags,
-		title: parsed.data.title,
-		type: parsed.data.type
+		...buildPostValues(parsed.data, files)
 	});
 
 	return res.status(201).json({
 		post: serializePost(post, 0)
+	});
+}
+
+export async function updatePost(req: Request, res: Response) {
+	if (!mongoose.isValidObjectId(req.params.postId)) {
+		return res.status(400).json({ message: "Invalid post" });
+	}
+
+	const parsed = postInputSchema.safeParse(req.body);
+	if (!parsed.success) {
+		return res.status(400).json({
+			message: parsed.error.issues[0]?.message || "Invalid post payload"
+		});
+	}
+
+	const viewer = await getAuthenticatedAccount(req);
+	if (!viewer || viewer.role !== "admin") {
+		return res.status(403).json({ message: "Admin access required" });
+	}
+
+	const existingPost = await Post.findById(req.params.postId);
+	if (!existingPost) {
+		return res.status(404).json({ message: "Post not found" });
+	}
+
+	const files = Array.isArray((req as any).files)
+		? ((req as any).files as UploadedFile[])
+		: [];
+
+	Object.assign(
+		existingPost,
+		buildPostValues(parsed.data, files, existingPost)
+	);
+
+	await existingPost.save();
+
+	const counts = await getCommentCounts([existingPost.id]);
+
+	return res.json({
+		post: serializePost(existingPost, counts.get(existingPost.id) || 0)
 	});
 }

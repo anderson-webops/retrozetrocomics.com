@@ -7,6 +7,7 @@ const props = defineProps<{
 
 const TYPE_LABELS: Record<PostSummary["type"], string> = {
 	comic: "Comic Drop",
+	outline: "Outline File",
 	photo: "Photo Log",
 	storyboard: "Storyboard"
 };
@@ -17,7 +18,7 @@ const leadImage = computed(
 
 const publishedLabel = computed(() => {
 	if (!props.post.publishedAt) {
-		return props.post.status === "draft" ? "Draft" : "Coming Soon";
+		return props.post.status === "published" ? "Coming Soon" : "Private";
 	}
 
 	return new Intl.DateTimeFormat("en-US", {
