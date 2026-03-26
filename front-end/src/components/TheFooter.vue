@@ -28,9 +28,6 @@ const session = useSessionStore();
 
 		<div class="footer__cta">
 			<h3>Community</h3>
-			<p>
-				Signed-in members can join moderated discussion on open posts.
-			</p>
 			<button
 				v-if="!session.isAuthenticated"
 				type="button"
@@ -38,6 +35,9 @@ const session = useSessionStore();
 			>
 				Create account
 			</button>
+			<p>
+				Signed-in members can join moderated discussion on open posts.
+			</p>
 		</div>
 
 		<div class="footer__contact">
@@ -162,11 +162,13 @@ const session = useSessionStore();
 	align-items: center;
 	justify-content: center;
 	width: fit-content;
-	padding: 0.62rem 1rem;
+	padding: 0.34rem 0.82rem;
 	border-radius: 999px;
 	background: #ff9459;
 	color: #08111f;
 	font-weight: 800;
+	font-size: 0.84rem;
+	line-height: 1.1;
 }
 
 .footer__contact {
