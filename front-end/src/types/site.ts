@@ -12,20 +12,22 @@ export type PostType = "comic" | "outline" | "photo" | "storyboard";
 
 export interface AuditLogRecord {
 	action: string;
+	after: Record<string, unknown> | null;
 	actorEmail: string;
 	actorId: string;
 	actorName: string;
 	actorRole: AccountRole;
+	before: Record<string, unknown> | null;
 	category: AuditLogCategory;
 	createdAt: string;
 	details: Record<string, unknown>;
+	entityId: string;
+	entityLabel: string;
+	entityType: string;
 	id: string;
 	ipAddress: string;
 	outcome: AuditLogOutcome;
 	summary: string;
-	targetId: string;
-	targetLabel: string;
-	targetType: string;
 	userAgent: string;
 }
 
@@ -152,7 +154,9 @@ export interface DashboardComment {
 }
 
 export interface DashboardPost {
+	deletedAt: string | null;
 	id: string;
+	isDeleted: boolean;
 	publishedAt: string | null;
 	slug: string;
 	status: PostStatus;
@@ -169,6 +173,7 @@ export interface DashboardUser {
 }
 
 export interface DashboardData {
+	deletedPosts: DashboardPost[];
 	metrics: DashboardMetrics;
 	pendingComments: DashboardComment[];
 	posts: DashboardPost[];

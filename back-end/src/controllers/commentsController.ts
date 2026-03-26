@@ -29,7 +29,7 @@ export async function createComment(req: Request, res: Response) {
 	}
 
 	const post = await Post.findById(req.params.postId);
-	if (!post || post.status !== "published") {
+	if (!post || post.isDeleted || post.status !== "published") {
 		return res.status(404).json({ message: "Post not found" });
 	}
 
@@ -47,13 +47,21 @@ export async function createComment(req: Request, res: Response) {
 	});
 
 	await recordAuditLog({
-		action: "comment.create",
+		action: "COMMENT_CREATED",
+		after: {
+			commentId: comment.id,
+			status: comment.status
+		},
 		actor: viewer,
+		before: null,
 		category: "comment",
 		details: {
 			commentId: comment.id,
 			status: comment.status
 		},
+		entityId: comment.id,
+		entityLabel: post.title,
+		entityType: "comment",
 		req,
 		summary: `${viewer.name} submitted a comment on ${post.title}`,
 		targetId: post.id,

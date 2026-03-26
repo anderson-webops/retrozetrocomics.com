@@ -57,6 +57,30 @@ function serializePost(
 	};
 }
 
+function serializeAuditPostState(post: PostDocument) {
+	return {
+		allowComments: post.allowComments,
+		deletedAt: post.deletedAt,
+		isDeleted: post.isDeleted,
+		mediaCount: post.media.length,
+		publishedAt: post.publishedAt,
+		slug: post.slug,
+		status: post.status,
+		summary: post.summary,
+		tagCount: post.tags.length,
+		title: post.title,
+		type: post.type
+	} satisfies Record<string, unknown>;
+}
+
+function postVisibilityLabel(status: ParsedPostInput["status"]) {
+	return status === "published" ? "public" : "private";
+}
+
+function buildPostAuditSummary(post: PostDocument) {
+	return `${post.type} post "${post.title}"`;
+}
+
 async function getCommentCounts(postIds: string[]) {
 	if (!postIds.length) {
 		return new Map<string, number>();
@@ -146,9 +170,15 @@ export async function listPosts(req: Request, res: Response) {
 	const viewer = await getAuthenticatedAccount(req);
 	const requestedType = postTypeSchema.safeParse(req.query.type);
 	const filter: Record<string, unknown> = {};
+	const includeDeleted
+		= viewer?.role === "admin" && req.query.includeDeleted === "all";
 
 	if (!(viewer?.role === "admin" && req.query.include === "all")) {
 		filter.status = "published";
+	}
+
+	if (!includeDeleted) {
+		filter.isDeleted = { $ne: true };
 	}
 
 	if (requestedType.success) {
@@ -168,9 +198,22 @@ export async function listPosts(req: Request, res: Response) {
 
 export async function getPostBySlug(req: Request, res: Response) {
 	const viewer = await getAuthenticatedAccount(req);
-	const post = await Post.findOne({ slug: req.params.slug });
+	const includeDeleted
+		= viewer?.role === "admin" && req.query.includeDeleted === "1";
+	const post = await Post.findOne({
+		slug: req.params.slug,
+		...(includeDeleted ? {} : { isDeleted: { $ne: true } })
+	});
 
-	if (!post || (post.status !== "published" && viewer?.role !== "admin")) {
+	if (!post) {
+		return res.status(404).json({ message: "Post not found" });
+	}
+
+	if (post.isDeleted && !includeDeleted) {
+		return res.status(404).json({ message: "Post not found" });
+	}
+
+	if (post.status !== "published" && viewer?.role !== "admin") {
 		return res.status(404).json({ message: "Post not found" });
 	}
 
@@ -231,8 +274,10 @@ export async function createPost(req: Request, res: Response) {
 	});
 
 	await recordAuditLog({
-		action: "post.create",
+		action: "POST_CREATED",
+		after: serializeAuditPostState(post),
 		actor: viewer,
+		before: null,
 		category: "post",
 		details: {
 			mediaCount: post.media.length,
@@ -240,8 +285,11 @@ export async function createPost(req: Request, res: Response) {
 			status: post.status,
 			type: post.type
 		},
+		entityId: post.id,
+		entityLabel: post.title,
+		entityType: "post",
 		req,
-		summary: `Created ${post.type} post "${post.title}"`,
+		summary: `Created ${buildPostAuditSummary(post)}`,
 		targetId: post.id,
 		targetLabel: post.title,
 		targetType: "post"
@@ -270,15 +318,12 @@ export async function updatePost(req: Request, res: Response) {
 	}
 
 	const existingPost = await Post.findById(req.params.postId);
-	if (!existingPost) {
+	if (!existingPost || existingPost.isDeleted) {
 		return res.status(404).json({ message: "Post not found" });
 	}
 
-	const previousValues = {
-		status: existingPost.status,
-		title: existingPost.title,
-		type: existingPost.type
-	};
+	const previousValues = serializeAuditPostState(existingPost);
+	const previousStatus = existingPost.status;
 
 	const files = Array.isArray((req as any).files)
 		? ((req as any).files as UploadedFile[])
@@ -292,29 +337,148 @@ export async function updatePost(req: Request, res: Response) {
 	await existingPost.save();
 
 	await recordAuditLog({
-		action: "post.update",
+		action: "POST_UPDATED",
+		after: serializeAuditPostState(existingPost),
 		actor: viewer,
+		before: previousValues,
 		category: "post",
 		details: {
 			addedMediaCount: files.length,
-			nextStatus: existingPost.status,
-			nextTitle: existingPost.title,
-			nextType: existingPost.type,
-			previousStatus: previousValues.status,
-			previousTitle: previousValues.title,
-			previousType: previousValues.type,
+			nextVisibility: postVisibilityLabel(existingPost.status),
+			previousVisibility: postVisibilityLabel(previousStatus),
 			slug: existingPost.slug
 		},
+		entityId: existingPost.id,
+		entityLabel: existingPost.title,
+		entityType: "post",
 		req,
-		summary: `Updated ${existingPost.type} post "${existingPost.title}"`,
+		summary: `Updated ${buildPostAuditSummary(existingPost)}`,
 		targetId: existingPost.id,
 		targetLabel: existingPost.title,
 		targetType: "post"
 	});
 
+	if (previousStatus !== existingPost.status) {
+		await recordAuditLog({
+			action: "POST_VISIBILITY_CHANGED",
+			after: {
+				status: existingPost.status,
+				visibility: postVisibilityLabel(existingPost.status)
+			},
+			actor: viewer,
+			before: {
+				status: previousStatus,
+				visibility: postVisibilityLabel(previousStatus)
+			},
+			category: "post",
+			details: {
+				slug: existingPost.slug
+			},
+			entityId: existingPost.id,
+			entityLabel: existingPost.title,
+			entityType: "post",
+			req,
+			summary: `Changed visibility for ${buildPostAuditSummary(existingPost)}`
+		});
+	}
+
 	const counts = await getCommentCounts([existingPost.id]);
 
 	return res.json({
 		post: serializePost(existingPost, counts.get(existingPost.id) || 0)
+	});
+}
+
+export async function deletePost(req: Request, res: Response) {
+	if (!mongoose.isValidObjectId(req.params.postId)) {
+		return res.status(400).json({ message: "Invalid post" });
+	}
+
+	const viewer = await getAuthenticatedAccount(req);
+	if (!viewer || viewer.role !== "admin") {
+		return res.status(403).json({ message: "Admin access required" });
+	}
+
+	const post = await Post.findById(req.params.postId);
+	if (!post || post.isDeleted) {
+		return res.status(404).json({ message: "Post not found" });
+	}
+
+	const previousValues = serializeAuditPostState(post);
+
+	post.deletedAt = new Date();
+	post.deletedBy = new mongoose.Types.ObjectId(viewer.id);
+	post.isDeleted = true;
+	await post.save();
+
+	await recordAuditLog({
+		action: "POST_DELETED",
+		after: serializeAuditPostState(post),
+		actor: viewer,
+		before: previousValues,
+		category: "post",
+		details: {
+			slug: post.slug,
+			visibility: postVisibilityLabel(post.status)
+		},
+		entityId: post.id,
+		entityLabel: post.title,
+		entityType: "post",
+		req,
+		summary: `Deleted ${buildPostAuditSummary(post)}`
+	});
+
+	return res.json({
+		post: {
+			deletedAt: post.deletedAt,
+			id: post.id,
+			isDeleted: post.isDeleted
+		}
+	});
+}
+
+export async function restorePost(req: Request, res: Response) {
+	if (!mongoose.isValidObjectId(req.params.postId)) {
+		return res.status(400).json({ message: "Invalid post" });
+	}
+
+	const viewer = await getAuthenticatedAccount(req);
+	if (!viewer || viewer.role !== "admin") {
+		return res.status(403).json({ message: "Admin access required" });
+	}
+
+	const post = await Post.findById(req.params.postId);
+	if (!post || !post.isDeleted) {
+		return res.status(404).json({ message: "Deleted post not found" });
+	}
+
+	const previousValues = serializeAuditPostState(post);
+
+	post.deletedAt = null;
+	post.deletedBy = null;
+	post.isDeleted = false;
+	await post.save();
+
+	await recordAuditLog({
+		action: "POST_RESTORED",
+		after: serializeAuditPostState(post),
+		actor: viewer,
+		before: previousValues,
+		category: "post",
+		details: {
+			slug: post.slug,
+			visibility: postVisibilityLabel(post.status)
+		},
+		entityId: post.id,
+		entityLabel: post.title,
+		entityType: "post",
+		req,
+		summary: `Restored ${buildPostAuditSummary(post)}`
+	});
+
+	const counts = await getCommentCounts([post.id]);
+
+	return res.json({
+		post: serializePost(post, counts.get(post.id) || 0)
 	});
 }

@@ -136,6 +136,20 @@ export async function updatePost(postId: string, payload: PostEditorPayload) {
 	return data.post;
 }
 
+export async function deletePost(postId: string) {
+	const { data } = await api.delete<{
+		post: { deletedAt: string | null; id: string; isDeleted: boolean };
+	}>(`/posts/${postId}`);
+	return data.post;
+}
+
+export async function restorePost(postId: string) {
+	const { data } = await api.post<{ post: PostSummary }>(
+		`/posts/${postId}/restore`
+	);
+	return data.post;
+}
+
 export async function moderateComment(
 	commentId: string,
 	status: "approved" | "hidden" | "rejected",

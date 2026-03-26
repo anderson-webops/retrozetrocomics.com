@@ -74,6 +74,8 @@ export async function updateCharactersPageContent(req: Request, res: Response) {
 		});
 	}
 
+	const existingDocument = await SiteContent.findOne({ key: CHARACTERS_PAGE_KEY });
+	const previousContent = normalizeCharactersPageContent(existingDocument?.data);
 	const document = await SiteContent.findOneAndUpdate(
 		{ key: CHARACTERS_PAGE_KEY },
 		{ data: parsed.data },
@@ -87,13 +89,24 @@ export async function updateCharactersPageContent(req: Request, res: Response) {
 	const viewer = readAuthAccount(req);
 	if (viewer) {
 		await recordAuditLog({
-			action: "site-content.characters.update",
+			action: "SITE_CONTENT_UPDATED",
+			after: {
+				characterCount: parsed.data.characters.length,
+				worldEntryCount: parsed.data.worldEntries.length
+			},
 			actor: viewer,
+			before: {
+				characterCount: previousContent.characters.length,
+				worldEntryCount: previousContent.worldEntries.length
+			},
 			category: "site-content",
 			details: {
 				characterCount: parsed.data.characters.length,
 				worldEntryCount: parsed.data.worldEntries.length
 			},
+			entityId: CHARACTERS_PAGE_KEY,
+			entityLabel: "Character and Threat Board",
+			entityType: "site-content",
 			req,
 			summary: "Updated the character and threat board",
 			targetId: CHARACTERS_PAGE_KEY,

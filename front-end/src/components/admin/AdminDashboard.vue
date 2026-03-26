@@ -23,11 +23,13 @@ import {
 } from "@/content/defaultCharactersPageContent";
 import {
 	createPost,
+	deletePost,
 	fetchAuditLogs,
 	fetchCharactersPageContent,
 	fetchDashboard,
 	fetchPost,
 	moderateComment,
+	restorePost,
 	updateCharactersPageContent,
 	updatePost,
 	updateUserStatus
@@ -62,12 +64,17 @@ const saving = ref(false);
 const selectedPreviewMedia = ref<MediaAsset[]>([]);
 const showPreview = ref(false);
 const showStorageDetails = ref(false);
+const postActionLoadingId = ref("");
+const postRemovalConfirmationError = ref("");
+const postRemovalConfirmationInput = ref("");
+const postRemovalTarget = ref<DashboardPost | null>(null);
 const suspendConfirmationError = ref("");
 const suspendConfirmationInput = ref("");
 const suspendTarget = ref<DashboardUser | null>(null);
 const userActionLoadingId = ref("");
 const moderationNotes = reactive<Record<string, string>>({});
 const publishFileInput = ref<HTMLInputElement | null>(null);
+const postRemovalConfirmInput = ref<HTMLInputElement | null>(null);
 const suspendConfirmInput = ref<HTMLInputElement | null>(null);
 const pendingBoardRemoval = ref<{
 	confirmLabel: string;
@@ -280,6 +287,9 @@ const boardWorldEntryCount = computed(
 const recentPostsPreview = computed(
 	() => dashboard.value?.posts.slice(0, 6) || []
 );
+const deletedPostsPreview = computed(
+	() => dashboard.value?.deletedPosts.slice(0, 6) || []
+);
 const memberPreview = computed(() => dashboard.value?.users.slice(0, 6) || []);
 const pendingCommentPreview = computed(
 	() => dashboard.value?.pendingComments.slice(0, 4) || []
@@ -382,6 +392,20 @@ function auditLogDetailPairs(details: Record<string, unknown>) {
 	return Object.entries(details).filter(
 		([, value]) => typeof value === "number" || typeof value === "string"
 	);
+}
+
+function auditLogSnapshotPairs(snapshot: Record<string, unknown> | null) {
+	if (!snapshot) {
+		return [];
+	}
+
+	return Object.entries(snapshot).filter(([, value]) => {
+		return (
+			typeof value === "number" ||
+			typeof value === "string" ||
+			typeof value === "boolean"
+		);
+	});
 }
 
 async function loadAuditLogs() {
@@ -515,16 +539,29 @@ const selectedDocumentCount = computed(
 const suspendTargetLabel = computed(
 	() => suspendTarget.value?.name || suspendTarget.value?.email || "member"
 );
+const postRemovalTargetLabel = computed(
+	() => postRemovalTarget.value?.title || "post"
+);
+const postRemovalConfirmationPhrase = computed(() =>
+	postRemovalTarget.value
+		? `confirm delete ${postRemovalTarget.value.slug}`
+		: ""
+);
+const postRemovalPhraseMatches = computed(
+	() =>
+		normalizeConfirmationPhrase(postRemovalConfirmationInput.value) ===
+		normalizeConfirmationPhrase(postRemovalConfirmationPhrase.value)
+);
 const suspendConfirmationPhrase = computed(() =>
 	suspendTarget.value ? `confirm suspend ${suspendTargetLabel.value}` : ""
 );
 const suspendPhraseMatches = computed(
 	() =>
-		normalizeSuspendPhrase(suspendConfirmationInput.value) ===
-		normalizeSuspendPhrase(suspendConfirmationPhrase.value)
+		normalizeConfirmationPhrase(suspendConfirmationInput.value) ===
+		normalizeConfirmationPhrase(suspendConfirmationPhrase.value)
 );
 
-function normalizeSuspendPhrase(value: string) {
+function normalizeConfirmationPhrase(value: string) {
 	return value
 		.trim()
 		.replaceAll(SUSPEND_PHRASE_WHITESPACE, " ")
@@ -980,6 +1017,69 @@ async function moderate(
 ) {
 	await moderateComment(commentId, status, moderationNotes[commentId] || "");
 	await loadDashboard();
+}
+
+function closePostRemovalConfirmation() {
+	postRemovalTarget.value = null;
+	postRemovalConfirmationInput.value = "";
+	postRemovalConfirmationError.value = "";
+}
+
+async function openPostRemovalConfirmation(post: DashboardPost) {
+	postRemovalTarget.value = post;
+	postRemovalConfirmationInput.value = "";
+	postRemovalConfirmationError.value = "";
+	await nextTick();
+	postRemovalConfirmInput.value?.focus();
+}
+
+async function confirmDeletePost() {
+	if (!postRemovalTarget.value) return;
+
+	if (!postRemovalPhraseMatches.value) {
+		postRemovalConfirmationError.value = `Type "${postRemovalConfirmationPhrase.value}" to continue.`;
+		return;
+	}
+
+	postActionLoadingId.value = postRemovalTarget.value.id;
+	error.value = "";
+	postRemovalConfirmationError.value = "";
+
+	try {
+		await deletePost(postRemovalTarget.value.id);
+		await loadDashboard();
+		closePostRemovalConfirmation();
+		if (editingPostId.value === postRemovalTarget.value.id) {
+			await switchToNewPost(false);
+			await replaceAdminQuery("posts");
+		}
+	} catch (deleteError: any) {
+		const message =
+			deleteError?.response?.data?.message ||
+			deleteError?.message ||
+			"Unable to delete the selected post.";
+		error.value = message;
+		postRemovalConfirmationError.value = message;
+	} finally {
+		postActionLoadingId.value = "";
+	}
+}
+
+async function restoreDeletedPost(post: DashboardPost) {
+	postActionLoadingId.value = post.id;
+	error.value = "";
+
+	try {
+		await restorePost(post.id);
+		await loadDashboard();
+	} catch (restoreError: any) {
+		error.value =
+			restoreError?.response?.data?.message ||
+			restoreError?.message ||
+			"Unable to restore the selected post.";
+	} finally {
+		postActionLoadingId.value = "";
+	}
 }
 
 function closeSuspendConfirmation() {
@@ -1565,6 +1665,18 @@ onBeforeUnmount(() => {
 								>
 									Edit
 								</button>
+								<button
+									type="button"
+									class="post-list__danger"
+									:disabled="postActionLoadingId === post.id"
+									@click="openPostRemovalConfirmation(post)"
+								>
+									{{
+										postActionLoadingId === post.id
+											? "Deleting..."
+											: "Delete"
+									}}
+								</button>
 								<RouterLink :to="`/posts/${post.slug}`">
 									Open page
 								</RouterLink>
@@ -1572,6 +1684,74 @@ onBeforeUnmount(() => {
 						</li>
 					</ul>
 					<p v-else class="admin-panel__empty">No posts exist yet.</p>
+
+					<div
+						v-if="dashboard.deletedPosts.length"
+						class="admin-dashboard__deleted-posts"
+					>
+						<header>
+							<h3>Deleted Posts</h3>
+							<p>
+								Soft-deleted posts stay here until you restore
+								them. They are hidden from the public site and
+								normal archive queries.
+							</p>
+						</header>
+
+						<ul class="post-list post-list--deleted">
+							<li
+								v-for="post in deletedPostsPreview"
+								:key="post.id"
+								class="post-list__item"
+							>
+								<div class="post-list__copy">
+									<div class="post-list__meta">
+										<span>{{
+											post.type.charAt(0).toUpperCase() +
+											post.type.slice(1)
+										}}</span>
+										<span
+											class="post-list__status post-list__status--deleted"
+										>
+											Deleted
+										</span>
+									</div>
+									<h3>{{ post.title }}</h3>
+									<small>
+										Deleted
+										{{
+											post.deletedAt
+												? new Intl.DateTimeFormat(
+														"en-US",
+														{
+															dateStyle: "medium",
+															timeStyle: "short"
+														}
+													).format(
+														new Date(post.deletedAt)
+													)
+												: "recently"
+										}}
+									</small>
+								</div>
+								<div class="post-list__actions">
+									<button
+										type="button"
+										:disabled="
+											postActionLoadingId === post.id
+										"
+										@click="restoreDeletedPost(post)"
+									>
+										{{
+											postActionLoadingId === post.id
+												? "Restoring..."
+												: "Restore"
+										}}
+									</button>
+								</div>
+							</li>
+						</ul>
+					</div>
 				</section>
 			</section>
 
@@ -2242,14 +2422,54 @@ onBeforeUnmount(() => {
 								<strong>Action</strong>
 								{{ log.action }}
 							</span>
-							<span v-if="log.targetLabel">
+							<span v-if="log.entityLabel">
 								<strong>Target</strong>
-								{{ log.targetLabel }}
+								{{ log.entityLabel }}
 							</span>
 							<span v-if="log.ipAddress">
 								<strong>IP</strong>
 								{{ log.ipAddress }}
 							</span>
+						</div>
+
+						<div
+							v-if="
+								auditLogSnapshotPairs(log.before).length ||
+								auditLogSnapshotPairs(log.after).length
+							"
+							class="audit-log__snapshot-grid"
+						>
+							<dl
+								v-if="auditLogSnapshotPairs(log.before).length"
+								class="audit-log__details audit-log__details--snapshot"
+							>
+								<div
+									v-for="[
+										label,
+										value
+									] in auditLogSnapshotPairs(log.before)"
+									:key="`${log.id}-before-${label}`"
+								>
+									<dt>{{ label }} before</dt>
+									<dd>{{ value }}</dd>
+								</div>
+							</dl>
+
+							<dl
+								v-if="auditLogSnapshotPairs(log.after).length"
+								class="audit-log__details audit-log__details--snapshot"
+							>
+								<div
+									v-for="[
+										label,
+										value
+									] in auditLogSnapshotPairs(log.after)"
+									:key="`${log.id}-after-${label}`"
+								>
+									<dt>{{ label }} after</dt>
+									<dd>{{ value }}</dd>
+								</div>
+							</dl>
 						</div>
 
 						<dl
@@ -2374,6 +2594,72 @@ onBeforeUnmount(() => {
 					</button>
 				</div>
 			</section>
+		</div>
+
+		<div
+			v-if="postRemovalTarget"
+			class="admin-confirmation"
+			@click.self="closePostRemovalConfirmation"
+		>
+			<form
+				class="admin-confirmation__dialog"
+				aria-modal="true"
+				role="dialog"
+				@submit.prevent="confirmDeletePost"
+			>
+				<p class="admin-dashboard__eyebrow">Confirm Deletion</p>
+				<h2>Delete {{ postRemovalTargetLabel }}?</h2>
+				<p>
+					This is a soft delete. The post will leave the public site
+					and archive, but you can still restore it later from the
+					deleted-posts list.
+				</p>
+				<p class="admin-confirmation__instruction">
+					Type <strong>{{ postRemovalConfirmationPhrase }}</strong>
+					to continue.
+				</p>
+				<label class="admin-confirmation__field">
+					<span>Confirmation phrase</span>
+					<input
+						ref="postRemovalConfirmInput"
+						v-model="postRemovalConfirmationInput"
+						:placeholder="postRemovalConfirmationPhrase"
+						autocomplete="off"
+						spellcheck="false"
+						type="text"
+					/>
+				</label>
+				<p
+					v-if="postRemovalConfirmationError"
+					class="admin-confirmation__error"
+				>
+					{{ postRemovalConfirmationError }}
+				</p>
+				<div class="admin-confirmation__actions">
+					<button
+						type="button"
+						class="admin-confirmation__cancel"
+						:disabled="postActionLoadingId === postRemovalTarget.id"
+						@click="closePostRemovalConfirmation"
+					>
+						Cancel
+					</button>
+					<button
+						type="submit"
+						class="admin-confirmation__submit"
+						:disabled="
+							!postRemovalPhraseMatches ||
+							postActionLoadingId === postRemovalTarget.id
+						"
+					>
+						{{
+							postActionLoadingId === postRemovalTarget.id
+								? "Deleting..."
+								: "Confirm Delete"
+						}}
+					</button>
+				</div>
+			</form>
 		</div>
 
 		<div
@@ -2814,6 +3100,10 @@ onBeforeUnmount(() => {
 	color: #1b0328;
 }
 
+.post-list__actions .post-list__danger {
+	background: linear-gradient(120deg, #ff8f8f, #ffb36f);
+}
+
 .publish-form__draft-discard,
 .post-list__actions a {
 	background: rgba(255, 255, 255, 0.08);
@@ -3064,6 +3354,28 @@ onBeforeUnmount(() => {
 	background: rgba(255, 255, 255, 0.04);
 }
 
+.admin-dashboard__deleted-posts {
+	display: grid;
+	gap: 1rem;
+	margin-top: 1.25rem;
+	padding-top: 1.25rem;
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-dashboard__deleted-posts header {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.admin-dashboard__deleted-posts header h3,
+.admin-dashboard__deleted-posts header p {
+	margin: 0;
+}
+
+.admin-dashboard__deleted-posts header p {
+	color: rgba(255, 255, 255, 0.7);
+}
+
 .review-list__actions,
 .member-list__controls,
 .post-list__actions {
@@ -3171,6 +3483,16 @@ onBeforeUnmount(() => {
 	color: #fff4e7;
 }
 
+.audit-log__snapshot-grid {
+	display: grid;
+	gap: 0.85rem;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.audit-log__details--snapshot div {
+	background: rgba(255, 255, 255, 0.03);
+}
+
 .audit-log__details {
 	display: grid;
 	gap: 0.75rem;
@@ -3252,6 +3574,11 @@ onBeforeUnmount(() => {
 .post-list__status--private {
 	background: rgba(255, 210, 125, 0.14);
 	color: #ffe1a0;
+}
+
+.post-list__status--deleted {
+	background: rgba(255, 143, 143, 0.14);
+	color: #ffd0d0;
 }
 
 .member-list__status {

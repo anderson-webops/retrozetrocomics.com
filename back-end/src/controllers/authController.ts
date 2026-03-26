@@ -125,14 +125,21 @@ export async function signup(req: Request, res: Response) {
 	};
 
 	await recordAuditLog({
-		action: "auth.signup",
+		action: "AUTH_SIGNUP",
+		after: {
+			status: user.status
+		},
 		actor: {
 			email: user.email,
 			id: user.id,
 			name: user.name,
 			role: "user"
 		},
+		before: null,
 		category: "auth",
+		entityId: user.id,
+		entityLabel: user.email,
+		entityType: "account",
 		req,
 		summary: `${user.name} created an account`,
 		targetId: user.id,
@@ -185,14 +192,21 @@ export async function login(req: Request, res: Response) {
 	});
 
 	await recordAuditLog({
-		action: "auth.login",
+		action: "AUTH_LOGIN",
+		after: {
+			status: record.status
+		},
 		actor: {
 			email: record.account.email,
 			id: record.account.id,
 			name: record.account.name,
 			role: record.role
 		},
+		before: null,
 		category: "auth",
+		entityId: record.account.id,
+		entityLabel: record.account.email,
+		entityType: "account",
 		req,
 		summary: `${record.account.name} signed in`,
 		targetId: record.account.id,
@@ -217,9 +231,16 @@ export async function logout(req: Request, res: Response) {
 
 	if (account) {
 		await recordAuditLog({
-			action: "auth.logout",
+			action: "AUTH_LOGOUT",
+			after: {
+				status: account.status
+			},
 			actor: account,
+			before: null,
 			category: "auth",
+			entityId: account.id,
+			entityLabel: account.email,
+			entityType: "account",
 			req,
 			summary: `${account.name} signed out`,
 			targetId: account.id,

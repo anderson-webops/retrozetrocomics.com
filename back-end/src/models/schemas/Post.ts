@@ -43,6 +43,13 @@ const postSchema = new Schema(
 			required: true,
 			index: true
 		},
+		deletedAt: { type: Date, default: null },
+		deletedBy: {
+			type: Schema.Types.ObjectId,
+			ref: "Admin",
+			default: null
+		},
+		isDeleted: { type: Boolean, default: false, index: true },
 		publishedAt: { type: Date, default: null }
 	},
 	{ timestamps: true }

@@ -9,6 +9,10 @@ const auditLogSchema = new Schema(
 			index: true,
 			trim: true
 		},
+		after: {
+			type: Schema.Types.Mixed,
+			default: null
+		},
 		actorEmail: {
 			type: String,
 			default: "",
@@ -37,9 +41,30 @@ const auditLogSchema = new Schema(
 			required: true,
 			index: true
 		},
+		before: {
+			type: Schema.Types.Mixed,
+			default: null
+		},
 		details: {
 			type: Schema.Types.Mixed,
 			default: {}
+		},
+		entityId: {
+			type: String,
+			default: "",
+			index: true,
+			trim: true
+		},
+		entityLabel: {
+			type: String,
+			default: "",
+			trim: true
+		},
+		entityType: {
+			type: String,
+			default: "",
+			index: true,
+			trim: true
 		},
 		ipAddress: {
 			type: String,
@@ -88,6 +113,7 @@ const auditLogSchema = new Schema(
 auditLogSchema.index({ createdAt: -1 });
 auditLogSchema.index({ category: 1, createdAt: -1 });
 auditLogSchema.index({ actorRole: 1, actorId: 1, createdAt: -1 });
+auditLogSchema.index({ entityType: 1, entityId: 1, createdAt: -1 });
 
 export type AuditLogDocument = HydratedDocument<
 	InferSchemaType<typeof auditLogSchema>

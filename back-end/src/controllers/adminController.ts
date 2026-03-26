@@ -39,34 +39,51 @@ function escapeRegex(value: string) {
 function serializeAuditLog(log: AuditLogDocument) {
 	return {
 		action: log.action,
+		after: log.after || null,
 		actorEmail: log.actorEmail,
 		actorId: log.actorId,
 		actorName: log.actorName,
 		actorRole: log.actorRole,
+		before: log.before || null,
 		category: log.category,
 		createdAt: log.createdAt,
 		details: log.details || {},
+		entityId: log.entityId || log.targetId || "",
+		entityLabel: log.entityLabel || log.targetLabel || "",
+		entityType: log.entityType || log.targetType || "",
 		id: log.id,
 		ipAddress: log.ipAddress,
 		outcome: log.outcome,
 		summary: log.summary,
-		targetId: log.targetId,
-		targetLabel: log.targetLabel,
-		targetType: log.targetType,
 		userAgent: log.userAgent
 	};
 }
 
 export async function getDashboard(_req: Request, res: Response) {
-	const [pendingComments, recentPosts, users, publishedPosts] = await Promise.all([
+	const [pendingComments, recentPosts, deletedPosts, users, publishedPosts] = await Promise.all([
 		Comment.find({ status: "pending" }).sort({ createdAt: -1 }).limit(20),
-		Post.find().sort({ createdAt: -1 }).limit(20),
+		Post.find({ isDeleted: { $ne: true } }).sort({ createdAt: -1 }).limit(20),
+		Post.find({ isDeleted: true }).sort({ deletedAt: -1, updatedAt: -1 }).limit(12),
 		User.find().sort({ createdAt: -1 }).limit(50),
-		Post.countDocuments({ status: "published" })
+		Post.countDocuments({
+			isDeleted: { $ne: true },
+			status: "published"
+		})
 	]);
 
 	return res.json({
+		deletedPosts: deletedPosts.map(post => ({
+			deletedAt: post.deletedAt,
+			id: post.id,
+			isDeleted: post.isDeleted,
+			publishedAt: post.publishedAt,
+			slug: post.slug,
+			status: post.status,
+			title: post.title,
+			type: post.type
+		})),
 		metrics: {
+			deletedPostCount: deletedPosts.length,
 			memberCount: users.length,
 			pendingCommentCount: pendingComments.length,
 			publishedPostCount: publishedPosts
@@ -81,7 +98,9 @@ export async function getDashboard(_req: Request, res: Response) {
 			status: comment.status
 		})),
 		posts: recentPosts.map(post => ({
+			deletedAt: post.deletedAt,
 			id: post.id,
+			isDeleted: post.isDeleted,
 			publishedAt: post.publishedAt,
 			slug: post.slug,
 			status: post.status,
@@ -125,6 +144,7 @@ export async function listAuditLogs(req: Request, res: Response) {
 		filter.$or = [
 			{ actorEmail: searchPattern },
 			{ actorName: searchPattern },
+			{ entityLabel: searchPattern },
 			{ summary: searchPattern },
 			{ targetLabel: searchPattern }
 		];
@@ -166,30 +186,39 @@ export async function moderateComment(req: Request, res: Response) {
 		return res.status(403).json({ message: "Admin access required" });
 	}
 
-	const comment = await Comment.findByIdAndUpdate(
-		req.params.commentId,
-		{
-			moderatedAt: new Date(),
-			moderatedBy: viewer.id,
-			moderationNote: parsed.data.moderationNote,
-			status: parsed.data.status
-		},
-		{ new: true }
-	);
-
+	const comment = await Comment.findById(req.params.commentId);
 	if (!comment) {
 		return res.status(404).json({ message: "Comment not found" });
 	}
 
+	const previousValues = {
+		moderationNote: comment.moderationNote,
+		status: comment.status
+	} satisfies Record<string, unknown>;
+
+	comment.moderatedAt = new Date();
+	comment.moderatedBy = new mongoose.Types.ObjectId(viewer.id);
+	comment.moderationNote = parsed.data.moderationNote;
+	comment.status = parsed.data.status;
+	await comment.save();
+
 	await recordAuditLog({
-		action: `comment.${parsed.data.status}`,
+		action: "COMMENT_MODERATED",
+		after: {
+			moderationNote: comment.moderationNote,
+			status: comment.status
+		},
 		actor: viewer,
+		before: previousValues,
 		category: "comment",
 		details: {
 			moderationNote: parsed.data.moderationNote,
 			postId: String(comment.postId),
 			status: comment.status
 		},
+		entityId: comment.id,
+		entityLabel: comment.authorName,
+		entityType: "comment",
 		req,
 		summary: `${parsed.data.status} comment from ${comment.authorName}`,
 		targetId: comment.id,
@@ -217,29 +246,36 @@ export async function updateUserStatus(req: Request, res: Response) {
 		});
 	}
 
-	const user = await User.findByIdAndUpdate(
-		req.params.userId,
-		{ status: parsed.data.status },
-		{ new: true }
-	);
-
+	const user = await User.findById(req.params.userId);
 	if (!user) {
 		return res.status(404).json({ message: "User not found" });
 	}
+
+	const previousValues = {
+		status: user.status
+	} satisfies Record<string, unknown>;
+
+	user.status = parsed.data.status;
+	await user.save();
 
 	const viewer = readAuthAccount(req);
 	if (viewer) {
 		await recordAuditLog({
 			action:
 				parsed.data.status === "suspended"
-					? "member.suspend"
-					: "member.reactivate",
+					? "USER_SUSPENDED"
+					: "USER_REACTIVATED",
+			after: { status: user.status },
 			actor: viewer,
+			before: previousValues,
 			category: "member",
 			details: {
 				email: user.email,
 				status: user.status
 			},
+			entityId: user.id,
+			entityLabel: user.name,
+			entityType: "user",
 			req,
 			summary: `${parsed.data.status === "suspended" ? "Suspended" : "Reactivated"} ${user.name}`,
 			targetId: user.id,
