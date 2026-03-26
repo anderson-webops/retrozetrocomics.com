@@ -241,15 +241,17 @@ const store = useMainStore();
 }
 
 .home-panel__actions {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
 	gap: 0.8rem;
+	justify-content: center;
+	justify-items: center;
 }
 
 .home-panel__actions a {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	width: min(100%, 22rem);
 	padding: 0.8rem 1.1rem;
 	border-radius: 999px;
 	text-decoration: none;
