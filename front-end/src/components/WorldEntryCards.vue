@@ -95,7 +95,12 @@ watch(
 </script>
 
 <template>
-	<section class="world-entry-grid">
+	<section
+		class="world-entry-grid"
+		:class="{
+			'world-entry-grid--editing': inlineEditing && !!editingId
+		}"
+	>
 		<article
 			v-for="entry in props.items"
 			:key="entry.id"
@@ -178,6 +183,7 @@ watch(
 							<button
 								type="button"
 								:disabled="(draftEntry.facts?.length || 0) <= 1"
+								class="world-entry-card__fact-remove"
 								@click="removeFact(index)"
 							>
 								Remove
@@ -185,35 +191,39 @@ watch(
 						</div>
 					</div>
 
-					<div class="world-entry-card__actions">
-						<button
-							type="submit"
-							:disabled="props.savingId === entry.id"
-						>
-							{{
-								props.savingId === entry.id
-									? "Saving..."
-									: "Save"
-							}}
-						</button>
-						<button type="button" @click="closeEditor">
-							Cancel
-						</button>
-						<button
-							type="button"
-							class="world-entry-card__danger"
-							@click="
-								removalArmedId === entry.id
-									? emit('remove', entry.id)
-									: (removalArmedId = entry.id)
-							"
-						>
-							{{
-								removalArmedId === entry.id
-									? "Confirm remove"
-									: "Remove"
-							}}
-						</button>
+					<div class="world-entry-card__footer">
+						<div class="world-entry-card__actions">
+							<button
+								type="submit"
+								:disabled="props.savingId === entry.id"
+							>
+								{{
+									props.savingId === entry.id
+										? "Saving..."
+										: "Save"
+								}}
+							</button>
+							<button type="button" @click="closeEditor">
+								Cancel edits
+							</button>
+						</div>
+						<div class="world-entry-card__danger-zone">
+							<button
+								type="button"
+								class="world-entry-card__danger"
+								@click="
+									removalArmedId === entry.id
+										? emit('remove', entry.id)
+										: (removalArmedId = entry.id)
+								"
+							>
+								{{
+									removalArmedId === entry.id
+										? "Confirm remove entry"
+										: "Remove entry"
+								}}
+							</button>
+						</div>
 					</div>
 				</form>
 			</template>
@@ -242,6 +252,10 @@ watch(
 	display: grid;
 	gap: 1rem;
 	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.world-entry-grid--editing {
+	grid-template-columns: minmax(0, 1fr);
 }
 
 .world-entry-card {
@@ -310,7 +324,9 @@ watch(
 
 .world-entry-card__facts-list,
 .world-entry-card__editor,
-.world-entry-card__facts {
+.world-entry-card__facts,
+.world-entry-card__footer,
+.world-entry-card__danger-zone {
 	display: grid;
 	gap: 0.8rem;
 }
@@ -368,7 +384,15 @@ watch(
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	background: rgba(10, 19, 36, 0.82);
 	color: #fff4e7;
-	padding: 0.82rem 0.9rem;
+	padding: 1rem 1rem;
+	font-size: 1rem;
+	line-height: 1.5;
+	min-height: 3.6rem;
+}
+
+.world-entry-card__editor textarea {
+	min-height: 11rem;
+	resize: vertical;
 }
 
 .world-entry-card__facts-header,
@@ -380,12 +404,29 @@ watch(
 	justify-content: space-between;
 }
 
+.world-entry-card__footer {
+	padding-top: 1rem;
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.world-entry-card__danger-zone {
+	justify-items: start;
+	padding-top: 0.25rem;
+}
+
+.world-entry-card__fact-row {
+	grid-template-columns: 1fr;
+	padding: 1rem;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.04);
+}
+
 .world-entry-card__fact-row button,
 .world-entry-card__facts-header button,
 .world-entry-card__actions button {
 	border: none;
 	border-radius: 999px;
-	padding: 0.68rem 0.95rem;
+	padding: 0.78rem 1rem;
 	font-weight: 800;
 	cursor: pointer;
 }
@@ -402,14 +443,17 @@ watch(
 	color: #fff2df;
 }
 
+.world-entry-card__fact-remove {
+	justify-self: start;
+}
+
 .world-entry-card__danger {
 	background: rgba(255, 143, 143, 0.16);
 	color: #ffd0d0;
 }
 
 @media (max-width: 720px) {
-	.world-entry-card__editor-grid,
-	.world-entry-card__fact-row {
+	.world-entry-card__editor-grid {
 		grid-template-columns: 1fr;
 	}
 }
