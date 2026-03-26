@@ -226,15 +226,17 @@ function handleAction(action: HeroAction) {
 	align-items: center;
 	justify-content: center;
 	width: fit-content;
-	max-width: min(100%, 42rem);
-	padding: 0.48rem 1.2rem;
+	max-width: 100%;
+	padding: 0.48rem 1.35rem;
 	border-radius: 999px;
 	font-size: clamp(0.72rem, 0.9vw, 0.82rem);
-	letter-spacing: 0.14em;
+	letter-spacing: 0.12em;
 	line-height: 1.35;
 	text-transform: uppercase;
 	text-align: center;
 	text-wrap: balance;
+	white-space: normal;
+	overflow-wrap: anywhere;
 	color: #091526;
 	background: #ffd27d;
 	margin: 0;
@@ -392,10 +394,6 @@ function handleAction(action: HeroAction) {
 @media (min-width: 1120px) {
 	.welcome {
 		grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.85fr);
-	}
-
-	.welcome__eyebrow {
-		white-space: nowrap;
 	}
 }
 
