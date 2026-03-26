@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { DashboardData, DashboardUser, PostType } from "@/types/site";
 
+import { useLocalDraft } from "@/composables/useLocalDraft";
 import {
 	createPost,
 	fetchDashboard,
@@ -11,8 +12,12 @@ import {
 const dashboard = ref<DashboardData | null>(null);
 const error = ref("");
 const loading = ref(false);
+const restoredDraftHadFiles = ref(false);
 const saving = ref(false);
 const moderationNotes = reactive<Record<string, string>>({});
+const publishFileInput = ref<HTMLInputElement | null>(null);
+
+const NEW_POST_DRAFT_KEY = "retrozetro:drafts:posts:new";
 
 const postForm = reactive<{
 	allowComments: boolean;
@@ -34,6 +39,66 @@ const postForm = reactive<{
 	type: "comic"
 });
 
+interface LocalPostDraft {
+	allowComments: boolean;
+	content: string;
+	hasFiles: boolean;
+	status: "draft" | "published";
+	summary: string;
+	tags: string;
+	title: string;
+	type: PostType;
+}
+
+const postDraftSnapshot = computed<LocalPostDraft>(() => ({
+	allowComments: postForm.allowComments,
+	content: postForm.content,
+	hasFiles: postForm.media.length > 0,
+	status: postForm.status,
+	summary: postForm.summary,
+	tags: postForm.tags,
+	title: postForm.title,
+	type: postForm.type
+}));
+
+const localDraft = useLocalDraft<LocalPostDraft>({
+	isEmpty(snapshot) {
+		return (
+			!snapshot.title.trim() &&
+			!snapshot.summary.trim() &&
+			!snapshot.content.trim() &&
+			!snapshot.tags.trim() &&
+			snapshot.type === "comic" &&
+			snapshot.status === "published" &&
+			snapshot.allowComments &&
+			!snapshot.hasFiles
+		);
+	},
+	source: () => postDraftSnapshot.value,
+	storageKey: NEW_POST_DRAFT_KEY
+});
+
+const savedLocallyLabel = computed(() => {
+	if (!localDraft.savedAt.value) return "";
+
+	return new Intl.DateTimeFormat("en-US", {
+		dateStyle: "medium",
+		timeStyle: "short"
+	}).format(new Date(localDraft.savedAt.value));
+});
+
+const filePersistenceWarning = computed(() => {
+	if (postForm.media.length) {
+		return "Files are not stored in the browser draft. Re-select them if this page reloads.";
+	}
+
+	if (restoredDraftHadFiles.value) {
+		return "This restored draft included files before refresh. Re-select them before publishing.";
+	}
+
+	return "";
+});
+
 function resetPostForm() {
 	postForm.allowComments = true;
 	postForm.content = "";
@@ -43,6 +108,33 @@ function resetPostForm() {
 	postForm.tags = "";
 	postForm.title = "";
 	postForm.type = "comic";
+	restoredDraftHadFiles.value = false;
+
+	if (publishFileInput.value) publishFileInput.value.value = "";
+}
+
+function applyLocalDraft(snapshot: LocalPostDraft) {
+	postForm.allowComments = snapshot.allowComments;
+	postForm.content = snapshot.content;
+	postForm.media = [];
+	postForm.status = snapshot.status;
+	postForm.summary = snapshot.summary;
+	postForm.tags = snapshot.tags;
+	postForm.title = snapshot.title;
+	postForm.type = snapshot.type;
+	restoredDraftHadFiles.value = snapshot.hasFiles;
+}
+
+function restoreLocalDraft() {
+	const snapshot = localDraft.restoreDraft();
+	if (!snapshot) return;
+
+	applyLocalDraft(snapshot);
+}
+
+function discardLocalDraft() {
+	localDraft.discardStoredDraft();
+	resetPostForm();
 }
 
 async function loadDashboard() {
@@ -72,6 +164,7 @@ async function publishPost() {
 
 	try {
 		await createPost(postForm);
+		localDraft.clearDraft();
 		resetPostForm();
 		await loadDashboard();
 	} catch (saveError: any) {
@@ -198,6 +291,40 @@ onMounted(() => {
 				</header>
 
 				<form class="publish-form" @submit.prevent="publishPost">
+					<div
+						v-if="localDraft.restorePromptVisible"
+						class="publish-form__draft-banner"
+					>
+						<div class="publish-form__draft-copy">
+							<p class="publish-form__draft-eyebrow">
+								Local Draft Found
+							</p>
+							<p>
+								A saved browser draft is available from
+								{{ savedLocallyLabel }}.
+							</p>
+							<p
+								v-if="localDraft.hasStoredFiles"
+								class="publish-form__draft-warning"
+							>
+								Files are not restorable and may need to be
+								reselected.
+							</p>
+						</div>
+						<div class="publish-form__draft-actions">
+							<button type="button" @click="restoreLocalDraft">
+								Restore draft
+							</button>
+							<button
+								type="button"
+								class="publish-form__draft-discard"
+								@click="discardLocalDraft"
+							>
+								Discard
+							</button>
+						</div>
+					</div>
+
 					<div class="publish-form__grid">
 						<label>
 							<span>Title</span>
@@ -268,6 +395,7 @@ onMounted(() => {
 					<label>
 						<span>Images or PDFs</span>
 						<input
+							ref="publishFileInput"
 							multiple
 							type="file"
 							@change="handleFileChange"
@@ -275,8 +403,22 @@ onMounted(() => {
 					</label>
 
 					<p
-						v-if="postForm.media.length"
+						v-if="savedLocallyLabel"
+						class="publish-form__local-status"
+					>
+						Saved locally {{ savedLocallyLabel }}
+					</p>
+
+					<p
+						v-if="filePersistenceWarning"
 						class="publish-form__uploads"
+					>
+						{{ filePersistenceWarning }}
+					</p>
+
+					<p
+						v-if="postForm.media.length"
+						class="publish-form__uploads publish-form__uploads--count"
 					>
 						{{ postForm.media.length }} file{{
 							postForm.media.length === 1 ? "" : "s"
@@ -537,6 +679,60 @@ onMounted(() => {
 	gap: 0.45rem;
 }
 
+.publish-form__draft-banner {
+	display: grid;
+	gap: 1rem;
+	padding: 1rem;
+	border-radius: 18px;
+	background: rgba(255, 179, 111, 0.12);
+	border: 1px solid rgba(255, 179, 111, 0.24);
+}
+
+.publish-form__draft-copy,
+.publish-form__draft-copy p {
+	margin: 0;
+}
+
+.publish-form__draft-eyebrow {
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	font-size: 0.76rem;
+	font-weight: 800;
+	color: #ffd27d;
+	margin-bottom: 0.45rem !important;
+}
+
+.publish-form__draft-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+}
+
+.publish-form__draft-actions button,
+.publish-form__draft-discard {
+	border: none;
+	border-radius: 999px;
+	padding: 0.72rem 1rem;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.publish-form__draft-actions button {
+	background: linear-gradient(120deg, #ff914d, #ffd27d);
+	color: #1b0328;
+}
+
+.publish-form__draft-discard {
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff2df;
+}
+
+.publish-form__draft-warning,
+.publish-form__local-status {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.78);
+}
+
 .publish-form span {
 	text-transform: uppercase;
 	letter-spacing: 0.1em;
@@ -575,6 +771,10 @@ onMounted(() => {
 .publish-form__uploads {
 	margin: 0;
 	color: rgba(255, 255, 255, 0.7);
+}
+
+.publish-form__uploads--count {
+	color: rgba(255, 255, 255, 0.6);
 }
 
 .publish-form__submit,

@@ -214,6 +214,7 @@
     "useKeyModifier": true,
     "useLastChanged": true,
     "useLink": true,
+    "useLocalDraft": true,
     "useLocalStorage": true,
     "useMagicKeys": true,
     "useMainStore": true,
