@@ -55,7 +55,35 @@ const panels = {
 	}
 } as const;
 
-const panel = computed(() => panels[props.variant]);
+const panel = computed(() => {
+	if (props.variant === "archive" && isStudioJournalRoute.value) {
+		return {
+			ctaLabel: "Jump to latest drops",
+			ctaTo: "/studio",
+			eyebrow: "Journal Tips",
+			items: [
+				{
+					label: "Start Wide",
+					value: "Browse every drop first"
+				},
+				{
+					label: "Use Filters",
+					value: "Sort by lane when needed"
+				},
+				{
+					label: "Open Posts",
+					value: "See full pages and notes"
+				},
+				{
+					label: "Join In",
+					value: "Members can comment on open threads"
+				}
+			]
+		} as const;
+	}
+
+	return panels[props.variant];
+});
 const archiveCta = computed(() => {
 	if (!isStudioJournalRoute.value) {
 		return {
