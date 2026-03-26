@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useSessionStore } from "@/stores/session";
+
 const props = withDefaults(
 	defineProps<{
 		variant?: "archive" | "community";
@@ -8,6 +10,7 @@ const props = withDefaults(
 	}
 );
 const route = useRoute();
+const session = useSessionStore();
 const isStudioJournalRoute = computed(() => route.path === "/studio");
 
 const panels = {
@@ -99,6 +102,14 @@ const archiveCta = computed(() => {
 		label: "Jump to latest drops"
 	};
 });
+
+const showPanelCta = computed(() => {
+	if (props.variant === "community") {
+		return session.isAdmin;
+	}
+
+	return true;
+});
 </script>
 
 <template>
@@ -115,13 +126,19 @@ const archiveCta = computed(() => {
 			</div>
 		</div>
 		<a
-			v-if="variant === 'archive' && archiveCta.isHashLink"
+			v-if="
+				showPanelCta && variant === 'archive' && archiveCta.isHashLink
+			"
 			class="side-ad__link"
 			:href="archiveCta.hashHref"
 		>
 			{{ archiveCta.label }}
 		</a>
-		<RouterLink v-else class="side-ad__link" :to="panel.ctaTo">
+		<RouterLink
+			v-else-if="showPanelCta"
+			class="side-ad__link"
+			:to="panel.ctaTo"
+		>
 			{{ variant === "archive" ? archiveCta.label : panel.ctaLabel }}
 		</RouterLink>
 	</aside>
