@@ -100,8 +100,8 @@ const archiveCta = computed(() => {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 0.75rem;
-	padding: 1.15rem;
+	gap: 0.45rem;
+	padding: 1rem 1.15rem 1.15rem;
 	border-radius: 20px;
 	background: rgba(9, 21, 38, 0.8);
 	border: 1px solid rgba(255, 255, 255, 0.08);
@@ -132,8 +132,8 @@ const archiveCta = computed(() => {
 			rgba(255, 255, 255, 0.02)
 		);
 	display: grid;
-	gap: 0.7rem;
-	padding: 0.9rem;
+	gap: 0.55rem;
+	padding: 0.55rem 0.75rem 0.75rem;
 }
 
 .side-ad__slot {
