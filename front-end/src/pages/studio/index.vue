@@ -123,8 +123,10 @@ const archiveStats = [
 				:key="lane.label"
 				class="studio-page__lane"
 			>
-				<p>{{ lane.label }}</p>
-				<h2>{{ lane.copy }}</h2>
+				<div class="studio-page__lane-copy">
+					<p>{{ lane.label }}</p>
+					<h2>{{ lane.copy }}</h2>
+				</div>
 				<RouterLink
 					v-if="session.showAdminTools"
 					class="studio-page__lane-action"
@@ -237,12 +239,19 @@ const archiveStats = [
 
 .studio-page__lane {
 	display: grid;
-	gap: 0.55rem;
+	grid-template-rows: minmax(0, 1fr) auto;
+	gap: 1rem;
 	padding: 1.2rem;
 	border-radius: 22px;
 	background: var(--surface-panel-strong);
 	border: 1px solid rgba(9, 21, 38, 0.08);
 	box-shadow: 0 18px 32px rgba(8, 13, 26, 0.12);
+}
+
+.studio-page__lane-copy {
+	display: grid;
+	align-content: start;
+	gap: 0.55rem;
 }
 
 .studio-page__lane p,
@@ -265,10 +274,12 @@ const archiveStats = [
 }
 
 .studio-page__lane-action {
-	justify-self: start;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	align-self: end;
+	justify-self: start;
+	min-height: 3.7rem;
 	padding: 0.68rem 0.95rem;
 	border-radius: 999px;
 	background: rgba(9, 21, 38, 0.08);
