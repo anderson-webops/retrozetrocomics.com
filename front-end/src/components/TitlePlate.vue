@@ -46,18 +46,18 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 	flex-direction: column;
 	gap: 1.5rem;
 	padding: clamp(1.25rem, 3vw, 2rem);
-	background: transparent;
+	background: rgba(255, 248, 239, 0.94);
 	border-radius: 20px;
-	border: none;
-	box-shadow: none;
-	backdrop-filter: none;
+	border: 1px solid rgba(8, 17, 31, 0.08);
+	box-shadow: 0 18px 36px rgba(8, 13, 26, 0.15);
+	backdrop-filter: blur(10px);
 }
 
 .title-plate__brand {
 	display: flex;
 	gap: 1rem;
 	align-items: center;
-	color: #fff4e7;
+	color: #08111f;
 }
 
 .title-plate__logo {
@@ -66,7 +66,7 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 	justify-content: center;
 	width: 96px;
 	height: 96px;
-	background: rgba(255, 255, 255, 0.08);
+	background: rgba(8, 17, 31, 0.04);
 	border-radius: 18px;
 	box-shadow: 0 12px 20px rgba(8, 13, 26, 0.12);
 }
@@ -90,7 +90,7 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 	font-size: 0.95rem;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
-	color: rgba(239, 244, 255, 0.74);
+	color: #31405a;
 }
 
 .title-plate__ad {
@@ -116,8 +116,8 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 	margin: 0;
 	padding: 1rem;
 	border-radius: 16px;
-	background: rgba(255, 255, 255, 0.06);
-	color: rgba(239, 244, 255, 0.82);
+	background: rgba(8, 17, 31, 0.06);
+	color: #102038;
 	line-height: 1.7;
 }
 

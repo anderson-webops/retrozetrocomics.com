@@ -66,12 +66,12 @@ const session = useSessionStore();
 	align-items: center;
 	gap: 1rem 1.25rem;
 	padding: clamp(0.75rem, 2vw, 1.25rem) clamp(1rem, 5vw, 3rem);
-	background: transparent;
-	border: none;
+	background: rgba(9, 21, 38, 0.84);
+	border: 1px solid rgba(255, 255, 255, 0.08);
 	border-radius: 24px;
 	color: #f4eaff;
-	box-shadow: none;
-	backdrop-filter: none;
+	box-shadow: 0 12px 24px rgba(7, 0, 18, 0.2);
+	backdrop-filter: blur(10px);
 }
 
 .footer__brand {

@@ -90,10 +90,10 @@ const store = useMainStore();
 .home-showcase {
 	display: grid;
 	gap: 1.4rem;
-	background: transparent;
-	color: #eff4ff;
-	box-shadow: none;
-	backdrop-filter: none;
+	background: rgba(249, 234, 219, 0.96);
+	color: #0b1323;
+	box-shadow: 0 22px 40px rgba(8, 13, 26, 0.2);
+	backdrop-filter: blur(10px);
 }
 
 .home-showcase__header {
@@ -131,7 +131,7 @@ const store = useMainStore();
 .home-showcase__header p {
 	max-width: 64ch;
 	line-height: 1.8;
-	color: rgba(239, 244, 255, 0.78);
+	color: #31405a;
 }
 
 .home-showcase__grid {
@@ -198,13 +198,13 @@ const store = useMainStore();
 .home-panel {
 	display: grid;
 	gap: 1rem;
-	background: transparent;
-	border: none;
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .home-panel--accent {
-	background: transparent;
-	border-color: transparent;
+	background: rgba(255, 255, 255, 0.06);
+	border-color: rgba(124, 225, 246, 0.18);
 }
 
 .home-panel__eyebrow {
