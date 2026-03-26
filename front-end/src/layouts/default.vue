@@ -324,7 +324,7 @@ onMounted(() => {
 }
 
 .page-slot {
-	padding: clamp(1.5rem, 4vw, 2.5rem);
+	padding: 0 clamp(1.5rem, 4vw, 2.5rem) clamp(1.5rem, 4vw, 2.5rem);
 	display: flex;
 	flex-direction: column;
 	gap: clamp(2rem, 3vw, 3rem);
