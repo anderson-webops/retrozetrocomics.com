@@ -149,6 +149,49 @@ describe("useLocalDraft()", () => {
 		scope.stop();
 	});
 
+	it("discards corrupted saved timestamps instead of surfacing a broken restore prompt", () => {
+		storage.setItem(
+			"retrozetro:test:drafts:new-post",
+			JSON.stringify({
+				hasFiles: true,
+				savedAt: "   ",
+				value: {
+					content: "Broken timestamp",
+					hasFiles: true,
+					title: "Damaged Draft"
+				},
+				version: 1
+			})
+		);
+
+		const scope = effectScope();
+		let draft!: ReturnType<typeof useLocalDraft<{
+			content: string;
+			hasFiles: boolean;
+			title: string;
+		}>>;
+
+		scope.run(() => {
+			draft = useLocalDraft({
+				isEmpty(snapshot) {
+					return !snapshot.title && !snapshot.content && !snapshot.hasFiles;
+				},
+				source: () => ({
+					content: "",
+					hasFiles: false,
+					title: ""
+				}),
+				storageKey: "retrozetro:test:drafts:new-post"
+			});
+		});
+
+		expect(draft.restorePromptVisible.value).toBe(false);
+		expect(draft.savedAt.value).toBeNull();
+		expect(storage.getItem("retrozetro:test:drafts:new-post")).toBeNull();
+
+		scope.stop();
+	});
+
 	it("switches draft namespaces without overwriting the stored draft on key change", async () => {
 		let draftKey!: { value: string };
 		let form!: {

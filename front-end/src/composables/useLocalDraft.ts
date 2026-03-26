@@ -48,6 +48,8 @@ export function useLocalDraft<T>({
 			if (
 				parsed?.version !== 1 ||
 				typeof parsed.savedAt !== "string" ||
+				!parsed.savedAt.trim() ||
+				Number.isNaN(Date.parse(parsed.savedAt)) ||
 				typeof parsed.hasFiles !== "boolean" ||
 				!parsed.value
 			) {

@@ -119,7 +119,15 @@ const postDraftSnapshot = computed<LocalPostDraft>(() => ({
 	type: postForm.type
 }));
 
-const localDraft = useLocalDraft<LocalPostDraft>({
+const {
+	clearDraft: clearLocalDraft,
+	discardStoredDraft,
+	hasStoredFiles,
+	restoreDraft,
+	restorePromptVisible,
+	savedAt,
+	saveNow
+} = useLocalDraft<LocalPostDraft>({
 	isEmpty(snapshot) {
 		return (
 			!snapshot.title.trim() &&
@@ -138,12 +146,12 @@ const localDraft = useLocalDraft<LocalPostDraft>({
 });
 
 const savedLocallyLabel = computed(() => {
-	if (!localDraft.savedAt.value) return "";
+	if (!savedAt.value) return "";
 
 	return new Intl.DateTimeFormat("en-US", {
 		dateStyle: "medium",
 		timeStyle: "short"
-	}).format(new Date(localDraft.savedAt.value));
+	}).format(new Date(savedAt.value));
 });
 
 const filePersistenceWarning = computed(() => {
@@ -251,17 +259,17 @@ function createDraftSnapshotFromPost(post: PostSummary): LocalPostDraft {
 
 async function syncDraftAutosaveAfterEditorSwap() {
 	await nextTick();
-	isDraftAutosaveEnabled.value = !localDraft.restorePromptVisible.value;
+	isDraftAutosaveEnabled.value = !restorePromptVisible.value;
 }
 
 function persistCurrentDraftIfSafe() {
 	if (isDraftAutosaveEnabled.value) {
-		localDraft.saveNow();
+		saveNow();
 	}
 }
 
 function restoreLocalDraft() {
-	const snapshot = localDraft.restoreDraft();
+	const snapshot = restoreDraft();
 	if (!snapshot) return;
 
 	applyLocalDraft(snapshot);
@@ -269,7 +277,7 @@ function restoreLocalDraft() {
 }
 
 function discardLocalDraft() {
-	localDraft.discardStoredDraft();
+	discardStoredDraft();
 	applyLocalDraft(postEditorBaseDraft.value);
 	isDraftAutosaveEnabled.value = true;
 }
@@ -356,7 +364,7 @@ async function savePost() {
 			? await updatePost(editingPostId.value, payload)
 			: await createPost(payload);
 
-		localDraft.clearDraft();
+		clearLocalDraft();
 		editorCommentCount.value = savedPost.commentCount;
 		editorPublishedAt.value = savedPost.publishedAt;
 		existingMedia.value = savedPost.media;
@@ -520,19 +528,20 @@ onBeforeUnmount(() => {
 					</div>
 
 					<div
-						v-if="localDraft.restorePromptVisible"
+						v-if="restorePromptVisible"
 						class="publish-form__draft-banner"
 					>
 						<div class="publish-form__draft-copy">
 							<p class="publish-form__draft-eyebrow">
 								Local Draft Found
 							</p>
-							<p>
+							<p v-if="savedLocallyLabel">
 								A saved browser draft is available from
 								{{ savedLocallyLabel }}.
 							</p>
+							<p v-else>A saved browser draft is available.</p>
 							<p
-								v-if="localDraft.hasStoredFiles"
+								v-if="hasStoredFiles"
 								class="publish-form__draft-warning"
 							>
 								Files are not restorable and may need to be
