@@ -1,4 +1,6 @@
 import type {
+	AuditLogCategory,
+	AuditLogRecord,
 	CharactersPageContent,
 	DashboardData,
 	PostDetailResponse,
@@ -18,6 +20,14 @@ export interface PostEditorPayload {
 	tags: string;
 	title: string;
 	type: PostType;
+}
+
+export interface AuditLogFilters {
+	action?: string;
+	actorRole?: "admin" | "all" | "user";
+	category?: AuditLogCategory | "all";
+	limit?: number;
+	search?: string;
 }
 
 function appendPostEditorFormData(
@@ -74,6 +84,29 @@ export async function createComment(postId: string, body: string) {
 
 export async function fetchDashboard() {
 	const { data } = await api.get<DashboardData>("/admin/dashboard");
+	return data;
+}
+
+export async function fetchAuditLogs(filters: AuditLogFilters = {}) {
+	const { data } = await api.get<{
+		actionOptions: string[];
+		logs: AuditLogRecord[];
+	}>("/admin/audit-logs", {
+		params: {
+			action: filters.action || undefined,
+			actorRole:
+				filters.actorRole && filters.actorRole !== "all"
+					? filters.actorRole
+					: undefined,
+			category:
+				filters.category && filters.category !== "all"
+					? filters.category
+					: undefined,
+			limit: filters.limit,
+			search: filters.search || undefined
+		}
+	});
+
 	return data;
 }
 

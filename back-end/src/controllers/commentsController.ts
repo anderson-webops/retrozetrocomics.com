@@ -5,6 +5,7 @@ import { z } from "zod";
 import { readAuthAccount } from "../middleware/auth.js";
 import { Comment } from "../models/schemas/Comment.js";
 import { Post } from "../models/schemas/Post.js";
+import { recordAuditLog } from "../services/auditLog.js";
 
 const createCommentSchema = z.object({
 	body: z.string().trim().min(3).max(1000)
@@ -43,6 +44,21 @@ export async function createComment(req: Request, res: Response) {
 		body: parsed.data.body,
 		postId: post.id,
 		status: viewer.role === "admin" ? "approved" : "pending"
+	});
+
+	await recordAuditLog({
+		action: "comment.create",
+		actor: viewer,
+		category: "comment",
+		details: {
+			commentId: comment.id,
+			status: comment.status
+		},
+		req,
+		summary: `${viewer.name} submitted a comment on ${post.title}`,
+		targetId: post.id,
+		targetLabel: post.title,
+		targetType: "post"
 	});
 
 	return res.status(201).json({

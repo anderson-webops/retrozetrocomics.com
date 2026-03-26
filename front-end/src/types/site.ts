@@ -1,7 +1,33 @@
 export type AccountRole = "admin" | "user";
+export type AuditLogCategory =
+	| "auth"
+	| "comment"
+	| "member"
+	| "post"
+	| "site-content";
+export type AuditLogOutcome = "failure" | "success";
 export type CommentStatus = "approved" | "hidden" | "pending" | "rejected";
 export type PostStatus = "draft" | "private" | "published";
 export type PostType = "comic" | "outline" | "photo" | "storyboard";
+
+export interface AuditLogRecord {
+	action: string;
+	actorEmail: string;
+	actorId: string;
+	actorName: string;
+	actorRole: AccountRole;
+	category: AuditLogCategory;
+	createdAt: string;
+	details: Record<string, unknown>;
+	id: string;
+	ipAddress: string;
+	outcome: AuditLogOutcome;
+	summary: string;
+	targetId: string;
+	targetLabel: string;
+	targetType: string;
+	userAgent: string;
+}
 
 export interface CharacterBoardFact {
 	label: string;

@@ -9,6 +9,7 @@ import {
 } from "../middleware/auth.js";
 import { Admin } from "../models/schemas/Admin.js";
 import { User } from "../models/schemas/User.js";
+import { recordAuditLog } from "../services/auditLog.js";
 import {
 	generateCaptchaChallenge,
 	verifyCaptcha
@@ -123,6 +124,22 @@ export async function signup(req: Request, res: Response) {
 		captcha: undefined
 	};
 
+	await recordAuditLog({
+		action: "auth.signup",
+		actor: {
+			email: user.email,
+			id: user.id,
+			name: user.name,
+			role: "user"
+		},
+		category: "auth",
+		req,
+		summary: `${user.name} created an account`,
+		targetId: user.id,
+		targetLabel: user.email,
+		targetType: "account"
+	});
+
 	return res.status(201).json({
 		account: {
 			email: user.email,
@@ -167,6 +184,22 @@ export async function login(req: Request, res: Response) {
 		status: record.status
 	});
 
+	await recordAuditLog({
+		action: "auth.login",
+		actor: {
+			email: record.account.email,
+			id: record.account.id,
+			name: record.account.name,
+			role: record.role
+		},
+		category: "auth",
+		req,
+		summary: `${record.account.name} signed in`,
+		targetId: record.account.id,
+		targetLabel: record.account.email,
+		targetType: "account"
+	});
+
 	return res.json({
 		account: {
 			email: record.account.email,
@@ -179,7 +212,22 @@ export async function login(req: Request, res: Response) {
 }
 
 export async function logout(req: Request, res: Response) {
+	const account = await getAuthenticatedAccount(req);
 	clearSession(req);
+
+	if (account) {
+		await recordAuditLog({
+			action: "auth.logout",
+			actor: account,
+			category: "auth",
+			req,
+			summary: `${account.name} signed out`,
+			targetId: account.id,
+			targetLabel: account.email,
+			targetType: "account"
+		});
+	}
+
 	res.status(204).send();
 }
 

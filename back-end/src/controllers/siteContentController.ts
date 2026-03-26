@@ -2,7 +2,9 @@ import type { Request, Response } from "express";
 import { z } from "zod";
 
 import { createDefaultCharactersPageContent } from "../content/defaultCharactersPageContent.js";
+import { readAuthAccount } from "../middleware/auth.js";
 import { SiteContent } from "../models/schemas/SiteContent.js";
+import { recordAuditLog } from "../services/auditLog.js";
 
 const CHARACTERS_PAGE_KEY = "characters-page";
 
@@ -81,6 +83,24 @@ export async function updateCharactersPageContent(req: Request, res: Response) {
 			upsert: true
 		}
 	);
+
+	const viewer = readAuthAccount(req);
+	if (viewer) {
+		await recordAuditLog({
+			action: "site-content.characters.update",
+			actor: viewer,
+			category: "site-content",
+			details: {
+				characterCount: parsed.data.characters.length,
+				worldEntryCount: parsed.data.worldEntries.length
+			},
+			req,
+			summary: "Updated the character and threat board",
+			targetId: CHARACTERS_PAGE_KEY,
+			targetLabel: "Character and Threat Board",
+			targetType: "site-content"
+		});
+	}
 
 	return res.json({
 		content: normalizeCharactersPageContent(document?.data)

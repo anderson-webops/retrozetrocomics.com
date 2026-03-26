@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import type {
+	AuditLogCategory,
+	AuditLogRecord,
 	CharacterBoardFact,
 	CharacterBoardProfile,
 	CharacterBoardWorldEntry,
@@ -21,6 +23,7 @@ import {
 } from "@/content/defaultCharactersPageContent";
 import {
 	createPost,
+	fetchAuditLogs,
 	fetchCharactersPageContent,
 	fetchDashboard,
 	fetchPost,
@@ -49,6 +52,10 @@ const editorCommentCount = ref(0);
 const error = ref("");
 const existingMedia = ref<MediaAsset[]>([]);
 const isDraftAutosaveEnabled = ref(true);
+const auditLogActionOptions = ref<string[]>([]);
+const auditLogError = ref("");
+const auditLogLoading = ref(false);
+const auditLogs = ref<AuditLogRecord[]>([]);
 const loading = ref(false);
 const restoredDraftHadFiles = ref(false);
 const saving = ref(false);
@@ -77,13 +84,29 @@ const EDIT_POST_DRAFT_KEY_PREFIX = "retrozetro:drafts:posts:edit";
 const SUSPEND_PHRASE_WHITESPACE = /\s+/g;
 
 type EditorPostStatus = "private" | "published";
-type AdminWorkspaceSection = "posts" | "board" | "comments" | "members";
+type AdminWorkspaceSection =
+	| "posts"
+	| "board"
+	| "comments"
+	| "members"
+	| "logs";
 
 const route = useRoute();
 const router = useRouter();
 const activeSection = ref<AdminWorkspaceSection>("posts");
 const boardWorkspaceVisible = ref(false);
 const postWorkspaceVisible = ref(false);
+const auditLogFilters = reactive<{
+	action: string;
+	actorRole: "admin" | "all" | "user";
+	category: AuditLogCategory | "all";
+	search: string;
+}>({
+	action: "",
+	actorRole: "all",
+	category: "all",
+	search: ""
+});
 
 const postForm = reactive<{
 	allowComments: boolean;
@@ -236,6 +259,12 @@ const sectionOptions: Array<{
 		description: "Suspend or restore member accounts in one place.",
 		key: "members",
 		label: "Members"
+	},
+	{
+		description:
+			"Review a filterable timeline of sign-ins, comments, post updates, and moderation actions.",
+		key: "logs",
+		label: "Logs"
 	}
 ];
 
@@ -255,11 +284,17 @@ const memberPreview = computed(() => dashboard.value?.users.slice(0, 6) || []);
 const pendingCommentPreview = computed(
 	() => dashboard.value?.pendingComments.slice(0, 4) || []
 );
+const auditLogPreview = computed(() => auditLogs.value.slice(0, 4));
 
 function normalizeAdminSection(
 	value: string | null | undefined
 ): AdminWorkspaceSection {
-	if (value === "board" || value === "comments" || value === "members") {
+	if (
+		value === "board" ||
+		value === "comments" ||
+		value === "members" ||
+		value === "logs"
+	) {
 		return value;
 	}
 
@@ -335,6 +370,44 @@ async function handleSectionChange(event: Event) {
 	await selectSection(target.value as AdminWorkspaceSection);
 }
 
+function resetAuditLogFilters() {
+	auditLogFilters.action = "";
+	auditLogFilters.actorRole = "all";
+	auditLogFilters.category = "all";
+	auditLogFilters.search = "";
+	void loadAuditLogs();
+}
+
+function auditLogDetailPairs(details: Record<string, unknown>) {
+	return Object.entries(details).filter(
+		([, value]) => typeof value === "number" || typeof value === "string"
+	);
+}
+
+async function loadAuditLogs() {
+	auditLogLoading.value = true;
+	auditLogError.value = "";
+
+	try {
+		const response = await fetchAuditLogs({
+			action: auditLogFilters.action,
+			actorRole: auditLogFilters.actorRole,
+			category: auditLogFilters.category,
+			limit: 80,
+			search: auditLogFilters.search
+		});
+		auditLogActionOptions.value = response.actionOptions;
+		auditLogs.value = response.logs;
+	} catch (loadError: any) {
+		auditLogError.value =
+			loadError?.response?.data?.message ||
+			loadError?.message ||
+			"Unable to load audit logs.";
+	} finally {
+		auditLogLoading.value = false;
+	}
+}
+
 async function syncWorkspaceFromRoute() {
 	const nextSection = normalizeAdminSection(
 		readQueryValue(route.query.section)
@@ -392,6 +465,10 @@ async function syncWorkspaceFromRoute() {
 			addWorldEntry();
 			await replaceAdminQuery("board", { manage: "1" });
 		}
+	}
+
+	if (nextSection === "logs") {
+		await loadAuditLogs();
 	}
 }
 
@@ -1073,6 +1150,14 @@ onBeforeUnmount(() => {
 						>
 							Manage board
 						</button>
+						<button
+							v-if="activeSection === 'logs'"
+							type="button"
+							class="admin-dashboard__secondary-action"
+							@click="loadAuditLogs"
+						>
+							Refresh logs
+						</button>
 					</div>
 				</div>
 
@@ -1102,7 +1187,9 @@ onBeforeUnmount(() => {
 											? `${boardCharacterCount} characters / ${boardWorldEntryCount} files`
 											: option.key === "comments"
 												? `${dashboard.pendingComments.length} pending`
-												: `${dashboard.users.length} members`
+												: option.key === "members"
+													? `${dashboard.users.length} members`
+													: `${auditLogs.length} loaded`
 								}}
 							</strong>
 							<button
@@ -2025,6 +2112,163 @@ onBeforeUnmount(() => {
 					</li>
 				</ul>
 			</section>
+
+			<section v-if="activeSection === 'logs'" class="admin-panel">
+				<header>
+					<h2>Activity Log</h2>
+					<p>
+						Review sign-ins, comments, post changes, board edits,
+						and moderation actions with filters for actor, action,
+						and category.
+					</p>
+				</header>
+
+				<form
+					class="audit-log__filters"
+					@submit.prevent="loadAuditLogs"
+				>
+					<label>
+						<span>Category</span>
+						<select v-model="auditLogFilters.category">
+							<option value="all">All categories</option>
+							<option value="auth">Auth</option>
+							<option value="comment">Comments</option>
+							<option value="member">Members</option>
+							<option value="post">Posts</option>
+							<option value="site-content">Site content</option>
+						</select>
+					</label>
+
+					<label>
+						<span>Actor role</span>
+						<select v-model="auditLogFilters.actorRole">
+							<option value="all">All roles</option>
+							<option value="admin">Admin</option>
+							<option value="user">User</option>
+						</select>
+					</label>
+
+					<label>
+						<span>Action</span>
+						<select v-model="auditLogFilters.action">
+							<option value="">All actions</option>
+							<option
+								v-for="action in auditLogActionOptions"
+								:key="action"
+								:value="action"
+							>
+								{{ action }}
+							</option>
+						</select>
+					</label>
+
+					<label class="audit-log__search">
+						<span>Search</span>
+						<input
+							v-model="auditLogFilters.search"
+							placeholder="Actor, summary, or target"
+							type="text"
+						/>
+					</label>
+
+					<div class="audit-log__filter-actions">
+						<button type="submit">Apply filters</button>
+						<button
+							type="button"
+							class="audit-log__filter-reset"
+							@click="resetAuditLogFilters"
+						>
+							Reset
+						</button>
+					</div>
+				</form>
+
+				<p v-if="auditLogError" class="admin-dashboard__error">
+					{{ auditLogError }}
+				</p>
+				<p v-if="auditLogLoading" class="admin-dashboard__loading">
+					Loading activity log...
+				</p>
+				<p v-else-if="!auditLogs.length" class="admin-panel__empty">
+					No matching log entries yet. New sign-ins, comments, post
+					changes, and moderation actions will appear here after
+					deploy.
+				</p>
+
+				<div v-else class="admin-dashboard__board-summary">
+					<article
+						v-for="log in auditLogPreview"
+						:key="log.id"
+						class="admin-dashboard__board-summary-card"
+					>
+						<p class="admin-dashboard__eyebrow">
+							{{ log.category }}
+						</p>
+						<h3>{{ log.actorName || log.actorEmail }}</h3>
+						<p>{{ log.summary }}</p>
+					</article>
+				</div>
+
+				<ul v-if="auditLogs.length" class="audit-log__list">
+					<li
+						v-for="log in auditLogs"
+						:key="log.id"
+						class="audit-log__item"
+					>
+						<div class="audit-log__item-header">
+							<div>
+								<p class="admin-dashboard__eyebrow">
+									{{ log.category }}
+								</p>
+								<h3>{{ log.summary }}</h3>
+							</div>
+							<time>
+								{{
+									new Intl.DateTimeFormat("en-US", {
+										dateStyle: "medium",
+										timeStyle: "short"
+									}).format(new Date(log.createdAt))
+								}}
+							</time>
+						</div>
+
+						<div class="audit-log__meta">
+							<span>
+								<strong>Actor</strong>
+								{{ log.actorName || log.actorEmail }}
+								({{ log.actorRole }})
+							</span>
+							<span>
+								<strong>Action</strong>
+								{{ log.action }}
+							</span>
+							<span v-if="log.targetLabel">
+								<strong>Target</strong>
+								{{ log.targetLabel }}
+							</span>
+							<span v-if="log.ipAddress">
+								<strong>IP</strong>
+								{{ log.ipAddress }}
+							</span>
+						</div>
+
+						<dl
+							v-if="auditLogDetailPairs(log.details).length"
+							class="audit-log__details"
+						>
+							<div
+								v-for="[label, value] in auditLogDetailPairs(
+									log.details
+								)"
+								:key="`${log.id}-${label}`"
+							>
+								<dt>{{ label }}</dt>
+								<dd>{{ value }}</dd>
+							</div>
+						</dl>
+					</li>
+				</ul>
+			</section>
 		</template>
 	</section>
 
@@ -2684,7 +2928,8 @@ onBeforeUnmount(() => {
 .publish-form__submit,
 .publish-form__preview-toggle,
 .review-list__actions button,
-.member-list__controls button {
+.member-list__controls button,
+.audit-log__filter-actions button {
 	border: none;
 	border-radius: 999px;
 	padding: 0.78rem 1.1rem;
@@ -2810,7 +3055,8 @@ onBeforeUnmount(() => {
 
 .review-list__item,
 .member-list__item,
-.post-list__item {
+.post-list__item,
+.audit-log__item {
 	display: grid;
 	gap: 0.85rem;
 	padding: 1rem;
@@ -2826,6 +3072,129 @@ onBeforeUnmount(() => {
 	gap: 0.65rem;
 	align-items: center;
 	justify-content: space-between;
+}
+
+.audit-log__filters {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	margin: 1rem 0 0;
+}
+
+.audit-log__filters label {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.audit-log__filters span {
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	font-size: 0.78rem;
+	color: rgba(255, 255, 255, 0.68);
+}
+
+.audit-log__filters input,
+.audit-log__filters select {
+	width: 100%;
+	border-radius: 14px;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	background: rgba(11, 1, 19, 0.38);
+	color: #f9efff;
+	padding: 0.85rem 0.95rem;
+}
+
+.audit-log__search {
+	grid-column: span 2;
+}
+
+.audit-log__filter-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	align-items: end;
+}
+
+.audit-log__filter-reset {
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff2df;
+}
+
+.audit-log__list {
+	display: grid;
+	gap: 1rem;
+	list-style: none;
+	margin: 1rem 0 0;
+	padding: 0;
+}
+
+.audit-log__item-header {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: start;
+	justify-content: space-between;
+}
+
+.audit-log__item-header h3,
+.audit-log__item-header p,
+.audit-log__item-header time {
+	margin: 0;
+}
+
+.audit-log__item-header h3 {
+	color: #fff4e7;
+	font-size: 1.15rem;
+}
+
+.audit-log__item-header time {
+	color: rgba(255, 255, 255, 0.6);
+}
+
+.audit-log__meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.65rem;
+}
+
+.audit-log__meta span {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	padding: 0.5rem 0.75rem;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.05);
+	color: rgba(255, 255, 255, 0.78);
+}
+
+.audit-log__meta strong,
+.audit-log__details dt {
+	color: #fff4e7;
+}
+
+.audit-log__details {
+	display: grid;
+	gap: 0.75rem;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	margin: 0;
+}
+
+.audit-log__details div {
+	display: grid;
+	gap: 0.25rem;
+	padding: 0.85rem 0.95rem;
+	border-radius: 16px;
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.audit-log__details dt,
+.audit-log__details dd {
+	margin: 0;
+}
+
+.audit-log__details dd {
+	color: rgba(255, 255, 255, 0.72);
+	line-height: 1.6;
+	word-break: break-word;
 }
 
 .review-list__copy h3,

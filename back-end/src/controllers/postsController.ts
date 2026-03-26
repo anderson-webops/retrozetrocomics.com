@@ -7,6 +7,7 @@ import { z } from "zod";
 import { getAuthenticatedAccount } from "../middleware/auth.js";
 import { Comment } from "../models/schemas/Comment.js";
 import { Post } from "../models/schemas/Post.js";
+import { recordAuditLog } from "../services/auditLog.js";
 import {
 	normalizeUploadedFiles,
 	presentMediaAssets
@@ -229,6 +230,23 @@ export async function createPost(req: Request, res: Response) {
 		...buildPostValues(parsed.data, files)
 	});
 
+	await recordAuditLog({
+		action: "post.create",
+		actor: viewer,
+		category: "post",
+		details: {
+			mediaCount: post.media.length,
+			slug: post.slug,
+			status: post.status,
+			type: post.type
+		},
+		req,
+		summary: `Created ${post.type} post "${post.title}"`,
+		targetId: post.id,
+		targetLabel: post.title,
+		targetType: "post"
+	});
+
 	return res.status(201).json({
 		post: serializePost(post, 0)
 	});
@@ -256,6 +274,12 @@ export async function updatePost(req: Request, res: Response) {
 		return res.status(404).json({ message: "Post not found" });
 	}
 
+	const previousValues = {
+		status: existingPost.status,
+		title: existingPost.title,
+		type: existingPost.type
+	};
+
 	const files = Array.isArray((req as any).files)
 		? ((req as any).files as UploadedFile[])
 		: [];
@@ -266,6 +290,27 @@ export async function updatePost(req: Request, res: Response) {
 	);
 
 	await existingPost.save();
+
+	await recordAuditLog({
+		action: "post.update",
+		actor: viewer,
+		category: "post",
+		details: {
+			addedMediaCount: files.length,
+			nextStatus: existingPost.status,
+			nextTitle: existingPost.title,
+			nextType: existingPost.type,
+			previousStatus: previousValues.status,
+			previousTitle: previousValues.title,
+			previousType: previousValues.type,
+			slug: existingPost.slug
+		},
+		req,
+		summary: `Updated ${existingPost.type} post "${existingPost.title}"`,
+		targetId: existingPost.id,
+		targetLabel: existingPost.title,
+		targetType: "post"
+	});
 
 	const counts = await getCommentCounts([existingPost.id]);
 
