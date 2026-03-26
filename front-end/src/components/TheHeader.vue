@@ -72,48 +72,67 @@ function isActive(path: string) {
 			</ul>
 
 			<div class="nav__actions">
-				<RouterLink
-					v-if="session.isAdmin"
-					class="nav__action nav__action--ghost"
-					to="/studio/admin"
-				>
-					Admin
-				</RouterLink>
-				<button
-					v-if="session.isAdmin"
-					class="nav__action nav__action--ghost"
-					type="button"
-					@click="session.toggleAdminViewerMode()"
-				>
-					{{ session.adminViewerMode ? "Edit Tools" : "Viewer Mode" }}
-				</button>
-				<p v-if="session.isAuthenticated" class="nav__welcome">
-					{{ session.account?.name }}
-				</p>
-				<button
-					v-if="!session.isAuthenticated"
-					class="nav__action nav__action--ghost"
-					type="button"
-					@click="session.openAuth('login')"
-				>
-					Login
-				</button>
-				<button
-					v-if="!session.isAuthenticated"
-					class="nav__action nav__action--primary"
-					type="button"
-					@click="session.openAuth('signup')"
-				>
-					Sign Up
-				</button>
-				<button
-					v-else
-					class="nav__action nav__action--primary"
-					type="button"
-					@click="session.logout()"
-				>
-					Logout
-				</button>
+				<template v-if="session.isAuthenticated">
+					<div class="nav__account">
+						<div class="nav__identity">
+							<p class="nav__identity-label">
+								{{
+									session.isAdmin
+										? "Admin account"
+										: "Signed in"
+								}}
+							</p>
+							<p class="nav__welcome">
+								{{ session.account?.name }}
+							</p>
+						</div>
+
+						<div v-if="session.isAdmin" class="nav__utility">
+							<RouterLink
+								class="nav__action nav__action--ghost nav__action--utility"
+								to="/studio/admin"
+							>
+								Admin
+							</RouterLink>
+							<button
+								class="nav__action nav__action--ghost nav__action--utility"
+								type="button"
+								@click="session.toggleAdminViewerMode()"
+							>
+								{{
+									session.adminViewerMode
+										? "Edit Tools"
+										: "Viewer Mode"
+								}}
+							</button>
+						</div>
+					</div>
+
+					<button
+						class="nav__action nav__action--primary"
+						type="button"
+						@click="session.logout()"
+					>
+						Logout
+					</button>
+				</template>
+
+				<template v-else>
+					<button
+						class="nav__action nav__action--ghost"
+						type="button"
+						@click="session.openAuth('login')"
+					>
+						Login
+					</button>
+					<button
+						class="nav__action nav__action--primary"
+						type="button"
+						@click="session.openAuth('signup')"
+					>
+						Sign Up
+					</button>
+				</template>
 			</div>
 		</nav>
 	</header>
@@ -226,10 +245,39 @@ function isActive(path: string) {
 
 .nav__actions {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	align-items: center;
 	justify-content: flex-end;
 	gap: 0.65rem;
+}
+
+.nav__account {
+	display: grid;
+	justify-items: end;
+	gap: 0.45rem;
+	padding-right: 0.1rem;
+}
+
+.nav__identity {
+	display: grid;
+	justify-items: end;
+	gap: 0.1rem;
+}
+
+.nav__identity-label {
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	font-size: 0.68rem;
+	font-weight: 700;
+	color: rgba(255, 255, 255, 0.48);
+}
+
+.nav__utility {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 0.55rem;
 }
 
 .nav__action {
@@ -252,10 +300,17 @@ function isActive(path: string) {
 	color: #180124;
 }
 
+.nav__action--utility {
+	padding: 0.56rem 0.9rem;
+	font-size: 0.92rem;
+}
+
 .nav__welcome {
 	margin: 0;
-	color: rgba(255, 255, 255, 0.68);
-	font-size: 0.9rem;
+	color: rgba(255, 255, 255, 0.82);
+	font-size: 1rem;
+	font-weight: 600;
+	line-height: 1.2;
 }
 
 .sr-only {
@@ -309,8 +364,18 @@ function isActive(path: string) {
 
 	.nav__actions {
 		width: 100%;
+		flex-wrap: wrap;
 		justify-content: flex-start;
 		padding-top: 0.5rem;
+	}
+
+	.nav__account,
+	.nav__identity {
+		justify-items: start;
+	}
+
+	.nav__utility {
+		justify-content: flex-start;
 	}
 
 	.nav__item::after {
