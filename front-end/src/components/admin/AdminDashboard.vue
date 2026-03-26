@@ -38,6 +38,9 @@ const boardContentSaving = ref(false);
 const boardForm = ref<CharactersPageContent>(
 	createDefaultCharactersPageContent()
 );
+const boardSavedSnapshot = ref<CharactersPageContent>(
+	createDefaultCharactersPageContent()
+);
 const editorLoading = ref(false);
 const editingPostId = ref("");
 const editingPostSlug = ref("");
@@ -59,6 +62,15 @@ const userActionLoadingId = ref("");
 const moderationNotes = reactive<Record<string, string>>({});
 const publishFileInput = ref<HTMLInputElement | null>(null);
 const suspendConfirmInput = ref<HTMLInputElement | null>(null);
+const pendingBoardRemoval = ref<{
+	confirmLabel: string;
+	description: string;
+	factIndex?: number;
+	entryId?: string;
+	entryIndex?: number;
+	itemLabel: string;
+	type: "character" | "worldEntry" | "worldFact";
+} | null>(null);
 
 const NEW_POST_DRAFT_KEY = "retrozetro:drafts:posts:new";
 const EDIT_POST_DRAFT_KEY_PREFIX = "retrozetro:drafts:posts:edit";
@@ -197,6 +209,11 @@ const previewToggleLabel = computed(() =>
 const boardSaveLabel = computed(() =>
 	boardContentSaving.value ? "Saving board..." : "Save board updates"
 );
+const boardHasUnsavedChanges = computed(
+	() =>
+		JSON.stringify(boardForm.value) !==
+		JSON.stringify(boardSavedSnapshot.value)
+);
 const previewTags = computed(() =>
 	postForm.tags
 		.split(",")
@@ -255,6 +272,10 @@ function replaceBoardForm(nextContent: CharactersPageContent) {
 	boardForm.value = cloneCharactersPageContent(nextContent);
 }
 
+function updateBoardSavedSnapshot(nextContent: CharactersPageContent) {
+	boardSavedSnapshot.value = cloneCharactersPageContent(nextContent);
+}
+
 function createBoardCharacter(): CharacterBoardProfile {
 	return {
 		description: "",
@@ -290,24 +311,94 @@ function addBoardCharacter() {
 	boardForm.value.characters.push(createBoardCharacter());
 }
 
-function removeBoardCharacter(characterId: string) {
-	if (boardForm.value.characters.length <= 1) return;
-
+function deleteBoardCharacter(characterId: string) {
 	boardForm.value.characters = boardForm.value.characters.filter(
 		character => character.id !== characterId
 	);
+}
+
+function hasTextContent(value?: string | null) {
+	return Boolean(value?.trim());
+}
+
+function characterHasContent(character: CharacterBoardProfile) {
+	return [
+		character.name,
+		character.role,
+		character.specialty,
+		character.frequency,
+		character.description,
+		character.image,
+		character.fallbackImage,
+		character.imgAlt
+	].some(hasTextContent);
+}
+
+function removeBoardCharacter(characterId: string) {
+	if (boardForm.value.characters.length <= 1) return;
+
+	const character = boardForm.value.characters.find(
+		entry => entry.id === characterId
+	);
+	if (!character) return;
+
+	if (!characterHasContent(character)) {
+		deleteBoardCharacter(characterId);
+		return;
+	}
+
+	pendingBoardRemoval.value = {
+		confirmLabel: "Remove character",
+		description:
+			"This only affects the local board editor until you click Save board updates.",
+		itemLabel: character.name || "this character",
+		type: "character",
+		entryId: characterId
+	};
 }
 
 function addWorldEntry() {
 	boardForm.value.worldEntries.push(createWorldEntry());
 }
 
-function removeWorldEntry(entryId: string) {
-	if (boardForm.value.worldEntries.length <= 1) return;
-
+function deleteWorldEntry(entryId: string) {
 	boardForm.value.worldEntries = boardForm.value.worldEntries.filter(
 		entry => entry.id !== entryId
 	);
+}
+
+function factHasContent(fact: CharacterBoardFact) {
+	return [fact.label, fact.value].some(hasTextContent);
+}
+
+function worldEntryHasContent(entry: CharacterBoardWorldEntry) {
+	return (
+		[entry.label, entry.title, entry.body].some(hasTextContent) ||
+		entry.facts?.some(factHasContent) === true
+	);
+}
+
+function removeWorldEntry(entryId: string) {
+	if (boardForm.value.worldEntries.length <= 1) return;
+
+	const entry = boardForm.value.worldEntries.find(
+		worldEntry => worldEntry.id === entryId
+	);
+	if (!entry) return;
+
+	if (!worldEntryHasContent(entry)) {
+		deleteWorldEntry(entryId);
+		return;
+	}
+
+	pendingBoardRemoval.value = {
+		confirmLabel: "Remove world file",
+		description:
+			"This only affects the local board editor until you click Save board updates.",
+		itemLabel: entry.title || "this world file",
+		type: "worldEntry",
+		entryId
+	};
 }
 
 function addWorldFact(entryIndex: number) {
@@ -318,7 +409,63 @@ function removeWorldFact(entryIndex: number, factIndex: number) {
 	const entry = boardForm.value.worldEntries[entryIndex];
 	if (!entry?.facts || entry.facts.length <= 1) return;
 
-	entry.facts.splice(factIndex, 1);
+	const fact = entry.facts[factIndex];
+	if (!fact) return;
+
+	if (!factHasContent(fact)) {
+		entry.facts.splice(factIndex, 1);
+		return;
+	}
+
+	pendingBoardRemoval.value = {
+		confirmLabel: "Remove fact",
+		description:
+			"This only affects the local board editor until you click Save board updates.",
+		entryIndex,
+		factIndex,
+		itemLabel: fact.label || "this fact",
+		type: "worldFact"
+	};
+}
+
+function closeBoardRemovalConfirmation() {
+	pendingBoardRemoval.value = null;
+}
+
+function confirmBoardRemoval() {
+	if (!pendingBoardRemoval.value) return;
+
+	if (
+		pendingBoardRemoval.value.type === "character" &&
+		pendingBoardRemoval.value.entryId
+	) {
+		deleteBoardCharacter(pendingBoardRemoval.value.entryId);
+	}
+
+	if (
+		pendingBoardRemoval.value.type === "worldEntry" &&
+		pendingBoardRemoval.value.entryId
+	) {
+		deleteWorldEntry(pendingBoardRemoval.value.entryId);
+	}
+
+	if (
+		pendingBoardRemoval.value.type === "worldFact" &&
+		typeof pendingBoardRemoval.value.entryIndex === "number" &&
+		typeof pendingBoardRemoval.value.factIndex === "number"
+	) {
+		boardForm.value.worldEntries[
+			pendingBoardRemoval.value.entryIndex
+		]?.facts?.splice(pendingBoardRemoval.value.factIndex, 1);
+	}
+
+	closeBoardRemovalConfirmation();
+}
+
+function revertBoardChanges() {
+	replaceBoardForm(boardSavedSnapshot.value);
+	boardContentError.value = "";
+	closeBoardRemovalConfirmation();
 }
 
 function revokeSelectedPreviewUrls() {
@@ -426,6 +573,7 @@ async function loadBoardContent() {
 
 	try {
 		const content = await fetchCharactersPageContent();
+		updateBoardSavedSnapshot(content);
 		replaceBoardForm(content);
 		applyCharactersPageContent(content);
 	} catch (loadError: any) {
@@ -433,7 +581,9 @@ async function loadBoardContent() {
 			loadError?.response?.data?.message ||
 			loadError?.message ||
 			"Unable to load the character and threat board.";
-		replaceBoardForm(createDefaultCharactersPageContent());
+		const fallbackContent = createDefaultCharactersPageContent();
+		updateBoardSavedSnapshot(fallbackContent);
+		replaceBoardForm(fallbackContent);
 	} finally {
 		boardContentLoading.value = false;
 	}
@@ -534,6 +684,7 @@ async function saveBoardContent() {
 
 	try {
 		const savedContent = await updateCharactersPageContent(boardForm.value);
+		updateBoardSavedSnapshot(savedContent);
 		replaceBoardForm(savedContent);
 		applyCharactersPageContent(savedContent);
 	} catch (saveError: any) {
@@ -1231,7 +1382,19 @@ onBeforeUnmount(() => {
 						</article>
 					</div>
 
-					<div class="publish-form__actions">
+					<div
+						class="publish-form__actions publish-form__actions--board"
+					>
+						<button
+							type="button"
+							class="publish-form__preview-toggle"
+							:disabled="
+								!boardHasUnsavedChanges || boardContentSaving
+							"
+							@click="revertBoardChanges"
+						>
+							Revert unsaved changes
+						</button>
 						<button
 							class="publish-form__submit"
 							:disabled="boardContentSaving"
@@ -1492,6 +1655,45 @@ onBeforeUnmount(() => {
 	</Teleport>
 
 	<Teleport to="body">
+		<div
+			v-if="pendingBoardRemoval"
+			class="admin-confirmation"
+			@click.self="closeBoardRemovalConfirmation"
+		>
+			<section
+				class="admin-confirmation__dialog"
+				aria-modal="true"
+				role="dialog"
+			>
+				<p class="admin-dashboard__eyebrow">Confirm Removal</p>
+				<h2>Remove {{ pendingBoardRemoval.itemLabel }}?</h2>
+				<p>
+					{{ pendingBoardRemoval.description }}
+				</p>
+				<p class="admin-confirmation__instruction">
+					Use <strong>Cancel</strong> to keep it. You can still use
+					<strong>Revert unsaved changes</strong> before saving if you
+					want it back.
+				</p>
+				<div class="admin-confirmation__actions">
+					<button
+						type="button"
+						class="admin-confirmation__cancel"
+						@click="closeBoardRemovalConfirmation"
+					>
+						Cancel
+					</button>
+					<button
+						type="button"
+						class="admin-confirmation__submit"
+						@click="confirmBoardRemoval"
+					>
+						{{ pendingBoardRemoval.confirmLabel }}
+					</button>
+				</div>
+			</section>
+		</div>
+
 		<div
 			v-if="suspendTarget"
 			class="admin-confirmation"
@@ -1914,6 +2116,12 @@ onBeforeUnmount(() => {
 	cursor: pointer;
 }
 
+.publish-form__submit:disabled,
+.publish-form__preview-toggle:disabled {
+	cursor: not-allowed;
+	opacity: 0.62;
+}
+
 .member-list__controls button:disabled,
 .admin-confirmation__actions button:disabled {
 	cursor: not-allowed;
@@ -1924,6 +2132,11 @@ onBeforeUnmount(() => {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.8rem;
+}
+
+.publish-form__actions--board {
+	justify-content: space-between;
+	align-items: center;
 }
 
 .board-editor__hero,
