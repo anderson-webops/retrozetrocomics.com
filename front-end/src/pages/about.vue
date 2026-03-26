@@ -183,18 +183,6 @@ function handleWorldEntryDiscard(entryId: string) {
 			actions-placement="poster"
 		/>
 
-		<section class="about-page__grid">
-			<article
-				v-for="step in store.about.workflow"
-				:key="step.title"
-				class="about-page__card"
-			>
-				<p class="about-page__eyebrow">Workflow</p>
-				<h2>{{ step.title }}</h2>
-				<p>{{ step.body }}</p>
-			</article>
-		</section>
-
 		<section class="about-page__story-section">
 			<header class="about-page__section-header">
 				<p class="about-page__eyebrow">Story Files</p>
@@ -302,7 +290,6 @@ function handleWorldEntryDiscard(entryId: string) {
 	color: #ffd0d0;
 }
 
-.about-page__grid,
 .about-page__milestones,
 .about-page__story-grid,
 .about-page__world-grid {
@@ -311,7 +298,6 @@ function handleWorldEntryDiscard(entryId: string) {
 	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
-.about-page__card,
 .about-page__milestone,
 .about-page__story-card,
 .about-page__world-card,
@@ -320,7 +306,6 @@ function handleWorldEntryDiscard(entryId: string) {
 	border-radius: 24px;
 }
 
-.about-page__card,
 .about-page__milestone,
 .about-page__story-card,
 .about-page__world-card {
@@ -330,7 +315,6 @@ function handleWorldEntryDiscard(entryId: string) {
 }
 
 .about-page__section-header,
-.about-page__card,
 .about-page__milestone,
 .about-page__story-card,
 .about-page__world-card,
@@ -350,8 +334,6 @@ function handleWorldEntryDiscard(entryId: string) {
 
 .about-page__section-header h2,
 .about-page__section-header p,
-.about-page__card h2,
-.about-page__card p,
 .about-page__story-card h3,
 .about-page__story-card p,
 .about-page__world-card h3,
@@ -363,7 +345,6 @@ function handleWorldEntryDiscard(entryId: string) {
 }
 
 .about-page__section-header h2,
-.about-page__card h2,
 .about-page__story-card h3,
 .about-page__world-card h3 {
 	font-family: var(--font-display);
@@ -371,7 +352,6 @@ function handleWorldEntryDiscard(entryId: string) {
 	color: #fff4e7;
 }
 
-.about-page__card h2,
 .about-page__story-card h3,
 .about-page__world-card h3 {
 	font-size: clamp(1.45rem, 2.8vw, 1.9rem);
@@ -380,7 +360,6 @@ function handleWorldEntryDiscard(entryId: string) {
 }
 
 .about-page__section-header p:last-child,
-.about-page__card p:last-child,
 .about-page__story-card p,
 .about-page__world-card p,
 .about-page__milestone p {

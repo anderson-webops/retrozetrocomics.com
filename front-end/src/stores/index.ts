@@ -203,20 +203,6 @@ export const useMainStore = defineStore("main", {
 					title: "The Fall of a Dream"
 				}
 			],
-			workflow: [
-				{
-					body: "Comics deliver the canonical narrative spine, where the finished pacing and issue-level stakes live.",
-					title: "Publish the canon"
-				},
-				{
-					body: "Storyboard posts let the owner test rhythms, shot language, and emotional turns before the final page package is locked.",
-					title: "Share the experiments"
-				},
-				{
-					body: "Photo posts create mood boards, travel textures, and studio context that keep the universe grounded in real surfaces.",
-					title: "Capture the atmosphere"
-				}
-			],
 			worldEntries: [
 				{
 					body: "In this universe, outlaw crews are called Star Hunters. The name gives them a specific place in the setting: hunted, mobile, and willing to go where official systems will not.",
