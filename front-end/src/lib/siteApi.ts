@@ -1,4 +1,5 @@
 import type {
+	CharactersPageContent,
 	DashboardData,
 	PostDetailResponse,
 	PostStatus,
@@ -76,6 +77,13 @@ export async function fetchDashboard() {
 	return data;
 }
 
+export async function fetchCharactersPageContent() {
+	const { data } = await api.get<{ content: CharactersPageContent }>(
+		"/site-content/characters"
+	);
+	return data.content;
+}
+
 export async function createPost(payload: PostEditorPayload) {
 	const formData = new FormData();
 	appendPostEditorFormData(formData, payload);
@@ -114,4 +122,14 @@ export async function updateUserStatus(
 ) {
 	const { data } = await api.patch(`/admin/users/${userId}`, { status });
 	return data;
+}
+
+export async function updateCharactersPageContent(
+	payload: CharactersPageContent
+) {
+	const { data } = await api.patch<{ content: CharactersPageContent }>(
+		"/admin/site-content/characters",
+		payload
+	);
+	return data.content;
 }

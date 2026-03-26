@@ -155,6 +155,7 @@
     "useBroadcastChannel": true,
     "useBrowserLocation": true,
     "useCached": true,
+    "useCharactersPageContent": true,
     "useClipboard": true,
     "useClipboardItems": true,
     "useCloned": true,

@@ -1,8 +1,11 @@
 <script lang="ts" setup>
+import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import { siteAssetCandidates } from "@/lib/siteAssets";
 import { useMainStore } from "~/stores";
 
 const store = useMainStore();
+const { content: charactersPageContent, load: loadCharactersPageContent } =
+	useCharactersPageContent();
 
 const highlights = computed(() =>
 	store.about.values.map(value => ({
@@ -10,6 +13,10 @@ const highlights = computed(() =>
 		term: value.title
 	}))
 );
+
+onMounted(() => {
+	void loadCharactersPageContent();
+});
 </script>
 
 <template>
@@ -122,8 +129,8 @@ const highlights = computed(() =>
 
 			<div class="about-page__world-grid">
 				<article
-					v-for="entry in store.about.worldEntries"
-					:key="entry.title"
+					v-for="entry in charactersPageContent.worldEntries"
+					:key="entry.id"
 					class="about-page__world-card"
 				>
 					<p class="about-page__eyebrow">{{ entry.label }}</p>

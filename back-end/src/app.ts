@@ -8,6 +8,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { adminRouter } from "./routes/admin.js";
 import { authRouter, legacyAccountsRouter } from "./routes/auth.js";
 import { postsRouter } from "./routes/posts.js";
+import { siteContentRouter } from "./routes/siteContent.js";
 import {
 	ensureUploadDirectories,
 	uploadRoot
@@ -77,6 +78,7 @@ export function createApp() {
 	apiRouter.use("/accounts", legacyAccountsRouter);
 	apiRouter.use("/posts", postsRouter);
 	apiRouter.use("/admin", adminRouter);
+	apiRouter.use("/site-content", siteContentRouter);
 
 	app.use("/api", apiRouter);
 
@@ -85,6 +87,7 @@ export function createApp() {
 	app.use("/accounts", legacyAccountsRouter);
 	app.use("/posts", postsRouter);
 	app.use("/admin", adminRouter);
+	app.use("/site-content", siteContentRouter);
 
 	app.use(errorHandler);
 

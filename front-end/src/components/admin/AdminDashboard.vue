@@ -1,5 +1,9 @@
 <script lang="ts" setup>
 import type {
+	CharacterBoardFact,
+	CharacterBoardProfile,
+	CharacterBoardWorldEntry,
+	CharactersPageContent,
 	DashboardData,
 	DashboardPost,
 	DashboardUser,
@@ -9,17 +13,31 @@ import type {
 	PostType
 } from "@/types/site";
 
+import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import { useLocalDraft } from "@/composables/useLocalDraft";
 import {
+	cloneCharactersPageContent,
+	createDefaultCharactersPageContent
+} from "@/content/defaultCharactersPageContent";
+import {
 	createPost,
+	fetchCharactersPageContent,
 	fetchDashboard,
 	fetchPost,
 	moderateComment,
+	updateCharactersPageContent,
 	updatePost,
 	updateUserStatus
 } from "@/lib/siteApi";
 
+const { apply: applyCharactersPageContent } = useCharactersPageContent();
 const dashboard = ref<DashboardData | null>(null);
+const boardContentError = ref("");
+const boardContentLoading = ref(false);
+const boardContentSaving = ref(false);
+const boardForm = ref<CharactersPageContent>(
+	createDefaultCharactersPageContent()
+);
 const editorLoading = ref(false);
 const editingPostId = ref("");
 const editingPostSlug = ref("");
@@ -176,6 +194,9 @@ const filePersistenceWarning = computed(() => {
 const previewToggleLabel = computed(() =>
 	showPreview.value ? "Hide Preview" : "Preview Post"
 );
+const boardSaveLabel = computed(() =>
+	boardContentSaving.value ? "Saving board..." : "Save board updates"
+);
 const previewTags = computed(() =>
 	postForm.tags
 		.split(",")
@@ -222,6 +243,82 @@ function normalizeSuspendPhrase(value: string) {
 		.trim()
 		.replaceAll(SUSPEND_PHRASE_WHITESPACE, " ")
 		.toLowerCase();
+}
+
+function nextBoardId(prefix: string) {
+	return `${prefix}-${Date.now().toString(36)}-${Math.random()
+		.toString(36)
+		.slice(2, 8)}`;
+}
+
+function replaceBoardForm(nextContent: CharactersPageContent) {
+	boardForm.value = cloneCharactersPageContent(nextContent);
+}
+
+function createBoardCharacter(): CharacterBoardProfile {
+	return {
+		description: "",
+		fallbackImage: "",
+		frequency: "",
+		id: nextBoardId("character"),
+		image: "",
+		imgAlt: "",
+		name: "",
+		role: "",
+		specialty: ""
+	};
+}
+
+function createBoardFact(): CharacterBoardFact {
+	return {
+		label: "",
+		value: ""
+	};
+}
+
+function createWorldEntry(): CharacterBoardWorldEntry {
+	return {
+		body: "",
+		facts: [createBoardFact()],
+		id: nextBoardId("world"),
+		label: "",
+		title: ""
+	};
+}
+
+function addBoardCharacter() {
+	boardForm.value.characters.push(createBoardCharacter());
+}
+
+function removeBoardCharacter(characterId: string) {
+	if (boardForm.value.characters.length <= 1) return;
+
+	boardForm.value.characters = boardForm.value.characters.filter(
+		character => character.id !== characterId
+	);
+}
+
+function addWorldEntry() {
+	boardForm.value.worldEntries.push(createWorldEntry());
+}
+
+function removeWorldEntry(entryId: string) {
+	if (boardForm.value.worldEntries.length <= 1) return;
+
+	boardForm.value.worldEntries = boardForm.value.worldEntries.filter(
+		entry => entry.id !== entryId
+	);
+}
+
+function addWorldFact(entryIndex: number) {
+	boardForm.value.worldEntries[entryIndex]?.facts?.push(createBoardFact());
+}
+
+function removeWorldFact(entryIndex: number, factIndex: number) {
+	const entry = boardForm.value.worldEntries[entryIndex];
+	if (!entry?.facts || entry.facts.length <= 1) return;
+
+	entry.facts.splice(factIndex, 1);
 }
 
 function revokeSelectedPreviewUrls() {
@@ -323,6 +420,25 @@ async function loadDashboard() {
 	}
 }
 
+async function loadBoardContent() {
+	boardContentLoading.value = true;
+	boardContentError.value = "";
+
+	try {
+		const content = await fetchCharactersPageContent();
+		replaceBoardForm(content);
+		applyCharactersPageContent(content);
+	} catch (loadError: any) {
+		boardContentError.value =
+			loadError?.response?.data?.message ||
+			loadError?.message ||
+			"Unable to load the character and threat board.";
+		replaceBoardForm(createDefaultCharactersPageContent());
+	} finally {
+		boardContentLoading.value = false;
+	}
+}
+
 function handleFileChange(event: Event) {
 	const input = event.target as HTMLInputElement;
 	postForm.media = Array.from(input.files || []);
@@ -412,6 +528,24 @@ async function savePost() {
 	}
 }
 
+async function saveBoardContent() {
+	boardContentSaving.value = true;
+	boardContentError.value = "";
+
+	try {
+		const savedContent = await updateCharactersPageContent(boardForm.value);
+		replaceBoardForm(savedContent);
+		applyCharactersPageContent(savedContent);
+	} catch (saveError: any) {
+		boardContentError.value =
+			saveError?.response?.data?.message ||
+			saveError?.message ||
+			"Unable to save the character and threat board.";
+	} finally {
+		boardContentSaving.value = false;
+	}
+}
+
 async function moderate(
 	commentId: string,
 	status: "approved" | "hidden" | "rejected"
@@ -481,6 +615,7 @@ async function confirmSuspendUser() {
 
 onMounted(() => {
 	void loadDashboard();
+	void loadBoardContent();
 });
 
 watch(
@@ -776,6 +911,336 @@ onBeforeUnmount(() => {
 
 					<PostPreviewPanel mode="preview" :post="previewPost" />
 				</div>
+			</section>
+
+			<section class="admin-panel">
+				<header>
+					<h2>Character and Threat Board</h2>
+					<p>
+						Edit the character board, hero copy, and world files
+						that feed the Characters page and the world-ledger
+						surfaces.
+					</p>
+				</header>
+
+				<p v-if="boardContentError" class="admin-dashboard__error">
+					{{ boardContentError }}
+				</p>
+				<p v-if="boardContentLoading" class="admin-dashboard__loading">
+					Loading board content...
+				</p>
+
+				<form
+					v-else
+					class="board-editor"
+					@submit.prevent="saveBoardContent"
+				>
+					<div class="publish-form__grid">
+						<label>
+							<span>Eyebrow</span>
+							<input
+								v-model="boardForm.eyebrow"
+								maxlength="80"
+								required
+								type="text"
+							/>
+						</label>
+
+						<label>
+							<span>Headline</span>
+							<input
+								v-model="boardForm.title"
+								maxlength="120"
+								required
+								type="text"
+							/>
+						</label>
+					</div>
+
+					<label>
+						<span>Intro copy</span>
+						<textarea
+							v-model="boardForm.description"
+							required
+							rows="4"
+						/>
+					</label>
+
+					<div class="board-editor__hero">
+						<p class="publish-form__draft-eyebrow">Hero image</p>
+						<div class="publish-form__grid">
+							<label>
+								<span>Primary image path</span>
+								<input
+									v-model="boardForm.heroImage"
+									placeholder="/legacy-images/Zetro2.jpg"
+									required
+									type="text"
+								/>
+							</label>
+
+							<label>
+								<span>Fallback image path</span>
+								<input
+									v-model="boardForm.heroImageFallback"
+									placeholder="/brand/characters-zetro.svg"
+									type="text"
+								/>
+							</label>
+						</div>
+
+						<label>
+							<span>Hero image alt</span>
+							<input
+								v-model="boardForm.heroImageAlt"
+								maxlength="180"
+								required
+								type="text"
+							/>
+						</label>
+					</div>
+
+					<div class="board-editor__section-header">
+						<div>
+							<p class="publish-form__draft-eyebrow">
+								Character cards
+							</p>
+							<p>
+								These populate the main roster cards on the
+								Characters page.
+							</p>
+						</div>
+						<button type="button" @click="addBoardCharacter">
+							Add character
+						</button>
+					</div>
+
+					<div class="board-editor__card-grid">
+						<article
+							v-for="character in boardForm.characters"
+							:key="character.id"
+							class="board-editor__card"
+						>
+							<div class="board-editor__card-header">
+								<p class="publish-form__draft-eyebrow">
+									{{ character.name || "New character" }}
+								</p>
+								<button
+									type="button"
+									class="board-editor__remove"
+									@click="removeBoardCharacter(character.id)"
+								>
+									Remove
+								</button>
+							</div>
+
+							<div class="publish-form__grid">
+								<label>
+									<span>Name</span>
+									<input
+										v-model="character.name"
+										required
+										type="text"
+									/>
+								</label>
+
+								<label>
+									<span>Role</span>
+									<input
+										v-model="character.role"
+										required
+										type="text"
+									/>
+								</label>
+							</div>
+
+							<div class="publish-form__grid">
+								<label>
+									<span>Specialty</span>
+									<input
+										v-model="character.specialty"
+										required
+										type="text"
+									/>
+								</label>
+
+								<label>
+									<span>Signal line</span>
+									<input
+										v-model="character.frequency"
+										required
+										type="text"
+									/>
+								</label>
+							</div>
+
+							<div class="publish-form__grid">
+								<label>
+									<span>Primary image path</span>
+									<input
+										v-model="character.image"
+										required
+										type="text"
+									/>
+								</label>
+
+								<label>
+									<span>Fallback image path</span>
+									<input
+										v-model="character.fallbackImage"
+										type="text"
+									/>
+								</label>
+							</div>
+
+							<label>
+								<span>Image alt</span>
+								<input
+									v-model="character.imgAlt"
+									required
+									type="text"
+								/>
+							</label>
+
+							<label>
+								<span>Description</span>
+								<textarea
+									v-model="character.description"
+									required
+									rows="5"
+								/>
+							</label>
+						</article>
+					</div>
+
+					<div class="board-editor__section-header">
+						<div>
+							<p class="publish-form__draft-eyebrow">
+								World files
+							</p>
+							<p>
+								These feed the supporting term, world, and
+								faction cards used on the public site.
+							</p>
+						</div>
+						<button type="button" @click="addWorldEntry">
+							Add world file
+						</button>
+					</div>
+
+					<div class="board-editor__world-grid">
+						<article
+							v-for="(
+								entry, entryIndex
+							) in boardForm.worldEntries"
+							:key="entry.id"
+							class="board-editor__world-card"
+						>
+							<div class="board-editor__card-header">
+								<p class="publish-form__draft-eyebrow">
+									{{ entry.title || "New world file" }}
+								</p>
+								<button
+									type="button"
+									class="board-editor__remove"
+									@click="removeWorldEntry(entry.id)"
+								>
+									Remove
+								</button>
+							</div>
+
+							<div class="publish-form__grid">
+								<label>
+									<span>Label</span>
+									<input
+										v-model="entry.label"
+										required
+										type="text"
+									/>
+								</label>
+
+								<label>
+									<span>Title</span>
+									<input
+										v-model="entry.title"
+										required
+										type="text"
+									/>
+								</label>
+							</div>
+
+							<label>
+								<span>Body</span>
+								<textarea
+									v-model="entry.body"
+									required
+									rows="4"
+								/>
+							</label>
+
+							<div class="board-editor__facts">
+								<div class="board-editor__section-header">
+									<div>
+										<p class="publish-form__draft-eyebrow">
+											Facts
+										</p>
+									</div>
+									<button
+										type="button"
+										@click="addWorldFact(entryIndex)"
+									>
+										Add fact
+									</button>
+								</div>
+
+								<div
+									v-for="(fact, factIndex) in entry.facts"
+									:key="`${entry.id}-${factIndex}`"
+									class="board-editor__fact-row"
+								>
+									<label>
+										<span>Fact label</span>
+										<input
+											v-model="fact.label"
+											required
+											type="text"
+										/>
+									</label>
+									<label>
+										<span>Fact value</span>
+										<input
+											v-model="fact.value"
+											required
+											type="text"
+										/>
+									</label>
+									<button
+										type="button"
+										class="board-editor__remove"
+										@click="
+											removeWorldFact(
+												entryIndex,
+												factIndex
+											)
+										"
+									>
+										Remove
+									</button>
+								</div>
+							</div>
+						</article>
+					</div>
+
+					<div class="publish-form__actions">
+						<button
+							class="publish-form__submit"
+							:disabled="boardContentSaving"
+							type="submit"
+						>
+							{{ boardSaveLabel }}
+						</button>
+					</div>
+				</form>
 			</section>
 
 			<div class="admin-dashboard__columns">
@@ -1191,6 +1656,7 @@ onBeforeUnmount(() => {
 }
 
 .publish-form,
+.board-editor,
 .review-list,
 .member-list,
 .post-list,
@@ -1242,6 +1708,11 @@ onBeforeUnmount(() => {
 }
 
 .publish-form label {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.board-editor label {
 	display: grid;
 	gap: 0.45rem;
 }
@@ -1338,9 +1809,18 @@ onBeforeUnmount(() => {
 	color: rgba(255, 255, 255, 0.68);
 }
 
+.board-editor span {
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	font-size: 0.78rem;
+	color: rgba(255, 255, 255, 0.68);
+}
+
 .publish-form input,
 .publish-form select,
 .publish-form textarea,
+.board-editor input,
+.board-editor textarea,
 .review-list textarea {
 	width: 100%;
 	border-radius: 14px;
@@ -1444,6 +1924,68 @@ onBeforeUnmount(() => {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.8rem;
+}
+
+.board-editor__hero,
+.board-editor__card,
+.board-editor__world-card {
+	display: grid;
+	gap: 0.85rem;
+	padding: 1rem;
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.board-editor__card-grid,
+.board-editor__world-grid {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.board-editor__section-header,
+.board-editor__card-header {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.board-editor__section-header p,
+.board-editor__card-header p {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.75);
+}
+
+.board-editor__section-header button,
+.board-editor__remove {
+	border: none;
+	border-radius: 999px;
+	padding: 0.7rem 0.95rem;
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff2df;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.board-editor__remove {
+	background: rgba(255, 143, 143, 0.14);
+	color: #ffd0d0;
+}
+
+.board-editor__facts {
+	display: grid;
+	gap: 0.75rem;
+	padding-top: 0.35rem;
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.board-editor__fact-row {
+	display: grid;
+	gap: 0.75rem;
+	grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+	align-items: end;
 }
 
 .publish-form__preview-toggle {
@@ -1730,6 +2272,10 @@ onBeforeUnmount(() => {
 
 @media (max-width: 720px) {
 	.publish-form__grid {
+		grid-template-columns: 1fr;
+	}
+
+	.board-editor__fact-row {
 		grid-template-columns: 1fr;
 	}
 }

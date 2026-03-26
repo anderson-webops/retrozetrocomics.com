@@ -3,6 +3,42 @@ export type CommentStatus = "approved" | "hidden" | "pending" | "rejected";
 export type PostStatus = "draft" | "private" | "published";
 export type PostType = "comic" | "outline" | "photo" | "storyboard";
 
+export interface CharacterBoardFact {
+	label: string;
+	value: string;
+}
+
+export interface CharacterBoardProfile {
+	description: string;
+	fallbackImage?: string;
+	frequency: string;
+	id: string;
+	image: string;
+	imgAlt: string;
+	name: string;
+	role: string;
+	specialty: string;
+}
+
+export interface CharacterBoardWorldEntry {
+	body: string;
+	facts?: CharacterBoardFact[];
+	id: string;
+	label: string;
+	title: string;
+}
+
+export interface CharactersPageContent {
+	characters: CharacterBoardProfile[];
+	description: string;
+	eyebrow: string;
+	heroImage: string;
+	heroImageAlt: string;
+	heroImageFallback?: string;
+	title: string;
+	worldEntries: CharacterBoardWorldEntry[];
+}
+
 export interface SiteAccount {
 	email: string;
 	id: string;

@@ -1,9 +1,14 @@
 <script lang="ts" setup>
+import type { CharacterBoardProfile } from "@/types/site";
 import { computed } from "vue";
-import { useMainStore } from "~/stores";
+import { createDefaultCharactersPageContent } from "@/content/defaultCharactersPageContent";
 
-const store = useMainStore();
-const characters = computed(() => store.characters);
+const props = defineProps<{
+	items?: CharacterBoardProfile[];
+}>();
+
+const fallbackCharacters = createDefaultCharactersPageContent().characters;
+const characters = computed(() => props.items ?? fallbackCharacters);
 
 function isDefinedImageCandidate(
 	candidate: string | undefined
@@ -20,8 +25,8 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 	<section class="characters-grid">
 		<div class="characters-grid__items">
 			<div
-				v-for="(item, index) in characters.character"
-				:key="index"
+				v-for="item in characters"
+				:key="item.id"
 				class="characters-grid__card"
 			>
 				<ResolvedImage

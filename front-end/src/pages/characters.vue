@@ -1,9 +1,19 @@
 <script lang="ts" setup>
-import { siteAssetCandidates } from "@/lib/siteAssets";
+import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import Characters from "~/components/TheCharacters.vue";
-import { useMainStore } from "~/stores";
 
-const store = useMainStore();
+const { content, load } = useCharactersPageContent();
+
+const characterHighlights = computed(() =>
+	content.value.characters.map(character => ({
+		description: character.specialty,
+		term: character.name
+	}))
+);
+
+onMounted(() => {
+	void load();
+});
 </script>
 
 <template>
@@ -21,24 +31,22 @@ const store = useMainStore();
 					to: '/contact'
 				}
 			]"
-			eyebrow="Character and Threat Board"
-			:highlights="
-				store.characters.character.map(character => ({
-					description: character.specialty,
-					term: character.name
-				}))
-			"
-			:image-candidates="siteAssetCandidates.zetroPortrait"
-			image-alt="Zetro portrait"
-			:message="store.characters.description"
-			title="Meet the Key Players"
+			:eyebrow="content.eyebrow"
+			:highlights="characterHighlights"
+			:image-candidates="[
+				content.heroImage,
+				content.heroImageFallback || ''
+			]"
+			:image-alt="content.heroImageAlt"
+			:message="content.description"
+			:title="content.title"
 		/>
-		<Characters />
+		<Characters :items="content.characters" />
 
 		<section class="characters-page__notes">
 			<article
-				v-for="entry in store.about.worldEntries"
-				:key="entry.title"
+				v-for="entry in content.worldEntries"
+				:key="entry.id"
 				class="characters-page__note"
 			>
 				<p class="characters-page__eyebrow">{{ entry.label }}</p>
