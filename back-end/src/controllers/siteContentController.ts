@@ -50,15 +50,7 @@ const aboutStoryArcSchema = z.object({
 	title: z.string().trim().min(1).max(120)
 });
 
-const aboutMilestoneSchema = z.object({
-	body: z.string().trim().min(12).max(320),
-	id: z.string().trim().min(1).max(80),
-	label: z.string().trim().min(1).max(80),
-	title: z.string().trim().min(1).max(120)
-});
-
 const aboutPageSchema = z.object({
-	milestones: z.array(aboutMilestoneSchema).min(1).max(16),
 	storyArcs: z.array(aboutStoryArcSchema).min(1).max(16)
 });
 
@@ -187,26 +179,23 @@ export async function updateAboutPageContent(req: Request, res: Response) {
 		await recordAuditLog({
 			action: "SITE_CONTENT_UPDATED",
 			after: {
-				milestoneCount: parsed.data.milestones.length,
 				storyArcCount: parsed.data.storyArcs.length
 			},
 			actor: viewer,
 			before: {
-				milestoneCount: previousContent.milestones.length,
 				storyArcCount: previousContent.storyArcs.length
 			},
 			category: "site-content",
 			details: {
-				milestoneCount: parsed.data.milestones.length,
 				storyArcCount: parsed.data.storyArcs.length
 			},
 			entityId: ABOUT_PAGE_KEY,
-			entityLabel: "About Page Story Files and Roadmap",
+			entityLabel: "About Page Story Files",
 			entityType: "site-content",
 			req,
-			summary: "Updated the about page story files and roadmap",
+			summary: "Updated the about page story files",
 			targetId: ABOUT_PAGE_KEY,
-			targetLabel: "About Page Story Files and Roadmap",
+			targetLabel: "About Page Story Files",
 			targetType: "site-content"
 		});
 	}

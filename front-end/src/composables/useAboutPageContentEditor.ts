@@ -1,8 +1,4 @@
-import type {
-	AboutMilestone,
-	AboutPageContent,
-	AboutStoryArc
-} from "@/types/site";
+import type { AboutPageContent, AboutStoryArc } from "@/types/site";
 
 import { cloneAboutPageContent } from "@/content/defaultAboutPageContent";
 import { updateAboutPageContent } from "@/lib/siteApi";
@@ -30,12 +26,6 @@ function isBlankStoryArc(arc: AboutStoryArc) {
 	].every(value => !(value || "").trim());
 }
 
-function isBlankMilestone(milestone: AboutMilestone) {
-	return [milestone.body, milestone.label, milestone.title].every(
-		value => !(value || "").trim()
-	);
-}
-
 function createStoryArcDraft(): AboutStoryArc {
 	return {
 		climax: "",
@@ -49,15 +39,6 @@ function createStoryArcDraft(): AboutStoryArc {
 		note: "",
 		resolution: "",
 		thirdPlotPoint: "",
-		title: ""
-	};
-}
-
-function createMilestoneDraft(): AboutMilestone {
-	return {
-		body: "",
-		id: nextDraftId("milestone"),
-		label: "",
 		title: ""
 	};
 }
@@ -140,70 +121,12 @@ export function useAboutPageContentEditor() {
 		});
 	}
 
-	function addMilestoneDraft() {
-		const nextContent = cloneAboutPageContent(content.value);
-		const draft = createMilestoneDraft();
-		nextContent.milestones.unshift(draft);
-		apply(nextContent);
-		return draft.id;
-	}
-
-	function discardMilestoneDraft(milestoneId: string) {
-		if (!milestoneId.startsWith("milestone-")) {
-			return;
-		}
-
-		const target = content.value.milestones.find(
-			milestone => milestone.id === milestoneId
-		);
-		if (!target || !isBlankMilestone(target)) {
-			return;
-		}
-
-		const nextContent = cloneAboutPageContent(content.value);
-		nextContent.milestones = nextContent.milestones.filter(
-			milestone => milestone.id !== milestoneId
-		);
-		apply(nextContent);
-	}
-
-	function saveMilestone(milestone: AboutMilestone) {
-		return persist(nextContent => {
-			const index = nextContent.milestones.findIndex(
-				currentMilestone => currentMilestone.id === milestone.id
-			);
-			if (index >= 0) {
-				nextContent.milestones[index] = milestone;
-				return;
-			}
-
-			nextContent.milestones.unshift(milestone);
-		});
-	}
-
-	function removeMilestone(milestoneId: string) {
-		if (content.value.milestones.length <= 1) {
-			error.value = "At least one roadmap step must remain.";
-			return Promise.resolve(content.value);
-		}
-
-		return persist(nextContent => {
-			nextContent.milestones = nextContent.milestones.filter(
-				milestone => milestone.id !== milestoneId
-			);
-		});
-	}
-
 	return {
-		addMilestoneDraft,
 		addStoryArcDraft,
 		content,
-		discardMilestoneDraft,
 		discardStoryArcDraft,
 		error,
-		removeMilestone,
 		removeStoryArc,
-		saveMilestone,
 		saveStoryArc,
 		saving
 	};

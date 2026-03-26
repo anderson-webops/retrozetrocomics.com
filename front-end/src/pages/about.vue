@@ -1,16 +1,11 @@
 <script lang="ts" setup>
-import type {
-	AboutMilestone,
-	AboutStoryArc,
-	CharacterBoardWorldEntry
-} from "@/types/site";
+import type { AboutStoryArc, CharacterBoardWorldEntry } from "@/types/site";
 import { useAboutPageContent } from "@/composables/useAboutPageContent";
 import { useAboutPageContentEditor } from "@/composables/useAboutPageContentEditor";
 import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import { useCharactersPageContentEditor } from "@/composables/useCharactersPageContentEditor";
 import { siteAssetCandidates } from "@/lib/siteAssets";
 import { useSessionStore } from "@/stores/session";
-import RoadmapMilestones from "~/components/RoadmapMilestones.vue";
 import StoryArcCards from "~/components/StoryArcCards.vue";
 import WorldEntryCards from "~/components/WorldEntryCards.vue";
 import { useMainStore } from "~/stores";
@@ -22,14 +17,10 @@ const { content: aboutPageContent, load: loadAboutPageContent } =
 const { content: charactersPageContent, load: loadCharactersPageContent } =
 	useCharactersPageContent();
 const {
-	addMilestoneDraft,
 	addStoryArcDraft,
-	discardMilestoneDraft,
 	discardStoryArcDraft,
 	error: aboutError,
-	removeMilestone,
 	removeStoryArc,
-	saveMilestone,
 	saveStoryArc,
 	saving: aboutSaving
 } = useAboutPageContentEditor();
@@ -43,8 +34,6 @@ const {
 } = useCharactersPageContentEditor();
 const openStoryArcEditorId = ref("");
 const savingStoryArcId = ref("");
-const openMilestoneEditorId = ref("");
-const savingMilestoneId = ref("");
 const openWorldEditorId = ref("");
 const savingWorldEditorId = ref("");
 
@@ -62,16 +51,11 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
 	handleStoryArcDiscard(openStoryArcEditorId.value);
-	handleMilestoneDiscard(openMilestoneEditorId.value);
 	handleWorldEntryDiscard(openWorldEditorId.value);
 });
 
 function addStoryArcInline() {
 	openStoryArcEditorId.value = addStoryArcDraft();
-}
-
-function addMilestoneInline() {
-	openMilestoneEditorId.value = addMilestoneDraft();
 }
 
 function addWorldEntryInline() {
@@ -97,28 +81,6 @@ function handleStoryArcDiscard(arcId: string) {
 	discardStoryArcDraft(arcId);
 	if (openStoryArcEditorId.value === arcId) {
 		openStoryArcEditorId.value = "";
-	}
-}
-
-async function handleMilestoneSave(milestone: AboutMilestone) {
-	savingMilestoneId.value = milestone.id;
-	try {
-		await saveMilestone(milestone);
-		openMilestoneEditorId.value = "";
-	} finally {
-		savingMilestoneId.value = "";
-	}
-}
-
-async function handleMilestoneRemove(milestoneId: string) {
-	await removeMilestone(milestoneId);
-	openMilestoneEditorId.value = "";
-}
-
-function handleMilestoneDiscard(milestoneId: string) {
-	discardMilestoneDraft(milestoneId);
-	if (openMilestoneEditorId.value === milestoneId) {
-		openMilestoneEditorId.value = "";
 	}
 }
 
@@ -242,36 +204,6 @@ function handleWorldEntryDiscard(entryId: string) {
 				<button type="button" @click="addWorldEntryInline">Add</button>
 			</div>
 		</section>
-
-		<section class="about-page__timeline">
-			<header class="about-page__section-header">
-				<p class="about-page__eyebrow">Roadmap</p>
-				<h2>What comes after the rebuild</h2>
-				<p>
-					The site is no longer pretending to be finished. It now
-					shows what exists, what is in motion, and where the pipeline
-					is heading next.
-				</p>
-			</header>
-
-			<div class="about-page__milestones">
-				<RoadmapMilestones
-					:inline-editing="session.showAdminTools"
-					:items="aboutPageContent.milestones"
-					:open-editor-id="openMilestoneEditorId"
-					:saving-id="savingMilestoneId"
-					@discard="handleMilestoneDiscard"
-					@remove="handleMilestoneRemove"
-					@save="handleMilestoneSave"
-				/>
-			</div>
-			<div
-				v-if="session.showAdminTools"
-				class="about-page__section-actions"
-			>
-				<button type="button" @click="addMilestoneInline">Add</button>
-			</div>
-		</section>
 	</div>
 </template>
 
@@ -290,7 +222,6 @@ function handleWorldEntryDiscard(entryId: string) {
 	color: #ffd0d0;
 }
 
-.about-page__milestones,
 .about-page__story-grid,
 .about-page__world-grid {
 	display: grid;
@@ -298,15 +229,12 @@ function handleWorldEntryDiscard(entryId: string) {
 	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
-.about-page__milestone,
 .about-page__story-card,
-.about-page__world-card,
-.about-page__timeline {
+.about-page__world-card {
 	padding: clamp(1.4rem, 4vw, 2rem);
 	border-radius: 24px;
 }
 
-.about-page__milestone,
 .about-page__story-card,
 .about-page__world-card {
 	background: rgba(255, 255, 255, 0.05);
@@ -315,7 +243,6 @@ function handleWorldEntryDiscard(entryId: string) {
 }
 
 .about-page__section-header,
-.about-page__milestone,
 .about-page__story-card,
 .about-page__world-card,
 .about-page__story-section {
@@ -324,8 +251,7 @@ function handleWorldEntryDiscard(entryId: string) {
 	align-content: start;
 }
 
-.about-page__story-section,
-.about-page__timeline {
+.about-page__story-section {
 	padding: clamp(1.4rem, 4vw, 2rem);
 	border-radius: 24px;
 	background: rgba(255, 255, 255, 0.04);
@@ -337,10 +263,7 @@ function handleWorldEntryDiscard(entryId: string) {
 .about-page__story-card h3,
 .about-page__story-card p,
 .about-page__world-card h3,
-.about-page__world-card p,
-.about-page__milestone h3,
-.about-page__milestone p,
-.about-page__milestone span {
+.about-page__world-card p {
 	margin: 0;
 }
 
@@ -361,37 +284,18 @@ function handleWorldEntryDiscard(entryId: string) {
 
 .about-page__section-header p:last-child,
 .about-page__story-card p,
-.about-page__world-card p,
-.about-page__milestone p {
+.about-page__world-card p {
 	line-height: 1.8;
 	color: rgba(239, 244, 255, 0.76);
 	overflow-wrap: anywhere;
 }
 
-.about-page__eyebrow,
-.about-page__milestone span {
+.about-page__eyebrow {
 	text-transform: uppercase;
 	letter-spacing: 0.16em;
 	font-size: 0.78rem;
 	font-weight: 700;
 	color: #ffd27d;
-}
-
-.about-page__timeline {
-	display: grid;
-	gap: 1rem;
-	background:
-		radial-gradient(
-			circle at top right,
-			rgba(255, 148, 89, 0.18),
-			transparent 32%
-		),
-		rgba(255, 255, 255, 0.04);
-}
-
-.about-page__milestone h3 {
-	font-size: 1.3rem;
-	color: #fff4e7;
 }
 
 .about-page__section-actions {

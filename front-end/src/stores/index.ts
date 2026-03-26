@@ -103,23 +103,6 @@ export const useMainStore = defineStore("main", {
 		about: {
 			description:
 				"RetroZetro Comics is a creator-driven universe built to hold the finished pages, the half-built ideas, and the canon files around Exo, the Star Hunters, the Apex Army, and the Zego Order in one place.",
-			milestones: [
-				{
-					body: "The visual language starts in VHS damage, synth haze, and hand-built poster energy, then gets sharpened until each story has its own pulse.",
-					label: "Phase 01",
-					title: "Build the look"
-				},
-				{
-					body: "The site is now structured to publish comics, storyboard fragments, and still photography without treating any of them like second-class content.",
-					label: "Phase 02",
-					title: "Make the archive breathe"
-				},
-				{
-					body: "Next up is turning the studio feed into a steadier rhythm of drops, updates, and canon files.",
-					label: "Phase 03",
-					title: "Scale the pipeline"
-				}
-			],
 			title: "Inside the Studio",
 			values: [
 				{

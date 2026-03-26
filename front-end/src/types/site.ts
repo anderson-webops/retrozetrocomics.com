@@ -79,7 +79,6 @@ export interface AboutMilestone {
 }
 
 export interface AboutPageContent {
-	milestones: AboutMilestone[];
 	storyArcs: AboutStoryArc[];
 }
 

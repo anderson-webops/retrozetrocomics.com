@@ -19,7 +19,6 @@ declare module 'vue' {
     PostFeed: typeof import('./components/posts/PostFeed.vue')['default']
     PostPreviewPanel: typeof import('./components/posts/PostPreviewPanel.vue')['default']
     ResolvedImage: typeof import('./components/ResolvedImage.vue')['default']
-    RoadmapMilestones: typeof import('./components/RoadmapMilestones.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SideAdvertisement: typeof import('./components/SideAdvertisement.vue')['default']

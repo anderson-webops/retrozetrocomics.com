@@ -1,25 +1,5 @@
 export function createDefaultAboutPageContent() {
 	return {
-		milestones: [
-			{
-				body: "The visual language starts in VHS damage, synth haze, and hand-built poster energy, then gets sharpened until each story has its own pulse.",
-				id: "phase-build-look",
-				label: "Phase 01",
-				title: "Build the look"
-			},
-			{
-				body: "The site is now structured to publish comics, storyboard fragments, and still photography without treating any of them like second-class content.",
-				id: "phase-archive-breathe",
-				label: "Phase 02",
-				title: "Make the archive breathe"
-			},
-			{
-				body: "Next up is turning the studio feed into a steadier rhythm of drops, updates, and canon files.",
-				id: "phase-scale-pipeline",
-				label: "Phase 03",
-				title: "Scale the pipeline"
-			}
-		],
 		storyArcs: [
 			{
 				climax: "The Apex Army and the Star Hunter community finally work together to take down the Zego Order.",
