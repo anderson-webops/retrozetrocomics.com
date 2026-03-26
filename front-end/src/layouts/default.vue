@@ -78,18 +78,7 @@ onMounted(() => {
 	flex-direction: column;
 	gap: clamp(2rem, 4vw, 3rem);
 	padding: clamp(1.5rem, 4vw, 3rem);
-	background:
-		radial-gradient(
-			circle at top,
-			rgba(255, 148, 89, 0.12),
-			transparent 65%
-		),
-		radial-gradient(
-			circle at bottom,
-			rgba(124, 225, 246, 0.14),
-			transparent 70%
-		),
-		transparent;
+	background: transparent;
 	color: #f7eaff;
 	font-family: var(--font-body);
 }
