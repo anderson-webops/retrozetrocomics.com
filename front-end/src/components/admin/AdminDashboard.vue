@@ -23,12 +23,16 @@ const dashboard = ref<DashboardData | null>(null);
 const editorLoading = ref(false);
 const editingPostId = ref("");
 const editingPostSlug = ref("");
+const editorPublishedAt = ref<string | null>(null);
+const editorCommentCount = ref(0);
 const error = ref("");
 const existingMedia = ref<MediaAsset[]>([]);
 const isDraftAutosaveEnabled = ref(true);
 const loading = ref(false);
 const restoredDraftHadFiles = ref(false);
 const saving = ref(false);
+const selectedPreviewMedia = ref<MediaAsset[]>([]);
+const showPreview = ref(false);
 const moderationNotes = reactive<Record<string, string>>({});
 const publishFileInput = ref<HTMLInputElement | null>(null);
 
@@ -154,6 +158,62 @@ const filePersistenceWarning = computed(() => {
 	return "";
 });
 
+const previewToggleLabel = computed(() =>
+	showPreview.value ? "Hide Preview" : "Preview Post"
+);
+const previewTags = computed(() =>
+	postForm.tags
+		.split(",")
+		.map(tag => tag.trim())
+		.filter(Boolean)
+);
+const previewMedia = computed(() => {
+	const retainedMedia =
+		editorMode.value === "edit"
+			? existingMedia.value.filter(asset => asset.kind === "image")
+			: [];
+	return [...retainedMedia, ...selectedPreviewMedia.value];
+});
+const previewPost = computed(() => ({
+	allowComments: postForm.allowComments,
+	commentCount: editorCommentCount.value,
+	content: postForm.content.trim() || "Post body preview appears here.",
+	media: previewMedia.value,
+	publishedAt:
+		postForm.status === "published" ? editorPublishedAt.value : null,
+	status: postForm.status,
+	summary: postForm.summary.trim() || "Summary preview appears here.",
+	tags: previewTags.value,
+	title: postForm.title.trim() || "Untitled post preview",
+	type: postForm.type
+}));
+const selectedDocumentCount = computed(
+	() => postForm.media.filter(file => !file.type.startsWith("image/")).length
+);
+
+function revokeSelectedPreviewUrls() {
+	selectedPreviewMedia.value.forEach(asset => {
+		if (asset.url.startsWith("blob:")) {
+			URL.revokeObjectURL(asset.url);
+		}
+	});
+}
+
+function rebuildSelectedPreviewMedia(files: File[] = postForm.media) {
+	revokeSelectedPreviewUrls();
+	selectedPreviewMedia.value = files
+		.filter(file => file.type.startsWith("image/"))
+		.map(file => ({
+			kind: "image",
+			mimeType: file.type || "image/*",
+			originalName: file.name,
+			provider: "local",
+			size: file.size,
+			storageKey: `preview-${file.name}-${file.size}`,
+			url: URL.createObjectURL(file)
+		}));
+}
+
 function applyLocalDraft(snapshot: LocalPostDraft) {
 	postForm.allowComments = snapshot.allowComments;
 	postForm.content = snapshot.content;
@@ -168,6 +228,8 @@ function applyLocalDraft(snapshot: LocalPostDraft) {
 	if (publishFileInput.value) {
 		publishFileInput.value.value = "";
 	}
+
+	rebuildSelectedPreviewMedia([]);
 }
 
 function normalizeEditorStatus(status: PostStatus): EditorPostStatus {
@@ -239,10 +301,13 @@ async function switchToNewPost(persistCurrentDraft = true) {
 	}
 
 	isDraftAutosaveEnabled.value = false;
+	editorCommentCount.value = 0;
 	editingPostId.value = "";
 	editingPostSlug.value = "";
+	editorPublishedAt.value = null;
 	existingMedia.value = [];
 	postEditorBaseDraft.value = emptyPostDraft();
+	showPreview.value = false;
 	applyLocalDraft(postEditorBaseDraft.value);
 	await syncDraftAutosaveAfterEditorSwap();
 }
@@ -260,8 +325,10 @@ async function editPost(post: DashboardPost) {
 	try {
 		const detail = await fetchPost(post.slug);
 		const draftSnapshot = createDraftSnapshotFromPost(detail.post);
+		editorCommentCount.value = detail.post.commentCount;
 		editingPostId.value = detail.post.id;
 		editingPostSlug.value = detail.post.slug;
+		editorPublishedAt.value = detail.post.publishedAt;
 		existingMedia.value = detail.post.media;
 		postEditorBaseDraft.value = draftSnapshot;
 		applyLocalDraft(draftSnapshot);
@@ -290,6 +357,8 @@ async function savePost() {
 			: await createPost(payload);
 
 		localDraft.clearDraft();
+		editorCommentCount.value = savedPost.commentCount;
+		editorPublishedAt.value = savedPost.publishedAt;
 		existingMedia.value = savedPost.media;
 		postEditorBaseDraft.value = createDraftSnapshotFromPost(savedPost);
 		applyLocalDraft(postEditorBaseDraft.value);
@@ -328,6 +397,16 @@ async function toggleUser(user: DashboardUser) {
 
 onMounted(() => {
 	void loadDashboard();
+});
+
+watch(
+	() => postForm.media,
+	files => rebuildSelectedPreviewMedia(files),
+	{ deep: true }
+);
+
+onBeforeUnmount(() => {
+	revokeSelectedPreviewUrls();
 });
 </script>
 
@@ -606,14 +685,50 @@ onMounted(() => {
 						selected
 					</p>
 
-					<button
-						class="publish-form__submit"
-						:disabled="saving || editorLoading"
-						type="submit"
-					>
-						{{ editorSubmitLabel }}
-					</button>
+					<div class="publish-form__actions">
+						<button
+							class="publish-form__submit"
+							:disabled="saving || editorLoading"
+							type="submit"
+						>
+							{{ editorSubmitLabel }}
+						</button>
+						<button
+							class="publish-form__preview-toggle"
+							:disabled="editorLoading"
+							type="button"
+							@click="showPreview = !showPreview"
+						>
+							{{ previewToggleLabel }}
+						</button>
+					</div>
 				</form>
+
+				<div v-if="showPreview" class="publish-preview">
+					<div class="publish-preview__header">
+						<div>
+							<p class="publish-form__draft-eyebrow">
+								Post Preview
+							</p>
+							<p>
+								This uses the current editor values, including
+								selected browser image previews.
+							</p>
+						</div>
+						<p
+							v-if="selectedDocumentCount"
+							class="publish-preview__note"
+						>
+							{{ selectedDocumentCount }} document{{
+								selectedDocumentCount === 1 ? "" : "s"
+							}}
+							selected. PDFs will attach on publish but do not
+							render in this preview.
+						</p>
+					</div>
+
+					<PostPreviewPanel mode="preview" :post="previewPost" />
+				</div>
 			</section>
 
 			<div class="admin-dashboard__columns">
@@ -1095,6 +1210,7 @@ onMounted(() => {
 }
 
 .publish-form__submit,
+.publish-form__preview-toggle,
 .review-list__actions button,
 .member-list__controls button {
 	border: none;
@@ -1106,8 +1222,33 @@ onMounted(() => {
 	cursor: pointer;
 }
 
-.publish-form__submit {
-	justify-self: start;
+.publish-form__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.8rem;
+}
+
+.publish-form__preview-toggle {
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff2df;
+}
+
+.publish-preview {
+	display: grid;
+	gap: 1rem;
+	margin-top: 1.4rem;
+}
+
+.publish-preview__header {
+	display: grid;
+	gap: 0.85rem;
+}
+
+.publish-preview__header p,
+.publish-preview__note {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.72);
+	line-height: 1.7;
 }
 
 .admin-dashboard__columns {
