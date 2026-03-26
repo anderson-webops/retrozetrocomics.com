@@ -33,6 +33,7 @@ const restoredDraftHadFiles = ref(false);
 const saving = ref(false);
 const selectedPreviewMedia = ref<MediaAsset[]>([]);
 const showPreview = ref(false);
+const showStorageDetails = ref(false);
 const suspendConfirmationError = ref("");
 const suspendConfirmationInput = ref("");
 const suspendTarget = ref<DashboardUser | null>(null);
@@ -504,6 +505,14 @@ onBeforeUnmount(() => {
 					can participate in the community.
 				</p>
 			</div>
+			<button
+				v-if="dashboard && !loading"
+				type="button"
+				class="admin-dashboard__secondary-action"
+				@click="showStorageDetails = true"
+			>
+				Storage setup notes
+			</button>
 		</header>
 
 		<p v-if="error" class="admin-dashboard__error">
@@ -528,52 +537,6 @@ onBeforeUnmount(() => {
 					<h2>{{ dashboard.metrics.memberCount }}</h2>
 				</article>
 			</div>
-
-			<section class="admin-panel">
-				<header>
-					<h2>Storage Readiness</h2>
-					<p>
-						The site still writes uploads to the server today, but
-						the media contract is now prepared for a later bucket
-						rollout.
-					</p>
-				</header>
-
-				<div class="storage-grid">
-					<article class="storage-card">
-						<span>Write driver</span>
-						<strong>{{
-							dashboard.storage.activeWriteDriver
-						}}</strong>
-					</article>
-					<article class="storage-card">
-						<span>Key prefix</span>
-						<strong>{{ dashboard.storage.keyPrefix }}</strong>
-					</article>
-					<article class="storage-card">
-						<span>Local base</span>
-						<strong>{{
-							dashboard.storage.localPublicBaseUrl
-						}}</strong>
-					</article>
-					<article class="storage-card">
-						<span>AWS target</span>
-						<strong>
-							{{
-								dashboard.storage.s3PublicBaseUrl ||
-								"Not configured yet"
-							}}
-						</strong>
-					</article>
-				</div>
-
-				<p class="storage-summary">
-					{{ dashboard.storage.switchSummary }}
-				</p>
-				<p class="storage-summary storage-summary--muted">
-					{{ dashboard.storage.nextStep }}
-				</p>
-			</section>
 
 			<section class="admin-panel">
 				<header>
@@ -1001,6 +964,70 @@ onBeforeUnmount(() => {
 
 	<Teleport to="body">
 		<div
+			v-if="showStorageDetails && dashboard"
+			class="admin-info-overlay"
+			@click.self="showStorageDetails = false"
+		>
+			<section class="admin-info-dialog">
+				<div class="admin-info-dialog__header">
+					<div>
+						<p class="admin-dashboard__eyebrow">Storage Setup</p>
+						<h2>Future bucket rollout notes</h2>
+						<p>
+							Advanced deployment detail for later media
+							infrastructure work. Not required for day-to-day
+							publishing.
+						</p>
+					</div>
+					<button
+						type="button"
+						class="admin-info-dialog__close"
+						@click="showStorageDetails = false"
+					>
+						Close
+					</button>
+				</div>
+
+				<div class="storage-grid">
+					<article class="storage-card">
+						<span>Write driver</span>
+						<strong>{{
+							dashboard.storage.activeWriteDriver
+						}}</strong>
+					</article>
+					<article class="storage-card">
+						<span>Key prefix</span>
+						<strong>{{ dashboard.storage.keyPrefix }}</strong>
+					</article>
+					<article class="storage-card">
+						<span>Local base</span>
+						<strong>{{
+							dashboard.storage.localPublicBaseUrl
+						}}</strong>
+					</article>
+					<article class="storage-card">
+						<span>AWS target</span>
+						<strong>
+							{{
+								dashboard.storage.s3PublicBaseUrl ||
+								"Not configured yet"
+							}}
+						</strong>
+					</article>
+				</div>
+
+				<p class="storage-summary">
+					{{ dashboard.storage.switchSummary }}
+				</p>
+				<p class="storage-summary storage-summary--muted">
+					{{ dashboard.storage.nextStep }}
+				</p>
+			</section>
+		</div>
+	</Teleport>
+
+	<Teleport to="body">
+		<div
 			v-if="suspendTarget"
 			class="admin-confirmation"
 			@click.self="closeSuspendConfirmation"
@@ -1073,6 +1100,14 @@ onBeforeUnmount(() => {
 	gap: 1.5rem;
 }
 
+.admin-dashboard__header {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: flex-start;
+	justify-content: space-between;
+}
+
 .admin-dashboard__header h1,
 .admin-dashboard__header p,
 .metric-card h2,
@@ -1108,6 +1143,16 @@ onBeforeUnmount(() => {
 .admin-panel__empty {
 	color: rgba(255, 255, 255, 0.75);
 	line-height: 1.7;
+}
+
+.admin-dashboard__secondary-action {
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 999px;
+	padding: 0.72rem 1rem;
+	background: rgba(255, 255, 255, 0.06);
+	color: #fff2df;
+	font-weight: 700;
+	cursor: pointer;
 }
 
 .admin-dashboard__error {
@@ -1531,6 +1576,7 @@ onBeforeUnmount(() => {
 	background: linear-gradient(120deg, #ff8f8f, #ffb36f);
 }
 
+.admin-info-overlay,
 .admin-confirmation {
 	position: fixed;
 	inset: 0;
@@ -1540,6 +1586,62 @@ onBeforeUnmount(() => {
 	padding: 1.25rem;
 	background: rgba(5, 8, 18, 0.72);
 	backdrop-filter: blur(10px);
+}
+
+.admin-info-dialog {
+	display: grid;
+	gap: 1rem;
+	width: min(100%, 760px);
+	max-height: min(90vh, 760px);
+	overflow: auto;
+	padding: 1.4rem;
+	border-radius: 24px;
+	background: linear-gradient(
+		180deg,
+		rgba(24, 31, 51, 0.98),
+		rgba(12, 17, 31, 0.98)
+	);
+	border: 1px solid rgba(255, 179, 111, 0.18);
+	box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+.admin-info-dialog__header {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: flex-start;
+	justify-content: space-between;
+}
+
+.admin-info-dialog__header h2,
+.admin-info-dialog__header p {
+	margin: 0;
+}
+
+.admin-info-dialog__header h2 {
+	color: #fff3e5;
+	font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.admin-info-dialog__header p {
+	margin-top: 0.55rem;
+	line-height: 1.7;
+	color: rgba(255, 255, 255, 0.76);
+	max-width: 44rem;
+}
+
+.admin-info-dialog__close {
+	border: none;
+	border-radius: 999px;
+	padding: 0.78rem 1.15rem;
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff2df;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.admin-confirmation {
+	z-index: 81;
 }
 
 .admin-confirmation__dialog {
