@@ -106,16 +106,16 @@ export const useMainStore = defineStore("main", {
 			title: "Inside the Studio",
 			values: [
 				{
-					body: "The world should feel built, not implied. Every issue, note, and photograph should deepen the setting instead of existing as filler.",
+					body: "Every page, note, and photo should deepen the world.",
 					title: "World-first storytelling"
 				},
 				{
-					body: "Readers should see the path from rough thumbnail to polished release. The process is part of the art, not something to hide.",
+					body: "Rough boards and finished pages belong in the same trail.",
 					title: "Process on the page"
 				},
 				{
-					body: "The site should be ready for more than one format at a time so new ideas can be published when they are fresh.",
-					title: "Flexible publishing"
+					body: "New ideas should be able to go live while they still feel alive.",
+					title: "Publish while it's fresh"
 				}
 			],
 			storyArcs: [

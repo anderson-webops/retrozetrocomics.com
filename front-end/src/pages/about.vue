@@ -143,6 +143,7 @@ function handleWorldEntryDiscard(entryId: string) {
 			:message="store.about.description"
 			:title="store.about.title"
 			actions-placement="poster"
+			highlights-layout="stack"
 		/>
 
 		<section class="about-page__story-section">
