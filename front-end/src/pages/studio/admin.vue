@@ -37,8 +37,8 @@ onMounted(() => {
 <style scoped>
 .admin-gate {
 	display: grid;
-	gap: 0.8rem;
-	padding: clamp(1.8rem, 4vw, 2.6rem);
+	gap: 1.15rem;
+	padding: clamp(2.2rem, 4vw, 3rem);
 	border-radius: 24px;
 	background: rgba(255, 255, 255, 0.06);
 	border: 1px solid rgba(255, 255, 255, 0.08);
@@ -68,6 +68,7 @@ onMounted(() => {
 
 .admin-gate button {
 	justify-self: start;
+	margin-top: 0.9rem;
 	border: none;
 	border-radius: 999px;
 	padding: 0.78rem 1.1rem;
