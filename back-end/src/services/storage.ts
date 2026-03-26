@@ -157,11 +157,20 @@ export function resolveMediaUrl(asset: Pick<MediaAssetLike, "provider" | "storag
 }
 
 export function presentMediaAsset<T extends MediaAssetLike>(asset: T) {
-	const provider = normalizeStorageDriver(asset.provider);
+	const maybeSubdocument = asset as T & { toObject?: () => T };
+	const baseAsset = typeof maybeSubdocument.toObject === "function"
+		? maybeSubdocument.toObject()
+		: asset;
+	const provider = normalizeStorageDriver(baseAsset.provider);
+
 	return {
-		...asset,
+		...baseAsset,
 		provider,
-		url: resolveMediaUrl({ provider, storageKey: asset.storageKey, url: asset.url })
+		url: resolveMediaUrl({
+			provider,
+			storageKey: baseAsset.storageKey,
+			url: baseAsset.url
+		})
 	};
 }
 
