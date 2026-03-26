@@ -41,13 +41,18 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 				>
 					Edit
 				</RouterLink>
-				<ResolvedImage
-					:alt="item.imgAlt"
-					:candidates="
-						definedImageCandidates([item.image, item.fallbackImage])
-					"
-					class="characters-grid__image"
-				/>
+				<div class="characters-grid__media">
+					<ResolvedImage
+						:alt="item.imgAlt"
+						:candidates="
+							definedImageCandidates([
+								item.image,
+								item.fallbackImage
+							])
+						"
+						class="characters-grid__image"
+					/>
+				</div>
 				<div class="characters-grid__copy">
 					<p class="characters-grid__role">{{ item.role }}</p>
 					<h3>{{ item.name }}</h3>
@@ -77,9 +82,13 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 }
 
 .characters-grid__card {
-	display: grid;
+	position: relative;
+	display: flex;
+	flex-direction: column;
 	gap: 1rem;
+	height: 100%;
 	padding: 1rem;
+	padding-top: 4.5rem;
 	border-radius: 24px;
 	background:
 		radial-gradient(
@@ -93,11 +102,14 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 }
 
 .characters-grid__edit {
-	justify-self: start;
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	padding: 0.58rem 0.9rem;
+	width: 4.5rem;
+	height: 2.5rem;
 	border-radius: 999px;
 	background: rgba(124, 225, 246, 0.12);
 	border: 1px solid rgba(124, 225, 246, 0.2);
@@ -107,8 +119,20 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 	text-decoration: none;
 }
 
+.characters-grid__media {
+	flex: 1 1 17rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 17rem;
+	border-radius: 22px;
+	background: rgba(255, 255, 255, 0.015);
+}
+
 .characters-grid__image {
 	width: 100%;
+	max-height: 18rem;
+	height: auto;
 	display: block;
 	border-radius: 20px;
 	background: #08111f;
@@ -117,6 +141,7 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 .characters-grid__copy {
 	display: grid;
 	gap: 0.6rem;
+	align-content: start;
 }
 
 .characters-grid__role,
