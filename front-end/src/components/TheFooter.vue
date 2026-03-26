@@ -61,9 +61,10 @@ const session = useSessionStore();
 		rgba(96, 57, 133, 0.5),
 		rgba(255, 145, 77, 0.18)
 	);
-	border-top: 1px solid rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 24px;
 	color: #f4eaff;
-	box-shadow: 0 -12px 24px rgba(7, 0, 18, 0.2);
+	box-shadow: 0 12px 24px rgba(7, 0, 18, 0.2);
 }
 
 .footer__brand {

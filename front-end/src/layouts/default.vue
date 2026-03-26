@@ -61,10 +61,11 @@ onMounted(() => {
 			<SideAdvertisement class="content-grid__ad" variant="archive" />
 			<div id="center-plate" class="center-plate">
 				<RouterView class="page-slot" />
-				<TheFooter />
 			</div>
 			<SideAdvertisement class="content-grid__ad" variant="community" />
 		</div>
+
+		<TheFooter class="site-shell__footer" />
 
 		<AccountManagement />
 	</main>
@@ -180,6 +181,10 @@ onMounted(() => {
 
 .content-grid__ad {
 	align-self: stretch;
+}
+
+.site-shell__footer {
+	width: 100%;
 }
 
 .center-plate {
