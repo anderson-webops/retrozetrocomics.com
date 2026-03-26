@@ -93,12 +93,6 @@ onMounted(() => {
 	font-family: var(--font-body);
 }
 
-.site-shell__header {
-	position: sticky;
-	top: clamp(0.5rem, 1.5vw, 1rem);
-	z-index: 30;
-}
-
 .title-grid {
 	display: grid;
 	grid-template-columns: minmax(220px, 280px) 1fr minmax(220px, 280px);
