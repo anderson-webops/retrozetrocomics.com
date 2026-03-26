@@ -100,15 +100,12 @@ const publishedLabel = computed(() => {
 	);
 }
 
-.post-card__image,
-.post-card__placeholder {
-	width: 100%;
-	aspect-ratio: 4 / 3;
-	border-radius: 18px;
-}
-
 .post-card__image {
 	display: block;
+	width: 100%;
+	height: auto;
+	max-height: 32rem;
+	border-radius: 18px;
 	object-fit: contain;
 	background: rgba(3, 9, 17, 0.74);
 	padding: 0.55rem;
@@ -117,6 +114,9 @@ const publishedLabel = computed(() => {
 .post-card__placeholder {
 	display: grid;
 	place-items: center;
+	width: 100%;
+	min-height: clamp(180px, 28vw, 260px);
+	border-radius: 18px;
 	background:
 		radial-gradient(
 			circle at top,
