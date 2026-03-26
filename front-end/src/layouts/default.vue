@@ -6,6 +6,7 @@ import SideAdvertisement from "~/components/SideAdvertisement.vue";
 
 const session = useSessionStore();
 const route = useRoute();
+const isHomeRoute = computed(() => route.path === "/");
 const isStudioJournalRoute = computed(() => route.path === "/studio");
 const isAdminRoute = computed(() => route.path === "/studio/admin");
 const isPostDetailRoute = computed(() => route.path.startsWith("/posts/"));
@@ -81,7 +82,7 @@ onMounted(() => {
 			</button>
 		</div>
 
-		<div id="title-plate" class="title-grid">
+		<div v-if="isHomeRoute" id="title-plate" class="title-grid">
 			<aside class="title-grid__rail">
 				<p class="title-grid__eyebrow">Release Stack</p>
 				<h2>One site, three publishing lanes.</h2>
