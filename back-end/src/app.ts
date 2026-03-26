@@ -1,4 +1,3 @@
-import { existsSync } from "node:fs";
 import { env } from "node:process";
 import cookieSession from "cookie-session";
 import express from "express";
@@ -11,8 +10,6 @@ import { authRouter, legacyAccountsRouter } from "./routes/auth.js";
 import { postsRouter } from "./routes/posts.js";
 import {
 	ensureUploadDirectories,
-	legacyFaviconsRoot,
-	legacyImagesRoot,
 	uploadRoot
 } from "./services/storage.js";
 
@@ -75,13 +72,6 @@ export function createApp() {
 	});
 
 	app.use("/uploads", express.static(uploadRoot));
-	if (existsSync(legacyImagesRoot)) {
-		app.use("/legacy-images", express.static(legacyImagesRoot));
-	}
-
-	if (existsSync(legacyFaviconsRoot)) {
-		app.use("/legacy-favicons", express.static(legacyFaviconsRoot));
-	}
 
 	apiRouter.use("/auth", authRouter);
 	apiRouter.use("/accounts", legacyAccountsRouter);

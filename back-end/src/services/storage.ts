@@ -16,14 +16,6 @@ const HTTP_PROTOCOL_REGEX = /^https?:\/\//;
 const TRAILING_SLASHES_REGEX = /\/+$/g;
 
 export const uploadRoot = path.resolve(backendRoot, "uploads");
-export const legacyFaviconsRoot = path.resolve(
-	backendRoot,
-	env.LEGACY_FAVICONS_ROOT || "legacy-favicons"
-);
-export const legacyImagesRoot = path.resolve(
-	backendRoot,
-	env.LEGACY_IMAGES_ROOT || "legacy-images"
-);
 export type StorageDriver = "local" | "s3";
 
 export interface UploadedFile {

@@ -167,14 +167,6 @@ export default defineConfig(({ command }) => ({
 			"/uploads": {
 				target: "http://localhost:3006",
 				changeOrigin: true
-			},
-			"/legacy-favicons": {
-				target: "http://localhost:3006",
-				changeOrigin: true
-			},
-			"/legacy-images": {
-				target: "http://localhost:3006",
-				changeOrigin: true
 			}
 		}
 	}

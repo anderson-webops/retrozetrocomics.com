@@ -1,5 +1,8 @@
 const siteOrigin = "https://retrozetrocomics.com";
 
+// Legacy art and favicons are treated as normal same-origin public URLs.
+// In production they are expected to be served by the site host, not the API app.
+
 async function canReachLocalAsset(path: string) {
 	if (typeof window === "undefined") {
 		return true;
