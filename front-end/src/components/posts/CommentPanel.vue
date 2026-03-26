@@ -49,7 +49,7 @@ async function submitComment() {
 </script>
 
 <template>
-	<section class="comment-panel">
+	<section id="community-thread" class="comment-panel">
 		<header class="comment-panel__header">
 			<div>
 				<p class="comment-panel__eyebrow">Community Thread</p>

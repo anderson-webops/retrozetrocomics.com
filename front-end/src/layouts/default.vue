@@ -7,6 +7,55 @@ import SideAdvertisement from "~/components/SideAdvertisement.vue";
 const session = useSessionStore();
 const route = useRoute();
 const isStudioJournalRoute = computed(() => route.path === "/studio");
+const isAdminRoute = computed(() => route.path === "/studio/admin");
+const isPostDetailRoute = computed(() => route.path.startsWith("/posts/"));
+
+const communityAction = computed(() => {
+	if (!session.isAuthenticated) {
+		if (session.authModalOpen) {
+			return {
+				kind: "current" as const,
+				label:
+					session.authModalMode === "signup"
+						? "Signup open"
+						: "Sign in open"
+			};
+		}
+
+		return {
+			kind: "button" as const,
+			label: "Join the thread"
+		};
+	}
+
+	if (session.isAdmin) {
+		if (isAdminRoute.value) {
+			return {
+				kind: "current" as const,
+				label: "Moderation open"
+			};
+		}
+
+		return {
+			kind: "link" as const,
+			label: "Open admin console",
+			to: "/studio/admin"
+		};
+	}
+
+	if (isPostDetailRoute.value) {
+		return {
+			hashHref: "#community-thread",
+			kind: "hash" as const,
+			label: "Jump to comments"
+		};
+	}
+
+	return {
+		kind: "current" as const,
+		label: "Member access active"
+	};
+});
 
 onMounted(() => {
 	void session.bootstrapSession();
@@ -57,16 +106,30 @@ onMounted(() => {
 					<li>Admins can review comments and suspend accounts.</li>
 				</ul>
 				<button
-					v-if="!session.isAuthenticated"
+					v-if="communityAction.kind === 'button'"
 					class="title-grid__cta title-grid__cta--button"
 					type="button"
 					@click="session.openAuth('signup')"
 				>
-					Join the thread
+					{{ communityAction.label }}
 				</button>
-				<RouterLink v-else class="title-grid__cta" to="/studio">
-					Open latest drops
+				<RouterLink
+					v-else-if="communityAction.kind === 'link'"
+					class="title-grid__cta"
+					:to="communityAction.to"
+				>
+					{{ communityAction.label }}
 				</RouterLink>
+				<a
+					v-else-if="communityAction.kind === 'hash'"
+					class="title-grid__cta"
+					:href="communityAction.hashHref"
+				>
+					{{ communityAction.label }}
+				</a>
+				<span v-else class="title-grid__cta title-grid__cta--current">
+					{{ communityAction.label }}
+				</span>
 			</aside>
 		</div>
 
