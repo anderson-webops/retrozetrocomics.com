@@ -38,7 +38,6 @@ const session = useSessionStore();
 			>
 				Create account
 			</button>
-			<RouterLink v-else to="/studio">Open archive</RouterLink>
 		</div>
 
 		<div class="footer__contact">
@@ -171,7 +170,7 @@ const session = useSessionStore();
 }
 
 .footer__contact {
-	justify-items: end;
+	justify-items: start;
 }
 
 .footer__social {
