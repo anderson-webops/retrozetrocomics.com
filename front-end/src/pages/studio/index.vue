@@ -1,34 +1,22 @@
 <script lang="ts" setup>
-import { useSessionStore } from "@/stores/session";
-
 const archiveLanes = [
 	{
-		copy: "Release-ready pages, chapter drops, and the core narrative spine.",
 		shortCopy: "Finished pages and chapters",
-		label: "Comics",
-		type: "comic"
+		label: "Comics"
 	},
 	{
-		copy: "Thumbnail passes, beat testing, and story architecture before final art.",
 		shortCopy: "Rough beats and shots",
-		label: "Storyboards",
-		type: "storyboard"
+		label: "Storyboards"
 	},
 	{
-		copy: "Plot maps, blog-style creator notes, and outline files that can stay private until they are ready.",
 		shortCopy: "Private notes and maps",
-		label: "Outlines",
-		type: "outline"
+		label: "Outlines"
 	},
 	{
-		copy: "Real-world texture, mood, and process fragments from the studio.",
 		shortCopy: "Studio mood and texture",
-		label: "Photos",
-		type: "photo"
+		label: "Photos"
 	}
 ];
-
-const session = useSessionStore();
 </script>
 
 <template>
@@ -115,38 +103,6 @@ const session = useSessionStore();
 			</div>
 		</section>
 
-		<section class="studio-page__lanes">
-			<article
-				v-for="lane in archiveLanes"
-				:key="lane.label"
-				class="studio-page__lane"
-			>
-				<div class="studio-page__lane-copy">
-					<p>{{ lane.label }}</p>
-					<h2>{{ lane.copy }}</h2>
-				</div>
-				<RouterLink
-					v-if="session.showAdminTools"
-					class="studio-page__lane-action"
-					:to="{
-						path: '/studio/admin',
-						query: {
-							intent: 'new',
-							manage: '1',
-							section: 'posts',
-							type: lane.type
-						}
-					}"
-				>
-					Add
-					{{
-						lane.label.toLowerCase().slice(0, -1) ||
-						lane.label.toLowerCase()
-					}}
-				</RouterLink>
-			</article>
-		</section>
-
 		<PostFeed
 			id="recent-drops"
 			:limit="24"
@@ -227,64 +183,6 @@ const session = useSessionStore();
 .studio-page__hero-panel strong {
 	color: #fff3e5;
 	line-height: 1.5;
-}
-
-.studio-page__lanes {
-	display: grid;
-	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.studio-page__lane {
-	display: grid;
-	grid-template-rows: minmax(0, 1fr) auto;
-	gap: 1rem;
-	padding: 1.2rem;
-	border-radius: 22px;
-	background: var(--surface-panel-strong);
-	border: 1px solid rgba(9, 21, 38, 0.08);
-	box-shadow: 0 18px 32px rgba(8, 13, 26, 0.12);
-}
-
-.studio-page__lane-copy {
-	display: grid;
-	align-content: start;
-	gap: 0.55rem;
-}
-
-.studio-page__lane p,
-.studio-page__lane h2 {
-	margin: 0;
-}
-
-.studio-page__lane p {
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	font-size: 0.78rem;
-	font-weight: 800;
-	color: #ff7d44;
-}
-
-.studio-page__lane h2 {
-	font-size: 1.25rem;
-	line-height: 1.4;
-	color: #102038;
-}
-
-.studio-page__lane-action {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	align-self: end;
-	justify-self: start;
-	min-height: 3.7rem;
-	padding: 0.68rem 0.95rem;
-	border-radius: 999px;
-	background: rgba(9, 21, 38, 0.08);
-	border: 1px solid rgba(9, 21, 38, 0.12);
-	color: #102038;
-	font-weight: 800;
-	text-decoration: none;
 }
 
 #recent-drops {
