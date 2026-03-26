@@ -16,7 +16,7 @@ export function createDefaultAboutPageContent(): AboutPageContent {
 				title: "Make the archive breathe"
 			},
 			{
-				body: "Next up is moving storage to AWS-friendly plumbing and turning the studio feed into an even richer release cadence.",
+				body: "Next up is turning the studio feed into a steadier rhythm of drops, updates, and canon files.",
 				id: "phase-scale-pipeline",
 				label: "Phase 03",
 				title: "Scale the pipeline"

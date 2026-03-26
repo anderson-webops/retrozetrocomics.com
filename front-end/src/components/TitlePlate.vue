@@ -25,17 +25,11 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 		</div>
 
 		<div id="top-ad" class="title-plate__ad">
-			<p class="title-plate__eyebrow">Transmission Board</p>
+			<p class="title-plate__eyebrow">Quick Tour</p>
 			<ul class="title-plate__board">
-				<li>
-					Archive now supports comics, storyboards, outlines, and
-					photo logs.
-				</li>
-				<li>Comments are member-only and moderated.</li>
-				<li>
-					Uploads live on the server and are staged for future AWS
-					storage.
-				</li>
+				<li>Studio journal for new drops.</li>
+				<li>Story files for the bigger canon.</li>
+				<li>Character board for cast and factions.</li>
 			</ul>
 		</div>
 	</header>

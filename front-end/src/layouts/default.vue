@@ -85,15 +85,12 @@ onMounted(() => {
 		<div v-if="isHomeRoute" id="title-plate" class="title-grid">
 			<aside class="title-grid__rail">
 				<p class="title-grid__eyebrow">Release Stack</p>
-				<h2>One site, three publishing lanes.</h2>
+				<h2>Choose a lane.</h2>
 				<ul class="title-grid__list">
-					<li>Finished comic drops for the main story spine.</li>
-					<li>
-						Storyboard notes for pacing, beats, and rough shots.
-					</li>
-					<li>
-						Photo dispatches for texture, reference, and atmosphere.
-					</li>
+					<li>Comics for the core story.</li>
+					<li>Storyboards for rough pacing.</li>
+					<li>Outlines for working notes.</li>
+					<li>Photos for studio texture.</li>
 				</ul>
 				<RouterLink
 					v-if="!isStudioJournalRoute"
@@ -114,12 +111,12 @@ onMounted(() => {
 				<TitlePlate />
 			</div>
 			<aside class="title-grid__rail title-grid__rail--dark">
-				<p class="title-grid__eyebrow">Community Mode</p>
-				<h2>Comments stay focused and moderated.</h2>
+				<p class="title-grid__eyebrow">Community</p>
+				<h2>Discussion stays readable.</h2>
 				<ul class="title-grid__list">
-					<li>Accounts are required before anyone can post.</li>
-					<li>Signup includes a captcha gate.</li>
-					<li>Admins can review comments and suspend accounts.</li>
+					<li>Open posts can host comments.</li>
+					<li>Accounts keep the thread clear.</li>
+					<li>Moderation keeps the focus on the work.</li>
 				</ul>
 				<button
 					v-if="communityAction.kind === 'button'"
