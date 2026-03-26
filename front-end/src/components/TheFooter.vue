@@ -16,13 +16,15 @@ const session = useSessionStore();
 			</p>
 		</div>
 
-		<div class="footer__links">
+		<nav aria-label="Footer navigation" class="footer__links">
 			<h3>Explore</h3>
-			<RouterLink to="/studio">Studio archive</RouterLink>
-			<RouterLink to="/characters">Characters</RouterLink>
-			<RouterLink to="/about">About the project</RouterLink>
-			<RouterLink to="/contact">Contact</RouterLink>
-		</div>
+			<div class="footer__link-list">
+				<RouterLink to="/studio">Studio archive</RouterLink>
+				<RouterLink to="/characters">Characters</RouterLink>
+				<RouterLink to="/about">About the project</RouterLink>
+				<RouterLink to="/contact">Contact</RouterLink>
+			</div>
+		</nav>
 
 		<div class="footer__cta">
 			<h3>Community</h3>
@@ -39,22 +41,30 @@ const session = useSessionStore();
 			<RouterLink v-else to="/studio">Open archive</RouterLink>
 		</div>
 
-		<nav aria-label="Contact links" class="footer__social">
-			<a href="mailto:retrozetrocomics@gmail.com">
+		<div class="footer__contact">
+			<h3>Contact</h3>
+			<a
+				aria-label="Email the studio"
+				class="footer__social"
+				href="mailto:retrozetrocomics@gmail.com"
+			>
 				<FontAwesomeIcon :icon="['fas', 'envelope']" size="2x" />
-				<span class="sr-only">Email</span>
+				<span>Email the studio</span>
 			</a>
-		</nav>
+		</div>
 	</footer>
 </template>
 
 <style scoped>
 .footer {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns:
+		minmax(0, 1.5fr)
+		minmax(0, 1.1fr)
+		minmax(0, 1.1fr)
+		auto;
 	align-items: center;
-	justify-content: space-between;
-	gap: 1rem 1.5rem;
+	gap: 1rem 1.25rem;
 	padding: clamp(0.75rem, 2vw, 1.25rem) clamp(1rem, 5vw, 3rem);
 	background: linear-gradient(
 		120deg,
@@ -69,8 +79,8 @@ const session = useSessionStore();
 
 .footer__brand {
 	display: grid;
-	gap: 0.25rem;
-	max-width: 28rem;
+	gap: 0.3rem;
+	min-width: 0;
 }
 
 .footer__eyebrow {
@@ -94,33 +104,44 @@ const session = useSessionStore();
 	line-height: 1.55;
 	font-size: 0.92rem;
 	color: rgba(255, 255, 255, 0.75);
+	max-width: 32rem;
 }
 
 .footer__links,
-.footer__cta {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 0.65rem 1rem;
+.footer__cta,
+.footer__contact {
+	display: grid;
+	gap: 0.45rem;
+	align-content: center;
+	min-width: 0;
 }
 
 .footer__links h3,
 .footer__cta h3,
-.footer__cta p {
+.footer__cta p,
+.footer__contact h3 {
 	margin: 0;
 }
 
 .footer__links h3,
-.footer__cta h3 {
+.footer__cta h3,
+.footer__contact h3 {
 	color: #fff4e7;
 	text-transform: uppercase;
 	letter-spacing: 0.16em;
 	font-size: 0.78rem;
 }
 
+.footer__link-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.55rem 1rem;
+}
+
 .footer__links a,
 .footer__cta a,
-.footer__cta button {
+.footer__cta button,
+.footer__social {
 	color: rgba(239, 244, 255, 0.82);
 	text-decoration: none;
 	font-weight: 600;
@@ -133,10 +154,10 @@ const session = useSessionStore();
 }
 
 .footer__cta p {
-	max-width: 20rem;
 	line-height: 1.55;
 	font-size: 0.92rem;
 	color: rgba(239, 244, 255, 0.72);
+	max-width: 22rem;
 }
 
 .footer__cta a,
@@ -152,61 +173,62 @@ const session = useSessionStore();
 	font-weight: 800;
 }
 
-.footer__social {
-	display: flex;
-	gap: 0.75rem;
-	align-items: center;
-	justify-content: flex-start;
-	margin-left: auto;
+.footer__contact {
+	justify-items: end;
 }
 
-.footer__social a {
+.footer__social {
 	display: inline-flex;
+	gap: 0.7rem;
 	align-items: center;
 	justify-content: center;
-	width: 2.75rem;
-	height: 2.75rem;
-	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.06);
-	color: rgba(255, 255, 255, 0.75);
-	transition:
-		transform 0.2s ease,
-		background-color 0.2s ease,
-		color 0.2s ease;
+	padding: 0.62rem 0.95rem;
+	width: fit-content;
 }
 
-.footer__social a:hover,
-.footer__social a:focus-visible {
+.footer__social :deep(svg) {
+	flex: 0 0 auto;
+}
+
+.footer__social span {
+	white-space: nowrap;
+}
+
+.footer__social:hover,
+.footer__social:focus-visible {
 	color: #ffb36f;
 	background: rgba(255, 255, 255, 0.12);
 	transform: translateY(-2px);
 }
 
-.sr-only {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	border: 0;
+@media (max-width: 1100px) {
+	.footer {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		align-items: start;
+	}
+
+	.footer__contact {
+		justify-items: start;
+	}
 }
 
 @media (max-width: 768px) {
 	.footer {
-		align-items: flex-start;
+		grid-template-columns: 1fr;
 	}
 
-	.footer__links,
-	.footer__cta {
+	.footer__link-list {
 		flex-direction: column;
 		align-items: flex-start;
+		gap: 0.45rem;
+	}
+
+	.footer__cta {
+		justify-items: start;
 	}
 
 	.footer__social {
 		justify-content: flex-start;
-		margin-left: 0;
 	}
 }
 </style>
