@@ -253,14 +253,15 @@ function isActive(path: string) {
 
 .nav__account {
 	display: grid;
-	justify-items: end;
+	justify-items: center;
 	gap: 0.45rem;
 	padding-right: 0.1rem;
 }
 
 .nav__identity {
 	display: grid;
-	justify-items: end;
+	justify-items: center;
+	text-align: center;
 	gap: 0.1rem;
 }
 
@@ -276,7 +277,7 @@ function isActive(path: string) {
 .nav__utility {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: flex-end;
+	justify-content: center;
 	gap: 0.55rem;
 }
 
