@@ -147,50 +147,6 @@ function handleWorldEntryDiscard(entryId: string) {
 
 <template>
 	<div class="page about-page">
-		<AdminInlineTools
-			:actions="[
-				{
-					label: 'Add world file here',
-					onClick: addWorldEntryInline
-				},
-				{
-					label: 'Add outline post',
-					to: {
-						path: '/studio/admin',
-						query: {
-							intent: 'new',
-							manage: '1',
-							section: 'posts',
-							type: 'outline'
-						}
-					}
-				},
-				{
-					label: 'Add storyboard post',
-					tone: 'ghost',
-					to: {
-						path: '/studio/admin',
-						query: {
-							intent: 'new',
-							manage: '1',
-							section: 'posts',
-							type: 'storyboard'
-						}
-					}
-				},
-				{
-					label: 'Open full board workspace',
-					tone: 'ghost',
-					to: {
-						path: '/studio/admin',
-						query: { manage: '1', section: 'board' }
-					}
-				}
-			]"
-			description="These story-page controls stay collapsed by default. World files can be edited here in place, while publishing still routes through the unified post editor."
-			title="Story page controls"
-		/>
-
 		<p
 			v-if="aboutError || boardError"
 			class="about-page__status about-page__status--error"
