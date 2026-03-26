@@ -1,11 +1,13 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
 
+import { createDefaultAboutPageContent } from "../content/defaultAboutPageContent.js";
 import { createDefaultCharactersPageContent } from "../content/defaultCharactersPageContent.js";
 import { readAuthAccount } from "../middleware/auth.js";
 import { SiteContent } from "../models/schemas/SiteContent.js";
 import { recordAuditLog } from "../services/auditLog.js";
 
+const ABOUT_PAGE_KEY = "about-page";
 const CHARACTERS_PAGE_KEY = "characters-page";
 
 const characterFactSchema = z.object({
@@ -33,6 +35,33 @@ const worldEntrySchema = z.object({
 	title: z.string().trim().min(1).max(120)
 });
 
+const aboutStoryArcSchema = z.object({
+	climax: z.string().trim().min(4).max(420),
+	description: z.string().trim().min(12).max(520),
+	firstPlotPoint: z.string().trim().min(4).max(420),
+	hook: z.string().trim().min(4).max(320),
+	id: z.string().trim().min(1).max(80),
+	incitingIncident: z.string().trim().min(4).max(420),
+	label: z.string().trim().min(1).max(80),
+	midpoint: z.string().trim().min(4).max(420),
+	note: z.string().trim().min(4).max(320),
+	resolution: z.string().trim().min(4).max(420),
+	thirdPlotPoint: z.string().trim().min(4).max(420),
+	title: z.string().trim().min(1).max(120)
+});
+
+const aboutMilestoneSchema = z.object({
+	body: z.string().trim().min(12).max(320),
+	id: z.string().trim().min(1).max(80),
+	label: z.string().trim().min(1).max(80),
+	title: z.string().trim().min(1).max(120)
+});
+
+const aboutPageSchema = z.object({
+	milestones: z.array(aboutMilestoneSchema).min(1).max(16),
+	storyArcs: z.array(aboutStoryArcSchema).min(1).max(16)
+});
+
 const charactersPageSchema = z.object({
 	description: z.string().trim().min(12).max(320),
 	eyebrow: z.string().trim().min(1).max(80),
@@ -45,10 +74,18 @@ const charactersPageSchema = z.object({
 });
 
 type CharactersPageContent = z.infer<typeof charactersPageSchema>;
+type AboutPageContent = z.infer<typeof aboutPageSchema>;
 
-function normalizeCharactersPageContent(
-	value: unknown
-): CharactersPageContent {
+function normalizeAboutPageContent(value: unknown): AboutPageContent {
+	const parsed = aboutPageSchema.safeParse(value);
+	if (parsed.success) {
+		return parsed.data;
+	}
+
+	return createDefaultAboutPageContent();
+}
+
+function normalizeCharactersPageContent(value: unknown): CharactersPageContent {
 	const parsed = charactersPageSchema.safeParse(value);
 	if (parsed.success) {
 		return parsed.data;
@@ -64,13 +101,18 @@ export async function getCharactersPageContent(_req: Request, res: Response) {
 	});
 }
 
+export async function getAboutPageContent(_req: Request, res: Response) {
+	const document = await SiteContent.findOne({ key: ABOUT_PAGE_KEY });
+	return res.json({
+		content: normalizeAboutPageContent(document?.data)
+	});
+}
+
 export async function updateCharactersPageContent(req: Request, res: Response) {
 	const parsed = charactersPageSchema.safeParse(req.body);
 	if (!parsed.success) {
 		return res.status(400).json({
-			message:
-				parsed.error.issues[0]?.message
-				|| "Invalid characters page payload"
+			message: parsed.error.issues[0]?.message || "Invalid characters page payload"
 		});
 	}
 
@@ -117,5 +159,59 @@ export async function updateCharactersPageContent(req: Request, res: Response) {
 
 	return res.json({
 		content: normalizeCharactersPageContent(document?.data)
+	});
+}
+
+export async function updateAboutPageContent(req: Request, res: Response) {
+	const parsed = aboutPageSchema.safeParse(req.body);
+	if (!parsed.success) {
+		return res.status(400).json({
+			message: parsed.error.issues[0]?.message || "Invalid about page payload"
+		});
+	}
+
+	const existingDocument = await SiteContent.findOne({ key: ABOUT_PAGE_KEY });
+	const previousContent = normalizeAboutPageContent(existingDocument?.data);
+	const document = await SiteContent.findOneAndUpdate(
+		{ key: ABOUT_PAGE_KEY },
+		{ data: parsed.data },
+		{
+			new: true,
+			setDefaultsOnInsert: true,
+			upsert: true
+		}
+	);
+
+	const viewer = readAuthAccount(req);
+	if (viewer) {
+		await recordAuditLog({
+			action: "SITE_CONTENT_UPDATED",
+			after: {
+				milestoneCount: parsed.data.milestones.length,
+				storyArcCount: parsed.data.storyArcs.length
+			},
+			actor: viewer,
+			before: {
+				milestoneCount: previousContent.milestones.length,
+				storyArcCount: previousContent.storyArcs.length
+			},
+			category: "site-content",
+			details: {
+				milestoneCount: parsed.data.milestones.length,
+				storyArcCount: parsed.data.storyArcs.length
+			},
+			entityId: ABOUT_PAGE_KEY,
+			entityLabel: "About Page Story Files and Roadmap",
+			entityType: "site-content",
+			req,
+			summary: "Updated the about page story files and roadmap",
+			targetId: ABOUT_PAGE_KEY,
+			targetLabel: "About Page Story Files and Roadmap",
+			targetType: "site-content"
+		});
+	}
+
+	return res.json({
+		content: normalizeAboutPageContent(document?.data)
 	});
 }

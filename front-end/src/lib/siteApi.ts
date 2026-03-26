@@ -1,4 +1,5 @@
 import type {
+	AboutPageContent,
 	AuditLogCategory,
 	AuditLogRecord,
 	CharactersPageContent,
@@ -117,6 +118,13 @@ export async function fetchCharactersPageContent() {
 	return data.content;
 }
 
+export async function fetchAboutPageContent() {
+	const { data } = await api.get<{ content: AboutPageContent }>(
+		"/site-content/about"
+	);
+	return data.content;
+}
+
 export async function createPost(payload: PostEditorPayload) {
 	const formData = new FormData();
 	appendPostEditorFormData(formData, payload);
@@ -176,6 +184,14 @@ export async function updateCharactersPageContent(
 ) {
 	const { data } = await api.patch<{ content: CharactersPageContent }>(
 		"/admin/site-content/characters",
+		payload
+	);
+	return data.content;
+}
+
+export async function updateAboutPageContent(payload: AboutPageContent) {
+	const { data } = await api.patch<{ content: AboutPageContent }>(
+		"/admin/site-content/about",
 		payload
 	);
 	return data.content;

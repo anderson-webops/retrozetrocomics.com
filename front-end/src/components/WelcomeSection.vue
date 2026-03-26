@@ -8,6 +8,10 @@ const props = defineProps({
 		default: undefined,
 		type: Array as PropType<HeroAction[] | undefined>
 	},
+	actionsPlacement: {
+		default: "content",
+		type: String as PropType<"content" | "poster">
+	},
 	eyebrow: {
 		default: "Your weekly broadcast from the Retroverse",
 		type: String
@@ -101,7 +105,10 @@ function handleAction(action: HeroAction) {
 				{{ message }}
 			</p>
 
-			<div class="welcome__actions">
+			<div
+				v-if="props.actionsPlacement === 'content'"
+				class="welcome__actions"
+			>
 				<template v-for="action in heroActions" :key="action.label">
 					<RouterLink
 						v-if="action.to"
@@ -149,6 +156,40 @@ function handleAction(action: HeroAction) {
 					:alt="imageAlt"
 					:candidates="resolvedImageCandidates"
 				/>
+			</div>
+			<div
+				v-if="props.actionsPlacement === 'poster'"
+				class="welcome__actions welcome__actions--poster"
+			>
+				<template v-for="action in heroActions" :key="action.label">
+					<RouterLink
+						v-if="action.to"
+						class="welcome__cta"
+						:class="`welcome__cta--${action.style || 'primary'}`"
+						:to="action.to"
+					>
+						{{ action.label }}
+					</RouterLink>
+					<a
+						v-else-if="action.href"
+						class="welcome__cta"
+						:class="`welcome__cta--${action.style || 'primary'}`"
+						:href="action.href"
+						rel="noreferrer"
+						target="_blank"
+					>
+						{{ action.label }}
+					</a>
+					<button
+						v-else
+						class="welcome__cta"
+						:class="`welcome__cta--${action.style || 'primary'}`"
+						type="button"
+						@click="handleAction(action)"
+					>
+						{{ action.label }}
+					</button>
+				</template>
 			</div>
 		</div>
 	</section>
@@ -286,6 +327,9 @@ function handleAction(action: HeroAction) {
 
 .welcome__poster {
 	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 1rem;
 	justify-content: center;
 }
 
@@ -296,6 +340,11 @@ function handleAction(action: HeroAction) {
 	background: linear-gradient(140deg, rgba(255, 148, 89, 0.8), #ffd27d);
 	box-shadow: 0 20px 50px rgba(8, 13, 26, 0.3);
 	max-width: 420px;
+}
+
+.welcome__actions--poster {
+	width: 100%;
+	justify-content: flex-end;
 }
 
 .welcome__poster-frame::after {
@@ -328,6 +377,14 @@ function handleAction(action: HeroAction) {
 @media (max-width: 640px) {
 	.welcome {
 		padding: 2.5rem 1.25rem;
+	}
+
+	.welcome__poster {
+		align-items: center;
+	}
+
+	.welcome__actions--poster {
+		justify-content: center;
 	}
 
 	.welcome__highlights {

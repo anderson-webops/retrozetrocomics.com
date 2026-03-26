@@ -119,6 +119,8 @@ declare global {
   const unref: typeof import('vue').unref
   const unrefElement: typeof import('@vueuse/core').unrefElement
   const until: typeof import('@vueuse/core').until
+  const useAboutPageContent: typeof import('./composables/useAboutPageContent').useAboutPageContent
+  const useAboutPageContentEditor: typeof import('./composables/useAboutPageContentEditor').useAboutPageContentEditor
   const useActiveElement: typeof import('@vueuse/core').useActiveElement
   const useAnimate: typeof import('@vueuse/core').useAnimate
   const useAppStore: typeof import('./stores/app').useAppStore
@@ -445,6 +447,8 @@ declare module 'vue' {
     readonly unref: UnwrapRef<typeof import('vue')['unref']>
     readonly unrefElement: UnwrapRef<typeof import('@vueuse/core')['unrefElement']>
     readonly until: UnwrapRef<typeof import('@vueuse/core')['until']>
+    readonly useAboutPageContent: UnwrapRef<typeof import('./composables/useAboutPageContent')['useAboutPageContent']>
+    readonly useAboutPageContentEditor: UnwrapRef<typeof import('./composables/useAboutPageContentEditor')['useAboutPageContentEditor']>
     readonly useActiveElement: UnwrapRef<typeof import('@vueuse/core')['useActiveElement']>
     readonly useAnimate: UnwrapRef<typeof import('@vueuse/core')['useAnimate']>
     readonly useAppStore: UnwrapRef<typeof import('./stores/app')['useAppStore']>

@@ -56,6 +56,33 @@ export interface CharacterBoardWorldEntry {
 	title: string;
 }
 
+export interface AboutStoryArc {
+	climax: string;
+	description: string;
+	firstPlotPoint: string;
+	hook: string;
+	id: string;
+	incitingIncident: string;
+	label: string;
+	midpoint: string;
+	note: string;
+	resolution: string;
+	thirdPlotPoint: string;
+	title: string;
+}
+
+export interface AboutMilestone {
+	body: string;
+	id: string;
+	label: string;
+	title: string;
+}
+
+export interface AboutPageContent {
+	milestones: AboutMilestone[];
+	storyArcs: AboutStoryArc[];
+}
+
 export interface CharactersPageContent {
 	characters: CharacterBoardProfile[];
 	description: string;

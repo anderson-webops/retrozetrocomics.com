@@ -130,6 +130,8 @@
     "unref": true,
     "unrefElement": true,
     "until": true,
+    "useAboutPageContent": true,
+    "useAboutPageContentEditor": true,
     "useActiveElement": true,
     "useAnimate": true,
     "useAppStore": true,

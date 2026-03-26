@@ -1,14 +1,38 @@
 <script lang="ts" setup>
-import type { CharacterBoardWorldEntry } from "@/types/site";
+import type {
+	AboutMilestone,
+	AboutStoryArc,
+	CharacterBoardWorldEntry
+} from "@/types/site";
+import { useAboutPageContent } from "@/composables/useAboutPageContent";
+import { useAboutPageContentEditor } from "@/composables/useAboutPageContentEditor";
 import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import { useCharactersPageContentEditor } from "@/composables/useCharactersPageContentEditor";
 import { siteAssetCandidates } from "@/lib/siteAssets";
+import { useSessionStore } from "@/stores/session";
+import RoadmapMilestones from "~/components/RoadmapMilestones.vue";
+import StoryArcCards from "~/components/StoryArcCards.vue";
 import WorldEntryCards from "~/components/WorldEntryCards.vue";
 import { useMainStore } from "~/stores";
 
 const store = useMainStore();
+const session = useSessionStore();
+const { content: aboutPageContent, load: loadAboutPageContent } =
+	useAboutPageContent();
 const { content: charactersPageContent, load: loadCharactersPageContent } =
 	useCharactersPageContent();
+const {
+	addMilestoneDraft,
+	addStoryArcDraft,
+	discardMilestoneDraft,
+	discardStoryArcDraft,
+	error: aboutError,
+	removeMilestone,
+	removeStoryArc,
+	saveMilestone,
+	saveStoryArc,
+	saving: aboutSaving
+} = useAboutPageContentEditor();
 const {
 	addWorldEntryDraft,
 	discardWorldEntryDraft,
@@ -17,6 +41,10 @@ const {
 	saveWorldEntry,
 	saving: boardSaving
 } = useCharactersPageContentEditor();
+const openStoryArcEditorId = ref("");
+const savingStoryArcId = ref("");
+const openMilestoneEditorId = ref("");
+const savingMilestoneId = ref("");
 const openWorldEditorId = ref("");
 const savingWorldEditorId = ref("");
 
@@ -28,15 +56,70 @@ const highlights = computed(() =>
 );
 
 onMounted(() => {
+	void loadAboutPageContent();
 	void loadCharactersPageContent();
 });
 
 onBeforeUnmount(() => {
+	handleStoryArcDiscard(openStoryArcEditorId.value);
+	handleMilestoneDiscard(openMilestoneEditorId.value);
 	handleWorldEntryDiscard(openWorldEditorId.value);
 });
 
+function addStoryArcInline() {
+	openStoryArcEditorId.value = addStoryArcDraft();
+}
+
+function addMilestoneInline() {
+	openMilestoneEditorId.value = addMilestoneDraft();
+}
+
 function addWorldEntryInline() {
 	openWorldEditorId.value = addWorldEntryDraft();
+}
+
+async function handleStoryArcSave(arc: AboutStoryArc) {
+	savingStoryArcId.value = arc.id;
+	try {
+		await saveStoryArc(arc);
+		openStoryArcEditorId.value = "";
+	} finally {
+		savingStoryArcId.value = "";
+	}
+}
+
+async function handleStoryArcRemove(arcId: string) {
+	await removeStoryArc(arcId);
+	openStoryArcEditorId.value = "";
+}
+
+function handleStoryArcDiscard(arcId: string) {
+	discardStoryArcDraft(arcId);
+	if (openStoryArcEditorId.value === arcId) {
+		openStoryArcEditorId.value = "";
+	}
+}
+
+async function handleMilestoneSave(milestone: AboutMilestone) {
+	savingMilestoneId.value = milestone.id;
+	try {
+		await saveMilestone(milestone);
+		openMilestoneEditorId.value = "";
+	} finally {
+		savingMilestoneId.value = "";
+	}
+}
+
+async function handleMilestoneRemove(milestoneId: string) {
+	await removeMilestone(milestoneId);
+	openMilestoneEditorId.value = "";
+}
+
+function handleMilestoneDiscard(milestoneId: string) {
+	discardMilestoneDraft(milestoneId);
+	if (openMilestoneEditorId.value === milestoneId) {
+		openMilestoneEditorId.value = "";
+	}
 }
 
 async function handleWorldEntrySave(entry: CharacterBoardWorldEntry) {
@@ -109,13 +192,17 @@ function handleWorldEntryDiscard(entryId: string) {
 		/>
 
 		<p
-			v-if="boardError"
+			v-if="aboutError || boardError"
 			class="about-page__status about-page__status--error"
 		>
-			{{ boardError }}
+			{{ aboutError || boardError }}
 		</p>
-		<p v-else-if="boardSaving" class="about-page__status">
-			Saving world file changes...
+		<p v-else-if="aboutSaving || boardSaving" class="about-page__status">
+			{{
+				aboutSaving
+					? "Saving story page changes..."
+					: "Saving world file changes..."
+			}}
 		</p>
 
 		<WelcomeSection
@@ -137,6 +224,7 @@ function handleWorldEntryDiscard(entryId: string) {
 			image-alt="RetroZetro flagship portrait"
 			:message="store.about.description"
 			:title="store.about.title"
+			actions-placement="poster"
 		/>
 
 		<section class="about-page__grid">
@@ -163,53 +251,21 @@ function handleWorldEntryDiscard(entryId: string) {
 			</header>
 
 			<div class="about-page__story-grid">
-				<article
-					v-for="arc in store.about.storyArcs"
-					:key="arc.title"
-					class="about-page__story-card"
-				>
-					<p class="about-page__eyebrow">{{ arc.label }}</p>
-					<h3>{{ arc.title }}</h3>
-					<p class="about-page__story-summary">
-						{{ arc.description }}
-					</p>
-
-					<ul class="about-page__story-beats">
-						<li>
-							<strong>Hook</strong>
-							<span>{{ arc.hook }}</span>
-						</li>
-						<li>
-							<strong>Inciting incident</strong>
-							<span>{{ arc.incitingIncident }}</span>
-						</li>
-						<li>
-							<strong>First plot point</strong>
-							<span>{{ arc.firstPlotPoint }}</span>
-						</li>
-						<li>
-							<strong>Midpoint</strong>
-							<span>{{ arc.midpoint }}</span>
-						</li>
-						<li>
-							<strong>Third plot point</strong>
-							<span>{{ arc.thirdPlotPoint }}</span>
-						</li>
-						<li>
-							<strong>Climax</strong>
-							<span>{{ arc.climax }}</span>
-						</li>
-						<li>
-							<strong>Resolution</strong>
-							<span>{{ arc.resolution }}</span>
-						</li>
-					</ul>
-
-					<p class="about-page__story-note">
-						<strong>Additional note</strong>
-						<span>{{ arc.note }}</span>
-					</p>
-				</article>
+				<StoryArcCards
+					:inline-editing="session.showAdminTools"
+					:items="aboutPageContent.storyArcs"
+					:open-editor-id="openStoryArcEditorId"
+					:saving-id="savingStoryArcId"
+					@discard="handleStoryArcDiscard"
+					@remove="handleStoryArcRemove"
+					@save="handleStoryArcSave"
+				/>
+			</div>
+			<div
+				v-if="session.showAdminTools"
+				class="about-page__section-actions"
+			>
+				<button type="button" @click="addStoryArcInline">Add</button>
 			</div>
 		</section>
 
@@ -226,7 +282,7 @@ function handleWorldEntryDiscard(entryId: string) {
 
 			<div class="about-page__world-grid">
 				<WorldEntryCards
-					:inline-editing="true"
+					:inline-editing="session.showAdminTools"
 					:items="charactersPageContent.worldEntries"
 					:open-editor-id="openWorldEditorId"
 					:saving-id="savingWorldEditorId"
@@ -234,6 +290,12 @@ function handleWorldEntryDiscard(entryId: string) {
 					@remove="handleWorldEntryRemove"
 					@save="handleWorldEntrySave"
 				/>
+			</div>
+			<div
+				v-if="session.showAdminTools"
+				class="about-page__section-actions"
+			>
+				<button type="button" @click="addWorldEntryInline">Add</button>
 			</div>
 		</section>
 
@@ -249,15 +311,21 @@ function handleWorldEntryDiscard(entryId: string) {
 			</header>
 
 			<div class="about-page__milestones">
-				<article
-					v-for="milestone in store.about.milestones"
-					:key="milestone.title"
-					class="about-page__milestone"
-				>
-					<span>{{ milestone.label }}</span>
-					<h3>{{ milestone.title }}</h3>
-					<p>{{ milestone.body }}</p>
-				</article>
+				<RoadmapMilestones
+					:inline-editing="session.showAdminTools"
+					:items="aboutPageContent.milestones"
+					:open-editor-id="openMilestoneEditorId"
+					:saving-id="savingMilestoneId"
+					@discard="handleMilestoneDiscard"
+					@remove="handleMilestoneRemove"
+					@save="handleMilestoneSave"
+				/>
+			</div>
+			<div
+				v-if="session.showAdminTools"
+				class="about-page__section-actions"
+			>
+				<button type="button" @click="addMilestoneInline">Add</button>
 			</div>
 		</section>
 	</div>
@@ -314,6 +382,14 @@ function handleWorldEntryDiscard(entryId: string) {
 	display: grid;
 	gap: 0.6rem;
 	align-content: start;
+}
+
+.about-page__story-section,
+.about-page__timeline {
+	padding: clamp(1.4rem, 4vw, 2rem);
+	border-radius: 24px;
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .about-page__section-header h2,
@@ -376,12 +452,27 @@ function handleWorldEntryDiscard(entryId: string) {
 			transparent 32%
 		),
 		rgba(255, 255, 255, 0.04);
-	border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .about-page__milestone h3 {
 	font-size: 1.3rem;
 	color: #fff4e7;
+}
+
+.about-page__section-actions {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 0.2rem;
+}
+
+.about-page__section-actions button {
+	border: none;
+	border-radius: 999px;
+	padding: 0.72rem 1rem;
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff2df;
+	font-weight: 800;
+	cursor: pointer;
 }
 
 .about-page__story-beats {
