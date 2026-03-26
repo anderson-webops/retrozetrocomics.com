@@ -159,25 +159,11 @@ watch(activeType, () => {
 	gap: 1.8rem;
 	padding: clamp(1.6rem, 4vw, 2.8rem);
 	border-radius: 28px;
-	background:
-		radial-gradient(
-			circle at bottom right,
-			rgba(124, 225, 246, 0.16),
-			transparent 36%
-		),
-		radial-gradient(
-			circle at top left,
-			rgba(255, 148, 89, 0.2),
-			transparent 28%
-		),
-		linear-gradient(
-			180deg,
-			rgba(255, 248, 239, 0.98),
-			rgba(244, 230, 214, 0.94)
-		);
+	background: rgba(255, 248, 239, 0.95);
 	border: 1px solid rgba(9, 21, 38, 0.08);
 	box-shadow: 0 24px 44px rgba(8, 13, 26, 0.16);
 	color: #091526;
+	backdrop-filter: blur(10px);
 }
 
 .post-feed__header {

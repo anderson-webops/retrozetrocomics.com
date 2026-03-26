@@ -46,20 +46,11 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 	flex-direction: column;
 	gap: 1.5rem;
 	padding: clamp(1.25rem, 3vw, 2rem);
-	background:
-		radial-gradient(
-			circle at top right,
-			rgba(255, 148, 89, 0.26),
-			transparent 32%
-		),
-		linear-gradient(
-			110deg,
-			rgba(255, 217, 166, 0.98),
-			rgba(255, 242, 222, 0.92)
-		);
+	background: rgba(255, 248, 239, 0.94);
 	border-radius: 20px;
 	border: 1px solid rgba(8, 17, 31, 0.08);
 	box-shadow: 0 18px 36px rgba(8, 13, 26, 0.15);
+	backdrop-filter: blur(10px);
 }
 
 .title-plate__brand {

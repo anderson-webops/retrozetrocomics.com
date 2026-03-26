@@ -90,15 +90,10 @@ const store = useMainStore();
 .home-showcase {
 	display: grid;
 	gap: 1.4rem;
-	background:
-		radial-gradient(
-			circle at top left,
-			rgba(255, 148, 89, 0.2),
-			transparent 30%
-		),
-		rgba(249, 234, 219, 0.98);
+	background: rgba(249, 234, 219, 0.96);
 	color: #0b1323;
 	box-shadow: 0 22px 40px rgba(8, 13, 26, 0.2);
+	backdrop-filter: blur(10px);
 }
 
 .home-showcase__header {
@@ -208,13 +203,8 @@ const store = useMainStore();
 }
 
 .home-panel--accent {
-	background:
-		radial-gradient(
-			circle at top right,
-			rgba(124, 225, 246, 0.2),
-			transparent 30%
-		),
-		rgba(255, 255, 255, 0.04);
+	background: rgba(255, 255, 255, 0.06);
+	border-color: rgba(124, 225, 246, 0.18);
 }
 
 .home-panel__eyebrow {

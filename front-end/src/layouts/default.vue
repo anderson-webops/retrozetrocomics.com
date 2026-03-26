@@ -180,12 +180,12 @@ onMounted(() => {
 	display: flex;
 	flex-direction: column;
 	min-width: 0;
-	background: rgba(9, 21, 38, 0.86);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-	border-radius: 28px;
-	overflow: hidden;
-	box-shadow: 0 30px 70px rgba(5, 10, 18, 0.35);
-	backdrop-filter: blur(10px);
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	overflow: visible;
+	box-shadow: none;
+	backdrop-filter: none;
 }
 
 .page-slot {
