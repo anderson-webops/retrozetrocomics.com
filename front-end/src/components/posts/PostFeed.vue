@@ -159,7 +159,7 @@ watch(activeType, () => {
 	gap: 1.8rem;
 	padding: clamp(1.6rem, 4vw, 2.8rem);
 	border-radius: 28px;
-	background: rgba(255, 248, 239, 0.95);
+	background: var(--surface-panel);
 	border: 1px solid rgba(9, 21, 38, 0.08);
 	box-shadow: 0 24px 44px rgba(8, 13, 26, 0.16);
 	color: #091526;
@@ -214,7 +214,7 @@ watch(activeType, () => {
 	gap: 0.25rem;
 	padding: 0.95rem 1rem;
 	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.7);
+	background: var(--surface-panel-soft);
 	border: 1px solid rgba(9, 21, 38, 0.08);
 }
 

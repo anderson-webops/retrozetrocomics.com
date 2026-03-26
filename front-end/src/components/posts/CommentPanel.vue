@@ -152,7 +152,7 @@ async function submitComment() {
 	gap: 1.3rem;
 	padding: clamp(1.4rem, 4vw, 2rem);
 	border-radius: 24px;
-	background: rgba(255, 248, 239, 0.97);
+	background: var(--surface-panel-strong);
 	border: 1px solid rgba(9, 21, 38, 0.08);
 	box-shadow: 0 18px 34px rgba(8, 13, 26, 0.12);
 }

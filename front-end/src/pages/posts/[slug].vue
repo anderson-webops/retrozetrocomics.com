@@ -120,7 +120,7 @@ watch(
 	margin: 0;
 	padding: 1rem 1.2rem;
 	border-radius: 18px;
-	background: rgba(255, 248, 239, 0.96);
+	background: var(--surface-panel);
 	color: #42516b;
 }
 
@@ -148,7 +148,7 @@ watch(
 }
 
 .post-page__content {
-	background: rgba(255, 248, 239, 0.97);
+	background: var(--surface-panel-strong);
 	border: 1px solid rgba(9, 21, 38, 0.08);
 	box-shadow: 0 20px 36px rgba(8, 13, 26, 0.12);
 }

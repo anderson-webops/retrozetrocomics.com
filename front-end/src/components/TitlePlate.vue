@@ -46,7 +46,7 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 	flex-direction: column;
 	gap: 1.5rem;
 	padding: clamp(1.25rem, 3vw, 2rem);
-	background: rgba(255, 248, 239, 0.94);
+	background: var(--surface-panel);
 	border-radius: 20px;
 	border: 1px solid rgba(8, 17, 31, 0.08);
 	box-shadow: 0 18px 36px rgba(8, 13, 26, 0.15);
