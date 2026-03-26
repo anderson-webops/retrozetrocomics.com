@@ -28,7 +28,13 @@ const sitemapExcludedRoutes = [
 	"/studio/admin",
 	"/:all(.*)"
 ];
-const staticRenderExcludedRoutes = ["/posts"];
+// Dynamic post detail and catch-all routes should resolve through a generic
+// static fallback like /index.html rather than placeholder prerender output.
+const staticRenderExcludedRoutes = [
+	"/posts",
+	"/posts/:slug",
+	"/:all(.*)"
+];
 
 export default defineConfig(({ command }) => ({
 	resolve: {
@@ -128,6 +134,7 @@ export default defineConfig(({ command }) => ({
 	// https://github.com/antfu/vite-ssg
 	ssgOptions: {
 		script: "async",
+		dirStyle: "nested",
 		formatting: "minify",
 		beastiesOptions: {
 			reduceInlineStyles: false
