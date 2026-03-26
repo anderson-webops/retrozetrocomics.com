@@ -239,14 +239,14 @@ function handleAction(action: HeroAction) {
 .welcome__cta--primary {
 	background: #ff9459;
 	color: #0a1526;
-	box-shadow: 0 12px 24px rgba(255, 148, 89, 0.28);
+	box-shadow: 0 6px 14px rgba(255, 148, 89, 0.16);
 	cursor: pointer;
 }
 
 .welcome__cta--primary:hover,
 .welcome__cta--primary:focus-visible {
 	transform: translateY(-2px);
-	box-shadow: 0 16px 28px rgba(255, 145, 77, 0.55);
+	box-shadow: 0 8px 18px rgba(255, 145, 77, 0.24);
 }
 
 .welcome__cta--secondary {
