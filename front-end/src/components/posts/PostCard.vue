@@ -39,7 +39,6 @@ const publishedLabel = computed(() => {
 			<div v-else class="post-card__placeholder" aria-hidden="true">
 				<span>{{ post.title.charAt(0) }}</span>
 			</div>
-
 			<div class="post-card__badges">
 				<span class="post-card__type">{{
 					TYPE_LABELS[post.type]
@@ -91,7 +90,8 @@ const publishedLabel = computed(() => {
 }
 
 .post-card__media {
-	position: relative;
+	display: grid;
+	gap: 0.85rem;
 	padding: 0.95rem;
 	background: linear-gradient(
 		145deg,
@@ -109,7 +109,9 @@ const publishedLabel = computed(() => {
 
 .post-card__image {
 	display: block;
-	object-fit: cover;
+	object-fit: contain;
+	background: rgba(3, 9, 17, 0.74);
+	padding: 0.55rem;
 }
 
 .post-card__placeholder {
@@ -128,10 +130,6 @@ const publishedLabel = computed(() => {
 }
 
 .post-card__badges {
-	position: absolute;
-	left: 1.4rem;
-	right: 1.4rem;
-	bottom: 1.4rem;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.55rem;
