@@ -5,10 +5,13 @@ import { defineStore } from "pinia";
 import { api } from "@/api";
 
 type AuthMode = "login" | "signup";
+const ADMIN_VIEWER_MODE_KEY = "retrozetro:admin-viewer-mode";
 
 export const useSessionStore = defineStore("session", {
 	state: () => ({
 		account: null as SiteAccount | null,
+		adminViewerMode: false,
+		adminViewerModeReady: false,
 		authError: "",
 		authModalMode: "login" as AuthMode,
 		authModalOpen: false,
@@ -18,11 +21,41 @@ export const useSessionStore = defineStore("session", {
 	}),
 
 	getters: {
+		showAdminTools: state =>
+			state.account?.role === "admin" && !state.adminViewerMode,
 		isAdmin: state => state.account?.role === "admin",
 		isAuthenticated: state => Boolean(state.account)
 	},
 
 	actions: {
+		initializeAdminViewerMode() {
+			if (this.adminViewerModeReady) {
+				return;
+			}
+
+			if (typeof window !== "undefined") {
+				this.adminViewerMode =
+					window.localStorage.getItem(ADMIN_VIEWER_MODE_KEY) === "1";
+			}
+
+			this.adminViewerModeReady = true;
+		},
+
+		setAdminViewerMode(nextValue: boolean) {
+			this.adminViewerMode = nextValue;
+
+			if (typeof window !== "undefined") {
+				window.localStorage.setItem(
+					ADMIN_VIEWER_MODE_KEY,
+					nextValue ? "1" : "0"
+				);
+			}
+		},
+
+		toggleAdminViewerMode() {
+			this.setAdminViewerMode(!this.adminViewerMode);
+		},
+
 		openAuth(mode: AuthMode) {
 			this.authError = "";
 			this.authModalMode = mode;
@@ -52,6 +85,8 @@ export const useSessionStore = defineStore("session", {
 		},
 
 		async bootstrapSession(force = false) {
+			this.initializeAdminViewerMode();
+
 			if (this.bootstrapped && !force) {
 				return;
 			}

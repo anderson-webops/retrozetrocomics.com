@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import { siteAssetCandidates } from "@/lib/siteAssets";
+import { useSessionStore } from "@/stores/session";
 import { useMainStore } from "~/stores";
 
 const store = useMainStore();
+const session = useSessionStore();
 const { content: charactersPageContent, load: loadCharactersPageContent } =
 	useCharactersPageContent();
 
@@ -21,6 +23,46 @@ onMounted(() => {
 
 <template>
 	<div class="page about-page">
+		<AdminInlineTools
+			:actions="[
+				{
+					label: 'Add outline post',
+					to: {
+						path: '/studio/admin',
+						query: {
+							intent: 'new',
+							manage: '1',
+							section: 'posts',
+							type: 'outline'
+						}
+					}
+				},
+				{
+					label: 'Add storyboard post',
+					tone: 'ghost',
+					to: {
+						path: '/studio/admin',
+						query: {
+							intent: 'new',
+							manage: '1',
+							section: 'posts',
+							type: 'storyboard'
+						}
+					}
+				},
+				{
+					label: 'Manage world files',
+					tone: 'ghost',
+					to: {
+						path: '/studio/admin',
+						query: { manage: '1', section: 'board' }
+					}
+				}
+			]"
+			description="Story and world pages can open straight into the publishing or board workspaces."
+			title="Story page controls"
+		/>
+
 		<WelcomeSection
 			:actions="[
 				{
@@ -133,6 +175,16 @@ onMounted(() => {
 					:key="entry.id"
 					class="about-page__world-card"
 				>
+					<RouterLink
+						v-if="session.showAdminTools"
+						class="about-page__edit"
+						:to="{
+							path: '/studio/admin',
+							query: { manage: '1', section: 'board' }
+						}"
+					>
+						Edit in admin
+					</RouterLink>
 					<p class="about-page__eyebrow">{{ entry.label }}</p>
 					<h3>{{ entry.title }}</h3>
 					<p>{{ entry.body }}</p>
@@ -300,6 +352,21 @@ onMounted(() => {
 	padding: 0.9rem 1rem;
 	border-radius: 18px;
 	background: rgba(255, 255, 255, 0.04);
+}
+
+.about-page__edit {
+	justify-self: start;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.62rem 0.9rem;
+	border-radius: 999px;
+	background: rgba(124, 225, 246, 0.12);
+	border: 1px solid rgba(124, 225, 246, 0.22);
+	color: #dff9ff;
+	text-decoration: none;
+	font-weight: 800;
+	font-size: 0.84rem;
 }
 
 .about-page__story-beats strong,

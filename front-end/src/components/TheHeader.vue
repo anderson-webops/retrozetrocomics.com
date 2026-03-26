@@ -79,6 +79,14 @@ function isActive(path: string) {
 				>
 					Admin
 				</RouterLink>
+				<button
+					v-if="session.isAdmin"
+					class="nav__action nav__action--ghost"
+					type="button"
+					@click="session.toggleAdminViewerMode()"
+				>
+					{{ session.adminViewerMode ? "Edit Tools" : "Viewer Mode" }}
+				</button>
 				<p v-if="session.isAuthenticated" class="nav__welcome">
 					{{ session.account?.name }}
 				</p>

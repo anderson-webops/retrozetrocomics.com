@@ -77,6 +77,13 @@ const EDIT_POST_DRAFT_KEY_PREFIX = "retrozetro:drafts:posts:edit";
 const SUSPEND_PHRASE_WHITESPACE = /\s+/g;
 
 type EditorPostStatus = "private" | "published";
+type AdminWorkspaceSection = "posts" | "board" | "comments" | "members";
+
+const route = useRoute();
+const router = useRouter();
+const activeSection = ref<AdminWorkspaceSection>("posts");
+const boardWorkspaceVisible = ref(false);
+const postWorkspaceVisible = ref(false);
 
 const postForm = reactive<{
 	allowComments: boolean;
@@ -202,6 +209,191 @@ const filePersistenceWarning = computed(() => {
 
 	return "";
 });
+
+const sectionOptions: Array<{
+	description: string;
+	key: AdminWorkspaceSection;
+	label: string;
+}> = [
+	{
+		description:
+			"Add new drops and reopen published posts only when needed.",
+		key: "posts",
+		label: "Posts"
+	},
+	{
+		description: "Manage the character board and world-file content.",
+		key: "board",
+		label: "Character Board"
+	},
+	{
+		description:
+			"Review community responses without mixing them into publishing.",
+		key: "comments",
+		label: "Comments"
+	},
+	{
+		description: "Suspend or restore member accounts in one place.",
+		key: "members",
+		label: "Members"
+	}
+];
+
+const activeSectionLabel = computed(
+	() =>
+		sectionOptions.find(option => option.key === activeSection.value)
+			?.label || "Posts"
+);
+const boardCharacterCount = computed(() => boardForm.value.characters.length);
+const boardWorldEntryCount = computed(
+	() => boardForm.value.worldEntries.length
+);
+const recentPostsPreview = computed(
+	() => dashboard.value?.posts.slice(0, 6) || []
+);
+const memberPreview = computed(() => dashboard.value?.users.slice(0, 6) || []);
+const pendingCommentPreview = computed(
+	() => dashboard.value?.pendingComments.slice(0, 4) || []
+);
+
+function normalizeAdminSection(
+	value: string | null | undefined
+): AdminWorkspaceSection {
+	if (value === "board" || value === "comments" || value === "members") {
+		return value;
+	}
+
+	return "posts";
+}
+
+function readQueryValue(value: unknown) {
+	if (Array.isArray(value)) {
+		return typeof value[0] === "string" ? value[0] : "";
+	}
+
+	return typeof value === "string" ? value : "";
+}
+
+function buildAdminQuery(
+	section: AdminWorkspaceSection,
+	extras: Record<string, string | undefined> = {}
+) {
+	return Object.fromEntries(
+		Object.entries({ section, ...extras }).filter(([, value]) =>
+			Boolean(value)
+		)
+	);
+}
+
+async function replaceAdminQuery(
+	section: AdminWorkspaceSection,
+	extras: Record<string, string | undefined> = {}
+) {
+	await router.replace({
+		query: buildAdminQuery(section, extras)
+	});
+}
+
+async function closeSectionWorkspace(section: AdminWorkspaceSection) {
+	if (section === "posts") {
+		postWorkspaceVisible.value = false;
+	}
+
+	if (section === "board") {
+		boardWorkspaceVisible.value = false;
+	}
+
+	await replaceAdminQuery(section);
+}
+
+async function openPostsWorkspace(
+	options: { slug?: string; type?: PostType } = {}
+) {
+	await replaceAdminQuery("posts", {
+		intent: options.slug ? undefined : "new",
+		manage: "1",
+		slug: options.slug,
+		type: options.type
+	});
+}
+
+async function openBoardWorkspace(create?: "character" | "world") {
+	await replaceAdminQuery("board", {
+		create,
+		manage: "1"
+	});
+}
+
+async function selectSection(section: AdminWorkspaceSection) {
+	await replaceAdminQuery(section);
+}
+
+async function handleSectionChange(event: Event) {
+	const target = event.target as HTMLSelectElement | null;
+	if (!target) return;
+
+	await selectSection(target.value as AdminWorkspaceSection);
+}
+
+async function syncWorkspaceFromRoute() {
+	const nextSection = normalizeAdminSection(
+		readQueryValue(route.query.section)
+	);
+	const manage = readQueryValue(route.query.manage) === "1";
+	const intent = readQueryValue(route.query.intent);
+	const slug = readQueryValue(route.query.slug);
+	const requestedType = readQueryValue(route.query.type);
+	const create = readQueryValue(route.query.create);
+
+	activeSection.value = nextSection;
+
+	if (nextSection !== "posts") {
+		postWorkspaceVisible.value = false;
+	}
+
+	if (nextSection !== "board") {
+		boardWorkspaceVisible.value = false;
+	}
+
+	if (nextSection === "posts") {
+		postWorkspaceVisible.value = manage || Boolean(intent) || Boolean(slug);
+
+		if (slug && dashboard.value) {
+			const targetPost = dashboard.value.posts.find(
+				post => post.slug === slug
+			);
+			if (targetPost && editingPostSlug.value !== slug) {
+				await editPost(targetPost);
+			}
+		}
+
+		if (!slug && intent === "new") {
+			await switchToNewPost(false);
+			if (
+				requestedType === "comic" ||
+				requestedType === "storyboard" ||
+				requestedType === "outline" ||
+				requestedType === "photo"
+			) {
+				postForm.type = requestedType;
+			}
+		}
+	}
+
+	if (nextSection === "board") {
+		boardWorkspaceVisible.value = manage || Boolean(create);
+
+		if (create === "character" && !boardContentLoading.value) {
+			addBoardCharacter();
+			await replaceAdminQuery("board", { manage: "1" });
+		}
+
+		if (create === "world" && !boardContentLoading.value) {
+			addWorldEntry();
+			await replaceAdminQuery("board", { manage: "1" });
+		}
+	}
+}
 
 const previewToggleLabel = computed(() =>
 	showPreview.value ? "Hide Preview" : "Preview Post"
@@ -557,6 +749,7 @@ async function loadDashboard() {
 
 	try {
 		dashboard.value = await fetchDashboard();
+		await syncWorkspaceFromRoute();
 	} catch (loadError: any) {
 		error.value =
 			loadError?.response?.data?.message ||
@@ -587,6 +780,8 @@ async function loadBoardContent() {
 	} finally {
 		boardContentLoading.value = false;
 	}
+
+	await syncWorkspaceFromRoute();
 }
 
 function handleFileChange(event: Event) {
@@ -613,6 +808,11 @@ async function switchToNewPost(persistCurrentDraft = true) {
 
 async function startNewPost() {
 	await switchToNewPost();
+	await replaceAdminQuery("posts", {
+		intent: "new",
+		manage: "1",
+		type: postForm.type
+	});
 }
 
 async function editPost(post: DashboardPost) {
@@ -770,6 +970,13 @@ onMounted(() => {
 });
 
 watch(
+	() => route.query,
+	() => {
+		void syncWorkspaceFromRoute();
+	}
+);
+
+watch(
 	() => postForm.media,
 	files => rebuildSelectedPreviewMedia(files),
 	{ deep: true }
@@ -824,247 +1031,464 @@ onBeforeUnmount(() => {
 				</article>
 			</div>
 
-			<section class="admin-panel">
+			<section class="admin-panel admin-workspace">
 				<header>
-					<h2>{{ editorModeLabel }}</h2>
+					<h2>Choose a workspace</h2>
 					<p>
-						{{ editorModeDescription }}
+						Pick the part of the site you want to manage. Editors
+						and destructive controls stay closed until you open the
+						relevant workspace.
+					</p>
+				</header>
+				<div class="admin-workspace__controls">
+					<label class="admin-workspace__select">
+						<span>Current workspace</span>
+						<select
+							:model-value="activeSection"
+							@change="handleSectionChange"
+						>
+							<option
+								v-for="option in sectionOptions"
+								:key="option.key"
+								:value="option.key"
+							>
+								{{ option.label }}
+							</option>
+						</select>
+					</label>
+					<div class="admin-workspace__actions">
+						<button
+							v-if="activeSection === 'posts'"
+							type="button"
+							class="admin-dashboard__secondary-action"
+							@click="openPostsWorkspace()"
+						>
+							New post
+						</button>
+						<button
+							v-if="activeSection === 'board'"
+							type="button"
+							class="admin-dashboard__secondary-action"
+							@click="openBoardWorkspace()"
+						>
+							Manage board
+						</button>
+					</div>
+				</div>
+
+				<div class="admin-workspace__cards">
+					<article
+						v-for="option in sectionOptions"
+						:key="option.key"
+						class="admin-workspace__card"
+						:class="{
+							'admin-workspace__card--active':
+								activeSection === option.key
+						}"
+					>
+						<div class="admin-workspace__card-copy">
+							<p class="admin-dashboard__eyebrow">
+								{{ option.label }}
+							</p>
+							<h3>{{ option.label }}</h3>
+							<p>{{ option.description }}</p>
+						</div>
+						<div class="admin-workspace__card-footer">
+							<strong>
+								{{
+									option.key === "posts"
+										? `${dashboard.posts.length} tracked`
+										: option.key === "board"
+											? `${boardCharacterCount} characters / ${boardWorldEntryCount} files`
+											: option.key === "comments"
+												? `${dashboard.pendingComments.length} pending`
+												: `${dashboard.users.length} members`
+								}}
+							</strong>
+							<button
+								type="button"
+								class="admin-workspace__card-action"
+								@click="selectSection(option.key)"
+							>
+								{{
+									activeSection === option.key
+										? "Selected"
+										: "Open"
+								}}
+							</button>
+						</div>
+					</article>
+				</div>
+			</section>
+
+			<section v-if="activeSection === 'posts'" class="admin-panel">
+				<header>
+					<h2>Publishing workspace</h2>
+					<p>
+						New comics, storyboards, outlines, and photo drops all
+						flow through one editor, but it stays tucked away until
+						you open it.
 					</p>
 				</header>
 
-				<form class="publish-form" @submit.prevent="savePost">
-					<div
-						v-if="editorMode === 'edit'"
-						class="publish-form__editor-state"
+				<div class="admin-dashboard__section-actions">
+					<button
+						type="button"
+						@click="openPostsWorkspace({ type: 'comic' })"
 					>
-						<div>
-							<p class="publish-form__draft-eyebrow">
-								Editing Live Record
-							</p>
-							<p>
-								Slug:
-								<strong>{{ editingPostSlug }}</strong>
-							</p>
-						</div>
-						<button type="button" @click="startNewPost">
-							Start a new post
-						</button>
-					</div>
+						Add comic
+					</button>
+					<button
+						type="button"
+						@click="openPostsWorkspace({ type: 'storyboard' })"
+					>
+						Add storyboard
+					</button>
+					<button
+						type="button"
+						@click="openPostsWorkspace({ type: 'outline' })"
+					>
+						Add outline
+					</button>
+					<button
+						type="button"
+						@click="openPostsWorkspace({ type: 'photo' })"
+					>
+						Add photo
+					</button>
+				</div>
 
-					<div
-						v-if="restorePromptVisible"
-						class="publish-form__draft-banner"
-					>
-						<div class="publish-form__draft-copy">
-							<p class="publish-form__draft-eyebrow">
-								Local Draft Found
+				<div
+					v-if="postWorkspaceVisible"
+					class="admin-dashboard__workspace-frame"
+				>
+					<div class="admin-dashboard__workspace-header">
+						<div>
+							<p class="admin-dashboard__eyebrow">
+								{{ activeSectionLabel }}
 							</p>
-							<p v-if="savedLocallyLabel">
-								A saved browser draft is available from
-								{{ savedLocallyLabel }}.
-							</p>
-							<p v-else>A saved browser draft is available.</p>
-							<p
-								v-if="hasStoredFiles"
-								class="publish-form__draft-warning"
-							>
-								Files are not restorable and may need to be
-								reselected.
-							</p>
+							<h3>{{ editorModeLabel }}</h3>
+							<p>{{ editorModeDescription }}</p>
 						</div>
-						<div class="publish-form__draft-actions">
-							<button type="button" @click="restoreLocalDraft">
-								Restore draft
+						<div class="admin-dashboard__workspace-actions">
+							<button type="button" @click="startNewPost">
+								Start new
 							</button>
 							<button
 								type="button"
-								class="publish-form__draft-discard"
-								@click="discardLocalDraft"
+								class="admin-dashboard__workspace-close"
+								@click="closeSectionWorkspace('posts')"
 							>
-								Discard
+								Close editor
 							</button>
 						</div>
 					</div>
 
-					<div class="publish-form__grid">
+					<form class="publish-form" @submit.prevent="savePost">
+						<div
+							v-if="editorMode === 'edit'"
+							class="publish-form__editor-state"
+						>
+							<div>
+								<p class="publish-form__draft-eyebrow">
+									Editing Live Record
+								</p>
+								<p>
+									Slug:
+									<strong>{{ editingPostSlug }}</strong>
+								</p>
+							</div>
+							<button type="button" @click="startNewPost">
+								Start a new post
+							</button>
+						</div>
+
+						<div
+							v-if="restorePromptVisible"
+							class="publish-form__draft-banner"
+						>
+							<div class="publish-form__draft-copy">
+								<p class="publish-form__draft-eyebrow">
+									Local Draft Found
+								</p>
+								<p v-if="savedLocallyLabel">
+									A saved browser draft is available from
+									{{ savedLocallyLabel }}.
+								</p>
+								<p v-else>
+									A saved browser draft is available.
+								</p>
+								<p
+									v-if="hasStoredFiles"
+									class="publish-form__draft-warning"
+								>
+									Files are not restorable and may need to be
+									reselected.
+								</p>
+							</div>
+							<div class="publish-form__draft-actions">
+								<button
+									type="button"
+									@click="restoreLocalDraft"
+								>
+									Restore draft
+								</button>
+								<button
+									type="button"
+									class="publish-form__draft-discard"
+									@click="discardLocalDraft"
+								>
+									Discard
+								</button>
+							</div>
+						</div>
+
+						<div class="publish-form__grid">
+							<label>
+								<span>Title</span>
+								<input
+									v-model="postForm.title"
+									maxlength="120"
+									required
+									type="text"
+								/>
+							</label>
+
+							<label>
+								<span>Type</span>
+								<select v-model="postForm.type">
+									<option value="comic">Comic</option>
+									<option value="storyboard">
+										Storyboard
+									</option>
+									<option value="outline">Outline</option>
+									<option value="photo">Photo</option>
+								</select>
+							</label>
+						</div>
+
 						<label>
-							<span>Title</span>
+							<span>Summary</span>
 							<input
-								v-model="postForm.title"
-								maxlength="120"
+								v-model="postForm.summary"
+								maxlength="220"
 								required
 								type="text"
 							/>
 						</label>
 
 						<label>
-							<span>Type</span>
-							<select v-model="postForm.type">
-								<option value="comic">Comic</option>
-								<option value="storyboard">Storyboard</option>
-								<option value="outline">Outline</option>
-								<option value="photo">Photo</option>
-							</select>
-						</label>
-					</div>
-
-					<label>
-						<span>Summary</span>
-						<input
-							v-model="postForm.summary"
-							maxlength="220"
-							required
-							type="text"
-						/>
-					</label>
-
-					<label>
-						<span>Post Body</span>
-						<textarea
-							v-model="postForm.content"
-							required
-							rows="8"
-						/>
-					</label>
-
-					<div class="publish-form__grid">
-						<label>
-							<span>Tags</span>
-							<input
-								v-model="postForm.tags"
-								placeholder="retro, behind-the-scenes, issue-1"
-								type="text"
+							<span>Post Body</span>
+							<textarea
+								v-model="postForm.content"
+								required
+								rows="8"
 							/>
 						</label>
 
-						<label>
-							<span>Visibility</span>
-							<select v-model="postForm.status">
-								<option value="published">Public</option>
-								<option value="private">Private</option>
-							</select>
+						<div class="publish-form__grid">
+							<label>
+								<span>Tags</span>
+								<input
+									v-model="postForm.tags"
+									placeholder="retro, behind-the-scenes, issue-1"
+									type="text"
+								/>
+							</label>
+
+							<label>
+								<span>Visibility</span>
+								<select v-model="postForm.status">
+									<option value="published">Public</option>
+									<option value="private">Private</option>
+								</select>
+							</label>
+						</div>
+
+						<label class="publish-form__checkbox">
+							<input
+								v-model="postForm.allowComments"
+								type="checkbox"
+							/>
+							Allow comments on this post
 						</label>
-					</div>
 
-					<label class="publish-form__checkbox">
-						<input
-							v-model="postForm.allowComments"
-							type="checkbox"
-						/>
-						Allow comments on this post
-					</label>
+						<label>
+							<span>Images or PDFs</span>
+							<input
+								ref="publishFileInput"
+								multiple
+								type="file"
+								@change="handleFileChange"
+							/>
+						</label>
 
-					<label>
-						<span>Images or PDFs</span>
-						<input
-							ref="publishFileInput"
-							multiple
-							type="file"
-							@change="handleFileChange"
-						/>
-					</label>
-
-					<div
-						v-if="editorLoading"
-						class="publish-form__uploads publish-form__uploads--count"
-					>
-						Loading the selected post...
-					</div>
-					<div
-						v-else-if="
-							editorMode === 'edit' && existingMedia.length
-						"
-						class="publish-form__existing-media"
-					>
-						<p class="publish-form__existing-title">
-							Attached media
-						</p>
-						<ul>
-							<li
-								v-for="asset in existingMedia"
-								:key="asset.storageKey"
-							>
-								<span>{{ asset.originalName }}</span>
-								<small>{{ asset.kind }}</small>
-							</li>
-						</ul>
-						<p class="publish-form__existing-note">
-							Existing files stay attached. Any new files selected
-							here will be added to the post on save.
-						</p>
-					</div>
-
-					<p
-						v-if="savedLocallyLabel"
-						class="publish-form__local-status"
-					>
-						Saved locally {{ savedLocallyLabel }}
-					</p>
-
-					<p
-						v-if="filePersistenceWarning"
-						class="publish-form__uploads"
-					>
-						{{ filePersistenceWarning }}
-					</p>
-
-					<p
-						v-if="postForm.media.length"
-						class="publish-form__uploads publish-form__uploads--count"
-					>
-						{{ postForm.media.length }} file{{
-							postForm.media.length === 1 ? "" : "s"
-						}}
-						selected
-					</p>
-
-					<div class="publish-form__actions">
-						<button
-							class="publish-form__submit"
-							:disabled="saving || editorLoading"
-							type="submit"
+						<div
+							v-if="editorLoading"
+							class="publish-form__uploads publish-form__uploads--count"
 						>
-							{{ editorSubmitLabel }}
-						</button>
-						<button
-							class="publish-form__preview-toggle"
-							:disabled="editorLoading"
-							type="button"
-							@click="showPreview = !showPreview"
+							Loading the selected post...
+						</div>
+						<div
+							v-else-if="
+								editorMode === 'edit' && existingMedia.length
+							"
+							class="publish-form__existing-media"
 						>
-							{{ previewToggleLabel }}
-						</button>
-					</div>
-				</form>
-
-				<div v-if="showPreview" class="publish-preview">
-					<div class="publish-preview__header">
-						<div>
-							<p class="publish-form__draft-eyebrow">
-								Post Preview
+							<p class="publish-form__existing-title">
+								Attached media
 							</p>
-							<p>
-								This uses the current editor values, including
-								selected browser image previews.
+							<ul>
+								<li
+									v-for="asset in existingMedia"
+									:key="asset.storageKey"
+								>
+									<span>{{ asset.originalName }}</span>
+									<small>{{ asset.kind }}</small>
+								</li>
+							</ul>
+							<p class="publish-form__existing-note">
+								Existing files stay attached. Any new files
+								selected here will be added to the post on save.
 							</p>
 						</div>
-						<p
-							v-if="selectedDocumentCount"
-							class="publish-preview__note"
-						>
-							{{ selectedDocumentCount }} document{{
-								selectedDocumentCount === 1 ? "" : "s"
-							}}
-							selected. PDFs will attach on publish but do not
-							render in this preview.
-						</p>
-					</div>
 
-					<PostPreviewPanel mode="preview" :post="previewPost" />
+						<p
+							v-if="savedLocallyLabel"
+							class="publish-form__local-status"
+						>
+							Saved locally {{ savedLocallyLabel }}
+						</p>
+
+						<p
+							v-if="filePersistenceWarning"
+							class="publish-form__uploads"
+						>
+							{{ filePersistenceWarning }}
+						</p>
+
+						<p
+							v-if="postForm.media.length"
+							class="publish-form__uploads publish-form__uploads--count"
+						>
+							{{ postForm.media.length }} file{{
+								postForm.media.length === 1 ? "" : "s"
+							}}
+							selected
+						</p>
+
+						<div class="publish-form__actions">
+							<button
+								class="publish-form__submit"
+								:disabled="saving || editorLoading"
+								type="submit"
+							>
+								{{ editorSubmitLabel }}
+							</button>
+							<button
+								class="publish-form__preview-toggle"
+								:disabled="editorLoading"
+								type="button"
+								@click="showPreview = !showPreview"
+							>
+								{{ previewToggleLabel }}
+							</button>
+						</div>
+					</form>
+
+					<div v-if="showPreview" class="publish-preview">
+						<div class="publish-preview__header">
+							<div>
+								<p class="publish-form__draft-eyebrow">
+									Post Preview
+								</p>
+								<p>
+									This uses the current editor values,
+									including selected browser image previews.
+								</p>
+							</div>
+							<p
+								v-if="selectedDocumentCount"
+								class="publish-preview__note"
+							>
+								{{ selectedDocumentCount }} document{{
+									selectedDocumentCount === 1 ? "" : "s"
+								}}
+								selected. PDFs will attach on publish but do not
+								render in this preview.
+							</p>
+						</div>
+
+						<PostPreviewPanel mode="preview" :post="previewPost" />
+					</div>
 				</div>
+
+				<section class="admin-panel admin-panel--subpanel">
+					<header>
+						<h2>Recent Posts</h2>
+						<p>
+							Open an existing comic, storyboard, outline, or
+							photo post to revise it or move it between public
+							and private visibility.
+						</p>
+					</header>
+
+					<ul v-if="dashboard.posts.length" class="post-list">
+						<li
+							v-for="post in recentPostsPreview"
+							:key="post.id"
+							class="post-list__item"
+						>
+							<div class="post-list__copy">
+								<div class="post-list__meta">
+									<span>{{
+										post.type.charAt(0).toUpperCase() +
+										post.type.slice(1)
+									}}</span>
+									<span
+										class="post-list__status"
+										:class="`post-list__status--${post.status === 'draft' ? 'private' : post.status}`"
+									>
+										{{
+											post.status === "published"
+												? "Public"
+												: "Private"
+										}}
+									</span>
+								</div>
+								<h3>{{ post.title }}</h3>
+								<small>
+									{{
+										post.publishedAt
+											? new Intl.DateTimeFormat("en-US", {
+													dateStyle: "medium"
+												}).format(
+													new Date(post.publishedAt)
+												)
+											: "Not published yet"
+									}}
+								</small>
+							</div>
+							<div class="post-list__actions">
+								<button
+									type="button"
+									@click="
+										openPostsWorkspace({ slug: post.slug })
+									"
+								>
+									Edit
+								</button>
+								<RouterLink :to="`/posts/${post.slug}`">
+									Open page
+								</RouterLink>
+							</div>
+						</li>
+					</ul>
+					<p v-else class="admin-panel__empty">No posts exist yet.</p>
+				</section>
 			</section>
 
-			<section class="admin-panel">
+			<section v-if="activeSection === 'board'" class="admin-panel">
 				<header>
 					<h2>Character and Threat Board</h2>
 					<p>
@@ -1074,6 +1498,38 @@ onBeforeUnmount(() => {
 					</p>
 				</header>
 
+				<div class="admin-dashboard__section-actions">
+					<button type="button" @click="openBoardWorkspace()">
+						Manage board
+					</button>
+					<button
+						type="button"
+						@click="openBoardWorkspace('character')"
+					>
+						Add character
+					</button>
+					<button type="button" @click="openBoardWorkspace('world')">
+						Add world file
+					</button>
+				</div>
+
+				<div class="admin-dashboard__board-summary">
+					<article class="admin-dashboard__board-summary-card">
+						<p class="admin-dashboard__eyebrow">Hero</p>
+						<h3>{{ boardForm.title }}</h3>
+						<p>{{ boardForm.description }}</p>
+					</article>
+					<article
+						v-for="character in boardForm.characters.slice(0, 4)"
+						:key="character.id"
+						class="admin-dashboard__board-summary-card"
+					>
+						<p class="admin-dashboard__eyebrow">Character</p>
+						<h3>{{ character.name }}</h3>
+						<p>{{ character.role }}</p>
+					</article>
+				</div>
+
 				<p v-if="boardContentError" class="admin-dashboard__error">
 					{{ boardContentError }}
 				</p>
@@ -1082,10 +1538,30 @@ onBeforeUnmount(() => {
 				</p>
 
 				<form
-					v-else
+					v-else-if="boardWorkspaceVisible"
 					class="board-editor"
 					@submit.prevent="saveBoardContent"
 				>
+					<div class="admin-dashboard__workspace-header">
+						<div>
+							<p class="admin-dashboard__eyebrow">Board editor</p>
+							<h3>Manage character page content</h3>
+							<p>
+								Only this workspace exposes save, add, and
+								remove controls.
+							</p>
+						</div>
+						<div class="admin-dashboard__workspace-actions">
+							<button
+								type="button"
+								class="admin-dashboard__workspace-close"
+								@click="closeSectionWorkspace('board')"
+							>
+								Close editor
+							</button>
+						</div>
+					</div>
+
 					<div class="publish-form__grid">
 						<label>
 							<span>Eyebrow</span>
@@ -1404,189 +1880,151 @@ onBeforeUnmount(() => {
 						</button>
 					</div>
 				</form>
+				<p v-else class="admin-panel__empty">
+					Board content stays summarized until you open the editor.
+				</p>
 			</section>
 
-			<div class="admin-dashboard__columns">
-				<section class="admin-panel">
-					<header>
-						<h2>Recent Posts</h2>
-						<p>
-							Open an existing comic, storyboard, outline, or
-							photo post to revise it or move it between public
-							and private visibility.
-						</p>
-					</header>
+			<section v-if="activeSection === 'comments'" class="admin-panel">
+				<header>
+					<h2>Pending Comments</h2>
+					<p>Moderate new comments before they go live.</p>
+				</header>
 
-					<ul v-if="dashboard.posts.length" class="post-list">
-						<li
-							v-for="post in dashboard.posts"
-							:key="post.id"
-							class="post-list__item"
-						>
-							<div class="post-list__copy">
-								<div class="post-list__meta">
-									<span>{{
-										post.type.charAt(0).toUpperCase() +
-										post.type.slice(1)
-									}}</span>
-									<span
-										class="post-list__status"
-										:class="`post-list__status--${post.status === 'draft' ? 'private' : post.status}`"
-									>
-										{{
-											post.status === "published"
-												? "Public"
-												: "Private"
-										}}
-									</span>
-								</div>
-								<h3>{{ post.title }}</h3>
-								<small>
-									{{
-										post.publishedAt
-											? new Intl.DateTimeFormat("en-US", {
-													dateStyle: "medium"
-												}).format(
-													new Date(post.publishedAt)
-												)
-											: "Not published yet"
-									}}
-								</small>
-							</div>
-							<div class="post-list__actions">
-								<button type="button" @click="editPost(post)">
-									Edit
-								</button>
-								<RouterLink :to="`/posts/${post.slug}`">
-									Open page
-								</RouterLink>
-							</div>
-						</li>
-					</ul>
-					<p v-else class="admin-panel__empty">No posts exist yet.</p>
-				</section>
-
-				<section class="admin-panel">
-					<header>
-						<h2>Pending Comments</h2>
-						<p>Moderate new comments before they go live.</p>
-					</header>
-
-					<ul
-						v-if="dashboard.pendingComments.length"
-						class="review-list"
+				<div class="admin-dashboard__board-summary">
+					<article
+						v-for="comment in pendingCommentPreview"
+						:key="comment.id"
+						class="admin-dashboard__board-summary-card"
 					>
-						<li
-							v-for="comment in dashboard.pendingComments"
-							:key="comment.id"
-							class="review-list__item"
-						>
-							<div class="review-list__copy">
-								<h3>{{ comment.authorName }}</h3>
-								<p>{{ comment.body }}</p>
-								<small>
-									{{
-										new Intl.DateTimeFormat("en-US", {
-											dateStyle: "medium",
-											timeStyle: "short"
-										}).format(new Date(comment.createdAt))
-									}}
-								</small>
-							</div>
-							<textarea
-								v-model="moderationNotes[comment.id]"
-								placeholder="Optional moderation note"
-								rows="2"
-							/>
-							<div class="review-list__actions">
-								<button
-									type="button"
-									@click="moderate(comment.id, 'approved')"
-								>
-									Approve
-								</button>
-								<button
-									type="button"
-									@click="moderate(comment.id, 'rejected')"
-								>
-									Reject
-								</button>
-								<button
-									type="button"
-									@click="moderate(comment.id, 'hidden')"
-								>
-									Hide
-								</button>
-							</div>
-						</li>
-					</ul>
-					<p v-else class="admin-panel__empty">
-						No pending comments right now.
+						<p class="admin-dashboard__eyebrow">Pending</p>
+						<h3>{{ comment.authorName }}</h3>
+						<p>{{ comment.body }}</p>
+					</article>
+				</div>
+
+				<ul v-if="dashboard.pendingComments.length" class="review-list">
+					<li
+						v-for="comment in dashboard.pendingComments"
+						:key="comment.id"
+						class="review-list__item"
+					>
+						<div class="review-list__copy">
+							<h3>{{ comment.authorName }}</h3>
+							<p>{{ comment.body }}</p>
+							<small>
+								{{
+									new Intl.DateTimeFormat("en-US", {
+										dateStyle: "medium",
+										timeStyle: "short"
+									}).format(new Date(comment.createdAt))
+								}}
+							</small>
+						</div>
+						<textarea
+							v-model="moderationNotes[comment.id]"
+							placeholder="Optional moderation note"
+							rows="2"
+						/>
+						<div class="review-list__actions">
+							<button
+								type="button"
+								@click="moderate(comment.id, 'approved')"
+							>
+								Approve
+							</button>
+							<button
+								type="button"
+								@click="moderate(comment.id, 'rejected')"
+							>
+								Reject
+							</button>
+							<button
+								type="button"
+								@click="moderate(comment.id, 'hidden')"
+							>
+								Hide
+							</button>
+						</div>
+					</li>
+				</ul>
+				<p v-else class="admin-panel__empty">
+					No pending comments right now.
+				</p>
+			</section>
+
+			<section v-if="activeSection === 'members'" class="admin-panel">
+				<header>
+					<h2>Community Members</h2>
+					<p>
+						Freeze or restore commenting access for member accounts.
 					</p>
-				</section>
+				</header>
 
-				<section class="admin-panel">
-					<header>
-						<h2>Community Members</h2>
-						<p>
-							Freeze or restore commenting access for member
-							accounts.
-						</p>
-					</header>
+				<div class="admin-dashboard__board-summary">
+					<article
+						v-for="user in memberPreview"
+						:key="user.id"
+						class="admin-dashboard__board-summary-card"
+					>
+						<p class="admin-dashboard__eyebrow">Member</p>
+						<h3>{{ user.name }}</h3>
+						<p>{{ user.email }}</p>
+					</article>
+				</div>
 
-					<ul v-if="dashboard.users.length" class="member-list">
-						<li
-							v-for="user in dashboard.users"
-							:key="user.id"
-							class="member-list__item"
-						>
-							<div>
-								<h3>{{ user.name }}</h3>
-								<p>{{ user.email }}</p>
-								<small>
-									Joined
-									{{
-										new Intl.DateTimeFormat("en-US", {
-											dateStyle: "medium"
-										}).format(new Date(user.createdAt))
-									}}
-								</small>
-							</div>
-							<div class="member-list__controls">
-								<span
-									class="member-list__status"
-									:class="`member-list__status--${user.status}`"
-								>
-									{{ user.status }}
-								</span>
-								<button
-									type="button"
-									:class="{
-										'member-list__button--danger':
-											user.status === 'active'
-									}"
-									:disabled="userActionLoadingId === user.id"
-									@click="
+				<ul v-if="dashboard.users.length" class="member-list">
+					<li
+						v-for="user in dashboard.users"
+						:key="user.id"
+						class="member-list__item"
+					>
+						<div>
+							<h3>{{ user.name }}</h3>
+							<p>{{ user.email }}</p>
+							<small>
+								Joined
+								{{
+									new Intl.DateTimeFormat("en-US", {
+										dateStyle: "medium"
+									}).format(new Date(user.createdAt))
+								}}
+							</small>
+						</div>
+						<div class="member-list__controls">
+							<span
+								class="member-list__status"
+								:class="`member-list__status--${user.status}`"
+							>
+								{{ user.status }}
+							</span>
+							<button
+								type="button"
+								:class="{
+									'member-list__button--danger':
 										user.status === 'active'
-											? openSuspendConfirmation(user)
-											: reactivateUser(user)
-									"
-								>
-									{{
-										userActionLoadingId === user.id
-											? user.status === "active"
-												? "Suspending..."
-												: "Reactivating..."
-											: user.status === "active"
-												? "Suspend"
-												: "Reactivate"
-									}}
-								</button>
-							</div>
-						</li>
-					</ul>
-				</section>
-			</div>
+								}"
+								:disabled="userActionLoadingId === user.id"
+								@click="
+									user.status === 'active'
+										? openSuspendConfirmation(user)
+										: reactivateUser(user)
+								"
+							>
+								{{
+									userActionLoadingId === user.id
+										? user.status === "active"
+											? "Suspending..."
+											: "Reactivating..."
+										: user.status === "active"
+											? "Suspend"
+											: "Reactivate"
+								}}
+							</button>
+						</div>
+					</li>
+				</ul>
+			</section>
 		</template>
 	</section>
 
@@ -1822,6 +2260,141 @@ onBeforeUnmount(() => {
 	cursor: pointer;
 }
 
+.admin-workspace {
+	display: grid;
+	gap: 1rem;
+}
+
+.admin-workspace__controls {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: end;
+	justify-content: space-between;
+}
+
+.admin-workspace__select {
+	display: grid;
+	gap: 0.45rem;
+	min-width: min(100%, 320px);
+}
+
+.admin-workspace__select span {
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	font-size: 0.78rem;
+	color: rgba(255, 255, 255, 0.68);
+}
+
+.admin-workspace__select select {
+	width: 100%;
+	border-radius: 14px;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	background: rgba(11, 1, 19, 0.38);
+	color: #f9efff;
+	padding: 0.85rem 0.95rem;
+}
+
+.admin-workspace__actions,
+.admin-dashboard__section-actions,
+.admin-dashboard__workspace-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+}
+
+.admin-workspace__actions button,
+.admin-workspace__card-action,
+.admin-dashboard__section-actions button,
+.admin-dashboard__workspace-actions button {
+	border: none;
+	border-radius: 999px;
+	padding: 0.72rem 1rem;
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff2df;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.admin-workspace__cards,
+.admin-dashboard__board-summary {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.admin-workspace__card,
+.admin-dashboard__board-summary-card {
+	display: grid;
+	gap: 0.85rem;
+	padding: 1rem;
+	border-radius: 20px;
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-workspace__card--active {
+	border-color: rgba(124, 225, 246, 0.34);
+	background: rgba(124, 225, 246, 0.08);
+}
+
+.admin-workspace__card-copy,
+.admin-workspace__card-copy h3,
+.admin-workspace__card-copy p,
+.admin-dashboard__board-summary-card h3,
+.admin-dashboard__board-summary-card p {
+	margin: 0;
+}
+
+.admin-workspace__card-copy {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.admin-workspace__card-copy h3,
+.admin-dashboard__workspace-header h3,
+.admin-dashboard__board-summary-card h3 {
+	color: #fff4e7;
+	font-size: 1.2rem;
+}
+
+.admin-workspace__card-copy p,
+.admin-dashboard__workspace-header p,
+.admin-dashboard__board-summary-card p {
+	color: rgba(255, 255, 255, 0.72);
+	line-height: 1.65;
+}
+
+.admin-workspace__card-footer,
+.admin-dashboard__workspace-header {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: start;
+	justify-content: space-between;
+}
+
+.admin-workspace__card-footer strong {
+	color: #fff2df;
+}
+
+.admin-dashboard__section-actions {
+	margin-bottom: 1rem;
+}
+
+.admin-dashboard__workspace-frame {
+	display: grid;
+	gap: 1rem;
+	padding: 1rem;
+	border-radius: 22px;
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-dashboard__workspace-close {
+	background: rgba(255, 255, 255, 0.06);
+}
+
 .admin-dashboard__error {
 	margin: 0;
 	padding: 1rem 1.2rem;
@@ -1842,6 +2415,11 @@ onBeforeUnmount(() => {
 	border-radius: 22px;
 	background: rgba(255, 255, 255, 0.06);
 	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-panel--subpanel {
+	padding: 1rem;
+	background: rgba(255, 255, 255, 0.03);
 }
 
 .metric-card p {

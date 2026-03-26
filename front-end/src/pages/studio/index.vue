@@ -1,22 +1,30 @@
 <script lang="ts" setup>
+import { useSessionStore } from "@/stores/session";
+
 const archiveLanes = [
 	{
 		copy: "Release-ready pages, chapter drops, and the core narrative spine.",
-		label: "Comics"
+		label: "Comics",
+		type: "comic"
 	},
 	{
 		copy: "Thumbnail passes, beat testing, and story architecture before final art.",
-		label: "Storyboards"
+		label: "Storyboards",
+		type: "storyboard"
 	},
 	{
 		copy: "Plot maps, blog-style creator notes, and outline files that can stay private until they are ready.",
-		label: "Outlines"
+		label: "Outlines",
+		type: "outline"
 	},
 	{
 		copy: "Real-world texture, mood, and process fragments from the studio.",
-		label: "Photos"
+		label: "Photos",
+		type: "photo"
 	}
 ];
+
+const session = useSessionStore();
 
 const archiveStats = [
 	{ label: "Publishing Model", value: "Live owner feed" },
@@ -27,6 +35,64 @@ const archiveStats = [
 
 <template>
 	<div class="studio-page">
+		<AdminInlineTools
+			:actions="[
+				{
+					label: 'Add comic',
+					to: {
+						path: '/studio/admin',
+						query: {
+							intent: 'new',
+							manage: '1',
+							section: 'posts',
+							type: 'comic'
+						}
+					}
+				},
+				{
+					label: 'Add storyboard',
+					tone: 'ghost',
+					to: {
+						path: '/studio/admin',
+						query: {
+							intent: 'new',
+							manage: '1',
+							section: 'posts',
+							type: 'storyboard'
+						}
+					}
+				},
+				{
+					label: 'Add outline',
+					tone: 'ghost',
+					to: {
+						path: '/studio/admin',
+						query: {
+							intent: 'new',
+							manage: '1',
+							section: 'posts',
+							type: 'outline'
+						}
+					}
+				},
+				{
+					label: 'Add photo',
+					tone: 'ghost',
+					to: {
+						path: '/studio/admin',
+						query: {
+							intent: 'new',
+							manage: '1',
+							section: 'posts',
+							type: 'photo'
+						}
+					}
+				}
+			]"
+			description="Use the live archive page to jump straight into the right publishing lane."
+			title="Studio controls"
+		/>
+
 		<section class="studio-page__hero">
 			<div class="studio-page__hero-copy">
 				<p class="studio-page__eyebrow">Open Archive</p>
@@ -59,6 +125,25 @@ const archiveStats = [
 			>
 				<p>{{ lane.label }}</p>
 				<h2>{{ lane.copy }}</h2>
+				<RouterLink
+					v-if="session.showAdminTools"
+					class="studio-page__lane-action"
+					:to="{
+						path: '/studio/admin',
+						query: {
+							intent: 'new',
+							manage: '1',
+							section: 'posts',
+							type: lane.type
+						}
+					}"
+				>
+					Add
+					{{
+						lane.label.toLowerCase().slice(0, -1) ||
+						lane.label.toLowerCase()
+					}}
+				</RouterLink>
 			</article>
 		</section>
 
@@ -177,6 +262,20 @@ const archiveStats = [
 	font-size: 1.25rem;
 	line-height: 1.4;
 	color: #102038;
+}
+
+.studio-page__lane-action {
+	justify-self: start;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.68rem 0.95rem;
+	border-radius: 999px;
+	background: rgba(9, 21, 38, 0.08);
+	border: 1px solid rgba(9, 21, 38, 0.12);
+	color: #102038;
+	font-weight: 800;
+	text-decoration: none;
 }
 
 #recent-drops {

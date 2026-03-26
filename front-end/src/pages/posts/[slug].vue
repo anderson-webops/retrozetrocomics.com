@@ -52,6 +52,36 @@ watch(
 		</p>
 
 		<template v-else-if="post && detail">
+			<AdminInlineTools
+				:actions="[
+					{
+						label: 'Edit this post',
+						to: {
+							path: '/studio/admin',
+							query: {
+								manage: '1',
+								section: 'posts',
+								slug: post.slug
+							}
+						}
+					},
+					{
+						label: 'Add another post',
+						tone: 'ghost',
+						to: {
+							path: '/studio/admin',
+							query: {
+								intent: 'new',
+								manage: '1',
+								section: 'posts',
+								type: post.type
+							}
+						}
+					}
+				]"
+				description="Jump from the live post directly into its publishing workspace."
+				title="Post controls"
+			/>
 			<PostPreviewPanel back-to="/studio" :post="post" />
 
 			<CommentPanel

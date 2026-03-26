@@ -2,6 +2,7 @@
 import type { CharacterBoardProfile } from "@/types/site";
 import { computed } from "vue";
 import { createDefaultCharactersPageContent } from "@/content/defaultCharactersPageContent";
+import { useSessionStore } from "@/stores/session";
 
 const props = defineProps<{
 	items?: CharacterBoardProfile[];
@@ -9,6 +10,7 @@ const props = defineProps<{
 
 const fallbackCharacters = createDefaultCharactersPageContent().characters;
 const characters = computed(() => props.items ?? fallbackCharacters);
+const session = useSessionStore();
 
 function isDefinedImageCandidate(
 	candidate: string | undefined
@@ -29,6 +31,16 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 				:key="item.id"
 				class="characters-grid__card"
 			>
+				<RouterLink
+					v-if="session.showAdminTools"
+					class="characters-grid__edit"
+					:to="{
+						path: '/studio/admin',
+						query: { manage: '1', section: 'board' }
+					}"
+				>
+					Edit
+				</RouterLink>
 				<ResolvedImage
 					:alt="item.imgAlt"
 					:candidates="
@@ -78,6 +90,21 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 		rgba(255, 255, 255, 0.05);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	box-shadow: 0 22px 40px rgba(8, 13, 26, 0.16);
+}
+
+.characters-grid__edit {
+	justify-self: start;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.58rem 0.9rem;
+	border-radius: 999px;
+	background: rgba(124, 225, 246, 0.12);
+	border: 1px solid rgba(124, 225, 246, 0.2);
+	color: #dff9ff;
+	font-weight: 800;
+	font-size: 0.82rem;
+	text-decoration: none;
 }
 
 .characters-grid__image {
