@@ -7,7 +7,7 @@ const store = useMainStore();
 
 <template>
 	<div class="page page--home">
-		<WelcomeSection />
+		<WelcomeSection actions-placement="poster" />
 		<Comics />
 
 		<section class="home-showcase">

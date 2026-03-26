@@ -51,6 +51,7 @@ function handleSubmit() {
 					to: '/studio'
 				}
 			]"
+			actions-placement="poster"
 			eyebrow="Contact the Studio"
 			:highlights="
 				store.contact.channels.map(channel => ({

@@ -143,6 +143,7 @@ function handleWorldEntryDiscard(entryId: string) {
 					to: '/contact'
 				}
 			]"
+			actions-placement="poster"
 			:eyebrow="content.eyebrow"
 			:highlights="characterHighlights"
 			:image-candidates="[
