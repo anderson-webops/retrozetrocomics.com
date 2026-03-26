@@ -20,6 +20,10 @@ const props = defineProps({
 		default: undefined,
 		type: Array as PropType<HeroHighlight[] | undefined>
 	},
+	highlightsLayout: {
+		default: "grid",
+		type: String as PropType<"grid" | "stack">
+	},
 	imageCandidates: {
 		default: () => [...siteAssetCandidates.hero],
 		type: Array as PropType<readonly string[]>
@@ -65,18 +69,15 @@ const defaultActions: HeroAction[] = [
 
 const defaultHighlights: HeroHighlight[] = [
 	{
-		description:
-			"Comics, storyboards, outlines, and photos publish from one admin console.",
+		description: "Fresh drops from every lane.",
 		term: "New Releases"
 	},
 	{
-		description:
-			"Follow the process with layout drafts and studio snapshots.",
+		description: "Draft notes, boards, and snapshots.",
 		term: "Creator Extras"
 	},
 	{
-		description:
-			"Member comments are moderated so discussion stays constructive.",
+		description: "Members can discuss open posts.",
 		term: "Community"
 	}
 ];
@@ -140,7 +141,10 @@ function handleAction(action: HeroAction) {
 				</template>
 			</div>
 
-			<dl class="welcome__highlights">
+			<dl
+				class="welcome__highlights"
+				:class="`welcome__highlights--${props.highlightsLayout}`"
+			>
 				<div v-for="highlight in heroHighlights" :key="highlight.term">
 					<dt>{{ highlight.term }}</dt>
 					<dd>
@@ -306,8 +310,29 @@ function handleAction(action: HeroAction) {
 .welcome__highlights {
 	display: grid;
 	gap: 1.25rem;
-	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 	margin: 0;
+}
+
+.welcome__highlights--grid {
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.welcome__highlights--stack {
+	gap: 0.9rem;
+	grid-template-columns: 1fr;
+	max-width: 34rem;
+}
+
+.welcome__highlights--stack div {
+	display: grid;
+	gap: 0.22rem;
+	padding-bottom: 0.9rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.welcome__highlights--stack div:last-child {
+	padding-bottom: 0;
+	border-bottom: none;
 }
 
 .welcome__highlights dt {
