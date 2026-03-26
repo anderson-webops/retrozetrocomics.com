@@ -1,13 +1,24 @@
 <script lang="ts" setup>
+import type { CharacterBoardWorldEntry } from "@/types/site";
 import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
+import { useCharactersPageContentEditor } from "@/composables/useCharactersPageContentEditor";
 import { siteAssetCandidates } from "@/lib/siteAssets";
-import { useSessionStore } from "@/stores/session";
+import WorldEntryCards from "~/components/WorldEntryCards.vue";
 import { useMainStore } from "~/stores";
 
 const store = useMainStore();
-const session = useSessionStore();
 const { content: charactersPageContent, load: loadCharactersPageContent } =
 	useCharactersPageContent();
+const {
+	addWorldEntryDraft,
+	discardWorldEntryDraft,
+	error: boardError,
+	removeWorldEntry,
+	saveWorldEntry,
+	saving: boardSaving
+} = useCharactersPageContentEditor();
+const openWorldEditorId = ref("");
+const savingWorldEditorId = ref("");
 
 const highlights = computed(() =>
 	store.about.values.map(value => ({
@@ -19,12 +30,46 @@ const highlights = computed(() =>
 onMounted(() => {
 	void loadCharactersPageContent();
 });
+
+onBeforeUnmount(() => {
+	handleWorldEntryDiscard(openWorldEditorId.value);
+});
+
+function addWorldEntryInline() {
+	openWorldEditorId.value = addWorldEntryDraft();
+}
+
+async function handleWorldEntrySave(entry: CharacterBoardWorldEntry) {
+	savingWorldEditorId.value = entry.id;
+	try {
+		await saveWorldEntry(entry);
+		openWorldEditorId.value = "";
+	} finally {
+		savingWorldEditorId.value = "";
+	}
+}
+
+async function handleWorldEntryRemove(entryId: string) {
+	await removeWorldEntry(entryId);
+	openWorldEditorId.value = "";
+}
+
+function handleWorldEntryDiscard(entryId: string) {
+	discardWorldEntryDraft(entryId);
+	if (openWorldEditorId.value === entryId) {
+		openWorldEditorId.value = "";
+	}
+}
 </script>
 
 <template>
 	<div class="page about-page">
 		<AdminInlineTools
 			:actions="[
+				{
+					label: 'Add world file here',
+					onClick: addWorldEntryInline
+				},
 				{
 					label: 'Add outline post',
 					to: {
@@ -51,7 +96,7 @@ onMounted(() => {
 					}
 				},
 				{
-					label: 'Manage world files',
+					label: 'Open full board workspace',
 					tone: 'ghost',
 					to: {
 						path: '/studio/admin',
@@ -59,9 +104,19 @@ onMounted(() => {
 					}
 				}
 			]"
-			description="Story and world pages can open straight into the publishing or board workspaces."
+			description="These story-page controls stay collapsed by default. World files can be edited here in place, while publishing still routes through the unified post editor."
 			title="Story page controls"
 		/>
+
+		<p
+			v-if="boardError"
+			class="about-page__status about-page__status--error"
+		>
+			{{ boardError }}
+		</p>
+		<p v-else-if="boardSaving" class="about-page__status">
+			Saving world file changes...
+		</p>
 
 		<WelcomeSection
 			:actions="[
@@ -170,32 +225,15 @@ onMounted(() => {
 			</header>
 
 			<div class="about-page__world-grid">
-				<article
-					v-for="entry in charactersPageContent.worldEntries"
-					:key="entry.id"
-					class="about-page__world-card"
-				>
-					<RouterLink
-						v-if="session.showAdminTools"
-						class="about-page__edit"
-						:to="{
-							path: '/studio/admin',
-							query: { manage: '1', section: 'board' }
-						}"
-					>
-						Edit in admin
-					</RouterLink>
-					<p class="about-page__eyebrow">{{ entry.label }}</p>
-					<h3>{{ entry.title }}</h3>
-					<p>{{ entry.body }}</p>
-
-					<dl v-if="entry.facts?.length" class="about-page__facts">
-						<div v-for="fact in entry.facts" :key="fact.label">
-							<dt>{{ fact.label }}</dt>
-							<dd>{{ fact.value }}</dd>
-						</div>
-					</dl>
-				</article>
+				<WorldEntryCards
+					:inline-editing="true"
+					:items="charactersPageContent.worldEntries"
+					:open-editor-id="openWorldEditorId"
+					:saving-id="savingWorldEditorId"
+					@discard="handleWorldEntryDiscard"
+					@remove="handleWorldEntryRemove"
+					@save="handleWorldEntrySave"
+				/>
 			</div>
 		</section>
 
@@ -229,6 +267,15 @@ onMounted(() => {
 .about-page {
 	display: grid;
 	gap: 1.8rem;
+}
+
+.about-page__status {
+	margin: 0;
+	color: rgba(239, 244, 255, 0.76);
+}
+
+.about-page__status--error {
+	color: #ffd0d0;
 }
 
 .about-page__grid,
@@ -352,21 +399,6 @@ onMounted(() => {
 	padding: 0.9rem 1rem;
 	border-radius: 18px;
 	background: rgba(255, 255, 255, 0.04);
-}
-
-.about-page__edit {
-	justify-self: start;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0.62rem 0.9rem;
-	border-radius: 999px;
-	background: rgba(124, 225, 246, 0.12);
-	border: 1px solid rgba(124, 225, 246, 0.22);
-	color: #dff9ff;
-	text-decoration: none;
-	font-weight: 800;
-	font-size: 0.84rem;
 }
 
 .about-page__story-beats strong,

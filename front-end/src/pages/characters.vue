@@ -1,10 +1,30 @@
 <script lang="ts" setup>
+import type {
+	CharacterBoardProfile,
+	CharacterBoardWorldEntry
+} from "@/types/site";
 import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
-import { useSessionStore } from "@/stores/session";
+import { useCharactersPageContentEditor } from "@/composables/useCharactersPageContentEditor";
 import Characters from "~/components/TheCharacters.vue";
+import WorldEntryCards from "~/components/WorldEntryCards.vue";
 
 const { content, load } = useCharactersPageContent();
-const session = useSessionStore();
+const {
+	addCharacterDraft,
+	addWorldEntryDraft,
+	discardCharacterDraft,
+	discardWorldEntryDraft,
+	error: boardError,
+	removeCharacter,
+	removeWorldEntry,
+	saveCharacter,
+	saveWorldEntry,
+	saving: boardSaving
+} = useCharactersPageContentEditor();
+const openCharacterEditorId = ref("");
+const openWorldEditorId = ref("");
+const savingCharacterId = ref("");
+const savingWorldEntryId = ref("");
 
 const characterHighlights = computed(() =>
 	content.value.characters.map(character => ({
@@ -16,6 +36,63 @@ const characterHighlights = computed(() =>
 onMounted(() => {
 	void load();
 });
+
+onBeforeUnmount(() => {
+	handleCharacterDiscard(openCharacterEditorId.value);
+	handleWorldEntryDiscard(openWorldEditorId.value);
+});
+
+function addCharacterInline() {
+	openCharacterEditorId.value = addCharacterDraft();
+}
+
+function addWorldEntryInline() {
+	openWorldEditorId.value = addWorldEntryDraft();
+}
+
+async function handleCharacterSave(character: CharacterBoardProfile) {
+	savingCharacterId.value = character.id;
+	try {
+		await saveCharacter(character);
+		openCharacterEditorId.value = "";
+	} finally {
+		savingCharacterId.value = "";
+	}
+}
+
+async function handleCharacterRemove(characterId: string) {
+	await removeCharacter(characterId);
+	openCharacterEditorId.value = "";
+}
+
+function handleCharacterDiscard(characterId: string) {
+	discardCharacterDraft(characterId);
+	if (openCharacterEditorId.value === characterId) {
+		openCharacterEditorId.value = "";
+	}
+}
+
+async function handleWorldEntrySave(entry: CharacterBoardWorldEntry) {
+	savingWorldEntryId.value = entry.id;
+	try {
+		await saveWorldEntry(entry);
+		openWorldEditorId.value = "";
+	} finally {
+		savingWorldEntryId.value = "";
+	}
+}
+
+async function handleWorldEntryRemove(entryId: string) {
+	await removeWorldEntry(entryId);
+	openWorldEditorId.value = "";
+}
+
+function handleWorldEntryDiscard(entryId: string) {
+	discardWorldEntryDraft(entryId);
+	if (openWorldEditorId.value === entryId) {
+		openWorldEditorId.value = "";
+	}
+}
 </script>
 
 <template>
@@ -23,40 +100,35 @@ onMounted(() => {
 		<AdminInlineTools
 			:actions="[
 				{
-					label: 'Manage character board',
+					label: 'Add character card',
+					onClick: addCharacterInline
+				},
+				{
+					label: 'Add world file',
+					onClick: addWorldEntryInline,
+					tone: 'ghost'
+				},
+				{
+					label: 'Open full board workspace',
 					to: {
 						path: '/studio/admin',
 						query: { manage: '1', section: 'board' }
 					}
-				},
-				{
-					label: 'Add character card',
-					tone: 'ghost',
-					to: {
-						path: '/studio/admin',
-						query: {
-							create: 'character',
-							manage: '1',
-							section: 'board'
-						}
-					}
-				},
-				{
-					label: 'Add world file',
-					tone: 'ghost',
-					to: {
-						path: '/studio/admin',
-						query: {
-							create: 'world',
-							manage: '1',
-							section: 'board'
-						}
-					}
 				}
 			]"
-			description="Jump straight into the character-board workspace or start a new board entry from the live page."
+			description="These page controls stay collapsed by default. Add or edit the character board right here, or open the full workspace when you need the broader admin panel."
 			title="Character page controls"
 		/>
+
+		<p
+			v-if="boardError"
+			class="characters-page__status characters-page__status--error"
+		>
+			{{ boardError }}
+		</p>
+		<p v-else-if="boardSaving" class="characters-page__status">
+			Saving board changes...
+		</p>
 
 		<WelcomeSection
 			:actions="[
@@ -81,29 +153,25 @@ onMounted(() => {
 			:message="content.description"
 			:title="content.title"
 		/>
-		<Characters :items="content.characters" />
+		<Characters
+			:inline-editing="true"
+			:items="content.characters"
+			:open-editor-id="openCharacterEditorId"
+			:saving-id="savingCharacterId"
+			@discard="handleCharacterDiscard"
+			@remove="handleCharacterRemove"
+			@save="handleCharacterSave"
+		/>
 
-		<section class="characters-page__notes">
-			<article
-				v-for="entry in content.worldEntries"
-				:key="entry.id"
-				class="characters-page__note"
-			>
-				<RouterLink
-					v-if="session.showAdminTools"
-					class="characters-page__edit"
-					:to="{
-						path: '/studio/admin',
-						query: { manage: '1', section: 'board' }
-					}"
-				>
-					Edit in admin
-				</RouterLink>
-				<p class="characters-page__eyebrow">{{ entry.label }}</p>
-				<h2>{{ entry.title }}</h2>
-				<p>{{ entry.body }}</p>
-			</article>
-		</section>
+		<WorldEntryCards
+			:inline-editing="true"
+			:items="content.worldEntries"
+			:open-editor-id="openWorldEditorId"
+			:saving-id="savingWorldEntryId"
+			@discard="handleWorldEntryDiscard"
+			@remove="handleWorldEntryRemove"
+			@save="handleWorldEntrySave"
+		/>
 	</div>
 </template>
 
@@ -113,63 +181,13 @@ onMounted(() => {
 	gap: 1.8rem;
 }
 
-.characters-page__notes {
-	display: grid;
-	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.characters-page__note {
-	display: grid;
-	gap: 0.7rem;
-	padding: clamp(1.25rem, 4vw, 1.8rem);
-	border-radius: 24px;
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-	min-width: 0;
-}
-
-.characters-page__edit {
-	justify-self: start;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0.62rem 0.9rem;
-	border-radius: 999px;
-	background: rgba(124, 225, 246, 0.12);
-	border: 1px solid rgba(124, 225, 246, 0.22);
-	color: #dff9ff;
-	text-decoration: none;
-	font-weight: 800;
-	font-size: 0.84rem;
-}
-
-.characters-page__note h2,
-.characters-page__note p {
+.characters-page__status {
 	margin: 0;
-}
-
-.characters-page__note h2 {
-	font-family: var(--font-display);
-	font-size: clamp(1.45rem, 2.8vw, 1.9rem);
-	line-height: 1.06;
-	color: #fff4e7;
-	overflow-wrap: anywhere;
-}
-
-.characters-page__note p:last-child {
-	line-height: 1.75;
 	color: rgba(239, 244, 255, 0.76);
-	overflow-wrap: anywhere;
 }
 
-.characters-page__eyebrow {
-	text-transform: uppercase;
-	letter-spacing: 0.16em;
-	font-size: 0.78rem;
-	font-weight: 700;
-	color: #ffd27d;
-	margin: 0;
+.characters-page__status--error {
+	color: #ffd0d0;
 }
 </style>
 

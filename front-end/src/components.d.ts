@@ -29,5 +29,6 @@ declare module 'vue' {
     TheHeader: typeof import('./components/TheHeader.vue')['default']
     TitlePlate: typeof import('./components/TitlePlate.vue')['default']
     WelcomeSection: typeof import('./components/WelcomeSection.vue')['default']
+    WorldEntryCards: typeof import('./components/WorldEntryCards.vue')['default']
   }
 }

@@ -101,7 +101,9 @@ type AdminWorkspaceSection =
 const route = useRoute();
 const router = useRouter();
 const activeSection = ref<AdminWorkspaceSection>("posts");
+const expandedSection = ref<AdminWorkspaceSection | null>(null);
 const boardWorkspaceVisible = ref(false);
+const hasInitializedWorkspaceState = ref(false);
 const postWorkspaceVisible = ref(false);
 const auditLogFilters = reactive<{
 	action: string;
@@ -348,12 +350,17 @@ async function closeSectionWorkspace(section: AdminWorkspaceSection) {
 		boardWorkspaceVisible.value = false;
 	}
 
+	if (expandedSection.value === section) {
+		expandedSection.value = null;
+	}
+
 	await replaceAdminQuery(section);
 }
 
 async function openPostsWorkspace(
 	options: { slug?: string; type?: PostType } = {}
 ) {
+	expandedSection.value = "posts";
 	await replaceAdminQuery("posts", {
 		intent: options.slug ? undefined : "new",
 		manage: "1",
@@ -363,6 +370,7 @@ async function openPostsWorkspace(
 }
 
 async function openBoardWorkspace(create?: "character" | "world") {
+	expandedSection.value = "board";
 	await replaceAdminQuery("board", {
 		create,
 		manage: "1"
@@ -370,7 +378,31 @@ async function openBoardWorkspace(create?: "character" | "world") {
 }
 
 async function selectSection(section: AdminWorkspaceSection) {
+	expandedSection.value = null;
+	postWorkspaceVisible.value = false;
+	boardWorkspaceVisible.value = false;
 	await replaceAdminQuery(section);
+}
+
+async function toggleSection(section: AdminWorkspaceSection) {
+	if (activeSection.value !== section) {
+		activeSection.value = section;
+	}
+
+	if (expandedSection.value === section) {
+		expandedSection.value = null;
+		postWorkspaceVisible.value = false;
+		boardWorkspaceVisible.value = false;
+		await replaceAdminQuery(section);
+		return;
+	}
+
+	expandedSection.value = section;
+	await replaceAdminQuery(section);
+
+	if (section === "logs") {
+		await loadAuditLogs();
+	}
 }
 
 async function handleSectionChange(event: Event) {
@@ -452,6 +484,12 @@ async function syncWorkspaceFromRoute() {
 		boardWorkspaceVisible.value = false;
 	}
 
+	if (manage || intent || slug || create) {
+		expandedSection.value = nextSection;
+	} else if (!hasInitializedWorkspaceState.value) {
+		expandedSection.value = null;
+	}
+
 	if (nextSection === "posts") {
 		postWorkspaceVisible.value = manage || Boolean(intent) || Boolean(slug);
 
@@ -492,8 +530,12 @@ async function syncWorkspaceFromRoute() {
 	}
 
 	if (nextSection === "logs") {
-		await loadAuditLogs();
+		if (expandedSection.value === "logs") {
+			await loadAuditLogs();
+		}
 	}
+
+	hasInitializedWorkspaceState.value = true;
 }
 
 const previewToggleLabel = computed(() =>
@@ -1235,7 +1277,10 @@ onBeforeUnmount(() => {
 					</label>
 					<div class="admin-workspace__actions">
 						<button
-							v-if="activeSection === 'posts'"
+							v-if="
+								activeSection === 'posts' &&
+								expandedSection === 'posts'
+							"
 							type="button"
 							class="admin-dashboard__secondary-action"
 							@click="openPostsWorkspace()"
@@ -1243,7 +1288,10 @@ onBeforeUnmount(() => {
 							New post
 						</button>
 						<button
-							v-if="activeSection === 'board'"
+							v-if="
+								activeSection === 'board' &&
+								expandedSection === 'board'
+							"
 							type="button"
 							class="admin-dashboard__secondary-action"
 							@click="openBoardWorkspace()"
@@ -1251,7 +1299,10 @@ onBeforeUnmount(() => {
 							Manage board
 						</button>
 						<button
-							v-if="activeSection === 'logs'"
+							v-if="
+								activeSection === 'logs' &&
+								expandedSection === 'logs'
+							"
 							type="button"
 							class="admin-dashboard__secondary-action"
 							@click="loadAuditLogs"
@@ -1295,12 +1346,15 @@ onBeforeUnmount(() => {
 							<button
 								type="button"
 								class="admin-workspace__card-action"
-								@click="selectSection(option.key)"
+								@click="toggleSection(option.key)"
 							>
 								{{
-									activeSection === option.key
-										? "Selected"
-										: "Open"
+									activeSection === option.key &&
+									expandedSection === option.key
+										? "Collapse"
+										: activeSection === option.key
+											? "Expand"
+											: "Focus"
 								}}
 							</button>
 						</div>
@@ -1308,7 +1362,10 @@ onBeforeUnmount(() => {
 				</div>
 			</section>
 
-			<section v-if="activeSection === 'posts'" class="admin-panel">
+			<section
+				v-if="activeSection === 'posts' && expandedSection === 'posts'"
+				class="admin-panel"
+			>
 				<header>
 					<h2>Publishing workspace</h2>
 					<p>
@@ -1755,7 +1812,10 @@ onBeforeUnmount(() => {
 				</section>
 			</section>
 
-			<section v-if="activeSection === 'board'" class="admin-panel">
+			<section
+				v-if="activeSection === 'board' && expandedSection === 'board'"
+				class="admin-panel"
+			>
 				<header>
 					<h2>Character and Threat Board</h2>
 					<p>
@@ -2152,7 +2212,13 @@ onBeforeUnmount(() => {
 				</p>
 			</section>
 
-			<section v-if="activeSection === 'comments'" class="admin-panel">
+			<section
+				v-if="
+					activeSection === 'comments' &&
+					expandedSection === 'comments'
+				"
+				class="admin-panel"
+			>
 				<header>
 					<h2>Pending Comments</h2>
 					<p>Moderate new comments before they go live.</p>
@@ -2220,7 +2286,12 @@ onBeforeUnmount(() => {
 				</p>
 			</section>
 
-			<section v-if="activeSection === 'members'" class="admin-panel">
+			<section
+				v-if="
+					activeSection === 'members' && expandedSection === 'members'
+				"
+				class="admin-panel"
+			>
 				<header>
 					<h2>Community Members</h2>
 					<p>
@@ -2293,7 +2364,10 @@ onBeforeUnmount(() => {
 				</ul>
 			</section>
 
-			<section v-if="activeSection === 'logs'" class="admin-panel">
+			<section
+				v-if="activeSection === 'logs' && expandedSection === 'logs'"
+				class="admin-panel"
+			>
 				<header>
 					<h2>Activity Log</h2>
 					<p>

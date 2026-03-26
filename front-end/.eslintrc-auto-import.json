@@ -156,6 +156,7 @@
     "useBrowserLocation": true,
     "useCached": true,
     "useCharactersPageContent": true,
+    "useCharactersPageContentEditor": true,
     "useClipboard": true,
     "useClipboardItems": true,
     "useCloned": true,

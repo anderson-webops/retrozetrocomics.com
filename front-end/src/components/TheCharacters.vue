@@ -4,13 +4,32 @@ import { computed } from "vue";
 import { createDefaultCharactersPageContent } from "@/content/defaultCharactersPageContent";
 import { useSessionStore } from "@/stores/session";
 
-const props = defineProps<{
-	items?: CharacterBoardProfile[];
+const props = withDefaults(
+	defineProps<{
+		inlineEditing?: boolean;
+		items?: CharacterBoardProfile[];
+		openEditorId?: string;
+		savingId?: string;
+	}>(),
+	{
+		inlineEditing: false,
+		openEditorId: "",
+		savingId: ""
+	}
+);
+
+const emit = defineEmits<{
+	discard: [characterId: string];
+	remove: [characterId: string];
+	save: [character: CharacterBoardProfile];
 }>();
 
 const fallbackCharacters = createDefaultCharactersPageContent().characters;
 const characters = computed(() => props.items ?? fallbackCharacters);
 const session = useSessionStore();
+const editingId = ref("");
+const removalArmedId = ref("");
+const draftCharacter = ref<CharacterBoardProfile | null>(null);
 
 function isDefinedImageCandidate(
 	candidate: string | undefined
@@ -21,6 +40,57 @@ function isDefinedImageCandidate(
 function definedImageCandidates(candidates: (string | undefined)[]) {
 	return candidates.filter(isDefinedImageCandidate);
 }
+
+function cloneCharacter(character: CharacterBoardProfile) {
+	return JSON.parse(JSON.stringify(character)) as CharacterBoardProfile;
+}
+
+function startEditing(character: CharacterBoardProfile) {
+	editingId.value = character.id;
+	removalArmedId.value = "";
+	draftCharacter.value = cloneCharacter(character);
+}
+
+function closeEditor() {
+	if (editingId.value) {
+		emit("discard", editingId.value);
+	}
+
+	editingId.value = "";
+	removalArmedId.value = "";
+	draftCharacter.value = null;
+}
+
+function submitCharacter() {
+	if (!draftCharacter.value) return;
+	emit("save", cloneCharacter(draftCharacter.value));
+	editingId.value = "";
+	removalArmedId.value = "";
+	draftCharacter.value = null;
+}
+
+watch(
+	() => props.openEditorId,
+	nextId => {
+		if (!nextId) return;
+		const target = characters.value.find(item => item.id === nextId);
+		if (target) {
+			startEditing(target);
+		}
+	},
+	{ immediate: true }
+);
+
+watch(
+	() => characters.value,
+	nextItems => {
+		if (!editingId.value) return;
+		if (!nextItems.some(item => item.id === editingId.value)) {
+			closeEditor();
+		}
+	},
+	{ deep: true }
+);
 </script>
 
 <template>
@@ -30,40 +100,163 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 				v-for="item in characters"
 				:key="item.id"
 				class="characters-grid__card"
+				:class="{
+					'characters-grid__card--editing': editingId === item.id
+				}"
 			>
-				<RouterLink
-					v-if="session.showAdminTools"
+				<button
+					v-if="session.showAdminTools && props.inlineEditing"
+					type="button"
 					class="characters-grid__edit"
-					:to="{
-						path: '/studio/admin',
-						query: { manage: '1', section: 'board' }
-					}"
+					@click="startEditing(item)"
 				>
-					Edit
-				</RouterLink>
-				<div class="characters-grid__media">
-					<ResolvedImage
-						:alt="item.imgAlt"
-						:candidates="
-							definedImageCandidates([
-								item.image,
-								item.fallbackImage
-							])
-						"
-						class="characters-grid__image"
-					/>
-				</div>
-				<div class="characters-grid__copy">
-					<p class="characters-grid__role">{{ item.role }}</p>
-					<h3>{{ item.name }}</h3>
-					<p class="characters-grid__description">
-						{{ item.description }}
-					</p>
-					<div class="characters-grid__chips">
-						<span>{{ item.specialty }}</span>
-						<span>{{ item.frequency }}</span>
+					{{ editingId === item.id ? "Editing" : "Edit" }}
+				</button>
+
+				<template
+					v-if="
+						session.showAdminTools &&
+						props.inlineEditing &&
+						editingId === item.id &&
+						draftCharacter
+					"
+				>
+					<form
+						class="characters-grid__editor"
+						@submit.prevent="submitCharacter"
+					>
+						<div class="characters-grid__editor-grid">
+							<label>
+								<span>Name</span>
+								<input
+									v-model="draftCharacter.name"
+									maxlength="80"
+									required
+									type="text"
+								/>
+							</label>
+							<label>
+								<span>Role</span>
+								<input
+									v-model="draftCharacter.role"
+									maxlength="80"
+									required
+									type="text"
+								/>
+							</label>
+							<label>
+								<span>Specialty</span>
+								<input
+									v-model="draftCharacter.specialty"
+									maxlength="120"
+									required
+									type="text"
+								/>
+							</label>
+							<label>
+								<span>Secondary line</span>
+								<input
+									v-model="draftCharacter.frequency"
+									maxlength="120"
+									required
+									type="text"
+								/>
+							</label>
+							<label>
+								<span>Image URL</span>
+								<input
+									v-model="draftCharacter.image"
+									maxlength="260"
+									required
+									type="text"
+								/>
+							</label>
+							<label>
+								<span>Fallback image</span>
+								<input
+									v-model="draftCharacter.fallbackImage"
+									maxlength="260"
+									type="text"
+								/>
+							</label>
+							<label class="characters-grid__editor-span">
+								<span>Image alt text</span>
+								<input
+									v-model="draftCharacter.imgAlt"
+									maxlength="180"
+									required
+									type="text"
+								/>
+							</label>
+						</div>
+
+						<label>
+							<span>Description</span>
+							<textarea
+								v-model="draftCharacter.description"
+								required
+								rows="6"
+							/>
+						</label>
+
+						<div class="characters-grid__actions">
+							<button
+								type="submit"
+								:disabled="props.savingId === item.id"
+							>
+								{{
+									props.savingId === item.id
+										? "Saving..."
+										: "Save"
+								}}
+							</button>
+							<button type="button" @click="closeEditor">
+								Cancel
+							</button>
+							<button
+								type="button"
+								class="characters-grid__danger"
+								@click="
+									removalArmedId === item.id
+										? emit('remove', item.id)
+										: (removalArmedId = item.id)
+								"
+							>
+								{{
+									removalArmedId === item.id
+										? "Confirm remove"
+										: "Remove"
+								}}
+							</button>
+						</div>
+					</form>
+				</template>
+
+				<template v-else>
+					<div class="characters-grid__media">
+						<ResolvedImage
+							:alt="item.imgAlt"
+							:candidates="
+								definedImageCandidates([
+									item.image,
+									item.fallbackImage
+								])
+							"
+							class="characters-grid__image"
+						/>
 					</div>
-				</div>
+					<div class="characters-grid__copy">
+						<p class="characters-grid__role">{{ item.role }}</p>
+						<h3>{{ item.name }}</h3>
+						<p class="characters-grid__description">
+							{{ item.description }}
+						</p>
+						<div class="characters-grid__chips">
+							<span>{{ item.specialty }}</span>
+							<span>{{ item.frequency }}</span>
+						</div>
+					</div>
+				</template>
 			</div>
 		</div>
 	</section>
@@ -101,6 +294,10 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 	box-shadow: 0 22px 40px rgba(8, 13, 26, 0.16);
 }
 
+.characters-grid__card--editing {
+	padding-top: 4.8rem;
+}
+
 .characters-grid__edit {
 	position: absolute;
 	top: 1rem;
@@ -117,6 +314,8 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 	font-weight: 800;
 	font-size: 0.82rem;
 	text-decoration: none;
+	border: none;
+	cursor: pointer;
 }
 
 .characters-grid__media {
@@ -127,6 +326,71 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 	min-height: 17rem;
 	border-radius: 22px;
 	background: rgba(255, 255, 255, 0.015);
+}
+
+.characters-grid__editor,
+.characters-grid__editor label {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.characters-grid__editor-grid {
+	display: grid;
+	gap: 0.85rem;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.characters-grid__editor-span {
+	grid-column: span 2;
+}
+
+.characters-grid__editor span {
+	text-transform: uppercase;
+	letter-spacing: 0.14em;
+	font-size: 0.72rem;
+	font-weight: 700;
+	color: rgba(255, 255, 255, 0.62);
+}
+
+.characters-grid__editor input,
+.characters-grid__editor textarea {
+	width: 100%;
+	border-radius: 16px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: rgba(10, 19, 36, 0.82);
+	color: #fff4e7;
+	padding: 0.82rem 0.9rem;
+}
+
+.characters-grid__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.characters-grid__actions button {
+	border: none;
+	border-radius: 999px;
+	padding: 0.72rem 1rem;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.characters-grid__actions button:first-child {
+	background: linear-gradient(120deg, #ff914d, #ffd27d);
+	color: #1b0328;
+}
+
+.characters-grid__actions button:nth-child(2) {
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff2df;
+}
+
+.characters-grid__danger {
+	background: rgba(255, 143, 143, 0.16);
+	color: #ffd0d0;
 }
 
 .characters-grid__image {
@@ -181,6 +445,16 @@ function definedImageCandidates(candidates: (string | undefined)[]) {
 	color: #7ce1f6;
 	font-size: 0.82rem;
 	line-height: 1.4;
+}
+
+@media (max-width: 720px) {
+	.characters-grid__editor-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.characters-grid__editor-span {
+		grid-column: span 1;
+	}
 }
 </style>
 
