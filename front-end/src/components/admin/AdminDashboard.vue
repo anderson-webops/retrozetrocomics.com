@@ -2829,6 +2829,7 @@ onBeforeUnmount(() => {
 .member-list__item p,
 .admin-panel__empty {
 	margin: 0;
+	padding-block: 0.35rem 0.8rem;
 }
 
 .admin-dashboard__eyebrow {
@@ -2983,7 +2984,7 @@ onBeforeUnmount(() => {
 }
 
 .admin-dashboard__section-actions {
-	margin-bottom: 1rem;
+	margin-bottom: 1.35rem;
 }
 
 .admin-dashboard__workspace-frame {
@@ -3024,6 +3025,12 @@ onBeforeUnmount(() => {
 .admin-panel--subpanel {
 	padding: 1rem;
 	background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-panel > header {
+	display: grid;
+	gap: 0.75rem;
+	margin-bottom: 1.35rem;
 }
 
 .metric-card p {
