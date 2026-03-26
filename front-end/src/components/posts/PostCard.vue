@@ -81,8 +81,8 @@ const publishedLabel = computed(() => {
 	overflow: hidden;
 	background: linear-gradient(
 		180deg,
-		rgba(245, 235, 222, 0.97),
-		rgba(231, 218, 200, 0.95)
+		rgba(236, 222, 205, 0.97),
+		rgba(219, 203, 184, 0.95)
 	);
 	border: 1px solid rgba(9, 21, 38, 0.08);
 	box-shadow: 0 20px 36px rgba(8, 13, 26, 0.14);
@@ -142,7 +142,7 @@ const publishedLabel = computed(() => {
 	align-items: center;
 	padding: 0.35rem 0.75rem;
 	border-radius: 999px;
-	background: rgba(239, 228, 211, 0.9);
+	background: rgba(228, 214, 196, 0.9);
 	color: #102038;
 	font-size: 0.75rem;
 	letter-spacing: 0.08em;

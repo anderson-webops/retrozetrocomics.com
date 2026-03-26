@@ -145,7 +145,7 @@ const store = useMainStore();
 	gap: 1rem;
 	padding: 1rem;
 	border-radius: 20px;
-	background: var(--surface-panel-soft);
+	background: var(--surface-panel);
 	border: 1px solid rgba(11, 19, 35, 0.08);
 }
 
