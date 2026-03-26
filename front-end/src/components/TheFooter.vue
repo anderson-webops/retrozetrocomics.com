@@ -11,9 +11,8 @@ const session = useSessionStore();
 			<p class="footer__eyebrow">RetroZetro Comics</p>
 			<h2>Stay in the Retroverse</h2>
 			<p>
-				The site is now built to keep publishing between issue launches.
-				Check the archive for comics, storyboard notes, and photo logs,
-				then come back often as the next layers are added.
+				Comics, storyboard notes, and photo logs keep the archive moving
+				between issue launches.
 			</p>
 		</div>
 
@@ -28,8 +27,7 @@ const session = useSessionStore();
 		<div class="footer__cta">
 			<h3>Community</h3>
 			<p>
-				Comments open on selected posts for signed-in members and stay
-				moderated on the way through.
+				Signed-in members can join moderated discussion on open posts.
 			</p>
 			<button
 				v-if="!session.isAuthenticated"
@@ -52,23 +50,30 @@ const session = useSessionStore();
 
 <style scoped>
 .footer {
-	display: grid;
-	gap: 1.5rem;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-	align-items: start;
-	padding: clamp(1.75rem, 3vw, 2.5rem);
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem 1.5rem;
+	padding: clamp(0.75rem, 2vw, 1.25rem) clamp(1rem, 5vw, 3rem);
 	background: linear-gradient(
-		180deg,
-		rgba(10, 18, 31, 0.98),
-		rgba(18, 32, 52, 0.98)
+		120deg,
+		rgba(96, 57, 133, 0.5),
+		rgba(255, 145, 77, 0.18)
 	);
-	border-top: 1px solid rgba(255, 255, 255, 0.12);
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
 	color: #f4eaff;
-	gap: clamp(1.5rem, 2.5vw, 2.5rem);
+	box-shadow: 0 -12px 24px rgba(7, 0, 18, 0.2);
+}
+
+.footer__brand {
+	display: grid;
+	gap: 0.25rem;
+	max-width: 28rem;
 }
 
 .footer__eyebrow {
-	margin: 0 0 0.5rem;
+	margin: 0;
 	font-size: 0.76rem;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
@@ -77,22 +82,25 @@ const session = useSessionStore();
 }
 
 .footer__brand h2 {
-	margin: 0 0 0.75rem;
-	font-size: 1.5rem;
+	margin: 0;
+	font-size: 1.2rem;
 	font-family: var(--font-display);
 	line-height: 1;
 }
 
 .footer__brand p {
 	margin: 0;
-	line-height: 1.75;
+	line-height: 1.55;
+	font-size: 0.92rem;
 	color: rgba(255, 255, 255, 0.75);
 }
 
 .footer__links,
 .footer__cta {
-	display: grid;
-	gap: 0.75rem;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.65rem 1rem;
 }
 
 .footer__links h3,
@@ -105,8 +113,8 @@ const session = useSessionStore();
 .footer__cta h3 {
 	color: #fff4e7;
 	text-transform: uppercase;
-	letter-spacing: 0.12em;
-	font-size: 0.9rem;
+	letter-spacing: 0.16em;
+	font-size: 0.78rem;
 }
 
 .footer__links a,
@@ -124,7 +132,9 @@ const session = useSessionStore();
 }
 
 .footer__cta p {
-	line-height: 1.7;
+	max-width: 20rem;
+	line-height: 1.55;
+	font-size: 0.92rem;
 	color: rgba(239, 244, 255, 0.72);
 }
 
@@ -134,7 +144,7 @@ const session = useSessionStore();
 	align-items: center;
 	justify-content: center;
 	width: fit-content;
-	padding: 0.75rem 1.1rem;
+	padding: 0.62rem 1rem;
 	border-radius: 999px;
 	background: #ff9459;
 	color: #08111f;
@@ -143,24 +153,31 @@ const session = useSessionStore();
 
 .footer__social {
 	display: flex;
-	gap: 0.9rem;
+	gap: 0.75rem;
 	align-items: center;
 	justify-content: flex-start;
+	margin-left: auto;
 }
 
 .footer__social a {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.06);
 	color: rgba(255, 255, 255, 0.75);
 	transition:
 		transform 0.2s ease,
+		background-color 0.2s ease,
 		color 0.2s ease;
 }
 
 .footer__social a:hover,
 .footer__social a:focus-visible {
 	color: #ffb36f;
+	background: rgba(255, 255, 255, 0.12);
 	transform: translateY(-2px);
 }
 
@@ -176,8 +193,19 @@ const session = useSessionStore();
 }
 
 @media (max-width: 768px) {
+	.footer {
+		align-items: flex-start;
+	}
+
+	.footer__links,
+	.footer__cta {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
 	.footer__social {
 		justify-content: flex-start;
+		margin-left: 0;
 	}
 }
 </style>
