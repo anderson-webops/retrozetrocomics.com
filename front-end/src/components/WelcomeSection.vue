@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { PropType } from "vue";
+import { siteAssetCandidates } from "@/lib/siteAssets";
 import { useSessionStore } from "@/stores/session";
 
 const props = defineProps({
@@ -15,12 +16,16 @@ const props = defineProps({
 		default: undefined,
 		type: Array as PropType<HeroHighlight[] | undefined>
 	},
+	imageCandidates: {
+		default: () => [...siteAssetCandidates.hero],
+		type: Array as PropType<readonly string[]>
+	},
 	imageAlt: {
-		default: "Stylised collage of RetroZetro heroes",
+		default: "RetroZetro lead portrait",
 		type: String
 	},
 	imageSrc: {
-		default: "/brand/hero-collage.svg",
+		default: "/legacy-images/Zetro2.jpg",
 		type: String
 	},
 	message: {
@@ -74,6 +79,9 @@ const defaultHighlights: HeroHighlight[] = [
 
 const heroActions = computed(() => props.actions ?? defaultActions);
 const heroHighlights = computed(() => props.highlights ?? defaultHighlights);
+const resolvedImageCandidates = computed(() =>
+	props.imageCandidates?.length ? props.imageCandidates : [props.imageSrc]
+);
 
 function handleAction(action: HeroAction) {
 	if (action.mode) {
@@ -137,7 +145,10 @@ function handleAction(action: HeroAction) {
 
 		<div class="welcome__poster" role="presentation">
 			<div class="welcome__poster-frame">
-				<img :alt="imageAlt" :src="imageSrc" />
+				<ResolvedImage
+					:alt="imageAlt"
+					:candidates="resolvedImageCandidates"
+				/>
 			</div>
 		</div>
 	</section>

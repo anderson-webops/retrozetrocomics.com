@@ -1,14 +1,16 @@
 <script lang="ts" setup>
+import { siteAssetCandidates } from "@/lib/siteAssets";
+
 const router = useRouter();
 </script>
 
 <template>
 	<main class="not-found-shell">
 		<div class="not-found-shell__frame">
-			<img
+			<ResolvedImage
 				alt="RetroZetro mark"
+				:candidates="siteAssetCandidates.logo"
 				class="not-found-shell__logo"
-				src="/brand/logo-mark.svg"
 			/>
 			<RouterView />
 			<div class="not-found-shell__actions">

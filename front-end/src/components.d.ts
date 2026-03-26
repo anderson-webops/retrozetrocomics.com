@@ -16,6 +16,7 @@ declare module 'vue' {
     CommentPanel: typeof import('./components/posts/CommentPanel.vue')['default']
     PostCard: typeof import('./components/posts/PostCard.vue')['default']
     PostFeed: typeof import('./components/posts/PostFeed.vue')['default']
+    ResolvedImage: typeof import('./components/ResolvedImage.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SideAdvertisement: typeof import('./components/SideAdvertisement.vue')['default']

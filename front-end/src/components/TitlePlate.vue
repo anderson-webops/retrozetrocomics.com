@@ -1,4 +1,6 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { siteAssetCandidates } from "@/lib/siteAssets";
+</script>
 
 <template>
 	<header class="title-plate">
@@ -8,7 +10,10 @@
 				class="title-plate__logo"
 				to="/"
 			>
-				<img alt="RetroZetro Comics Logo" src="/brand/logo-mark.svg" />
+				<ResolvedImage
+					alt="RetroZetro Comics Logo"
+					:candidates="siteAssetCandidates.logo"
+				/>
 			</RouterLink>
 			<div class="title-plate__text">
 				<span>RetroZetro Comics</span>

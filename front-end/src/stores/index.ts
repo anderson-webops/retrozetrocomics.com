@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { siteAssetCandidates } from "@/lib/siteAssets";
 
 export const useMainStore = defineStore("main", {
 	state: () => ({
@@ -75,7 +76,8 @@ export const useMainStore = defineStore("main", {
 					description:
 						"Zetro keeps charging toward the mess with enough heart to rally a block and enough stubbornness to make every clean exit impossible.",
 					frequency: "Hope against bad circuitry",
-					image: "/brand/characters-zetro.svg",
+					fallbackImage: siteAssetCandidates.zetroPortrait[1],
+					image: siteAssetCandidates.zetroPortrait[0],
 					imgAlt: "Poster portrait of Zetro in orange and cyan tones",
 					name: "Zetro",
 					role: "Lead hero",
@@ -85,7 +87,8 @@ export const useMainStore = defineStore("main", {
 					description:
 						"Kazay treats every room like a waveform to bend, slipping through systems and conversations before anyone notices what was taken.",
 					frequency: "Speed, style, and sabotage",
-					image: "/brand/characters-kazay.svg",
+					fallbackImage: siteAssetCandidates.kazayPortrait[1],
+					image: siteAssetCandidates.kazayPortrait[0],
 					imgAlt: "Poster portrait of Kazay in cyan and amber tones",
 					name: "Kazay",
 					role: "Signal runner",
@@ -95,7 +98,8 @@ export const useMainStore = defineStore("main", {
 					description:
 						"Exo hits like an emergency alarm and flies like one too, built for breakneck rescues, impact moves, and impossible recoveries.",
 					frequency: "Pressure and propulsion",
-					image: "/brand/characters-exo.svg",
+					fallbackImage: siteAssetCandidates.exoPortrait[1],
+					image: siteAssetCandidates.exoPortrait[0],
 					imgAlt: "Poster portrait of Exo in pale blue and gold tones",
 					name: "Exo",
 					role: "Rescue bruiser",
@@ -105,7 +109,8 @@ export const useMainStore = defineStore("main", {
 					description:
 						"Shaman slows the room down, listens to what history left in the walls, and speaks only when the answer is worth carrying.",
 					frequency: "Memory, ritual, and repair",
-					image: "/brand/characters-shaman.svg",
+					fallbackImage: siteAssetCandidates.shamanPortrait[1],
+					image: siteAssetCandidates.shamanPortrait[0],
 					imgAlt: "Poster portrait of Shaman in violet and gold tones",
 					name: "Shaman",
 					role: "Mystic anchor",
@@ -115,7 +120,7 @@ export const useMainStore = defineStore("main", {
 					description:
 						"Zorix is cool-headed and ruthless. He does not play around, wastes no breath on theatrics, and goes straight to the point the second conflict starts moving.",
 					frequency: "Cold precision and intimidation",
-					image: "/brand/characters-zorix.svg",
+					image: siteAssetCandidates.zorixPortrait[0],
 					imgAlt: "Poster portrait of Zorix in crimson and obsidian tones",
 					name: "Zorix",
 					role: "Antagonist",

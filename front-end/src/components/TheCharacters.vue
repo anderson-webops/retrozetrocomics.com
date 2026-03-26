@@ -4,6 +4,16 @@ import { useMainStore } from "~/stores";
 
 const store = useMainStore();
 const characters = computed(() => store.characters);
+
+function isDefinedImageCandidate(
+	candidate: string | undefined
+): candidate is string {
+	return Boolean(candidate);
+}
+
+function definedImageCandidates(candidates: (string | undefined)[]) {
+	return candidates.filter(isDefinedImageCandidate);
+}
 </script>
 
 <template>
@@ -14,9 +24,11 @@ const characters = computed(() => store.characters);
 				:key="index"
 				class="characters-grid__card"
 			>
-				<img
+				<ResolvedImage
 					:alt="item.imgAlt"
-					:src="item.image"
+					:candidates="
+						definedImageCandidates([item.image, item.fallbackImage])
+					"
 					class="characters-grid__image"
 				/>
 				<div class="characters-grid__copy">

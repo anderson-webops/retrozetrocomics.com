@@ -1,12 +1,48 @@
 <script lang="ts" setup>
-const defaultHeroImageAlt = "Stylised collage of RetroZetro heroes";
-const defaultHeroImagePath = "/brand/hero-collage.svg";
-const defaultSocialImageUrl = new URL(
-	defaultHeroImagePath,
-	"https://retrozetrocomics.com"
-).toString();
+import {
+	resolvePreferredLocalAsset,
+	siteAssetCandidates,
+	toAbsoluteSiteUrl
+} from "@/lib/siteAssets";
 
-useHead({
+const defaultHeroImageAlt = "RetroZetro lead portrait";
+const appleTouchIconHref = ref<string>(
+	siteAssetCandidates.favicons.appleTouch[0]
+);
+const favicon16Href = ref<string>(siteAssetCandidates.favicons.favicon16[0]);
+const favicon32Href = ref<string>(siteAssetCandidates.favicons.favicon32[0]);
+const faviconIcoHref = ref<string>(siteAssetCandidates.favicons.faviconIco[0]);
+const manifestHref = ref<string>(
+	siteAssetCandidates.favicons.manifest[0] || ""
+);
+const socialPreviewPath = ref<string>(siteAssetCandidates.socialPreview[0]);
+
+const defaultSocialImageUrl = computed(() =>
+	toAbsoluteSiteUrl(socialPreviewPath.value)
+);
+
+onMounted(async () => {
+	appleTouchIconHref.value = await resolvePreferredLocalAsset(
+		siteAssetCandidates.favicons.appleTouch
+	);
+	favicon16Href.value = await resolvePreferredLocalAsset(
+		siteAssetCandidates.favicons.favicon16
+	);
+	favicon32Href.value = await resolvePreferredLocalAsset(
+		siteAssetCandidates.favicons.favicon32
+	);
+	faviconIcoHref.value = await resolvePreferredLocalAsset(
+		siteAssetCandidates.favicons.faviconIco
+	);
+	manifestHref.value = await resolvePreferredLocalAsset(
+		siteAssetCandidates.favicons.manifest
+	);
+	socialPreviewPath.value = await resolvePreferredLocalAsset(
+		siteAssetCandidates.socialPreview
+	);
+});
+
+useHead(() => ({
 	title: "RetroZetro Comics",
 	meta: [
 		{
@@ -37,7 +73,7 @@ useHead({
 		},
 		{
 			property: "og:image",
-			content: defaultSocialImageUrl
+			content: defaultSocialImageUrl.value
 		},
 		{
 			property: "og:image:alt",
@@ -58,35 +94,39 @@ useHead({
 		},
 		{
 			name: "twitter:image",
-			content: defaultSocialImageUrl
+			content: defaultSocialImageUrl.value
 		}
 	],
 	link: [
 		{
 			rel: "icon",
 			type: "image/x-icon",
-			href: "/Favicons/favicon.ico"
+			href: faviconIcoHref.value
 		},
 		{
 			rel: "icon",
 			type: "image/png",
 			sizes: "32x32",
-			href: "/Favicons/favicon-32x32.png"
+			href: favicon32Href.value
 		},
 		{
 			rel: "icon",
 			type: "image/png",
 			sizes: "16x16",
-			href: "/Favicons/favicon-16x16.png"
+			href: favicon16Href.value
 		},
 		{
 			rel: "apple-touch-icon",
 			sizes: "180x180",
-			href: "/Favicons/apple-touch-icon.png"
+			href: appleTouchIconHref.value
+		},
+		{
+			rel: "manifest",
+			href: manifestHref.value
 		},
 		{
 			rel: "image_src",
-			href: defaultHeroImagePath
+			href: socialPreviewPath.value
 		}
 	],
 	script: import.meta.env.PROD
@@ -98,7 +138,7 @@ useHead({
 				}
 			]
 		: []
-});
+}));
 </script>
 
 <template>

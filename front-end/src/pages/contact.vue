@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
+import { siteAssetCandidates } from "@/lib/siteAssets";
 import { useMainStore } from "~/stores";
 
 const store = useMainStore();
@@ -57,8 +58,8 @@ function handleSubmit() {
 					term: channel.label
 				}))
 			"
+			:image-candidates="siteAssetCandidates.contactLogo"
 			image-alt="RetroZetro logo mark"
-			image-src="/brand/logo-mark.svg"
 			:message="store.contact.description"
 			:title="store.contact.title"
 		/>

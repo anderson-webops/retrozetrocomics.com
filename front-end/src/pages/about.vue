@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { siteAssetCandidates } from "@/lib/siteAssets";
 import { useMainStore } from "~/stores";
 
 const store = useMainStore();
@@ -28,8 +29,8 @@ const highlights = computed(() =>
 			]"
 			eyebrow="Studio Origins"
 			:highlights="highlights"
-			image-alt="RetroZetro flagship poster"
-			image-src="/brand/poster-retrozetro.svg"
+			:image-candidates="siteAssetCandidates.aboutHero"
+			image-alt="RetroZetro flagship portrait"
 			:message="store.about.description"
 			:title="store.about.title"
 		/>

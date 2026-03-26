@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { siteAssetCandidates } from "@/lib/siteAssets";
 import Characters from "~/components/TheCharacters.vue";
 import { useMainStore } from "~/stores";
 
@@ -27,8 +28,8 @@ const store = useMainStore();
 					term: character.name
 				}))
 			"
-			image-alt="Zetro portrait poster"
-			image-src="/brand/characters-zetro.svg"
+			:image-candidates="siteAssetCandidates.zetroPortrait"
+			image-alt="Zetro portrait"
 			:message="store.characters.description"
 			title="Meet the Key Players"
 		/>
