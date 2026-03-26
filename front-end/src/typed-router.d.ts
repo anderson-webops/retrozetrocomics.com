@@ -58,6 +58,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/posts': RouteRecordInfo<
+      '/posts',
+      '/posts',
+      Record<never, never>,
+      Record<never, never>,
+      | '/posts/[slug]'
+    >,
     '/posts/[slug]': RouteRecordInfo<
       '/posts/[slug]',
       '/posts/:slug',
@@ -121,6 +128,13 @@ declare module 'vue-router/auto-routes' {
         | '/contact'
       views:
         | never
+    }
+    'src/pages/posts.vue': {
+      routes:
+        | '/posts'
+        | '/posts/[slug]'
+      views:
+        | 'default'
     }
     'src/pages/posts/[slug].vue': {
       routes:
