@@ -216,6 +216,8 @@ function handleAction(action: HeroAction) {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.75rem;
+	width: 100%;
+	justify-content: center;
 }
 
 .welcome__cta {

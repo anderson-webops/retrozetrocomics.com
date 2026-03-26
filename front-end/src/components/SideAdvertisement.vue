@@ -163,6 +163,7 @@ const archiveCta = computed(() => {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	align-self: center;
 	padding: 0.72rem 1rem;
 	border-radius: 999px;
 	text-decoration: none;
