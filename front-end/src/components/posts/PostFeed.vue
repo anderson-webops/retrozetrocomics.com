@@ -26,6 +26,8 @@ const filters: Array<{ label: string; value: PostType | null }> = [
 	{ label: "Outlines", value: "outline" },
 	{ label: "Photos", value: "photo" }
 ];
+const allFilter = filters[0];
+const laneFilters = filters.slice(1);
 
 const activeType = ref<PostType | null>(null);
 const posts = ref<PostSummary[]>([]);
@@ -89,13 +91,24 @@ watch(activeType, () => {
 				<p class="post-feed__filter-copy">
 					{{ activeFilterDescription }}
 				</p>
+				<button
+					class="post-feed__filter post-feed__filter--all"
+					:class="{
+						'post-feed__filter--active':
+							activeType === allFilter.value
+					}"
+					type="button"
+					@click="activeType = allFilter.value"
+				>
+					{{ allFilter.label }}
+				</button>
 				<div
 					class="post-feed__filters"
 					role="tablist"
 					aria-label="Filter studio posts"
 				>
 					<button
-						v-for="filter in filters"
+						v-for="filter in laneFilters"
 						:key="filter.label"
 						class="post-feed__filter"
 						:class="{
@@ -201,27 +214,36 @@ watch(activeType, () => {
 }
 
 .post-feed__filters {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 0.6rem;
 }
 
 .post-feed__filter,
 .post-feed__view-all {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	border-radius: 999px;
 	padding: 0.72rem 1rem;
+	min-height: 3.35rem;
 	font-weight: 700;
 	text-decoration: none;
 	border: 1px solid rgba(255, 255, 255, 0.12);
 	background: rgba(255, 255, 255, 0.06);
 	color: #f3f7ff;
 	cursor: pointer;
+	text-align: center;
 }
 
 .post-feed__filter--active {
 	background: linear-gradient(120deg, #ff9459, #ffd27d);
 	color: #08111f;
 	border-color: transparent;
+}
+
+.post-feed__filter--all {
+	width: 100%;
 }
 
 .post-feed__view-all {
