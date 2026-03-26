@@ -37,20 +37,6 @@ export const useMainStore = defineStore("main", {
 						"Bitgam is an ancient Gambit archive world populated by red-skinned residents with yellow-white eyes and exoskeletons, with history stretching back to the Great Manifested.",
 					title: "Bitgam"
 				}
-			],
-			studioNotes: [
-				{
-					body: "Finished comics, raw storyboard pages, and photo dispatches now share one publishing lane so the site feels alive between major issue drops.",
-					title: "A living archive"
-				},
-				{
-					body: "Each post can carry notes, process context, and attached media now, which means the site can keep growing without redesigning the content model again.",
-					title: "Built for expansion"
-				},
-				{
-					body: "Comments stay member-only and moderated, giving the owner a place to encourage discussion without opening the door to unmanaged noise.",
-					title: "Community with guardrails"
-				}
 			]
 		},
 		characters: {

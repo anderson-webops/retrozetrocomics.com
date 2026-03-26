@@ -40,20 +40,6 @@ const store = useMainStore();
 		</section>
 
 		<section class="home-panels">
-			<div class="home-panel">
-				<p class="home-panel__eyebrow">Studio Notes</p>
-				<h2>What the rebuilt site is ready for now</h2>
-				<ul>
-					<li
-						v-for="note in store.home.studioNotes"
-						:key="note.title"
-					>
-						<strong>{{ note.title }}</strong>
-						<span>{{ note.body }}</span>
-					</li>
-				</ul>
-			</div>
-
 			<div class="home-panel home-panel--accent">
 				<p class="home-panel__eyebrow">Go Deeper</p>
 				<h2>Follow the world beyond the archive</h2>
@@ -186,8 +172,6 @@ const store = useMainStore();
 
 .home-panels {
 	display: grid;
-	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .home-panel {
@@ -198,6 +182,8 @@ const store = useMainStore();
 }
 
 .home-panel--accent {
+	width: min(100%, 46rem);
+	margin-inline: auto;
 	background: rgba(255, 255, 255, 0.06);
 	border-color: rgba(124, 225, 246, 0.18);
 }
@@ -208,31 +194,6 @@ const store = useMainStore();
 
 .home-panel h2 {
 	color: #fff4e7;
-}
-
-.home-panel ul {
-	display: grid;
-	gap: 0.9rem;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.home-panel li {
-	display: grid;
-	gap: 0.3rem;
-	padding: 1rem;
-	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.04);
-}
-
-.home-panel strong {
-	color: #fff4e7;
-}
-
-.home-panel span {
-	color: rgba(239, 244, 255, 0.76);
-	line-height: 1.7;
 }
 
 .home-panel__summary {
