@@ -51,20 +51,6 @@ export const useMainStore = defineStore("main", {
 					body: "Comments stay member-only and moderated, giving the owner a place to encourage discussion without opening the door to unmanaged noise.",
 					title: "Community with guardrails"
 				}
-			],
-			studioSignals: [
-				{
-					body: "Comics, storyboard studies, and photo logs now publish from one admin console.",
-					title: "One publishing surface"
-				},
-				{
-					body: "Outlines and creator notes can stay private until they are ready to move into the public canon.",
-					title: "Private drafting space"
-				},
-				{
-					body: "Canon files, character boards, and current drops now connect more cleanly so the site reads like one world.",
-					title: "Connected story paths"
-				}
 			]
 		},
 		characters: {

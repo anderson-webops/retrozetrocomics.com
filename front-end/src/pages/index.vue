@@ -55,17 +55,12 @@ const store = useMainStore();
 			</div>
 
 			<div class="home-panel home-panel--accent">
-				<p class="home-panel__eyebrow">Broadcast Signals</p>
-				<h2>Designed to keep growing</h2>
-				<ul>
-					<li
-						v-for="signal in store.home.studioSignals"
-						:key="signal.title"
-					>
-						<strong>{{ signal.title }}</strong>
-						<span>{{ signal.body }}</span>
-					</li>
-				</ul>
+				<p class="home-panel__eyebrow">Go Deeper</p>
+				<h2>Follow the world beyond the archive</h2>
+				<p class="home-panel__summary">
+					Read the broader studio story or jump straight to the
+					creator contact page when you want the bigger picture.
+				</p>
 				<div class="home-panel__actions">
 					<RouterLink to="/about">Read the studio story</RouterLink>
 					<RouterLink to="/contact">Contact the creator</RouterLink>
@@ -238,6 +233,13 @@ const store = useMainStore();
 .home-panel span {
 	color: rgba(239, 244, 255, 0.76);
 	line-height: 1.7;
+}
+
+.home-panel__summary {
+	margin: 0;
+	color: rgba(239, 244, 255, 0.76);
+	line-height: 1.75;
+	max-width: 34rem;
 }
 
 .home-panel__actions {
