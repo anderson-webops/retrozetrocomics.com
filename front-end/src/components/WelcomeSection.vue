@@ -181,12 +181,15 @@ function handleAction(action: HeroAction) {
 	align-items: center;
 	justify-content: center;
 	width: fit-content;
-	max-width: 100%;
-	padding: 0.42rem 1.45rem;
+	max-width: min(100%, 42rem);
+	padding: 0.48rem 1.2rem;
 	border-radius: 999px;
-	font-size: 0.82rem;
-	letter-spacing: 0.18em;
+	font-size: clamp(0.72rem, 0.9vw, 0.82rem);
+	letter-spacing: 0.14em;
+	line-height: 1.35;
 	text-transform: uppercase;
+	text-align: center;
+	text-wrap: balance;
 	color: #091526;
 	background: #ffd27d;
 	margin: 0;
@@ -310,7 +313,7 @@ function handleAction(action: HeroAction) {
 	box-shadow: 0 20px 36px rgba(17, 0, 24, 0.4);
 }
 
-@media (min-width: 960px) {
+@media (min-width: 1120px) {
 	.welcome {
 		grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.85fr);
 	}
