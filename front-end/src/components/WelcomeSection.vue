@@ -172,6 +172,7 @@ function handleAction(action: HeroAction) {
 .welcome__content {
 	display: flex;
 	flex-direction: column;
+	align-items: flex-start;
 	gap: 1.5rem;
 }
 
@@ -180,7 +181,8 @@ function handleAction(action: HeroAction) {
 	align-items: center;
 	justify-content: center;
 	width: fit-content;
-	padding: 0.42rem 0.8rem;
+	max-width: 100%;
+	padding: 0.42rem 1.45rem;
 	border-radius: 999px;
 	font-size: 0.82rem;
 	letter-spacing: 0.18em;
@@ -306,6 +308,16 @@ function handleAction(action: HeroAction) {
 	height: auto;
 	border-radius: 14px;
 	box-shadow: 0 20px 36px rgba(17, 0, 24, 0.4);
+}
+
+@media (min-width: 960px) {
+	.welcome {
+		grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.85fr);
+	}
+
+	.welcome__eyebrow {
+		white-space: nowrap;
+	}
 }
 
 @media (max-width: 640px) {
