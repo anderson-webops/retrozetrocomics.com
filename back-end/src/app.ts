@@ -18,6 +18,8 @@ export function createApp() {
 	const app = express();
 	const apiRouter = express.Router();
 	const SESSION_SECRET = env.SESSION_SECRET;
+	const internalDiagnosticsKey = env.INTERNAL_DIAGNOSTICS_KEY;
+	const loopbackAddresses = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
 
 	if (!SESSION_SECRET) {
 		throw new Error("Missing SESSION_SECRET");
@@ -51,24 +53,67 @@ export function createApp() {
 	ensureUploadDirectories();
 
 	app.get("/healthz", (_req, res) => {
+		res.set("Cache-Control", "no-store");
 		res.json({ ok: true });
 	});
 
-	app.get("/readyz", (_req, res) => {
-		const state = mongoose.connection.readyState;
-		if (state === 1) {
-			return res.json({ ready: true });
+	app.get("/readyz", async (_req, res) => {
+		const connection = mongoose.connection;
+		const state = connection.readyState;
+		if (state !== 1 || !connection.db) {
+			return res.status(503).set("Cache-Control", "no-store").json({
+				ready: false,
+				components: {
+					db: { ok: false, state }
+				}
+			});
 		}
 
-		return res.status(503).json({ ready: false, state });
+		try {
+			await connection.db.admin().ping();
+			return res.set("Cache-Control", "no-store").json({
+				ready: true,
+				components: {
+					db: { ok: true, state }
+				}
+			});
+		}
+		catch (error) {
+			return res.status(503).set("Cache-Control", "no-store").json({
+				ready: false,
+				components: {
+					db: {
+						ok: false,
+						state,
+						error: error instanceof Error ? error.message : "db-ping-failed"
+					}
+				}
+			});
+		}
 	});
 
-	app.get("/_dbinfo", (_req, res) => {
+	app.get("/_dbinfo", (req, res) => {
 		const connection = mongoose.connection;
-		res.json({
-			databaseName: connection.db?.databaseName,
-			host: connection.host,
-			name: connection.name
+		const forwardedFor = req.headers["x-forwarded-for"];
+		const forwardedIp = typeof forwardedFor === "string"
+			? forwardedFor.split(",")[0]?.trim()
+			: Array.isArray(forwardedFor)
+				? forwardedFor[0]?.trim()
+				: undefined;
+		const clientIp = forwardedIp || req.ip || req.socket.remoteAddress || "";
+		const isInternalRequest = env.NODE_ENV !== "production"
+			|| (internalDiagnosticsKey && req.get("x-internal-diagnostics-key") === internalDiagnosticsKey)
+			|| loopbackAddresses.has(clientIp);
+
+		if (!isInternalRequest) {
+			return res.status(403).set("Cache-Control", "no-store").json({ ok: false, error: "forbidden" });
+		}
+
+		res.set("Cache-Control", "no-store").json({
+			databaseName: connection.db?.databaseName ?? null,
+			host: connection.host || null,
+			name: connection.name || null,
+			readyState: connection.readyState
 		});
 	});
 
