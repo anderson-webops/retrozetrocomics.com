@@ -15,6 +15,7 @@ const TYPE_LABELS: Record<PostSummary["type"], string> = {
 const leadImage = computed(
 	() => props.post.media.find(asset => asset.kind === "image")?.url || ""
 );
+const visibleTags = computed(() => props.post.tags.slice(0, 2));
 
 const publishedLabel = computed(() => {
 	if (!props.post.publishedAt) {
@@ -48,26 +49,17 @@ const publishedLabel = computed(() => {
 		</div>
 
 		<div class="post-card__body">
-			<div class="post-card__meta">
-				<p>
-					{{ post.commentCount }} comment{{
-						post.commentCount === 1 ? "" : "s"
-					}}
-				</p>
-				<p>{{ post.allowComments ? "Community open" : "Read-only" }}</p>
-			</div>
-
 			<h3>{{ post.title }}</h3>
 			<p>{{ post.summary }}</p>
 
-			<ul v-if="post.tags.length" class="post-card__tags">
-				<li v-for="tag in post.tags" :key="tag">#{{ tag }}</li>
+			<ul v-if="visibleTags.length" class="post-card__tags">
+				<li v-for="tag in visibleTags" :key="tag">#{{ tag }}</li>
 			</ul>
 		</div>
 
 		<footer class="post-card__footer">
 			<RouterLink class="post-card__cta" :to="`/posts/${post.slug}`">
-				Open Post
+				Read entry
 			</RouterLink>
 		</footer>
 	</article>
@@ -152,20 +144,9 @@ const publishedLabel = computed(() => {
 .post-card__body {
 	display: grid;
 	gap: 0.9rem;
-	padding: 1.35rem 1.4rem 0.2rem;
+	padding: 1.35rem 1.4rem 0.4rem;
 }
 
-.post-card__meta {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.75rem;
-	font-size: 0.82rem;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: #5c6d86;
-}
-
-.post-card__meta p,
 .post-card__body h3,
 .post-card__body p {
 	margin: 0;
@@ -180,6 +161,10 @@ const publishedLabel = computed(() => {
 .post-card__body p {
 	line-height: 1.7;
 	color: #40506a;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 
 .post-card__tags {

@@ -128,12 +128,6 @@ async function submitComment() {
 							}}
 						</p>
 					</div>
-					<span
-						class="comment-panel__status"
-						:class="`comment-panel__status--${comment.status}`"
-					>
-						{{ comment.status }}
-					</span>
 				</div>
 				<p class="comment-panel__body">
 					{{ comment.body }}
@@ -267,31 +261,5 @@ async function submitComment() {
 	white-space: pre-line;
 	line-height: 1.7;
 	color: #31405a;
-}
-
-.comment-panel__status {
-	display: inline-flex;
-	align-items: center;
-	padding: 0.32rem 0.7rem;
-	border-radius: 999px;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	font-size: 0.74rem;
-}
-
-.comment-panel__status--approved {
-	background: rgba(130, 229, 173, 0.18);
-	color: #1f7b4a;
-}
-
-.comment-panel__status--pending {
-	background: rgba(255, 179, 111, 0.2);
-	color: #9d5d1e;
-}
-
-.comment-panel__status--rejected,
-.comment-panel__status--hidden {
-	background: rgba(255, 143, 143, 0.18);
-	color: #a14040;
 }
 </style>

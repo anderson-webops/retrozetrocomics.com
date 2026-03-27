@@ -17,42 +17,42 @@ const panels = {
 	archive: {
 		ctaLabel: "See full journal",
 		ctaTo: "/studio",
-		eyebrow: "Archive Guide",
+		eyebrow: "New Here?",
 		items: [
 			{
-				label: "Comics",
-				value: "Final pages"
+				label: "Start in Studio",
+				value: "See every recent drop"
 			},
 			{
-				label: "Storyboards",
-				value: "Rough shots"
+				label: "Filter by lane",
+				value: "Comics, boards, notes, photos"
 			},
 			{
-				label: "Outlines",
-				value: "Plot notes"
+				label: "Open a post",
+				value: "Read the full entry"
 			},
 			{
-				label: "Photos",
-				value: "Studio texture"
+				label: "Keep exploring",
+				value: "Move from archive to world files"
 			}
 		]
 	},
 	community: {
 		ctaLabel: "Admin console",
 		ctaTo: "/studio/admin",
-		eyebrow: "Community Rules",
+		eyebrow: "Community",
 		items: [
 			{
-				label: "Comment Access",
-				value: "Members only, with one clear identity per account"
+				label: "Open threads",
+				value: "Only some posts invite replies"
 			},
 			{
-				label: "Moderation Flow",
-				value: "Admins can approve, reject, hide, or suspend as needed"
+				label: "Member accounts",
+				value: "Sign in before joining the thread"
 			},
 			{
-				label: "Signup Gate",
-				value: "Captcha stays in front of new account creation"
+				label: "Moderated",
+				value: "Discussion stays focused on the work"
 			}
 		]
 	}
@@ -63,7 +63,7 @@ const panel = computed(() => {
 		return {
 			ctaLabel: "Jump to latest drops",
 			ctaTo: "/studio",
-			eyebrow: "Journal Tips",
+			eyebrow: "Use the Journal",
 			items: [
 				{
 					label: "Start Wide",
@@ -113,7 +113,7 @@ const showPanelCta = computed(() => {
 </script>
 
 <template>
-	<aside aria-label="Studio quick facts" class="side-ad">
+	<aside aria-label="Page guide" class="side-ad">
 		<p class="side-ad__eyebrow">{{ panel.eyebrow }}</p>
 		<div class="side-ad__frame">
 			<div

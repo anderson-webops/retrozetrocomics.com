@@ -2,8 +2,8 @@
 	<PostFeed
 		:limit="6"
 		:show-view-all="true"
-		subtitle="Fresh comics, storyboard notes, outlines, and photo updates now come from the live publishing feed instead of a static showcase."
-		title="Latest Studio Drops"
+		subtitle="Start with the newest comic, board, note, or photo from the studio."
+		title="Latest Drops"
 	/>
 </template>
 

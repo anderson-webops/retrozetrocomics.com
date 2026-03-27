@@ -30,25 +30,39 @@ const allFilter = filters[0];
 const laneFilters = filters.slice(1);
 
 const activeType = ref<PostType | null>(null);
+const searchQuery = ref("");
+const sortOrder = ref<"newest" | "oldest">("newest");
 const posts = ref<PostSummary[]>([]);
 const loading = ref(false);
 const error = ref("");
 
-const filterDescriptions: Record<"all" | PostType, string> = {
-	all: "The live archive mixes finished comic pages, rough boards, working outlines, and photo dispatches in one stream.",
-	comic: "Finished comic drops, chapter releases, and polished narrative pages.",
-	outline:
-		"Open story files, plot maps, and owner notes that can stay private until they are ready for readers.",
-	photo: "Reference textures, studio snapshots, and atmosphere captured off the page.",
-	storyboard:
-		"Shot plans, pacing experiments, and early visual problem-solving."
-};
+const filteredPosts = computed(() => {
+	const query = searchQuery.value.trim().toLowerCase();
+	const sorted = [...posts.value].sort((left, right) => {
+		const leftDate = new Date(
+			left.publishedAt || left.updatedAt || left.createdAt
+		).getTime();
+		const rightDate = new Date(
+			right.publishedAt || right.updatedAt || right.createdAt
+		).getTime();
 
-const activeFilterDescription = computed(() =>
-	activeType.value
-		? filterDescriptions[activeType.value]
-		: filterDescriptions.all
-);
+		return sortOrder.value === "oldest"
+			? leftDate - rightDate
+			: rightDate - leftDate;
+	});
+
+	if (!query) {
+		return sorted;
+	}
+
+	return sorted.filter(post => {
+		const haystack = [post.title, post.summary, post.type, ...post.tags]
+			.join(" ")
+			.toLowerCase();
+
+		return haystack.includes(query);
+	});
+});
 
 async function loadPosts() {
 	loading.value = true;
@@ -88,9 +102,21 @@ watch(activeType, () => {
 			</div>
 
 			<div class="post-feed__controls">
-				<p class="post-feed__filter-copy">
-					{{ activeFilterDescription }}
-				</p>
+				<label class="post-feed__control">
+					<span>Find a drop</span>
+					<input
+						v-model="searchQuery"
+						placeholder="Search titles or tags"
+						type="search"
+					/>
+				</label>
+				<label class="post-feed__control">
+					<span>Order</span>
+					<select v-model="sortOrder">
+						<option value="newest">Newest first</option>
+						<option value="oldest">Oldest first</option>
+					</select>
+				</label>
 				<button
 					class="post-feed__filter post-feed__filter--all"
 					:class="{
@@ -138,13 +164,23 @@ watch(activeType, () => {
 		<p v-else-if="loading" class="post-feed__state">
 			Refreshing the journal feed...
 		</p>
+		<p
+			v-else-if="!filteredPosts.length && posts.length"
+			class="post-feed__state"
+		>
+			No drops match that search yet.
+		</p>
 		<p v-else-if="!posts.length" class="post-feed__state">
 			The archive is empty for now. Once the first drop is published, it
 			will land here.
 		</p>
 
 		<div v-else class="post-feed__grid">
-			<PostCard v-for="post in posts" :key="post.id" :post="post" />
+			<PostCard
+				v-for="post in filteredPosts"
+				:key="post.id"
+				:post="post"
+			/>
 		</div>
 	</section>
 </template>
@@ -201,16 +237,36 @@ watch(activeType, () => {
 
 .post-feed__controls {
 	display: grid;
-	gap: 1rem;
+	gap: 0.85rem;
 	padding: 1.1rem;
 	border-radius: 22px;
 	background: rgba(9, 21, 38, 0.92);
 	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
-.post-feed__filter-copy {
-	max-width: none;
-	color: rgba(239, 244, 255, 0.78) !important;
+.post-feed__control {
+	display: grid;
+	gap: 0.4rem;
+}
+
+.post-feed__control span {
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.14em;
+	font-size: 0.72rem;
+	font-weight: 700;
+	color: rgba(239, 244, 255, 0.62);
+}
+
+.post-feed__control input,
+.post-feed__control select {
+	width: 100%;
+	border-radius: 16px;
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	background: rgba(255, 255, 255, 0.06);
+	color: #f3f7ff;
+	padding: 0.78rem 0.95rem;
+	font: inherit;
 }
 
 .post-feed__filters {

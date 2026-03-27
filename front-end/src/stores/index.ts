@@ -42,7 +42,7 @@ export const useMainStore = defineStore("main", {
 		characters: {
 			description:
 				"Track the heroes, rivals, and pressure points shaping the Retroverse as the Apex Army, the Star Hunters, and the Zego Order collide.",
-			title: "Signal Crew and Threat Board",
+			title: "Character and Threat Board",
 			character: [
 				{
 					description:
@@ -102,7 +102,7 @@ export const useMainStore = defineStore("main", {
 		},
 		about: {
 			description:
-				"RetroZetro Comics is a creator-driven universe built to hold the finished pages, the half-built ideas, and the canon files around Exo, the Star Hunters, the Apex Army, and the Zego Order in one place.",
+				"RetroZetro Comics is a creator-run archive for finished pages, rough boards, world files, and studio process from the same universe.",
 			title: "Inside the Studio",
 			values: [
 				{

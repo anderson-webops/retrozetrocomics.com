@@ -129,6 +129,9 @@ function handleSubmit() {
 					rows="7"
 				/>
 
+				<p class="contact-form__note">
+					Replies usually go out within two days.
+				</p>
 				<button type="submit">Open email draft</button>
 
 				<p v-if="responseMessage" class="contact-form__response">
@@ -188,6 +191,7 @@ function handleSubmit() {
 .contact-panel p,
 .contact-panel a,
 .contact-form label,
+.contact-form__note,
 .contact-form__response {
 	margin: 0;
 }
@@ -278,6 +282,11 @@ function handleSubmit() {
 	color: #08111f;
 	font-weight: 800;
 	cursor: pointer;
+}
+
+.contact-form__note {
+	color: rgba(239, 244, 255, 0.68);
+	line-height: 1.6;
 }
 
 .contact-form__response {

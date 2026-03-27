@@ -10,10 +10,7 @@ const session = useSessionStore();
 		<div class="footer__brand">
 			<p class="footer__eyebrow">RetroZetro Comics</p>
 			<h2>Stay in the Retroverse</h2>
-			<p>
-				Comics, storyboard notes, and photo logs keep the archive moving
-				between issue launches.
-			</p>
+			<p>Comics, boards, notes, and studio photos from the same world.</p>
 		</div>
 
 		<nav aria-label="Footer navigation" class="footer__links">
@@ -35,9 +32,7 @@ const session = useSessionStore();
 			>
 				Create account
 			</button>
-			<p>
-				Signed-in members can join moderated discussion on open posts.
-			</p>
+			<p>Open posts can host member discussion.</p>
 		</div>
 
 		<div class="footer__contact">
