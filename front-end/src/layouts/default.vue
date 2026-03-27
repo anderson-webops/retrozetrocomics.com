@@ -338,5 +338,9 @@ onMounted(() => {
 	.content-grid__ad {
 		min-height: 140px;
 	}
+
+	.page-slot {
+		padding-inline: 0;
+	}
 }
 </style>
