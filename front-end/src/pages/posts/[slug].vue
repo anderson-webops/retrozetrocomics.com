@@ -3,7 +3,7 @@ import type { PostDetailResponse } from "@/types/site";
 
 import { fetchPost } from "@/lib/siteApi";
 
-const route = useRoute();
+const route = useRoute("/posts/[slug]");
 
 const detail = ref<PostDetailResponse | null>(null);
 const error = ref("");
