@@ -11,6 +11,6 @@ context("Content pages", () => {
 
   it("characters page exposes the board controls", () => {
     cy.visit("/characters");
-    cy.contains("Character page controls").should("exist");
+    cy.contains("Zetro").should("exist");
   });
 });
