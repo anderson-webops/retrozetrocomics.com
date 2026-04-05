@@ -2,6 +2,20 @@
 
 Express and MongoDB API for `retrozetrocomics.com`.
 
+## Standalone Backend Workflow
+
+The backend is intentionally runnable from inside `back-end/` for deploy and operations paths:
+
+```bash
+cd back-end
+npm ci --ignore-scripts
+npm run lint
+npm run build
+npm run test
+```
+
+`npm run ci:check` performs a dry-run `npm ci` lockfile validation so root-level checks can catch backend lock drift before deploy.
+
 ## Upload Storage
 
 - Uploaded files are written to `back-end/uploads/content/YYYY-MM`.

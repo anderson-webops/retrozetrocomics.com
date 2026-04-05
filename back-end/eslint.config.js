@@ -1,32 +1,28 @@
-// back-end/eslint.config.js
-import importFull from "eslint-plugin-import";
 import globals from "globals";
-import ts from "typescript-eslint";
-import base from "../eslint.config.js";
+import tseslint from "typescript-eslint";
 
-export default base.append(
+export default tseslint.config(
+	{ ignores: ["dist/**"] },
+	...tseslint.configs.recommended,
 	{
 		files: ["**/*.ts"],
-		plugins: { "import-ext": importFull },
 		languageOptions: {
-			parser: ts.parser,
-			parserOptions: { project: "./tsconfig.json", sourceType: "module" },
-			globals: { ...globals.node }
+			globals: { ...globals.node },
+			parserOptions: {
+				sourceType: "module"
+			}
 		},
 		rules: {
-			// full-fat rule lives on the new prefix
-			// "import-ext/extensions": ["error", "always", { js: "always", ts: "always" }],
-			// can still tap into lite rules via the old name
-			// "import-ext/no-unresolved": ["error", { ignore: ["\\.vue$"] }],
+			"@typescript-eslint/no-explicit-any": "off",
+			"@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+			"no-console": "off",
 			"new-cap": "off"
-		},
-		settings: {
-			"import/resolver": {
-				typescript: { project: "./tsconfig.json" },
-				node: { extensions: [".js", ".ts"] }
-			}
 		}
 	},
-	{ files: ["**/*.{js,cjs,mjs}"], languageOptions: { globals: { ...globals.node } } },
-	{ ignores: ["dist/**"] }
+	{
+		files: ["**/*.{js,cjs,mjs}"],
+		languageOptions: {
+			globals: { ...globals.node }
+		}
+	}
 );
