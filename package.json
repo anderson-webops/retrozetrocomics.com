@@ -40,6 +40,7 @@
 		"typescript": "^5.9.3"
 	},
 	"overrides": {
+		"defu": "6.1.6",
 		"picomatch": "4.0.4",
 		"anymatch": {
 			"picomatch": "2.3.2"
