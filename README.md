@@ -24,3 +24,4 @@ npm run up
 - The root `package-lock.json` is the authoritative lockfile for the repo. Keep it updated whenever dependencies change.
 - Use `npm run server` and `npm run serve` when you want the API and front-end started separately.
 - Use [`HEALTHCHECKS.md`](./HEALTHCHECKS.md) for deployment monitor targets instead of `/`.
+- The backend runtime user must have write access to `back-end/uploads` and `back-end/uploads/content`. Uploads are written under `back-end/uploads/content/YYYY-MM`, so deploys should provision those directories before the API starts.

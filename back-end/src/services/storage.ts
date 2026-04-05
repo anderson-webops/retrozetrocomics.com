@@ -4,6 +4,10 @@ import path from "node:path";
 import { env } from "node:process";
 import { fileURLToPath } from "node:url";
 import multer from "multer";
+import {
+	StorageUnavailableError,
+	UploadValidationError
+} from "../errors/appError.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const backendRoot = path.resolve(__dirname, "../..");
@@ -48,6 +52,24 @@ interface StorageStatus {
 	s3Region: string | null;
 	switchReady: boolean;
 	switchSummary: string;
+}
+
+function toStorageUnavailableError(
+	error: unknown,
+	targetDirectory: string
+) {
+	if (error instanceof StorageUnavailableError) {
+		return error;
+	}
+
+	const systemError = error as NodeJS.ErrnoException;
+	const code = systemError?.code || "STORAGE_UNAVAILABLE";
+	const detail = error instanceof Error ? error.message : String(error);
+
+	return new StorageUnavailableError(
+		`Upload storage unavailable at ${targetDirectory}: ${detail}`,
+		code
+	);
 }
 
 function createRelativeStorageKey(absolutePath: string) {
@@ -137,7 +159,15 @@ function resolveStorageKeyForFile(file: UploadedFile) {
 }
 
 export function ensureUploadDirectories() {
-	mkdirSync(uploadRoot, { recursive: true });
+	const keyRoot = path.join(uploadRoot, getStorageKeyPrefix());
+
+	try {
+		mkdirSync(uploadRoot, { recursive: true });
+		mkdirSync(keyRoot, { recursive: true });
+	}
+	catch (error) {
+		throw toStorageUnavailableError(error, keyRoot);
+	}
 }
 
 export function resolveMediaUrl(asset: Pick<MediaAssetLike, "provider" | "storageKey" | "url">) {
@@ -207,8 +237,14 @@ const storage = multer.diskStorage({
 	) => {
 		const storageKey = ensureGeneratedStorageKey(_file);
 		const folder = path.join(uploadRoot, path.dirname(storageKey));
-		mkdirSync(folder, { recursive: true });
-		callback(null, folder);
+
+		try {
+			mkdirSync(folder, { recursive: true });
+			callback(null, folder);
+		}
+		catch (error) {
+			callback(toStorageUnavailableError(error, folder), "");
+		}
 	},
 	filename: (
 		_req: unknown,
@@ -228,7 +264,7 @@ function fileFilter(
 		return callback(null, true);
 	}
 
-	return callback(new Error("Only images and PDF uploads are supported"));
+	return callback(new UploadValidationError("Only images and PDF uploads are supported"));
 }
 
 export const postUpload = multer({
