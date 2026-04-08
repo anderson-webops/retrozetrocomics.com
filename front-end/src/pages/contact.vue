@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { siteAssetCandidates } from "@/lib/siteAssets";
+import { siteAssetCandidates, toAbsoluteSiteUrl } from "@/lib/siteAssets";
 import { useMainStore } from "~/stores";
 
 const store = useMainStore();
@@ -13,6 +13,45 @@ const form = ref({
 });
 
 const responseMessage = ref("");
+
+useHead({
+	title: "Contact the Studio | RetroZetro Comics",
+	link: [
+		{
+			rel: "canonical",
+			href: toAbsoluteSiteUrl("/contact")
+		}
+	],
+	meta: [
+		{
+			name: "description",
+			content:
+				"Contact RetroZetro Comics for collaboration, commissions, interviews, and studio inquiries."
+		},
+		{
+			property: "og:title",
+			content: "Contact the Studio | RetroZetro Comics"
+		},
+		{
+			property: "og:description",
+			content:
+				"Contact RetroZetro Comics for collaboration, commissions, interviews, and studio inquiries."
+		},
+		{
+			property: "og:url",
+			content: toAbsoluteSiteUrl("/contact")
+		},
+		{
+			name: "twitter:title",
+			content: "Contact the Studio | RetroZetro Comics"
+		},
+		{
+			name: "twitter:description",
+			content:
+				"Contact RetroZetro Comics for collaboration, commissions, interviews, and studio inquiries."
+		}
+	]
+});
 
 function handleSubmit() {
 	const subject = encodeURIComponent(

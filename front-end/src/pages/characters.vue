@@ -5,6 +5,7 @@ import type {
 } from "@/types/site";
 import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import { useCharactersPageContentEditor } from "@/composables/useCharactersPageContentEditor";
+import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
 import Characters from "~/components/TheCharacters.vue";
 import WorldEntryCards from "~/components/WorldEntryCards.vue";
 
@@ -32,6 +33,45 @@ const characterHighlights = computed(() =>
 		term: character.name
 	}))
 );
+
+useHead({
+	title: "Characters and Threat Board | RetroZetro Comics",
+	link: [
+		{
+			rel: "canonical",
+			href: toAbsoluteSiteUrl("/characters")
+		}
+	],
+	meta: [
+		{
+			name: "description",
+			content:
+				"Meet the key heroes, rivals, and world files shaping the Retroverse."
+		},
+		{
+			property: "og:title",
+			content: "Characters and Threat Board | RetroZetro Comics"
+		},
+		{
+			property: "og:description",
+			content:
+				"Meet the key heroes, rivals, and world files shaping the Retroverse."
+		},
+		{
+			property: "og:url",
+			content: toAbsoluteSiteUrl("/characters")
+		},
+		{
+			name: "twitter:title",
+			content: "Characters and Threat Board | RetroZetro Comics"
+		},
+		{
+			name: "twitter:description",
+			content:
+				"Meet the key heroes, rivals, and world files shaping the Retroverse."
+		}
+	]
+});
 
 onMounted(() => {
 	void load();

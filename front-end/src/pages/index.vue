@@ -1,8 +1,48 @@
 <script lang="ts" setup>
+import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
 import Comics from "~/components/TheComics.vue";
 import { useMainStore } from "~/stores";
 
 const store = useMainStore();
+
+useHead({
+	title: "RetroZetro Comics | Comics, Storyboards, and Studio Drops",
+	link: [
+		{
+			rel: "canonical",
+			href: toAbsoluteSiteUrl("/")
+		}
+	],
+	meta: [
+		{
+			name: "description",
+			content:
+				"Read RetroZetro Comics, browse storyboard experiments, explore canon files, and follow new studio drops from the Retroverse."
+		},
+		{
+			property: "og:title",
+			content: "RetroZetro Comics | Comics, Storyboards, and Studio Drops"
+		},
+		{
+			property: "og:description",
+			content:
+				"Read RetroZetro Comics, browse storyboard experiments, explore canon files, and follow new studio drops from the Retroverse."
+		},
+		{
+			property: "og:url",
+			content: toAbsoluteSiteUrl("/")
+		},
+		{
+			name: "twitter:title",
+			content: "RetroZetro Comics | Comics, Storyboards, and Studio Drops"
+		},
+		{
+			name: "twitter:description",
+			content:
+				"Read RetroZetro Comics, browse storyboard experiments, explore canon files, and follow new studio drops from the Retroverse."
+		}
+	]
+});
 </script>
 
 <template>

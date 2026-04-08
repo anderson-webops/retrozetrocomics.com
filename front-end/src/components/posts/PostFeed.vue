@@ -33,6 +33,7 @@ const activeType = ref<PostType | null>(null);
 const posts = ref<PostSummary[]>([]);
 const loading = ref(false);
 const error = ref("");
+const hasResolved = ref(false);
 
 const filterDescriptions: Record<"all" | PostType, string> = {
 	all: "The live archive mixes finished comic pages, rough boards, working outlines, and photo dispatches in one stream.",
@@ -49,6 +50,25 @@ const activeFilterDescription = computed(() =>
 		? filterDescriptions[activeType.value]
 		: filterDescriptions.all
 );
+const emptyStateMessage = computed(() => {
+	if (activeType.value === "comic") {
+		return "No public comics are live yet.";
+	}
+
+	if (activeType.value === "storyboard") {
+		return "No public storyboards are live yet.";
+	}
+
+	if (activeType.value === "outline") {
+		return "No public outlines are live yet.";
+	}
+
+	if (activeType.value === "photo") {
+		return "No public photo drops are live yet.";
+	}
+
+	return "No public studio drops are live yet.";
+});
 
 async function loadPosts() {
 	loading.value = true;
@@ -66,11 +86,18 @@ async function loadPosts() {
 			"Unable to load posts right now.";
 	} finally {
 		loading.value = false;
+		hasResolved.value = true;
 	}
 }
 
+onServerPrefetch(async () => {
+	await loadPosts();
+});
+
 onMounted(() => {
-	void loadPosts();
+	if (!hasResolved.value) {
+		void loadPosts();
+	}
 });
 
 watch(activeType, () => {
@@ -138,9 +165,8 @@ watch(activeType, () => {
 		<p v-else-if="loading" class="post-feed__state">
 			Refreshing the journal feed...
 		</p>
-		<p v-else-if="!posts.length" class="post-feed__state">
-			The archive is empty for now. Once the first drop is published, it
-			will land here.
+		<p v-else-if="hasResolved && !posts.length" class="post-feed__state">
+			{{ emptyStateMessage }}
 		</p>
 
 		<div v-else class="post-feed__grid">

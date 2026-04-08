@@ -4,7 +4,7 @@ import { useAboutPageContent } from "@/composables/useAboutPageContent";
 import { useAboutPageContentEditor } from "@/composables/useAboutPageContentEditor";
 import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import { useCharactersPageContentEditor } from "@/composables/useCharactersPageContentEditor";
-import { siteAssetCandidates } from "@/lib/siteAssets";
+import { siteAssetCandidates, toAbsoluteSiteUrl } from "@/lib/siteAssets";
 import { useSessionStore } from "@/stores/session";
 import StoryArcCards from "~/components/StoryArcCards.vue";
 import WorldEntryCards from "~/components/WorldEntryCards.vue";
@@ -44,9 +44,47 @@ const highlights = computed(() =>
 	}))
 );
 
+useHead({
+	title: "About the Project | RetroZetro Comics",
+	link: [
+		{
+			rel: "canonical",
+			href: toAbsoluteSiteUrl("/about")
+		}
+	],
+	meta: [
+		{
+			name: "description",
+			content:
+				"Learn the studio ethos, active story arcs, and world ledger behind RetroZetro Comics."
+		},
+		{
+			property: "og:title",
+			content: "About the Project | RetroZetro Comics"
+		},
+		{
+			property: "og:description",
+			content:
+				"Learn the studio ethos, active story arcs, and world ledger behind RetroZetro Comics."
+		},
+		{
+			property: "og:url",
+			content: toAbsoluteSiteUrl("/about")
+		},
+		{
+			name: "twitter:title",
+			content: "About the Project | RetroZetro Comics"
+		},
+		{
+			name: "twitter:description",
+			content:
+				"Learn the studio ethos, active story arcs, and world ledger behind RetroZetro Comics."
+		}
+	]
+});
+
 onMounted(() => {
-	void loadAboutPageContent();
-	void loadCharactersPageContent();
+	void Promise.all([loadAboutPageContent(), loadCharactersPageContent()]);
 });
 
 onBeforeUnmount(() => {
