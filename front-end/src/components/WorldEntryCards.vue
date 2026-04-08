@@ -251,7 +251,7 @@ watch(
 .world-entry-grid {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
 }
 
 .world-entry-grid--editing {

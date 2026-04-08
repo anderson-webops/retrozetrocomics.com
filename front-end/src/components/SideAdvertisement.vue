@@ -224,6 +224,17 @@ const showPanelCta = computed(() => {
 @media (max-width: 1024px) {
 	.side-ad {
 		align-items: stretch;
+		padding: 0.95rem 1rem 1rem;
+	}
+
+	.side-ad__link {
+		width: 100%;
+	}
+}
+
+@media (max-width: 640px) {
+	.side-ad__slot {
+		padding: 0.8rem;
 	}
 }
 </style>

@@ -293,7 +293,7 @@ watch(activeType, () => {
 .post-feed__grid {
 	display: grid;
 	gap: 1.35rem;
-	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
 }
 
 @media (max-width: 860px) {
@@ -303,8 +303,12 @@ watch(activeType, () => {
 }
 
 @media (max-width: 680px) {
-	.post-feed__intel {
-		grid-template-columns: 1fr;
+	.post-feed {
+		padding: 1.2rem;
+	}
+
+	.post-feed__controls {
+		padding: 0.9rem;
 	}
 }
 </style>

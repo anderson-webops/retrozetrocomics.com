@@ -198,7 +198,7 @@ function handleSubmit() {
 .contact-page__grid {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 }
 
 .contact-panel,

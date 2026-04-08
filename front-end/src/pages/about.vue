@@ -265,7 +265,7 @@ function handleWorldEntryDiscard(entryId: string) {
 .about-page__world-grid {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 }
 
 .about-page__story-card,

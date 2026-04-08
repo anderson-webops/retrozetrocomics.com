@@ -158,7 +158,7 @@ useHead({
 .home-showcase__grid {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
 }
 
 .home-showcase__card {

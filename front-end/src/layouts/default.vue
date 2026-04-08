@@ -166,6 +166,8 @@ onMounted(() => {
 	display: flex;
 	flex-direction: column;
 	gap: clamp(2rem, 4vw, 3rem);
+	width: min(100%, 122rem);
+	margin-inline: auto;
 	padding: clamp(1.5rem, 4vw, 3rem);
 	background: transparent;
 	color: #f7eaff;
@@ -211,18 +213,22 @@ onMounted(() => {
 
 .title-grid {
 	display: grid;
+	grid-template-areas: "release center community";
 	grid-template-columns: minmax(220px, 280px) 1fr minmax(220px, 280px);
 	gap: 1rem;
 	align-items: stretch;
 }
 
 .title-grid__center {
+	grid-area: center;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	min-width: 0;
 }
 
 .title-grid__rail {
+	min-width: 0;
 	display: grid;
 	gap: 0.95rem;
 	align-content: start;
@@ -234,7 +240,12 @@ onMounted(() => {
 	color: #eff4ff;
 }
 
+.title-grid__rail:first-child {
+	grid-area: release;
+}
+
 .title-grid__rail--dark {
+	grid-area: community;
 	color: #eff4ff;
 }
 
@@ -297,13 +308,19 @@ onMounted(() => {
 
 .content-grid {
 	display: grid;
+	grid-template-areas: "archive center community";
 	grid-template-columns: minmax(220px, 260px) 1fr minmax(220px, 260px);
 	gap: 1rem;
 	align-items: start;
 }
 
 .content-grid__ad {
+	min-width: 0;
 	align-self: stretch;
+}
+
+.content-grid__ad:first-child {
+	grid-area: archive;
 }
 
 .site-shell__footer {
@@ -311,9 +328,11 @@ onMounted(() => {
 }
 
 .center-plate {
+	grid-area: center;
 	display: flex;
 	flex-direction: column;
 	min-width: 0;
+	width: 100%;
 	background: transparent;
 	border: none;
 	border-radius: 0;
@@ -327,20 +346,56 @@ onMounted(() => {
 	display: flex;
 	flex-direction: column;
 	gap: clamp(2rem, 3vw, 3rem);
+	min-width: 0;
+}
+
+.content-grid__ad:last-child {
+	grid-area: community;
 }
 
 @media (max-width: 1024px) {
-	.title-grid,
+	.title-grid {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"center"
+			"release"
+			"community";
+	}
+
 	.content-grid {
 		grid-template-columns: 1fr;
+		grid-template-areas:
+			"center"
+			"archive"
+			"community";
+		gap: 0.9rem;
 	}
 
 	.content-grid__ad {
-		min-height: 140px;
+		min-height: 0;
 	}
 
 	.page-slot {
 		padding-inline: 0;
+	}
+}
+
+@media (max-width: 768px) {
+	.site-shell {
+		gap: 1.25rem;
+		padding: 0.85rem;
+	}
+
+	.admin-viewer-banner {
+		padding: 0.95rem 1rem;
+	}
+
+	.title-grid__rail {
+		padding: 1.1rem;
+	}
+
+	.title-grid__cta {
+		width: min(100%, 18rem);
 	}
 }
 </style>

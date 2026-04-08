@@ -203,7 +203,7 @@ function handleAction(action: HeroAction) {
 .welcome {
 	display: grid;
 	gap: 2rem;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 	align-items: center;
 	padding: 3.5rem clamp(1rem, 4vw, 3rem);
 	background: rgba(9, 21, 38, 0.84);
@@ -219,6 +219,7 @@ function handleAction(action: HeroAction) {
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 1.5rem;
+	min-width: 0;
 }
 
 .welcome__eyebrow {
@@ -249,6 +250,7 @@ function handleAction(action: HeroAction) {
 	line-height: 0.98;
 	margin: 0;
 	color: #fff8ef;
+	text-wrap: balance;
 }
 
 .welcome__description {
@@ -271,6 +273,7 @@ function handleAction(action: HeroAction) {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	min-height: 3rem;
 	padding: 0.75rem 1.8rem;
 	border-radius: 999px;
 	font-weight: 700;
@@ -362,6 +365,7 @@ function handleAction(action: HeroAction) {
 
 .welcome__poster-frame {
 	position: relative;
+	width: min(100%, 420px);
 	padding: 0.75rem;
 	border-radius: 22px;
 	background: linear-gradient(140deg, rgba(255, 148, 89, 0.8), #ffd27d);
@@ -402,8 +406,21 @@ function handleAction(action: HeroAction) {
 		padding: 2.5rem 1.25rem;
 	}
 
+	.welcome__content {
+		align-items: stretch;
+	}
+
 	.welcome__poster {
 		align-items: center;
+	}
+
+	.welcome__actions {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.welcome__cta {
+		width: min(100%, 22rem);
 	}
 
 	.welcome__actions--poster {

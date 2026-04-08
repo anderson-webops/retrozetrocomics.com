@@ -128,4 +128,24 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 		max-width: 420px;
 	}
 }
+
+@media (max-width: 560px) {
+	.title-plate__brand {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.title-plate__logo {
+		width: 80px;
+		height: 80px;
+	}
+
+	.title-plate__logo img {
+		width: 60px;
+	}
+
+	.title-plate__text p {
+		font-size: 0.88rem;
+	}
+}
 </style>
