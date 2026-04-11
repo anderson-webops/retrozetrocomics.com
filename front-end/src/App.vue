@@ -6,6 +6,9 @@ import {
 } from "@/lib/siteAssets";
 
 const defaultHeroImageAlt = "RetroZetro lead portrait";
+const siteUrl = "https://retrozetrocomics.com";
+const siteDescription = "RetroZetro Comics publishes comics, storyboard drops, art archives, and studio dispatches for readers and collaborators.";
+const route = useRoute();
 const appleTouchIconHref = ref<string>(
 	siteAssetCandidates.favicons.appleTouch[0]
 );
@@ -20,6 +23,28 @@ const socialPreviewPath = ref<string>(siteAssetCandidates.socialPreview[0]);
 const defaultSocialImageUrl = computed(() =>
 	toAbsoluteSiteUrl(socialPreviewPath.value)
 );
+const canonicalUrl = computed(() => new URL(route.path || "/", `${siteUrl}/`).toString());
+const robotsContent = computed(() =>
+	/^\/studio(?:\/|$)|^\/api(?:\/|$)/.test(route.path)
+		? "noindex,nofollow"
+		: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+);
+const structuredData = computed(() => [
+	{
+		"@context": "https://schema.org",
+		"@type": "Organization",
+		"description": siteDescription,
+		"name": "RetroZetro Comics",
+		"url": siteUrl
+	},
+	{
+		"@context": "https://schema.org",
+		"@type": "WebSite",
+		"description": siteDescription,
+		"name": "RetroZetro Comics",
+		"url": siteUrl
+	}
+]);
 
 onMounted(async () => {
 	appleTouchIconHref.value = await resolvePreferredLocalAsset(
@@ -68,8 +93,11 @@ useHead(() => ({
 		},
 		{
 			property: "og:description",
-			content:
-				"RetroZetro Comics publishes comics, outline files, storyboard drops, and studio photo dispatches in one live archive."
+			content: siteDescription
+		},
+		{
+			property: "og:url",
+			content: canonicalUrl.value
 		},
 		{
 			property: "og:image",
@@ -89,12 +117,15 @@ useHead(() => ({
 		},
 		{
 			name: "twitter:description",
-			content:
-				"RetroZetro Comics publishes comics, outline files, storyboard drops, and studio photo dispatches in one live archive."
+			content: siteDescription
 		},
 		{
 			name: "twitter:image",
 			content: defaultSocialImageUrl.value
+		},
+		{
+			name: "robots",
+			content: robotsContent.value
 		}
 	],
 	link: [
@@ -127,17 +158,28 @@ useHead(() => ({
 		{
 			rel: "image_src",
 			href: socialPreviewPath.value
+		},
+		{
+			rel: "canonical",
+			href: canonicalUrl.value
 		}
 	],
-	script: import.meta.env.PROD
-		? [
-				{
-					defer: true,
-					src: "https://analytics.retrozetrocomics.com/script.js",
-					"data-website-id": "568434bd-9bbe-44f9-9537-3bb0cb65f242"
-				}
-			]
-		: []
+	script: [
+		...(import.meta.env.PROD
+			? [
+					{
+						defer: true,
+						src: "https://analytics.retrozetrocomics.com/script.js",
+						"data-website-id": "568434bd-9bbe-44f9-9537-3bb0cb65f242"
+					}
+				]
+			: []),
+		...structuredData.value.map((entry, index) => ({
+			children: JSON.stringify(entry),
+			key: `ld-json-${index}`,
+			type: "application/ld+json"
+		}))
+	]
 }));
 </script>
 
