@@ -156,10 +156,6 @@ useHead(() => ({
 			href: manifestHref.value
 		},
 		{
-			rel: "image_src",
-			href: socialPreviewPath.value
-		},
-		{
 			rel: "canonical",
 			href: canonicalUrl.value
 		}
@@ -175,12 +171,12 @@ useHead(() => ({
 				]
 			: []),
 		...structuredData.value.map((entry, index) => ({
-			children: JSON.stringify(entry),
+			innerHTML: JSON.stringify(entry),
 			key: `ld-json-${index}`,
 			type: "application/ld+json"
 		}))
 	]
-}));
+}) as any);
 </script>
 
 <template>

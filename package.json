@@ -51,6 +51,8 @@
 		},
 		"readdirp": {
 			"picomatch": "2.3.2"
-		}
+		},
+		"vite": "^8.0.8",
+		"vue-router": "^5.0.4"
 	}
 }
