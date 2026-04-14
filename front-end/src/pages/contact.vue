@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
+import { api } from "@/api";
 import { siteAssetCandidates, toAbsoluteSiteUrl } from "@/lib/siteAssets";
 import { useMainStore } from "~/stores";
 
@@ -9,10 +10,13 @@ const form = ref({
 	subject: "",
 	name: "",
 	email: "",
-	message: ""
+	message: "",
+	website: ""
 });
 
 const responseMessage = ref("");
+const responseTone = ref<"success" | "error">("success");
+const isSubmitting = ref(false);
 
 useHead({
 	title: "Contact the Studio | RetroZetro Comics",
@@ -53,25 +57,32 @@ useHead({
 	]
 });
 
-function handleSubmit() {
-	const subject = encodeURIComponent(
-		`[RetroZetro] ${form.value.subject || "Website inquiry"}`
-	);
-	const body = encodeURIComponent(
-		`Name: ${form.value.name}\nEmail: ${form.value.email}\n\n${form.value.message}`
-	);
+async function handleSubmit() {
+	isSubmitting.value = true;
+	responseMessage.value = "";
 
-	if (typeof window !== "undefined") {
-		window.location.href = `mailto:retrozetrocomics@gmail.com?subject=${subject}&body=${body}`;
+	try {
+		await api.post("/contact", form.value);
+		responseTone.value = "success";
+		responseMessage.value =
+			"Message sent. The studio will follow up through the email address you provided.";
+
+		form.value.subject = "";
+		form.value.name = "";
+		form.value.email = "";
+		form.value.message = "";
+		form.value.website = "";
 	}
-
-	responseMessage.value =
-		"Your email app should open with the draft message. If it does not, use retrozetrocomics@gmail.com directly.";
-
-	form.value.subject = "";
-	form.value.name = "";
-	form.value.email = "";
-	form.value.message = "";
+	catch (error: unknown) {
+		console.error("RetroZetro contact form failed:", error);
+		responseTone.value = "error";
+		responseMessage.value =
+			(error as { response?: { data?: { error?: string } } })?.response?.data?.error
+			|| "The message could not be sent right now. Please try again later.";
+	}
+	finally {
+		isSubmitting.value = false;
+	}
 }
 </script>
 
@@ -141,9 +152,9 @@ function handleSubmit() {
 		</section>
 
 		<section class="contact-page__grid">
-			<form class="contact-form" @submit.prevent="handleSubmit">
-				<p class="contact-panel__eyebrow">Message Draft</p>
-				<h2>Send a clean brief</h2>
+				<form class="contact-form" @submit.prevent="handleSubmit">
+					<p class="contact-panel__eyebrow">Send a message</p>
+					<h2>Send a clean brief</h2>
 				<label for="subject">Subject</label>
 				<input
 					id="subject"
@@ -160,20 +171,36 @@ function handleSubmit() {
 				<input id="email" v-model="form.email" required type="email" />
 
 				<label for="message">Message</label>
-				<textarea
-					id="message"
-					v-model="form.message"
+					<textarea
+						id="message"
+						v-model="form.message"
 					placeholder="Tell the studio what you need, your timeline, and any links or references."
-					required
-					rows="7"
-				/>
+						required
+						rows="7"
+					/>
 
-				<button type="submit">Open email draft</button>
+					<input
+						v-model="form.website"
+						type="text"
+						name="website"
+						autocomplete="off"
+						tabindex="-1"
+						class="sr-only"
+						aria-hidden="true"
+					/>
 
-				<p v-if="responseMessage" class="contact-form__response">
-					{{ responseMessage }}
-				</p>
-			</form>
+					<button type="submit" :disabled="isSubmitting">
+						{{ isSubmitting ? "Sending..." : "Send message" }}
+					</button>
+
+					<p
+						v-if="responseMessage"
+						class="contact-form__response"
+						:class="responseTone === 'error' ? 'contact-form__response--error' : ''"
+					>
+						{{ responseMessage }}
+					</p>
+				</form>
 
 			<article class="contact-panel">
 				<p class="contact-panel__eyebrow">FAQ</p>
@@ -322,6 +349,10 @@ function handleSubmit() {
 .contact-form__response {
 	color: #7ce1f6;
 	line-height: 1.7;
+}
+
+.contact-form__response--error {
+	color: #ffb1a1;
 }
 
 @media (max-width: 800px) {

@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { adminRouter } from "./routes/admin.js";
 import { authRouter, legacyAccountsRouter } from "./routes/auth.js";
+import { contactRouter } from "./routes/contact.js";
 import { postsRouter } from "./routes/posts.js";
 import { siteContentRouter } from "./routes/siteContent.js";
 import {
@@ -121,6 +122,7 @@ export function createApp() {
 
 	apiRouter.use("/auth", authRouter);
 	apiRouter.use("/accounts", legacyAccountsRouter);
+	apiRouter.use("/contact", contactRouter);
 	apiRouter.use("/posts", postsRouter);
 	apiRouter.use("/admin", adminRouter);
 	apiRouter.use("/site-content", siteContentRouter);
