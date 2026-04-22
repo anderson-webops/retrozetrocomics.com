@@ -190,10 +190,7 @@ watch(
 }
 </style>
 
-<route>
-{
-"meta": {
-"layout": "default"
-}
-}
+<route lang="yaml">
+meta:
+  layout: default
 </route>

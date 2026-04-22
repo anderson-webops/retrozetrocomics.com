@@ -232,15 +232,7 @@ function handleWorldEntryDiscard(entryId: string) {
 }
 </style>
 
-<route>
-{
-"meta": {
-"layout": "default"
-}
-}
+<route lang="yaml">
+meta:
+  layout: default
 </route>
-
-<!-- <route lang="yaml"> -->
-<!-- meta: -->
-<!-- layout: default -->
-<!-- </route> -->

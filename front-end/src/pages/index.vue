@@ -264,15 +264,7 @@ useHead({
 }
 </style>
 
-<route>
-{
-"meta": {
-"layout": "default"
-}
-}
-</route>
-
-<!-- <route lang="yaml">
+<route lang="yaml">
 meta:
-layout: home
-</route> -->
+  layout: default
+</route>

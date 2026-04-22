@@ -457,11 +457,3 @@ watch(
 	}
 }
 </style>
-
-<route>
-{
-"meta": {
-"layout": "default"
-}
-}
-</route>

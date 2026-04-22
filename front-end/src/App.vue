@@ -167,6 +167,11 @@ useHead(() => ({
 						defer: true,
 						src: "https://analytics.retrozetrocomics.com/script.js",
 						"data-website-id": "568434bd-9bbe-44f9-9537-3bb0cb65f242"
+					},
+					{
+						defer: true,
+						src: "https://analytics.jacobdanderson.net/script.js",
+						"data-website-id": "0085594f-0e98-4159-ba2b-4fc8fcd717cb"
 					}
 				]
 			: []),

@@ -6,11 +6,3 @@
 		title="Latest Studio Drops"
 	/>
 </template>
-
-<route>
-{
-"meta": {
-"layout": "default"
-}
-}
-</route>
