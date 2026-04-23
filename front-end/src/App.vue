@@ -7,7 +7,8 @@ import {
 
 const defaultHeroImageAlt = "RetroZetro lead portrait";
 const siteUrl = "https://retrozetrocomics.com";
-const siteDescription = "RetroZetro Comics publishes comics, storyboard drops, art archives, and studio dispatches for readers and collaborators.";
+const siteDescription =
+	"RetroZetro Comics publishes comics, storyboard drops, art archives, and studio dispatches for readers and collaborators.";
 const route = useRoute();
 const appleTouchIconHref = ref<string>(
 	siteAssetCandidates.favicons.appleTouch[0]
@@ -23,7 +24,9 @@ const socialPreviewPath = ref<string>(siteAssetCandidates.socialPreview[0]);
 const defaultSocialImageUrl = computed(() =>
 	toAbsoluteSiteUrl(socialPreviewPath.value)
 );
-const canonicalUrl = computed(() => new URL(route.path || "/", `${siteUrl}/`).toString());
+const canonicalUrl = computed(() =>
+	new URL(route.path || "/", `${siteUrl}/`).toString()
+);
 const robotsContent = computed(() =>
 	/^\/studio(?:\/|$)|^\/api(?:\/|$)/.test(route.path)
 		? "noindex,nofollow"
@@ -33,16 +36,16 @@ const structuredData = computed(() => [
 	{
 		"@context": "https://schema.org",
 		"@type": "Organization",
-		"description": siteDescription,
-		"name": "RetroZetro Comics",
-		"url": siteUrl
+		description: siteDescription,
+		name: "RetroZetro Comics",
+		url: siteUrl
 	},
 	{
 		"@context": "https://schema.org",
 		"@type": "WebSite",
-		"description": siteDescription,
-		"name": "RetroZetro Comics",
-		"url": siteUrl
+		description: siteDescription,
+		name: "RetroZetro Comics",
+		url: siteUrl
 	}
 ]);
 
@@ -67,121 +70,126 @@ onMounted(async () => {
 	);
 });
 
-useHead(() => ({
-	title: "RetroZetro Comics",
-	meta: [
-		{
-			name: "description",
-			content:
-				"RetroZetro Comics publishes comics, outline files, storyboard drops, and studio photo dispatches in one live archive."
-		},
-		{
-			name: "theme-color",
-			content: "#091526"
-		},
-		{
-			property: "og:site_name",
-			content: "RetroZetro Comics"
-		},
-		{
-			property: "og:type",
-			content: "website"
-		},
-		{
-			property: "og:title",
-			content: "RetroZetro Comics"
-		},
-		{
-			property: "og:description",
-			content: siteDescription
-		},
-		{
-			property: "og:url",
-			content: canonicalUrl.value
-		},
-		{
-			property: "og:image",
-			content: defaultSocialImageUrl.value
-		},
-		{
-			property: "og:image:alt",
-			content: defaultHeroImageAlt
-		},
-		{
-			name: "twitter:card",
-			content: "summary_large_image"
-		},
-		{
-			name: "twitter:title",
-			content: "RetroZetro Comics"
-		},
-		{
-			name: "twitter:description",
-			content: siteDescription
-		},
-		{
-			name: "twitter:image",
-			content: defaultSocialImageUrl.value
-		},
-		{
-			name: "robots",
-			content: robotsContent.value
-		}
-	],
-	link: [
-		{
-			rel: "icon",
-			type: "image/x-icon",
-			href: faviconIcoHref.value
-		},
-		{
-			rel: "icon",
-			type: "image/png",
-			sizes: "32x32",
-			href: favicon32Href.value
-		},
-		{
-			rel: "icon",
-			type: "image/png",
-			sizes: "16x16",
-			href: favicon16Href.value
-		},
-		{
-			rel: "apple-touch-icon",
-			sizes: "180x180",
-			href: appleTouchIconHref.value
-		},
-		{
-			rel: "manifest",
-			href: manifestHref.value
-		},
-		{
-			rel: "canonical",
-			href: canonicalUrl.value
-		}
-	],
-	script: [
-		...(import.meta.env.PROD
-			? [
-					{
-						defer: true,
-						src: "https://analytics.retrozetrocomics.com/script.js",
-						"data-website-id": "568434bd-9bbe-44f9-9537-3bb0cb65f242"
-					},
-					{
-						defer: true,
-						src: "https://analytics.jacobdanderson.net/script.js",
-						"data-website-id": "0085594f-0e98-4159-ba2b-4fc8fcd717cb"
-					}
-				]
-			: []),
-		...structuredData.value.map((entry, index) => ({
-			innerHTML: JSON.stringify(entry),
-			key: `ld-json-${index}`,
-			type: "application/ld+json"
-		}))
-	]
-}) as any);
+useHead(
+	() =>
+		({
+			title: "RetroZetro Comics",
+			meta: [
+				{
+					name: "description",
+					content:
+						"RetroZetro Comics publishes comics, outline files, storyboard drops, and studio photo dispatches in one live archive."
+				},
+				{
+					name: "theme-color",
+					content: "#091526"
+				},
+				{
+					property: "og:site_name",
+					content: "RetroZetro Comics"
+				},
+				{
+					property: "og:type",
+					content: "website"
+				},
+				{
+					property: "og:title",
+					content: "RetroZetro Comics"
+				},
+				{
+					property: "og:description",
+					content: siteDescription
+				},
+				{
+					property: "og:url",
+					content: canonicalUrl.value
+				},
+				{
+					property: "og:image",
+					content: defaultSocialImageUrl.value
+				},
+				{
+					property: "og:image:alt",
+					content: defaultHeroImageAlt
+				},
+				{
+					name: "twitter:card",
+					content: "summary_large_image"
+				},
+				{
+					name: "twitter:title",
+					content: "RetroZetro Comics"
+				},
+				{
+					name: "twitter:description",
+					content: siteDescription
+				},
+				{
+					name: "twitter:image",
+					content: defaultSocialImageUrl.value
+				},
+				{
+					name: "robots",
+					content: robotsContent.value
+				}
+			],
+			link: [
+				{
+					rel: "icon",
+					type: "image/x-icon",
+					href: faviconIcoHref.value
+				},
+				{
+					rel: "icon",
+					type: "image/png",
+					sizes: "32x32",
+					href: favicon32Href.value
+				},
+				{
+					rel: "icon",
+					type: "image/png",
+					sizes: "16x16",
+					href: favicon16Href.value
+				},
+				{
+					rel: "apple-touch-icon",
+					sizes: "180x180",
+					href: appleTouchIconHref.value
+				},
+				{
+					rel: "manifest",
+					href: manifestHref.value
+				},
+				{
+					rel: "canonical",
+					href: canonicalUrl.value
+				}
+			],
+			script: [
+				...(import.meta.env.PROD
+					? [
+							{
+								defer: true,
+								src: "https://analytics.retrozetrocomics.com/script.js",
+								"data-website-id":
+									"568434bd-9bbe-44f9-9537-3bb0cb65f242"
+							},
+							{
+								defer: true,
+								src: "https://analytics.jacobdanderson.net/script.js",
+								"data-website-id":
+									"0085594f-0e98-4159-ba2b-4fc8fcd717cb"
+							}
+						]
+					: []),
+				...structuredData.value.map((entry, index) => ({
+					innerHTML: JSON.stringify(entry),
+					key: `ld-json-${index}`,
+					type: "application/ld+json"
+				}))
+			]
+		}) as any
+);
 </script>
 
 <template>

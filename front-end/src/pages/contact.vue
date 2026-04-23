@@ -72,15 +72,16 @@ async function handleSubmit() {
 		form.value.email = "";
 		form.value.message = "";
 		form.value.website = "";
-	}
-	catch (error: unknown) {
+	} catch (error: unknown) {
 		console.error("RetroZetro contact form failed:", error);
 		responseTone.value = "error";
+		const response = (error as { response?: { data?: { error?: string } } })
+			.response;
+		const errorMessage = response?.data?.error;
 		responseMessage.value =
-			(error as { response?: { data?: { error?: string } } })?.response?.data?.error
-			|| "The message could not be sent right now. Please try again later.";
-	}
-	finally {
+			errorMessage ||
+			"The message could not be sent right now. Please try again later.";
+	} finally {
 		isSubmitting.value = false;
 	}
 }
@@ -152,9 +153,9 @@ async function handleSubmit() {
 		</section>
 
 		<section class="contact-page__grid">
-				<form class="contact-form" @submit.prevent="handleSubmit">
-					<p class="contact-panel__eyebrow">Send a message</p>
-					<h2>Send a clean brief</h2>
+			<form class="contact-form" @submit.prevent="handleSubmit">
+				<p class="contact-panel__eyebrow">Send a message</p>
+				<h2>Send a clean brief</h2>
 				<label for="subject">Subject</label>
 				<input
 					id="subject"
@@ -171,36 +172,40 @@ async function handleSubmit() {
 				<input id="email" v-model="form.email" required type="email" />
 
 				<label for="message">Message</label>
-					<textarea
-						id="message"
-						v-model="form.message"
+				<textarea
+					id="message"
+					v-model="form.message"
 					placeholder="Tell the studio what you need, your timeline, and any links or references."
-						required
-						rows="7"
-					/>
+					required
+					rows="7"
+				/>
 
-					<input
-						v-model="form.website"
-						type="text"
-						name="website"
-						autocomplete="off"
-						tabindex="-1"
-						class="sr-only"
-						aria-hidden="true"
-					/>
+				<input
+					v-model="form.website"
+					type="text"
+					name="website"
+					autocomplete="off"
+					tabindex="-1"
+					class="sr-only"
+					aria-hidden="true"
+				/>
 
-					<button type="submit" :disabled="isSubmitting">
-						{{ isSubmitting ? "Sending..." : "Send message" }}
-					</button>
+				<button type="submit" :disabled="isSubmitting">
+					{{ isSubmitting ? "Sending..." : "Send message" }}
+				</button>
 
-					<p
-						v-if="responseMessage"
-						class="contact-form__response"
-						:class="responseTone === 'error' ? 'contact-form__response--error' : ''"
-					>
-						{{ responseMessage }}
-					</p>
-				</form>
+				<p
+					v-if="responseMessage"
+					class="contact-form__response"
+					:class="
+						responseTone === 'error'
+							? 'contact-form__response--error'
+							: ''
+					"
+				>
+					{{ responseMessage }}
+				</p>
+			</form>
 
 			<article class="contact-panel">
 				<p class="contact-panel__eyebrow">FAQ</p>
@@ -364,5 +369,5 @@ async function handleSubmit() {
 
 <route lang="yaml">
 meta:
-  layout: default
+    layout: default
 </route>
