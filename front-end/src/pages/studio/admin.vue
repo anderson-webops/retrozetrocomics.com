@@ -81,5 +81,5 @@ onMounted(() => {
 
 <route lang="yaml">
 meta:
-    layout: default
+    layout: false
 </route>
