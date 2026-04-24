@@ -1,12 +1,9 @@
-import {
-	defineConfig,
-	presetAttributify,
-	presetIcons,
-	presetTypography,
-	presetWind3,
-	transformerDirectives,
-	transformerVariantGroup
-} from "unocss";
+import { presetAttributify } from "@unocss/preset-attributify";
+import { presetIcons } from "@unocss/preset-icons";
+import { presetTypography } from "@unocss/preset-typography";
+import { presetWind3 } from "@unocss/preset-wind3";
+import transformerDirectives from "@unocss/transformer-directives";
+import transformerVariantGroup from "@unocss/transformer-variant-group";
 
 const presets = [
 	presetWind3(),
@@ -17,7 +14,7 @@ const presets = [
 	presetTypography()
 ];
 
-export default defineConfig({
+export default {
 	shortcuts: [
 		[
 			"btn",
@@ -31,4 +28,4 @@ export default defineConfig({
 	presets,
 	transformers: [transformerDirectives(), transformerVariantGroup()],
 	safelist: "prose prose-sm m-auto text-left".split(" ")
-});
+};
