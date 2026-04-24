@@ -68,6 +68,8 @@ onMounted(() => {
 	display: flex;
 	flex-direction: column;
 	gap: clamp(2rem, 4vw, 3rem);
+	width: min(100%, 122rem);
+	margin-inline: auto;
 	padding: clamp(1.5rem, 4vw, 3rem);
 	background: transparent;
 	color: #f7eaff;
@@ -113,6 +115,7 @@ onMounted(() => {
 
 .content-grid {
 	display: grid;
+	grid-template-areas: "archive center community";
 	grid-template-columns: minmax(220px, 260px) 1fr minmax(220px, 260px);
 	gap: 1rem;
 	align-items: start;
@@ -123,7 +126,12 @@ onMounted(() => {
 }
 
 .content-grid__ad {
+	min-width: 0;
 	align-self: stretch;
+}
+
+.content-grid__ad:first-child {
+	grid-area: archive;
 }
 
 .site-shell__footer {
@@ -131,9 +139,11 @@ onMounted(() => {
 }
 
 .center-plate {
+	grid-area: center;
 	display: flex;
 	flex-direction: column;
 	min-width: 0;
+	width: 100%;
 	background: transparent;
 	border: none;
 	border-radius: 0;
@@ -147,19 +157,40 @@ onMounted(() => {
 	display: flex;
 	flex-direction: column;
 	gap: clamp(2rem, 3vw, 3rem);
+	min-width: 0;
+}
+
+.content-grid__ad:last-child {
+	grid-area: community;
 }
 
 @media (max-width: 1024px) {
 	.content-grid {
 		grid-template-columns: 1fr;
+		grid-template-areas:
+			"center"
+			"archive"
+			"community";
+		gap: 0.9rem;
 	}
 
 	.content-grid__ad {
-		min-height: 140px;
+		min-height: 0;
 	}
 
 	.page-slot {
 		padding-inline: 0;
+	}
+}
+
+@media (max-width: 768px) {
+	.site-shell {
+		gap: 1.25rem;
+		padding: 0.85rem;
+	}
+
+	.admin-viewer-banner {
+		padding: 0.95rem 1rem;
 	}
 }
 </style>

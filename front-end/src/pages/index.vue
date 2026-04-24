@@ -1,8 +1,48 @@
 <script lang="ts" setup>
+import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
 import Comics from "~/components/TheComics.vue";
 import { useMainStore } from "~/stores";
 
 const store = useMainStore();
+
+useHead({
+	title: "RetroZetro Comics | Comics, Storyboards, and Studio Drops",
+	link: [
+		{
+			rel: "canonical",
+			href: toAbsoluteSiteUrl("/")
+		}
+	],
+	meta: [
+		{
+			name: "description",
+			content:
+				"Read RetroZetro Comics, browse storyboard experiments, explore canon files, and follow new studio drops from the Retroverse."
+		},
+		{
+			property: "og:title",
+			content: "RetroZetro Comics | Comics, Storyboards, and Studio Drops"
+		},
+		{
+			property: "og:description",
+			content:
+				"Read RetroZetro Comics, browse storyboard experiments, explore canon files, and follow new studio drops from the Retroverse."
+		},
+		{
+			property: "og:url",
+			content: toAbsoluteSiteUrl("/")
+		},
+		{
+			name: "twitter:title",
+			content: "RetroZetro Comics | Comics, Storyboards, and Studio Drops"
+		},
+		{
+			name: "twitter:description",
+			content:
+				"Read RetroZetro Comics, browse storyboard experiments, explore canon files, and follow new studio drops from the Retroverse."
+		}
+	]
+});
 </script>
 
 <template>
@@ -129,7 +169,7 @@ const store = useMainStore();
 .home-showcase__grid {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
 }
 
 .home-showcase__card {
@@ -245,15 +285,7 @@ const store = useMainStore();
 }
 </style>
 
-<route>
-{
-"meta": {
-"layout": "default"
-}
-}
-</route>
-
-<!-- <route lang="yaml">
+<route lang="yaml">
 meta:
-layout: home
-</route> -->
+    layout: default
+</route>

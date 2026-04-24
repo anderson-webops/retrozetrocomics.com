@@ -35,6 +35,7 @@ const sortOrder = ref<"newest" | "oldest">("newest");
 const posts = ref<PostSummary[]>([]);
 const loading = ref(false);
 const error = ref("");
+const hasResolved = ref(false);
 
 const filteredPosts = computed(() => {
 	const query = searchQuery.value.trim().toLowerCase();
@@ -64,6 +65,26 @@ const filteredPosts = computed(() => {
 	});
 });
 
+const emptyStateMessage = computed(() => {
+	if (activeType.value === "comic") {
+		return "No public comics are live yet.";
+	}
+
+	if (activeType.value === "storyboard") {
+		return "No public storyboards are live yet.";
+	}
+
+	if (activeType.value === "outline") {
+		return "No public outlines are live yet.";
+	}
+
+	if (activeType.value === "photo") {
+		return "No public photo drops are live yet.";
+	}
+
+	return "No public studio drops are live yet.";
+});
+
 async function loadPosts() {
 	loading.value = true;
 	error.value = "";
@@ -80,11 +101,18 @@ async function loadPosts() {
 			"Unable to load posts right now.";
 	} finally {
 		loading.value = false;
+		hasResolved.value = true;
 	}
 }
 
+onServerPrefetch(async () => {
+	await loadPosts();
+});
+
 onMounted(() => {
-	void loadPosts();
+	if (!hasResolved.value) {
+		void loadPosts();
+	}
 });
 
 watch(activeType, () => {
@@ -170,8 +198,8 @@ watch(activeType, () => {
 		>
 			No drops match that search yet.
 		</p>
-		<p v-else-if="!posts.length" class="post-feed__state">
-			No public drops are live yet.
+		<p v-else-if="hasResolved && !posts.length" class="post-feed__state">
+			{{ emptyStateMessage }}
 		</p>
 
 		<div v-else class="post-feed__grid">
@@ -322,7 +350,7 @@ watch(activeType, () => {
 .post-feed__grid {
 	display: grid;
 	gap: 1.35rem;
-	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
 }
 
 @media (max-width: 860px) {
@@ -332,8 +360,12 @@ watch(activeType, () => {
 }
 
 @media (max-width: 680px) {
-	.post-feed__intel {
-		grid-template-columns: 1fr;
+	.post-feed {
+		padding: 1.2rem;
+	}
+
+	.post-feed__controls {
+		padding: 0.9rem;
 	}
 }
 </style>

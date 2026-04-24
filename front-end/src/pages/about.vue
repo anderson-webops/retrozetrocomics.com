@@ -4,7 +4,7 @@ import { useAboutPageContent } from "@/composables/useAboutPageContent";
 import { useAboutPageContentEditor } from "@/composables/useAboutPageContentEditor";
 import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import { useCharactersPageContentEditor } from "@/composables/useCharactersPageContentEditor";
-import { siteAssetCandidates } from "@/lib/siteAssets";
+import { siteAssetCandidates, toAbsoluteSiteUrl } from "@/lib/siteAssets";
 import { useSessionStore } from "@/stores/session";
 import StoryArcCards from "~/components/StoryArcCards.vue";
 import WorldEntryCards from "~/components/WorldEntryCards.vue";
@@ -44,9 +44,47 @@ const highlights = computed(() =>
 	}))
 );
 
+useHead({
+	title: "About the Project | RetroZetro Comics",
+	link: [
+		{
+			rel: "canonical",
+			href: toAbsoluteSiteUrl("/about")
+		}
+	],
+	meta: [
+		{
+			name: "description",
+			content:
+				"Learn the studio ethos, active story arcs, and world ledger behind RetroZetro Comics."
+		},
+		{
+			property: "og:title",
+			content: "About the Project | RetroZetro Comics"
+		},
+		{
+			property: "og:description",
+			content:
+				"Learn the studio ethos, active story arcs, and world ledger behind RetroZetro Comics."
+		},
+		{
+			property: "og:url",
+			content: toAbsoluteSiteUrl("/about")
+		},
+		{
+			name: "twitter:title",
+			content: "About the Project | RetroZetro Comics"
+		},
+		{
+			name: "twitter:description",
+			content:
+				"Learn the studio ethos, active story arcs, and world ledger behind RetroZetro Comics."
+		}
+	]
+});
+
 onMounted(() => {
-	void loadAboutPageContent();
-	void loadCharactersPageContent();
+	void Promise.all([loadAboutPageContent(), loadCharactersPageContent()]);
 });
 
 onBeforeUnmount(() => {
@@ -217,7 +255,7 @@ function handleWorldEntryDiscard(entryId: string) {
 .about-page__world-grid {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 }
 
 .about-page__story-card,
@@ -359,15 +397,7 @@ function handleWorldEntryDiscard(entryId: string) {
 }
 </style>
 
-<route>
-{
-"meta": {
-"layout": "default"
-}
-}
+<route lang="yaml">
+meta:
+    layout: default
 </route>
-
-<!-- <route lang="yaml"> -->
-<!-- meta: -->
-<!-- layout: default -->
-<!-- </route> -->

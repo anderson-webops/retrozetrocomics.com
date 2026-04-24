@@ -2,14 +2,84 @@
 import type { PostDetailResponse } from "@/types/site";
 
 import { fetchPost } from "@/lib/siteApi";
+import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
 
-const route = useRoute();
+const route = useRoute("/posts/[slug]");
 
 const detail = ref<PostDetailResponse | null>(null);
 const error = ref("");
 const loading = ref(false);
 
 const post = computed(() => detail.value?.post || null);
+const postPath = computed(
+	() => `/posts/${String(route.params.slug || "").trim()}`
+);
+const heroImageUrl = computed(() => {
+	const image = post.value?.media.find(asset => asset.kind === "image")?.url;
+	return image ? toAbsoluteSiteUrl(image) : undefined;
+});
+
+useHead(() => {
+	const currentPost = post.value;
+	const title = currentPost
+		? `${currentPost.title} | RetroZetro Comics`
+		: "Studio Post | RetroZetro Comics";
+	const description =
+		currentPost?.summary ||
+		"Read the latest comics, storyboards, outlines, and studio notes from RetroZetro Comics.";
+
+	return {
+		title,
+		link: [
+			{
+				rel: "canonical",
+				href: toAbsoluteSiteUrl(postPath.value)
+			}
+		],
+		meta: [
+			{
+				name: "description",
+				content: description
+			},
+			{
+				property: "og:title",
+				content: title
+			},
+			{
+				property: "og:description",
+				content: description
+			},
+			{
+				property: "og:type",
+				content: "article"
+			},
+			{
+				property: "og:url",
+				content: toAbsoluteSiteUrl(postPath.value)
+			},
+			...(heroImageUrl.value
+				? [
+						{
+							property: "og:image",
+							content: heroImageUrl.value
+						},
+						{
+							name: "twitter:image",
+							content: heroImageUrl.value
+						}
+					]
+				: []),
+			{
+				name: "twitter:title",
+				content: title
+			},
+			{
+				name: "twitter:description",
+				content: description
+			}
+		]
+	};
+});
 
 async function loadPost() {
 	const slug = String(route.params.slug || "");
@@ -32,8 +102,14 @@ async function loadPost() {
 	}
 }
 
+onServerPrefetch(async () => {
+	await loadPost();
+});
+
 onMounted(() => {
-	void loadPost();
+	if (!detail.value && !loading.value && !error.value) {
+		void loadPost();
+	}
 });
 
 watch(
@@ -114,10 +190,7 @@ watch(
 }
 </style>
 
-<route>
-{
-"meta": {
-"layout": "default"
-}
-}
+<route lang="yaml">
+meta:
+    layout: default
 </route>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import { useSessionStore } from "@/stores/session";
@@ -31,11 +31,18 @@ function isActive(path: string) {
 
 	return route.path.startsWith(path);
 }
+
+watch(
+	() => route.fullPath,
+	() => {
+		closeMenu();
+	}
+);
 </script>
 
 <template>
 	<header class="site-header">
-		<nav class="nav">
+		<nav class="nav" :class="{ 'nav--expanded': isExpanded }">
 			<button
 				aria-controls="primary-navigation"
 				:aria-expanded="isExpanded"
@@ -44,9 +51,14 @@ function isActive(path: string) {
 				type="button"
 				@click="toggleMenu"
 			>
-				<span class="nav__toggle-line" />
-				<span class="nav__toggle-line" />
-				<span class="nav__toggle-line" />
+				<span aria-hidden="true" class="nav__toggle-icon">
+					<span class="nav__toggle-line" />
+					<span class="nav__toggle-line" />
+					<span class="nav__toggle-line" />
+				</span>
+				<span aria-hidden="true" class="nav__toggle-text">
+					{{ isExpanded ? "Close" : "Menu" }}
+				</span>
 				<span class="sr-only">Toggle navigation</span>
 			</button>
 
@@ -156,28 +168,44 @@ function isActive(path: string) {
 	padding: clamp(0.75rem, 2vw, 1.25rem) clamp(1rem, 5vw, 3rem);
 	position: relative;
 	gap: 1rem;
+	min-width: 0;
 }
 
 .nav__toggle {
-	position: absolute;
-	left: clamp(1rem, 5vw, 3rem);
 	display: none;
+	align-items: center;
+	gap: 0.65rem;
+	padding: 0.68rem 0.9rem;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.06);
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	color: #fff4e7;
+	cursor: pointer;
+	flex-shrink: 0;
+}
+
+.nav__toggle-icon {
+	display: inline-flex;
 	flex-direction: column;
 	gap: 0.3rem;
-	background: transparent;
-	border: none;
-	cursor: pointer;
-	padding: 0.4rem;
+	justify-content: center;
 }
 
 .nav__toggle-line {
-	width: 24px;
+	width: 18px;
 	height: 2px;
 	background: #fbe5ff;
 	border-radius: 2px;
 	transition:
 		transform 0.3s ease,
 		opacity 0.3s ease;
+}
+
+.nav__toggle-text {
+	font-size: 0.78rem;
+	font-weight: 800;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
 }
 
 .nav__toggle--open .nav__toggle-line:nth-child(1) {
@@ -202,6 +230,7 @@ function isActive(path: string) {
 	letter-spacing: 0.28em;
 	flex: 1;
 	justify-content: center;
+	min-width: 0;
 }
 
 .nav__item {
@@ -249,6 +278,7 @@ function isActive(path: string) {
 	align-items: center;
 	justify-content: flex-end;
 	gap: 0.65rem;
+	min-width: 0;
 }
 
 .nav__account {
@@ -325,58 +355,59 @@ function isActive(path: string) {
 	border: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 920px) {
 	.nav {
-		flex-wrap: wrap;
-		padding-top: 1rem;
+		display: grid;
+		grid-template-columns: auto 1fr;
+		align-items: center;
+		gap: 0.85rem;
+		padding: 0.85rem 0.95rem;
 	}
 
 	.nav__toggle {
 		display: inline-flex;
+		justify-self: start;
 	}
 
 	.nav__links {
-		position: absolute;
-		top: 100%;
-		left: clamp(1rem, 5vw, 3rem);
-		right: clamp(1rem, 5vw, 3rem);
-		margin-top: 0.75rem;
+		display: none;
+		grid-column: 1 / -1;
+		margin-top: 0.15rem;
 		background: rgba(15, 2, 24, 0.92);
 		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 16px;
+		border-radius: 18px;
 		box-shadow: 0 18px 40px rgba(8, 0, 16, 0.45);
 		flex-direction: column;
-		padding: 1.2rem;
-		gap: 0.85rem;
-		min-width: 220px;
-		opacity: 0;
-		pointer-events: none;
-		transform: translateY(-10px);
-		transition:
-			opacity 0.2s ease,
-			transform 0.2s ease;
+		padding: 1rem;
+		gap: 0.9rem;
 	}
 
 	.nav__links--expanded {
-		opacity: 1;
-		pointer-events: auto;
-		transform: translateY(0);
+		display: flex;
 	}
 
 	.nav__actions {
+		display: none;
+		grid-column: 1 / -1;
+		flex-direction: column;
+		align-items: stretch;
+		justify-content: stretch;
 		width: 100%;
-		flex-wrap: wrap;
-		justify-content: flex-start;
-		padding-top: 0.5rem;
+		padding: 1rem;
+		border-radius: 18px;
+		background: rgba(9, 21, 38, 0.92);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+	}
+
+	.nav--expanded .nav__actions {
+		display: flex;
 	}
 
 	.nav__account,
 	.nav__identity {
 		justify-items: start;
-	}
-
-	.nav__utility {
-		justify-content: flex-start;
+		text-align: left;
 	}
 
 	.nav__item::after {
@@ -384,9 +415,41 @@ function isActive(path: string) {
 	}
 
 	.nav__link {
-		font-size: 0.85rem;
-		letter-spacing: 0.2em;
-		padding: 0;
+		display: block;
+		font-size: 0.82rem;
+		letter-spacing: 0.18em;
+		padding: 0.2rem 0;
+	}
+
+	.nav__utility {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		width: 100%;
+	}
+
+	.nav__action {
+		width: 100%;
+		justify-content: center;
+		padding: 0.78rem 1rem;
+	}
+
+	.nav__action--utility {
+		padding: 0.72rem 0.9rem;
+		font-size: 0.88rem;
+	}
+}
+
+@media (max-width: 560px) {
+	.nav__toggle {
+		padding: 0.65rem 0.82rem;
+	}
+
+	.nav__toggle-text {
+		font-size: 0.74rem;
+	}
+
+	.nav__utility {
+		grid-template-columns: 1fr;
 	}
 }
 </style>

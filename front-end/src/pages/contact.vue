@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { siteAssetCandidates } from "@/lib/siteAssets";
+import { api } from "@/api";
+import { siteAssetCandidates, toAbsoluteSiteUrl } from "@/lib/siteAssets";
 import { useMainStore } from "~/stores";
 
 const store = useMainStore();
@@ -9,30 +10,80 @@ const form = ref({
 	subject: "",
 	name: "",
 	email: "",
-	message: ""
+	message: "",
+	website: ""
 });
 
 const responseMessage = ref("");
+const responseTone = ref<"success" | "error">("success");
+const isSubmitting = ref(false);
 
-function handleSubmit() {
-	const subject = encodeURIComponent(
-		`[RetroZetro] ${form.value.subject || "Website inquiry"}`
-	);
-	const body = encodeURIComponent(
-		`Name: ${form.value.name}\nEmail: ${form.value.email}\n\n${form.value.message}`
-	);
+useHead({
+	title: "Contact the Studio | RetroZetro Comics",
+	link: [
+		{
+			rel: "canonical",
+			href: toAbsoluteSiteUrl("/contact")
+		}
+	],
+	meta: [
+		{
+			name: "description",
+			content:
+				"Contact RetroZetro Comics for collaboration, commissions, interviews, and studio inquiries."
+		},
+		{
+			property: "og:title",
+			content: "Contact the Studio | RetroZetro Comics"
+		},
+		{
+			property: "og:description",
+			content:
+				"Contact RetroZetro Comics for collaboration, commissions, interviews, and studio inquiries."
+		},
+		{
+			property: "og:url",
+			content: toAbsoluteSiteUrl("/contact")
+		},
+		{
+			name: "twitter:title",
+			content: "Contact the Studio | RetroZetro Comics"
+		},
+		{
+			name: "twitter:description",
+			content:
+				"Contact RetroZetro Comics for collaboration, commissions, interviews, and studio inquiries."
+		}
+	]
+});
 
-	if (typeof window !== "undefined") {
-		window.location.href = `mailto:retrozetrocomics@gmail.com?subject=${subject}&body=${body}`;
+async function handleSubmit() {
+	isSubmitting.value = true;
+	responseMessage.value = "";
+
+	try {
+		await api.post("/contact", form.value);
+		responseTone.value = "success";
+		responseMessage.value =
+			"Message sent. The studio will follow up through the email address you provided.";
+
+		form.value.subject = "";
+		form.value.name = "";
+		form.value.email = "";
+		form.value.message = "";
+		form.value.website = "";
+	} catch (error: unknown) {
+		console.error("RetroZetro contact form failed:", error);
+		responseTone.value = "error";
+		const response = (error as { response?: { data?: { error?: string } } })
+			.response;
+		const errorMessage = response?.data?.error;
+		responseMessage.value =
+			errorMessage ||
+			"The message could not be sent right now. Please try again later.";
+	} finally {
+		isSubmitting.value = false;
 	}
-
-	responseMessage.value =
-		"Your email app should open with the draft message. If it does not, use retrozetrocomics@gmail.com directly.";
-
-	form.value.subject = "";
-	form.value.name = "";
-	form.value.email = "";
-	form.value.message = "";
 }
 </script>
 
@@ -93,7 +144,7 @@ function handleSubmit() {
 
 		<section class="contact-page__grid">
 			<form class="contact-form" @submit.prevent="handleSubmit">
-				<p class="contact-panel__eyebrow">Message Draft</p>
+				<p class="contact-panel__eyebrow">Send a message</p>
 				<h2>Send a clean brief</h2>
 				<label for="subject">Subject</label>
 				<input
@@ -119,12 +170,33 @@ function handleSubmit() {
 					rows="7"
 				/>
 
+				<input
+					v-model="form.website"
+					type="text"
+					name="website"
+					autocomplete="off"
+					tabindex="-1"
+					class="sr-only"
+					aria-hidden="true"
+				/>
+
 				<p class="contact-form__note">
 					Replies usually go out within two days.
 				</p>
-				<button type="submit">Open email draft</button>
 
-				<p v-if="responseMessage" class="contact-form__response">
+				<button type="submit" :disabled="isSubmitting">
+					{{ isSubmitting ? "Sending..." : "Send message" }}
+				</button>
+
+				<p
+					v-if="responseMessage"
+					class="contact-form__response"
+					:class="
+						responseTone === 'error'
+							? 'contact-form__response--error'
+							: ''
+					"
+				>
 					{{ responseMessage }}
 				</p>
 			</form>
@@ -152,7 +224,7 @@ function handleSubmit() {
 .contact-page__grid {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 }
 
 .contact-panel,
@@ -284,6 +356,22 @@ function handleSubmit() {
 	line-height: 1.7;
 }
 
+.contact-form__response--error {
+	color: #ffb1a1;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
 @media (max-width: 800px) {
 	.contact-page__grid {
 		grid-template-columns: 1fr;
@@ -293,5 +381,5 @@ function handleSubmit() {
 
 <route lang="yaml">
 meta:
-layout: default
+    layout: default
 </route>

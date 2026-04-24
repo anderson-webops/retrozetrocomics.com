@@ -2,6 +2,9 @@
 import { siteAssetCandidates } from "@/lib/siteAssets";
 
 const router = useRouter();
+useHead({
+	title: "Not found"
+});
 </script>
 
 <template>

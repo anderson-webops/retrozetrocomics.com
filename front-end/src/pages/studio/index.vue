@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
+
 const archiveLanes = [
 	{
 		shortCopy: "Finished pages and chapters",
@@ -17,6 +19,45 @@ const archiveLanes = [
 		label: "Photos"
 	}
 ];
+
+useHead({
+	title: "Studio Journal | RetroZetro Comics",
+	link: [
+		{
+			rel: "canonical",
+			href: toAbsoluteSiteUrl("/studio")
+		}
+	],
+	meta: [
+		{
+			name: "description",
+			content:
+				"Browse the RetroZetro studio journal for published comics, storyboards, outlines, and photo dispatches."
+		},
+		{
+			property: "og:title",
+			content: "Studio Journal | RetroZetro Comics"
+		},
+		{
+			property: "og:description",
+			content:
+				"Browse the RetroZetro studio journal for published comics, storyboards, outlines, and photo dispatches."
+		},
+		{
+			property: "og:url",
+			content: toAbsoluteSiteUrl("/studio")
+		},
+		{
+			name: "twitter:title",
+			content: "Studio Journal | RetroZetro Comics"
+		},
+		{
+			name: "twitter:description",
+			content:
+				"Browse the RetroZetro studio journal for published comics, storyboards, outlines, and photo dispatches."
+		}
+	]
+});
 </script>
 
 <template>
@@ -195,10 +236,7 @@ const archiveLanes = [
 }
 </style>
 
-<route>
-{
-"meta": {
-"layout": "default"
-}
-}
+<route lang="yaml">
+meta:
+    layout: default
 </route>

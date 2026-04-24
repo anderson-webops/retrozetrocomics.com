@@ -271,7 +271,7 @@ watch(
 .characters-grid__items {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
 }
 
 .characters-grid__card {
@@ -457,11 +457,3 @@ watch(
 	}
 }
 </style>
-
-<route>
-{
-"meta": {
-"layout": "default"
-}
-}
-</route>

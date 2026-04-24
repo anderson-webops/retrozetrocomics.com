@@ -64,3 +64,18 @@
   both code paths when changing auth or persistence.
 - Never commit real credentials or production endpoints. Scrub logs before sharing, and verify rate limiting when
   exposing new routes under `/admin-mail` or other sensitive prefixes.
+
+
+## Agent Delivery Workflow
+- Do not leave completed work uncommitted. After each coherent, validated change set, create a commit and push it in the same session.
+- Use multiple commits and pushes when that keeps unrelated changes, partial validations, or follow-up fixes clearly separated. Prefer small, logically grouped commits over one mixed commit.
+- Keep `package-lock.json` synchronized before every commit or push.
+- Use lowercase annotated semver tags only. Do not invent ad-hoc labels such as `V1`, `torca-r07`, `pre-lfs-migration-*`, or similar one-off names.
+- This repo follows the stable `v2.x` line. Stay on `v2` for routine work; only cut `v3` for an intentional breaking site or API change.
+- Before creating a new tag, check the latest tag in the active semver line and decide whether the new commit is still the same release milestone. If it is, move that existing tag forward to the new validated commit instead of minting a new version number.
+- Keep the GitHub release aligned with that decision: when the commit still belongs to the same milestone, update or recreate the existing release so it points at the moved tag/current commit; only create a brand-new release when the change creates a genuinely new milestone.
+- Cut a fresh semver tag and release only when the work crosses a real release boundary, such as a new deployable milestone, a materially different operator/user-facing state, or a version-line change that deserves its own notes and rollback point.
+- Create an annotated tag when comic/catalog browsing, storefront-like behavior, content structure, dependency/security, or deploy/health behavior materially changes.
+- Create a GitHub release when that tag represents a meaningful public-site or operations milestone. Release notes should summarize scope, validation, rollout notes, and any migration or recovery steps.
+- If the existing tag or release history contains stale drafts, redundant entries, or ad-hoc labels, clean that history up instead of preserving clutter.
+- Skip tags and releases for trivial doc-only edits, formatting-only changes, or routine housekeeping unless they change deployment, operations, or a consumer-facing contract.

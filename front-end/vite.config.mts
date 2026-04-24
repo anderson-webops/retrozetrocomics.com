@@ -1,7 +1,6 @@
 // vite.config.ts
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import VueI18n from "@intlify/unplugin-vue-i18n/vite";
 
 import { unheadVueComposablesImports } from "@unhead/vue";
 import Vue from "@vitejs/plugin-vue";
@@ -9,28 +8,60 @@ import Vue from "@vitejs/plugin-vue";
 import Unocss from "unocss/vite";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
-import VueMacros from "unplugin-vue-macros/vite";
-import { VueRouterAutoImports } from "unplugin-vue-router";
-import VueRouter from "unplugin-vue-router/vite";
 import { defineConfig } from "vite";
 import Layouts from "vite-plugin-vue-layouts-next";
 import generateSitemap from "vite-ssg-sitemap";
+import { VueRouterAutoImports } from "vue-router/unplugin";
+import VueRouter from "vue-router/vite";
+
+import { resolveSsgApiBaseUrl } from "./src/lib/apiBase";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteHostname = "https://retrozetrocomics.com";
 const sitemapExcludedRoutes = [
 	"/posts",
-	"/posts/:slug",
 	"/studio/admin",
 	"/:all(.*)"
 ];
 // Dynamic post detail and catch-all routes should resolve through a generic
 // static fallback like /index.html rather than placeholder prerender output.
+// Real published post routes are injected separately during the SSG pass.
 const staticRenderExcludedRoutes = [
 	"/posts",
 	"/posts/:slug",
 	"/:all(.*)"
 ];
+
+async function fetchPublishedPostRoutes() {
+	const apiBaseUrl = resolveSsgApiBaseUrl(process.env);
+
+	try {
+		const response = await fetch(`${apiBaseUrl}/posts?limit=200`, {
+			headers: {
+				accept: "application/json"
+			}
+		});
+
+		if (!response.ok) {
+			throw new Error(`Unexpected ${response.status} while fetching posts`);
+		}
+
+		const data = (await response.json()) as {
+			posts?: Array<{ slug?: string }>;
+		};
+
+		return (data.posts || [])
+			.map(post => post.slug?.trim())
+			.filter((slug): slug is string => Boolean(slug))
+			.map(slug => `/posts/${slug}`);
+	} catch (error) {
+		console.warn(
+			`[vite-ssg] Unable to fetch published post routes from ${apiBaseUrl}:`,
+			error
+		);
+		return [];
+	}
+}
 
 export default defineConfig(({ command }) => ({
 	resolve: {
@@ -44,23 +75,19 @@ export default defineConfig(({ command }) => ({
 		/* 1️⃣  Router (must run before macros/layouts) */
 		VueRouter({
 			extensions: [".vue"],
-			dts: "src/typed-router.d.ts",
+			dts: "src/route-map.d.ts",
 			watch: command === "serve" && !process.env.VITEST
 		}),
 
-		/* 2️⃣  VueMacros – this already injects @vitejs/plugin-vue */
-		VueMacros({
-			plugins: {
-				vue: Vue({ include: [/\.vue$/] })
-			}
-		}),
+		/* 2️⃣  Vue */
+		Vue(),
 
 		/* 3️⃣  Layouts */
 		Layouts(),
 
 		/* 4️⃣  Auto-import globals */
 		AutoImport({
-			include: [/\.[jt]sx?$/, /\.vue$/, /\.vue\?vue/],
+			include: [/\.[jt]sx?$/, /\.vue$/, /\.vue\?vue/, /\.md$/],
 			// ⚠️ remove @vueuse/head to avoid duplicate helpers
 			imports: [
 				"vue",
@@ -83,21 +110,12 @@ export default defineConfig(({ command }) => ({
 		/* 5️⃣  Auto-register components */
 		Components({
 			extensions: ["vue"],
-			include: [/\.vue$/, /\.vue\?vue/],
+			include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
 			dts: "src/components.d.ts"
 		}),
 
-		/* 6️⃣  CSS */
-		Unocss(),
-
-		/* 7️⃣  i18n */
-		// https://github.com/intlify/bundle-tools/tree/main/packages/unplugin-vue-i18n
-		VueI18n({
-			runtimeOnly: true,
-			compositionOnly: true,
-			fullInstall: true,
-			include: [path.resolve(__dirname, "locales/**")]
-		})
+		/* 6️⃣  CSS / Markdown / Misc */
+		Unocss()
 	],
 
 	/* vitest */
@@ -116,10 +134,13 @@ export default defineConfig(({ command }) => ({
 		beastiesOptions: {
 			reduceInlineStyles: false
 		},
-		includedRoutes(paths) {
-			return paths.filter(
+		async includedRoutes(paths) {
+			const publishedPostRoutes = await fetchPublishedPostRoutes();
+			const staticRoutes = paths.filter(
 				path => !staticRenderExcludedRoutes.includes(path)
 			);
+
+			return [...new Set([...staticRoutes, ...publishedPostRoutes])];
 		},
 		onFinished() {
 			generateSitemap({

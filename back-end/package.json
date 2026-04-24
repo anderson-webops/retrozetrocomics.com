@@ -7,6 +7,8 @@
 	"main": "dist/server.js",
 	"scripts": {
 		"server": "tsx watch -r dotenv/config src/server.ts",
+		"server:once": "tsx -r dotenv/config src/server.ts",
+		"ci:check": "npm ci --ignore-scripts --workspaces=false --dry-run",
 		"test": "vitest run",
 		"start": "node dist/server.js",
 		"build": "tsc -p tsconfig.json",
@@ -22,43 +24,45 @@
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
+	"overrides": {
+		"brace-expansion": "5.0.5",
+		"lodash": "4.18.1",
+		"path-to-regexp": "8.4.2",
+		"vite": "8.0.10"
+	},
 	"dependencies": {
 		"argon2": "^0.44.0",
 		"body-parser": "^2.2.2",
 		"cookie-session": "^2.1.1",
-		"dotenv": "^17.3.1",
-		"esbuild": "^0.27.4",
+		"dotenv": "^17.4.2",
+		"esbuild": "^0.28.0",
 		"express": "^5.2.1",
-		"express-rate-limit": "^8.3.1",
-		"express-validator": "^7.3.1",
+		"express-rate-limit": "^8.3.2",
+		"express-validator": "^7.3.2",
 		"helmet": "^8.1.0",
-		"marked": "^17.0.5",
+		"marked": "^18.0.0",
 		"moment": "^2.30.1",
-		"mongoose": "^9.3.1",
+		"mongoose": "^9.3.3",
 		"multer": "^2.1.1",
 		"nodemailer": "^8.0.6",
 		"readline-sync": "^1.4.10",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
-		"@eslint/compat": "^2.0.3",
 		"@types/body-parser": "^1.19.6",
 		"@types/cookie-session": "^2.0.49",
 		"@types/express": "^5.0.6",
 		"@types/express-session": "^1.18.2",
-		"@types/node": "^25.5.0",
-		"@types/nodemailer": "^7.0.11",
+		"@types/node": "^25.6.0",
+		"@types/nodemailer": "^8.0.0",
 		"@types/readline-sync": "^1.4.8",
-		"eslint-plugin-import": "^2.32.0",
+		"eslint": "^10.1.0",
+		"globals": "^17.4.0",
 		"nodemon": "^3.1.14",
 		"ts-node": "^10.9.2",
 		"tsx": "^4.21.0",
-		"typescript": "^5.9.3",
-		"typescript-eslint": "^8.57.1"
-	},
-	"overrides": {
-		"brace-expansion": "5.0.5",
-		"lodash": "4.18.1",
-		"path-to-regexp": "8.4.2"
+		"typescript": "^6.0.3",
+		"typescript-eslint": "^8.59.0",
+		"vitest": "^4.1.2"
 	}
 }

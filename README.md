@@ -1,55 +1,31 @@
-# RetroZetro Comics
+# retrozetrocomics.com
 
-## Workspace
+Website and supporting API for `retrozetrocomics.com`.
+
+## Repo Layout
+
+- `front-end/` - Vite SSG application
+- `back-end/` - Express + MongoDB API
+- `HEALTHCHECKS.md` - monitor endpoints and expected `200`/`503` behavior
+
+## Common Commands
 
 ```bash
 npm install
-```
-
-```bash
+npm run dev
 npm run server
-```
-
-```bash
 npm run serve
-```
-
-```bash
 npm run build
+npm run up
 ```
 
-```bash
-npm run lint-fix
-```
+## Operational Notes
 
-## Media Storage
-
-Uploads still land on the application server today, but the media contract is
-now designed around `provider + storageKey` instead of hardcoded local URLs.
-That means a future S3 rollout does not need a schema rewrite or frontend API
-change.
-
-Current local behavior:
-
-- files are written under `back-end/uploads/<storage-key>`
-- public URLs are resolved from `LOCAL_UPLOAD_PUBLIC_BASE_URL`
-- responses always rebuild asset URLs from `provider` and `storageKey`
-
-Prepared AWS settings:
-
-- `STORAGE_KEY_PREFIX`
-- `LOCAL_UPLOAD_PUBLIC_BASE_URL`
-- `AWS_S3_BUCKET`
-- `AWS_S3_REGION`
-- `AWS_S3_PUBLIC_BASE_URL`
-
-Future S3 switch path:
-
-1. Point the AWS variables at the target bucket or CloudFront URL.
-2. Replace the local write driver in `back-end/src/services/storage.ts` with an
-   S3 write driver.
-3. Keep the same `storageKey` pattern so existing frontend contracts keep
-   working.
-
-Once that write driver is added, the rest of the app is already prepared to
-serve S3-backed asset URLs.
+- The root `package-lock.json` is the authoritative lockfile for monorepo installs from the repo root.
+- `back-end/package-lock.json` is the authoritative lockfile for standalone installs and deploys that run from inside `back-end/`.
+- Use `npm run server` and `npm run serve` when you want the API and front-end started separately.
+- Static front-end builds now prerender published post pages and archive excerpts from the public API. If the build environment cannot reach the live site, set `VITE_SSG_API_BASE_URL` to an accessible API base URL such as `https://retrozetrocomics.com/api` before running `npm run -w front-end build`.
+- If you override the public site hostname during builds, also set `VITE_PUBLIC_SITE_ORIGIN` so canonical URLs and SSG API resolution stay correct.
+- Use [`HEALTHCHECKS.md`](./HEALTHCHECKS.md) for deployment monitor targets instead of `/`.
+- The backend runtime user must have write access to `back-end/uploads` and `back-end/uploads/content`. Uploads are written under `back-end/uploads/content/YYYY-MM`, so deploys should provision those directories before the API starts.
+- The public contact form now submits through the backend. Set `CONTACT_FROM_EMAIL` and either `CONTACT_USE_SENDMAIL=true` or the `CONTACT_SMTP_*` settings. If `CONTACT_TO_EMAIL` is unset, submissions default to `contacts@jacobdanderson.net`; `CONTACT_BCC_EMAIL` stays optional so future alias-plus-BCC routing is a simple env change.
