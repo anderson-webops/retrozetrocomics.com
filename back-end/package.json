@@ -25,7 +25,8 @@
 	"author": "",
 	"license": "ISC",
 	"overrides": {
-		"vite": "8.0.5"
+		"vite": "8.0.5",
+		"postcss": "8.5.10"
 	},
 	"dependencies": {
 		"argon2": "^0.44.0",
