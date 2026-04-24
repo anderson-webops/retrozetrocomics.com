@@ -10,7 +10,7 @@ export const useMainStore = defineStore("main", {
 					image: "/brand/poster-the-list.svg",
 					status: "Exo and Team Rimlaw search for the truth",
 					summary:
-						"Exo returns to an Apex Army moon base looking for his mother and a missing friend. The clues point past one case toward a hidden hand.",
+						"Exo returns to an Apex Army moon base looking for his mother and a missing friend. The clues point to a larger enemy.",
 					title: "The List"
 				},
 				{
@@ -18,15 +18,14 @@ export const useMainStore = defineStore("main", {
 					image: "/brand/poster-fall-of-a-dream.svg",
 					status: "The Apex Army fractures",
 					summary:
-						"Trust inside the Apex Army breaks down as Giza, Oix, Diyo, and Exo face rebellion, deception, and Zego's growing influence.",
+						"Trust inside the Apex Army breaks down as Giza, Oix, Diyo, and Exo face rebellion and Zego's growing influence.",
 					title: "The Fall of a Dream"
 				},
 				{
 					format: "Antagonist profile",
 					image: "/brand/characters-zorix.svg",
 					status: "Controlled, ruthless, direct",
-					summary:
-						"Zorix uses calm pressure and direct command to turn every confrontation toward his next move.",
+					summary: "Zorix turns fear and command into leverage.",
 					title: "Zorix"
 				},
 				{
@@ -34,19 +33,19 @@ export const useMainStore = defineStore("main", {
 					image: "/brand/world-bitgam.svg",
 					status: "Fazo's homeworld",
 					summary:
-						"Bitgam is an old Gamborus world with deep recorded history and a people marked by red skin, yellow-white eyes, and exoskeletons.",
+						"Bitgam is an old Gamborus world tied to the Great Manifested.",
 					title: "Bitgam"
 				}
 			]
 		},
 		characters: {
 			description:
-				"Meet the heroes, rivals, factions, and worlds behind the active RetroZetro stories.",
-			title: "Characters and Factions",
+				"Meet the characters, factions, and worlds driving The List and The Fall of a Dream.",
+			title: "Meet the Characters",
 			character: [
 				{
 					description:
-						"Zetro is the heart of the story: brave, stubborn, and quick to step into danger when someone else needs help.",
+						"Zetro is brave, stubborn, and quick to step into danger.",
 					frequency: "Hope under pressure",
 					fallbackImage: siteAssetCandidates.zetroPortrait[1],
 					image: siteAssetCandidates.zetroPortrait[0],
@@ -57,7 +56,7 @@ export const useMainStore = defineStore("main", {
 				},
 				{
 					description:
-						"Kazay is fast, stylish, and hard to pin down, built for missions where timing and misdirection matter.",
+						"Kazay handles missions built on timing and misdirection.",
 					frequency: "Speed and misdirection",
 					fallbackImage: siteAssetCandidates.kazayPortrait[1],
 					image: siteAssetCandidates.kazayPortrait[0],
@@ -68,7 +67,7 @@ export const useMainStore = defineStore("main", {
 				},
 				{
 					description:
-						"Exo leads Team Rimlaw through dangerous searches, rescue attempts, and conflicts that keep pulling him back to the Apex Army.",
+						"Exo leads Team Rimlaw through searches that keep pulling him back to the Apex Army.",
 					frequency: "Search and rescue",
 					fallbackImage: siteAssetCandidates.exoPortrait[1],
 					image: siteAssetCandidates.exoPortrait[0],
@@ -79,7 +78,7 @@ export const useMainStore = defineStore("main", {
 				},
 				{
 					description:
-						"Shaman brings memory, healing, and spiritual judgment to a group that often moves faster than it can understand.",
+						"Shaman brings memory, healing, and spiritual judgment.",
 					frequency: "Memory and repair",
 					fallbackImage: siteAssetCandidates.shamanPortrait[1],
 					image: siteAssetCandidates.shamanPortrait[0],
@@ -90,7 +89,7 @@ export const useMainStore = defineStore("main", {
 				},
 				{
 					description:
-						"Zorix is controlled, ruthless, and direct, using fear and command to force every conflict toward his next move.",
+						"Zorix uses fear and command to force each conflict toward his next move.",
 					frequency: "Control and intimidation",
 					image: siteAssetCandidates.zorixPortrait[0],
 					imgAlt: "Poster portrait of Zorix in crimson and obsidian tones",
@@ -102,7 +101,7 @@ export const useMainStore = defineStore("main", {
 		},
 		about: {
 			description:
-				"RetroZetro Comics follows heroes, outlaw crews, and damaged institutions caught between personal searches and a wider fight for control.",
+				"RetroZetro Comics follows Exo, Zetro, outlaw crews, and the damaged institutions caught in Zego's path.",
 			title: "About RetroZetro",
 			values: [
 				{
@@ -110,11 +109,11 @@ export const useMainStore = defineStore("main", {
 					title: "Story first"
 				},
 				{
-					body: "Background notes should help readers understand the worlds, not distract from them.",
+					body: "World notes should clarify the story.",
 					title: "Useful context"
 				},
 				{
-					body: "Characters, factions, and places should feel connected across every arc.",
+					body: "Characters, factions, and places should stay connected.",
 					title: "Connected worlds"
 				}
 			],
@@ -122,7 +121,7 @@ export const useMainStore = defineStore("main", {
 				{
 					climax: "The Star Hunters and the Apex Army have to decide whether they can trust each other long enough to face the real enemy.",
 					description:
-						"Exo leads Team Rimlaw into an investigation tied to his mother, a missing friend, and crimes blamed on Apex Army members.",
+						"Exo searches for his mother and a missing friend as Star Hunters target accused Apex Army members.",
 					firstPlotPoint:
 						"The case grows from one disappearance into a pattern of altered symbols, false trails, and hidden influence.",
 					hook: "Star Hunters begin targeting Apex Army members accused of crimes across other worlds.",
@@ -141,7 +140,7 @@ export const useMainStore = defineStore("main", {
 				{
 					climax: "Exo is pushed toward a direct confrontation with Zego.",
 					description:
-						"The Apex Army begins to fracture from the inside as the Zego Order's influence turns suspicion into open rebellion.",
+						"The Apex Army fractures as the Zego Order turns suspicion into rebellion.",
 					firstPlotPoint:
 						"Diyo warns the outlaw teams that Apex Army members are dying under mysterious circumstances.",
 					hook: "Trust inside the Apex Army breaks apart as allies question who is still acting freely.",
@@ -203,16 +202,8 @@ export const useMainStore = defineStore("main", {
 			]
 		},
 		contact: {
-			channels: [
-				{
-					href: "mailto:retrozetrocomics@gmail.com",
-					label: "Creator inbox",
-					note: "Use this for commissions, collaboration, press, and convention requests.",
-					value: "retrozetrocomics@gmail.com"
-				}
-			],
 			description:
-				"Reach out for commissions, collaborations, convention programming, press, or a clear project question.",
+				"Reach out for commissions, collaboration, press, or project questions.",
 			faq: [
 				{
 					answer: "Commissions, story collaboration, process interviews, convention programming, and press requests are welcome.",
@@ -221,17 +212,7 @@ export const useMainStore = defineStore("main", {
 				{
 					answer: "If you are writing about the work, include the project, outlet, deadline, and whether you need images, answers, or both.",
 					question: "What helps a press request get answered quickly?"
-				},
-				{
-					answer: "Not yet. For now, use the contact form for commission and collaboration questions.",
-					question: "Are products available yet?"
 				}
-			],
-			inquiryTypes: [
-				"Commissioned character art",
-				"Podcast or interview requests",
-				"Convention programming",
-				"General collaboration ideas"
 			],
 			title: "Contact RetroZetro"
 		}

@@ -17,17 +17,8 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 			</RouterLink>
 			<div class="title-plate__text">
 				<span>RetroZetro Comics</span>
-				<p>Comics, characters, and story notes from the Retroverse.</p>
+				<p>Stories, characters, and world notes from the Retroverse.</p>
 			</div>
-		</div>
-
-		<div id="top-ad" class="title-plate__ad">
-			<p class="title-plate__eyebrow">Start Here</p>
-			<ul class="title-plate__board">
-				<li>Read the newest comics and story notes.</li>
-				<li>Meet the cast and factions.</li>
-				<li>Use project notes for background.</li>
-			</ul>
 		</div>
 	</header>
 </template>
@@ -85,44 +76,11 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 	color: #31405a;
 }
 
-.title-plate__ad {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	align-items: flex-start;
-}
-
-.title-plate__eyebrow {
-	margin: 0;
-	text-transform: uppercase;
-	letter-spacing: 0.18em;
-	font-size: 0.78rem;
-	font-weight: 700;
-	color: #ff7d44;
-}
-
-.title-plate__board {
-	display: grid;
-	gap: 0.7rem;
-	list-style: none;
-	margin: 0;
-	padding: 1rem;
-	border-radius: 16px;
-	background: rgba(8, 17, 31, 0.06);
-	color: #102038;
-	line-height: 1.7;
-}
-
 @media (min-width: 768px) {
 	.title-plate {
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-	}
-
-	.title-plate__ad {
-		align-items: flex-start;
-		max-width: 420px;
 	}
 }
 

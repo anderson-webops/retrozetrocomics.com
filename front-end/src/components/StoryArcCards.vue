@@ -9,7 +9,6 @@ type StoryArcBeatKey =
 	| "midpoint"
 	| "resolution"
 	| "thirdPlotPoint";
-type StoryArcPublicFieldKey = "hook" | "incitingIncident" | "midpoint" | "note";
 
 const props = withDefaults(
 	defineProps<{
@@ -40,13 +39,6 @@ const editorBeatFields: { key: StoryArcBeatKey; label: string }[] = [
 	{ key: "climax", label: "Climax" },
 	{ key: "resolution", label: "Resolution" }
 ];
-const publicBeatFields: { key: StoryArcPublicFieldKey; label: string }[] = [
-	{ key: "hook", label: "Opening conflict" },
-	{ key: "incitingIncident", label: "Complication" },
-	{ key: "midpoint", label: "Pressure point" },
-	{ key: "note", label: "Reader note" }
-];
-
 const editingId = ref("");
 const removalArmedId = ref("");
 const draftArc = ref<AboutStoryArc | null>(null);
@@ -219,17 +211,7 @@ watch(
 				<p class="story-arc-card__eyebrow">{{ arc.label }}</p>
 				<h3>{{ arc.title }}</h3>
 				<p class="story-arc-card__summary">{{ arc.description }}</p>
-
-				<dl class="story-arc-card__beats-list">
-					<div
-						v-for="field in publicBeatFields"
-						:key="field.key"
-						class="story-arc-card__beat-row"
-					>
-						<dt>{{ field.label }}</dt>
-						<dd>{{ arc[field.key] }}</dd>
-					</div>
-				</dl>
+				<p class="story-arc-card__stake">{{ arc.climax }}</p>
 			</template>
 		</article>
 	</section>
@@ -305,42 +287,16 @@ watch(
 }
 
 .story-arc-card__summary,
-.story-arc-card__beats-list dd {
+.story-arc-card__stake {
 	line-height: 1.75;
 	color: rgba(239, 244, 255, 0.76);
 	overflow-wrap: anywhere;
 }
 
-.story-arc-card__beats-list {
-	display: grid;
-	gap: 0;
-	margin: 0;
-	padding: 0.3rem 0;
-	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.04);
-}
-
-.story-arc-card__beat-row {
-	display: grid;
-	gap: 0.3rem;
-	padding: 1rem;
-}
-
-.story-arc-card__beat-row + .story-arc-card__beat-row {
+.story-arc-card__stake {
+	padding-top: 0.75rem;
 	border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.story-arc-card__beats-list dt {
 	color: #fff4e7;
-	font-size: 0.86rem;
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
-	font-weight: 700;
-	margin: 0;
-}
-
-.story-arc-card__beats-list dd {
-	margin: 0;
 }
 
 .story-arc-card__editor,

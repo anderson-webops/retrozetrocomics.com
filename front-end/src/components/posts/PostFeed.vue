@@ -13,9 +13,8 @@ const props = withDefaults(
 	{
 		limit: 12,
 		showViewAll: false,
-		subtitle:
-			"Latest comics, storyboards, outlines, and process images from the Retroverse.",
-		title: "Latest Posts"
+		subtitle: "Published RetroZetro posts.",
+		title: "Posts"
 	}
 );
 
@@ -36,10 +35,10 @@ const error = ref("");
 const hasResolved = ref(false);
 
 const filterDescriptions: Record<"all" | PostType, string> = {
-	all: "Browse every public post, or filter by the kind of material you want to read.",
+	all: "Filter public posts by format.",
 	comic: "Finished comic pages, chapters, and polished narrative work.",
 	outline: "Story notes, plot maps, and background material for active arcs.",
-	photo: "Reference images, studio snapshots, and visual process notes.",
+	photo: "Reference images and visual process notes.",
 	storyboard: "Rough scenes, pacing tests, and visual planning."
 };
 
@@ -65,7 +64,7 @@ const emptyStateMessage = computed(() => {
 		return "No public photo posts are live yet.";
 	}
 
-	return "No public posts are live yet.";
+	return "No public posts are available yet.";
 });
 
 async function loadPosts() {
@@ -112,7 +111,7 @@ watch(activeType, () => {
 				<p>{{ subtitle }}</p>
 			</div>
 
-			<div class="post-feed__controls">
+			<div v-if="posts.length || activeType" class="post-feed__controls">
 				<p class="post-feed__filter-copy">
 					{{ activeFilterDescription }}
 				</p>
@@ -130,7 +129,7 @@ watch(activeType, () => {
 				<div
 					class="post-feed__filters"
 					role="tablist"
-					aria-label="Filter studio posts"
+					aria-label="Filter posts"
 				>
 					<button
 						v-for="filter in formatFilters"

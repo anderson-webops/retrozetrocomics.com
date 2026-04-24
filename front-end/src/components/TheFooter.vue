@@ -1,8 +1,5 @@
 <script lang="ts" setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { useSessionStore } from "@/stores/session";
-
-const session = useSessionStore();
 </script>
 
 <template>
@@ -10,33 +7,17 @@ const session = useSessionStore();
 		<div class="footer__brand">
 			<p class="footer__eyebrow">RetroZetro Comics</p>
 			<h2>Stay in the Retroverse</h2>
-			<p>
-				Comics, characters, and story notes from the worlds around Zetro
-				and Exo.
-			</p>
+			<p>Stories, characters, and world notes from the Retroverse.</p>
 		</div>
 
 		<nav aria-label="Footer navigation" class="footer__links">
 			<h3>Explore</h3>
 			<div class="footer__link-list">
-				<RouterLink to="/studio">Read posts</RouterLink>
 				<RouterLink to="/characters">Characters</RouterLink>
 				<RouterLink to="/about">About the project</RouterLink>
 				<RouterLink to="/contact">Contact</RouterLink>
 			</div>
 		</nav>
-
-		<div class="footer__cta">
-			<h3>Comments</h3>
-			<button
-				v-if="!session.isAuthenticated"
-				type="button"
-				@click="session.openAuth('signup')"
-			>
-				Create account
-			</button>
-			<p>Some posts are open for moderated reader comments.</p>
-		</div>
 
 		<div class="footer__contact">
 			<h3>Contact</h3>
@@ -57,7 +38,6 @@ const session = useSessionStore();
 	display: grid;
 	grid-template-columns:
 		minmax(0, 1.5fr)
-		minmax(0, 1.1fr)
 		minmax(0, 1.1fr)
 		auto;
 	align-items: center;
@@ -102,7 +82,6 @@ const session = useSessionStore();
 }
 
 .footer__links,
-.footer__cta,
 .footer__contact {
 	display: grid;
 	gap: 0.45rem;
@@ -113,14 +92,11 @@ const session = useSessionStore();
 }
 
 .footer__links h3,
-.footer__cta h3,
-.footer__cta p,
 .footer__contact h3 {
 	margin: 0;
 }
 
 .footer__links h3,
-.footer__cta h3,
 .footer__contact h3 {
 	color: #fff4e7;
 	text-transform: uppercase;
@@ -136,8 +112,6 @@ const session = useSessionStore();
 }
 
 .footer__links a,
-.footer__cta a,
-.footer__cta button,
 .footer__social {
 	color: rgba(239, 244, 255, 0.82);
 	text-decoration: none;
@@ -148,28 +122,6 @@ const session = useSessionStore();
 	text-align: left;
 	cursor: pointer;
 	font: inherit;
-}
-
-.footer__cta p {
-	line-height: 1.55;
-	font-size: 0.92rem;
-	color: rgba(239, 244, 255, 0.72);
-	max-width: 22rem;
-}
-
-.footer__cta a,
-.footer__cta button {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: fit-content;
-	padding: 0.34rem 0.82rem;
-	border-radius: 999px;
-	background: #ff9459;
-	color: #08111f;
-	font-weight: 800;
-	font-size: 0.84rem;
-	line-height: 1.1;
 }
 
 .footer__social {
@@ -209,7 +161,6 @@ const session = useSessionStore();
 	}
 
 	.footer__links,
-	.footer__cta,
 	.footer__contact {
 		justify-items: start;
 		text-align: left;

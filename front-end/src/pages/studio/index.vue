@@ -1,27 +1,8 @@
 <script lang="ts" setup>
 import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
 
-const archiveSections = [
-	{
-		shortCopy: "Finished pages and chapters",
-		label: "Comics"
-	},
-	{
-		shortCopy: "Rough scenes and pacing notes",
-		label: "Storyboards"
-	},
-	{
-		shortCopy: "Story notes and maps",
-		label: "Outlines"
-	},
-	{
-		shortCopy: "Reference and process images",
-		label: "Photos"
-	}
-];
-
 useHead({
-	title: "Comics and Story Notes | RetroZetro Comics",
+	title: "Posts | RetroZetro Comics",
 	link: [
 		{
 			rel: "canonical",
@@ -31,17 +12,15 @@ useHead({
 	meta: [
 		{
 			name: "description",
-			content:
-				"Read RetroZetro comics, storyboards, outlines, and process images in one place."
+			content: "Public RetroZetro posts."
 		},
 		{
 			property: "og:title",
-			content: "Comics and Story Notes | RetroZetro Comics"
+			content: "Posts | RetroZetro Comics"
 		},
 		{
 			property: "og:description",
-			content:
-				"Read RetroZetro comics, storyboards, outlines, and process images in one place."
+			content: "Public RetroZetro posts."
 		},
 		{
 			property: "og:url",
@@ -49,12 +28,11 @@ useHead({
 		},
 		{
 			name: "twitter:title",
-			content: "Comics and Story Notes | RetroZetro Comics"
+			content: "Posts | RetroZetro Comics"
 		},
 		{
 			name: "twitter:description",
-			content:
-				"Read RetroZetro comics, storyboards, outlines, and process images in one place."
+			content: "Public RetroZetro posts."
 		}
 	]
 });
@@ -122,33 +100,20 @@ useHead({
 
 		<section class="studio-page__hero">
 			<div class="studio-page__hero-copy">
-				<p class="studio-page__eyebrow">Read</p>
-				<h1>Comics and Story Notes</h1>
+				<p class="studio-page__eyebrow">Posts</p>
+				<h1>Public posts</h1>
 				<p>
-					Start with finished pages, then use storyboards, outlines,
-					and process images for a closer look at how the Retroverse
-					is built.
+					Comics, storyboards, outlines, and process images appear
+					here when they are published.
 				</p>
-			</div>
-
-			<div class="studio-page__hero-panel">
-				<p class="studio-page__eyebrow studio-page__eyebrow--panel">
-					Sections
-				</p>
-				<ul>
-					<li v-for="section in archiveSections" :key="section.label">
-						<span>{{ section.label }}</span>
-						<strong>{{ section.shortCopy }}</strong>
-					</li>
-				</ul>
 			</div>
 		</section>
 
 		<PostFeed
 			id="recent-posts"
 			:limit="24"
-			subtitle="Read the newest comics, storyboards, outlines, and process images."
-			title="Recent Posts"
+			subtitle="Published RetroZetro posts."
+			title="Posts"
 		/>
 	</div>
 </template>
@@ -162,7 +127,6 @@ useHead({
 .studio-page__hero {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.9fr);
 	padding: clamp(1.8rem, 4vw, 2.8rem);
 	border-radius: 28px;
 	background: rgba(9, 21, 38, 0.84);
@@ -193,47 +157,8 @@ useHead({
 	color: #ffb36f;
 }
 
-.studio-page__eyebrow--panel {
-	margin-bottom: 0.75rem;
-}
-
-.studio-page__hero-panel {
-	padding: 1.2rem;
-	border-radius: 22px;
-	background: rgba(255, 255, 255, 0.06);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.studio-page__hero-panel ul {
-	display: grid;
-	gap: 0.9rem;
-}
-
-.studio-page__hero-panel li {
-	display: grid;
-	gap: 0.2rem;
-}
-
-.studio-page__hero-panel span {
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	font-size: 0.76rem;
-	color: rgba(255, 255, 255, 0.56);
-}
-
-.studio-page__hero-panel strong {
-	color: #fff3e5;
-	line-height: 1.5;
-}
-
 #recent-posts {
 	scroll-margin-top: 1.5rem;
-}
-
-@media (max-width: 820px) {
-	.studio-page__hero {
-		grid-template-columns: 1fr;
-	}
 }
 </style>
 

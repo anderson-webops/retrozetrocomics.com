@@ -95,21 +95,11 @@ async function handleSubmit() {
 					href: 'mailto:retrozetrocomics@gmail.com',
 					label: 'Email RetroZetro',
 					style: 'primary'
-				},
-				{
-					label: 'Read recent posts',
-					style: 'secondary',
-					to: '/studio'
 				}
 			]"
 			actions-placement="poster"
 			eyebrow="Contact"
-			:highlights="
-				store.contact.channels.map(channel => ({
-					description: channel.note,
-					term: channel.label
-				}))
-			"
+			:highlights="[]"
 			:image-candidates="siteAssetCandidates.contactLogo"
 			image-alt="RetroZetro logo mark"
 			:message="store.contact.description"
@@ -117,45 +107,8 @@ async function handleSubmit() {
 		/>
 
 		<section class="contact-page__grid">
-			<article class="contact-panel">
-				<p class="contact-panel__eyebrow">Contact Channels</p>
-				<h2>Email</h2>
-				<ul class="contact-panel__list">
-					<li
-						v-for="channel in store.contact.channels"
-						:key="channel.label"
-					>
-						<strong>{{ channel.label }}</strong>
-						<a
-							:href="channel.href"
-							rel="noreferrer"
-							target="_blank"
-						>
-							{{ channel.value }}
-						</a>
-						<p>{{ channel.note }}</p>
-					</li>
-				</ul>
-			</article>
-
-			<article class="contact-panel contact-panel--warm">
-				<p class="contact-panel__eyebrow">Best Uses</p>
-				<h2>When to reach out</h2>
-				<ul class="contact-panel__tags">
-					<li
-						v-for="inquiry in store.contact.inquiryTypes"
-						:key="inquiry"
-					>
-						{{ inquiry }}
-					</li>
-				</ul>
-			</article>
-		</section>
-
-		<section class="contact-page__grid">
 			<form class="contact-form" @submit.prevent="handleSubmit">
-				<p class="contact-panel__eyebrow">Send a message</p>
-				<h2>Send a clean brief</h2>
+				<h2>Send a message</h2>
 				<label for="subject">Subject</label>
 				<input
 					id="subject"
@@ -175,7 +128,7 @@ async function handleSubmit() {
 				<textarea
 					id="message"
 					v-model="form.message"
-					placeholder="Tell RetroZetro what you need, your timeline, and any links or references."
+					placeholder="Share what you need, your timeline, and any useful links."
 					required
 					rows="7"
 				/>

@@ -3,7 +3,7 @@ export function createDefaultAboutPageContent() {
 		storyArcs: [
 			{
 				climax: "The Star Hunters and the Apex Army have to decide whether they can trust each other long enough to face the real enemy.",
-				description: "Exo leads Team Rimlaw into an investigation tied to his mother, a missing friend, and crimes blamed on Apex Army members.",
+				description: "Exo searches for his mother and a missing friend as Star Hunters target accused Apex Army members.",
 				firstPlotPoint: "The case grows from one disappearance into a pattern of altered symbols, false trails, and hidden influence.",
 				hook: "Star Hunters begin targeting Apex Army members accused of crimes across other worlds.",
 				id: "arc-the-list",
@@ -17,7 +17,7 @@ export function createDefaultAboutPageContent() {
 			},
 			{
 				climax: "Exo is pushed toward a direct confrontation with Zego.",
-				description: "The Apex Army begins to fracture from the inside as the Zego Order's influence turns suspicion into open rebellion.",
+				description: "The Apex Army fractures as the Zego Order turns suspicion into rebellion.",
 				firstPlotPoint: "Diyo warns the outlaw teams that Apex Army members are dying under mysterious circumstances.",
 				hook: "Trust inside the Apex Army breaks apart as allies question who is still acting freely.",
 				id: "arc-fall-of-a-dream",

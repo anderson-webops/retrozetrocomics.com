@@ -78,7 +78,7 @@ useHead(
 				{
 					name: "description",
 					content:
-						"Read RetroZetro Comics, follow the active stories, and meet the characters and worlds behind the Retroverse."
+						"Explore RetroZetro Comics, the characters, and the worlds behind Exo, Zetro, and the Star Hunters."
 				},
 				{
 					name: "theme-color",

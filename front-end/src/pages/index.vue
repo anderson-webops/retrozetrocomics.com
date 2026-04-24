@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
-import Comics from "~/components/TheComics.vue";
 import { useMainStore } from "~/stores";
 
 const store = useMainStore();
 
 useHead({
-	title: "RetroZetro Comics | Comics, Characters, and Story Notes",
+	title: "RetroZetro Comics | Stories and Characters",
 	link: [
 		{
 			rel: "canonical",
@@ -17,16 +16,16 @@ useHead({
 		{
 			name: "description",
 			content:
-				"Read RetroZetro Comics, meet the cast, and follow the active stories of the Retroverse."
+				"Explore RetroZetro Comics, the cast, and the current conflicts of the Retroverse."
 		},
 		{
 			property: "og:title",
-			content: "RetroZetro Comics | Comics, Characters, and Story Notes"
+			content: "RetroZetro Comics | Stories and Characters"
 		},
 		{
 			property: "og:description",
 			content:
-				"Read RetroZetro Comics, meet the cast, and follow the active stories of the Retroverse."
+				"Explore RetroZetro Comics, the cast, and the current conflicts of the Retroverse."
 		},
 		{
 			property: "og:url",
@@ -34,12 +33,12 @@ useHead({
 		},
 		{
 			name: "twitter:title",
-			content: "RetroZetro Comics | Comics, Characters, and Story Notes"
+			content: "RetroZetro Comics | Stories and Characters"
 		},
 		{
 			name: "twitter:description",
 			content:
-				"Read RetroZetro Comics, meet the cast, and follow the active stories of the Retroverse."
+				"Explore RetroZetro Comics, the cast, and the current conflicts of the Retroverse."
 		}
 	]
 });
@@ -48,16 +47,15 @@ useHead({
 <template>
 	<div class="page page--home">
 		<WelcomeSection actions-placement="poster" highlights-layout="stack" />
-		<Comics />
 
 		<section class="home-showcase">
 			<header class="home-showcase__header">
-				<p class="home-showcase__eyebrow">Stories and Worlds</p>
-				<h2>Start with the conflicts shaping the Retroverse</h2>
+				<p class="home-showcase__eyebrow">Current Conflicts</p>
+				<h2>Two storylines drive the Retroverse</h2>
 				<p>
-					The main arcs follow Exo, Zetro, the Star Hunters, and the
-					Apex Army as personal searches turn into wider fights over
-					trust, power, and hidden control.
+					Exo's search in The List exposes a hidden enemy. The Fall of
+					a Dream follows the damage when that influence reaches the
+					Apex Army itself.
 				</p>
 			</header>
 
@@ -77,21 +75,6 @@ useHead({
 				</article>
 			</div>
 		</section>
-
-		<section class="home-panels">
-			<div class="home-panel home-panel--accent">
-				<p class="home-panel__eyebrow">Next Steps</p>
-				<h2>Keep reading without the tour</h2>
-				<p class="home-panel__summary">
-					Use the project notes for context, or reach out when you
-					have a specific commission, collaboration, or press request.
-				</p>
-				<div class="home-panel__actions">
-					<RouterLink to="/about">Read the project notes</RouterLink>
-					<RouterLink to="/contact">Contact the creator</RouterLink>
-				</div>
-			</div>
-		</section>
 	</div>
 </template>
 
@@ -101,8 +84,7 @@ useHead({
 	gap: 1.8rem;
 }
 
-.home-showcase,
-.home-panel {
+.home-showcase {
 	padding: clamp(1.5rem, 4vw, 2.4rem);
 	border-radius: 24px;
 }
@@ -129,8 +111,7 @@ useHead({
 	margin: 0;
 }
 
-.home-showcase__eyebrow,
-.home-panel__eyebrow {
+.home-showcase__eyebrow {
 	text-transform: uppercase;
 	letter-spacing: 0.18em;
 	font-size: 0.78rem;
@@ -141,8 +122,7 @@ useHead({
 	color: #ff7d44;
 }
 
-.home-showcase__header h2,
-.home-panel h2 {
+.home-showcase__header h2 {
 	font-family: var(--font-display);
 	font-size: clamp(2rem, 4vw, 2.9rem);
 	line-height: 1.02;
@@ -207,59 +187,6 @@ useHead({
 .home-showcase__copy p:last-child {
 	line-height: 1.7;
 	color: #31405a;
-}
-
-.home-panels {
-	display: grid;
-}
-
-.home-panel {
-	display: grid;
-	gap: 1rem;
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.home-panel--accent {
-	width: min(100%, 46rem);
-	margin-inline: auto;
-	background: rgba(255, 255, 255, 0.06);
-	border-color: rgba(124, 225, 246, 0.18);
-}
-
-.home-panel__eyebrow {
-	color: #ffd27d;
-}
-
-.home-panel h2 {
-	color: #fff4e7;
-}
-
-.home-panel__summary {
-	margin: 0;
-	color: rgba(239, 244, 255, 0.76);
-	line-height: 1.75;
-	max-width: 34rem;
-}
-
-.home-panel__actions {
-	display: grid;
-	gap: 0.8rem;
-	justify-content: center;
-	justify-items: center;
-}
-
-.home-panel__actions a {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: min(100%, 22rem);
-	padding: 0.8rem 1.1rem;
-	border-radius: 999px;
-	text-decoration: none;
-	font-weight: 700;
-	background: #ff9459;
-	color: #07111f;
 }
 </style>
 

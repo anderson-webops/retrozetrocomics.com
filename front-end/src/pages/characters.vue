@@ -27,13 +27,6 @@ const openWorldEditorId = ref("");
 const savingCharacterId = ref("");
 const savingWorldEntryId = ref("");
 
-const characterHighlights = computed(() =>
-	content.value.characters.map(character => ({
-		description: character.specialty,
-		term: character.name
-	}))
-);
-
 useHead({
 	title: "Characters and Factions | RetroZetro Comics",
 	link: [
@@ -46,7 +39,7 @@ useHead({
 		{
 			name: "description",
 			content:
-				"Meet the key heroes, rivals, factions, and worlds shaping the Retroverse."
+				"Meet the characters, factions, and worlds driving The List and The Fall of a Dream."
 		},
 		{
 			property: "og:title",
@@ -55,7 +48,7 @@ useHead({
 		{
 			property: "og:description",
 			content:
-				"Meet the key heroes, rivals, factions, and worlds shaping the Retroverse."
+				"Meet the characters, factions, and worlds driving The List and The Fall of a Dream."
 		},
 		{
 			property: "og:url",
@@ -68,7 +61,7 @@ useHead({
 		{
 			name: "twitter:description",
 			content:
-				"Meet the key heroes, rivals, factions, and worlds shaping the Retroverse."
+				"Meet the characters, factions, and worlds driving The List and The Fall of a Dream."
 		}
 	]
 });
@@ -173,19 +166,19 @@ function handleWorldEntryDiscard(entryId: string) {
 		<WelcomeSection
 			:actions="[
 				{
-					label: 'Read recent posts',
+					label: 'About the Project',
 					style: 'primary',
-					to: '/studio'
+					to: '/about'
 				},
 				{
-					label: 'Contact the studio',
+					label: 'Contact RetroZetro',
 					style: 'secondary',
 					to: '/contact'
 				}
 			]"
 			actions-placement="poster"
 			:eyebrow="content.eyebrow"
-			:highlights="characterHighlights"
+			:highlights="[]"
 			:image-candidates="[
 				content.heroImage,
 				content.heroImageFallback || ''

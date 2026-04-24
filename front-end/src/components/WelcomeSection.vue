@@ -13,7 +13,7 @@ const props = defineProps({
 		type: String as PropType<"content" | "poster">
 	},
 	eyebrow: {
-		default: "Your weekly broadcast from the Retroverse",
+		default: "RetroZetro Comics",
 		type: String
 	},
 	highlights: {
@@ -38,7 +38,7 @@ const props = defineProps({
 	},
 	message: {
 		default:
-			"Read the latest comics, follow the active story arcs, and meet the characters and worlds shaping the Retroverse.",
+			"Exo, Zetro, and the Star Hunters are caught between personal searches, broken alliances, and the Apex Army's hidden corruption.",
 		type: String
 	},
 	title: {
@@ -63,22 +63,22 @@ interface HeroHighlight {
 }
 
 const defaultActions: HeroAction[] = [
-	{ label: "Read the Comics", style: "primary", to: "/studio" },
-	{ label: "Meet the Characters", style: "secondary", to: "/characters" }
+	{ label: "Meet the Characters", style: "primary", to: "/characters" },
+	{ label: "About the Project", style: "secondary", to: "/about" }
 ];
 
 const defaultHighlights: HeroHighlight[] = [
 	{
-		description: "Finished pages and story updates.",
-		term: "Comics"
+		description: "The search that exposes a deeper enemy.",
+		term: "The List"
 	},
 	{
-		description: "Rough boards and process material.",
-		term: "Storyboards"
+		description: "The Apex Army fractures from within.",
+		term: "The Fall of a Dream"
 	},
 	{
-		description: "Cast, factions, and world notes.",
-		term: "Characters"
+		description: "Heroes, rivals, factions, and worlds.",
+		term: "Retroverse"
 	}
 ];
 
@@ -142,6 +142,7 @@ function handleAction(action: HeroAction) {
 			</div>
 
 			<dl
+				v-if="heroHighlights.length"
 				class="welcome__highlights"
 				:class="`welcome__highlights--${props.highlightsLayout}`"
 			>

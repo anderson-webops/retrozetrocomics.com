@@ -164,17 +164,17 @@ function handleWorldEntryDiscard(entryId: string) {
 		<WelcomeSection
 			:actions="[
 				{
-					label: 'Read recent posts',
+					label: 'Meet the Characters',
 					style: 'primary',
-					to: '/studio'
+					to: '/characters'
 				},
 				{
-					label: 'Contact the creator',
+					label: 'Contact RetroZetro',
 					style: 'secondary',
 					to: '/contact'
 				}
 			]"
-			eyebrow="Studio Origins"
+			eyebrow="Project"
 			:highlights="highlights"
 			:image-candidates="siteAssetCandidates.aboutHero"
 			image-alt="RetroZetro flagship portrait"
@@ -187,11 +187,10 @@ function handleWorldEntryDiscard(entryId: string) {
 		<section class="about-page__story-section">
 			<header class="about-page__section-header">
 				<p class="about-page__eyebrow">Stories</p>
-				<h2>The main stories in motion</h2>
+				<h2>The current conflicts</h2>
 				<p>
-					These arcs show how personal searches, damaged alliances,
-					and the Zego Order's influence pull the characters into
-					larger conflict.
+					The List begins with Exo's search. The Fall of a Dream shows
+					what happens when the Apex Army starts breaking from inside.
 				</p>
 			</header>
 

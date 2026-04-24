@@ -251,10 +251,6 @@ watch(
 						<p class="characters-grid__description">
 							{{ item.description }}
 						</p>
-						<div class="characters-grid__chips">
-							<span>{{ item.specialty }}</span>
-							<span>{{ item.frequency }}</span>
-						</div>
 					</div>
 				</template>
 			</div>
@@ -430,21 +426,6 @@ watch(
 .characters-grid__description {
 	line-height: 1.75;
 	color: rgba(239, 244, 255, 0.76);
-}
-
-.characters-grid__chips {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.65rem;
-}
-
-.characters-grid__chips span {
-	padding: 0.5rem 0.8rem;
-	border-radius: 999px;
-	background: rgba(124, 225, 246, 0.1);
-	color: #7ce1f6;
-	font-size: 0.82rem;
-	line-height: 1.4;
 }
 
 @media (max-width: 720px) {

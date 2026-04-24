@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { CharacterBoardWorldEntry } from "@/types/site";
+import { useSessionStore } from "@/stores/session";
 
 const props = withDefaults(
 	defineProps<{
@@ -24,6 +25,8 @@ const emit = defineEmits<{
 const editingId = ref("");
 const removalArmedId = ref("");
 const draftEntry = ref<CharacterBoardWorldEntry | null>(null);
+const session = useSessionStore();
+const canEdit = computed(() => props.inlineEditing && session.showAdminTools);
 
 function cloneWorldEntry(
 	entry: CharacterBoardWorldEntry
@@ -98,7 +101,7 @@ watch(
 	<section
 		class="world-entry-grid"
 		:class="{
-			'world-entry-grid--editing': inlineEditing && !!editingId
+			'world-entry-grid--editing': canEdit && !!editingId
 		}"
 	>
 		<article
@@ -110,7 +113,7 @@ watch(
 			}"
 		>
 			<button
-				v-if="inlineEditing"
+				v-if="canEdit"
 				type="button"
 				class="world-entry-card__edit"
 				@click="startEditing(entry)"
@@ -118,9 +121,7 @@ watch(
 				{{ editingId === entry.id ? "Editing" : "Edit" }}
 			</button>
 
-			<template
-				v-if="inlineEditing && editingId === entry.id && draftEntry"
-			>
+			<template v-if="canEdit && editingId === entry.id && draftEntry">
 				<form
 					class="world-entry-card__editor"
 					@submit.prevent="submitEntry"

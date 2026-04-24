@@ -116,14 +116,14 @@ async function submitSignup() {
 						{{
 							authModalMode === "login"
 								? "Welcome back"
-								: "Create an account"
+								: "Reader account"
 						}}
 					</h2>
 					<p>
 						{{
 							authModalMode === "login"
-								? "Sign in to comment on posts that are open for replies."
-								: "Create an account to leave moderated comments on open posts."
+								? "Sign in to reply on posts that allow comments."
+								: "Use a reader account when a post is open for replies."
 						}}
 					</p>
 				</div>
@@ -149,7 +149,7 @@ async function submitSignup() {
 						type="button"
 						@click="session.openAuth('signup')"
 					>
-						Sign Up
+						Register
 					</button>
 				</div>
 
@@ -198,7 +198,7 @@ async function submitSignup() {
 							type="button"
 							@click="session.openAuth('signup')"
 						>
-							Create an account
+							Register
 						</button>
 					</p>
 				</form>

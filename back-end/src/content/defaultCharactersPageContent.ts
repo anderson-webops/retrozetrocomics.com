@@ -1,16 +1,16 @@
 export function createDefaultCharactersPageContent() {
 	return {
 		description:
-			"Meet the heroes, rivals, factions, and worlds behind the active RetroZetro stories.",
+			"Meet the characters, factions, and worlds driving The List and The Fall of a Dream.",
 		eyebrow: "Characters and Factions",
 		heroImage: "/legacy-images/Zetro2.jpg",
 		heroImageAlt: "Zetro portrait",
 		heroImageFallback: "/brand/characters-zetro.svg",
-		title: "Meet the Key Players",
+		title: "Meet the Characters",
 		characters: [
 			{
 				description:
-					"Zetro is the heart of the story: brave, stubborn, and quick to step into danger when someone else needs help.",
+					"Zetro is brave, stubborn, and quick to step into danger.",
 				fallbackImage: "/brand/characters-zetro.svg",
 				frequency: "Hope under pressure",
 				id: "zetro",
@@ -22,7 +22,7 @@ export function createDefaultCharactersPageContent() {
 			},
 			{
 				description:
-					"Kazay is fast, stylish, and hard to pin down, built for missions where timing and misdirection matter.",
+					"Kazay handles missions built on timing and misdirection.",
 				fallbackImage: "/brand/characters-kazay.svg",
 				frequency: "Speed and misdirection",
 				id: "kazay",
@@ -34,7 +34,7 @@ export function createDefaultCharactersPageContent() {
 			},
 			{
 				description:
-					"Exo leads Team Rimlaw through dangerous searches, rescue attempts, and conflicts that keep pulling him back to the Apex Army.",
+					"Exo leads Team Rimlaw through searches that keep pulling him back to the Apex Army.",
 				fallbackImage: "/brand/characters-exo.svg",
 				frequency: "Search and rescue",
 				id: "exo",
@@ -46,7 +46,7 @@ export function createDefaultCharactersPageContent() {
 			},
 			{
 				description:
-					"Shaman brings memory, healing, and spiritual judgment to a group that often moves faster than it can understand.",
+					"Shaman brings memory, healing, and spiritual judgment.",
 				fallbackImage: "/brand/characters-shaman.svg",
 				frequency: "Memory and repair",
 				id: "shaman",
@@ -58,7 +58,7 @@ export function createDefaultCharactersPageContent() {
 			},
 			{
 				description:
-					"Zorix is controlled, ruthless, and direct, using fear and command to force every conflict toward his next move.",
+					"Zorix uses fear and command to force each conflict toward his next move.",
 				fallbackImage: "",
 				frequency: "Control and intimidation",
 				id: "zorix",

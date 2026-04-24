@@ -10,7 +10,6 @@ const session = useSessionStore();
 
 const links = [
 	{ name: "Home", path: "/" },
-	{ name: "Read", path: "/studio" },
 	{ name: "Characters", path: "/characters" },
 	{ name: "About", path: "/about" },
 	{ name: "Contact", path: "/contact" }
@@ -135,14 +134,7 @@ watch(
 						type="button"
 						@click="session.openAuth('login')"
 					>
-						Login
-					</button>
-					<button
-						class="nav__action nav__action--primary"
-						type="button"
-						@click="session.openAuth('signup')"
-					>
-						Sign Up
+						Sign in
 					</button>
 				</template>
 			</div>
