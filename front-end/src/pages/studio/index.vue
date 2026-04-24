@@ -75,7 +75,7 @@ const archiveLanes = [
 					}
 				}
 			]"
-			description="Use the live archive page to jump straight into the right publishing lane."
+			description="Add a post from this page."
 			title="Studio controls"
 		/>
 
@@ -84,9 +84,8 @@ const archiveLanes = [
 				<p class="studio-page__eyebrow">Open Archive</p>
 				<h1>Studio Journal</h1>
 				<p>
-					Browse finished comics, raw storyboard explorations,
-					outlines, and photo dispatches from the making of RetroZetro
-					Comics.
+					Browse comics, storyboards, outlines, and photos in one
+					place.
 				</p>
 			</div>
 
@@ -106,7 +105,7 @@ const archiveLanes = [
 		<PostFeed
 			id="recent-drops"
 			:limit="24"
-			subtitle="Everything the owner publishes lands here, including comics, outlines, and studio notes, with comments enabled where the post invites discussion."
+			subtitle="Browse comics, storyboards, outlines, and photos from newest to oldest."
 			title="All Recent Drops"
 		/>
 	</div>

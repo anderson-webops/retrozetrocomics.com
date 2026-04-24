@@ -2,7 +2,7 @@ export function createDefaultCharactersPageContent() {
 	return {
 		description:
 			"Track the heroes, rivals, and pressure points shaping the Retroverse as the Apex Army, the Star Hunters, and the Zego Order collide.",
-		eyebrow: "Character and Threat Board",
+		eyebrow: "Characters",
 		heroImage: "/legacy-images/Zetro2.jpg",
 		heroImageAlt: "Zetro portrait",
 		heroImageFallback: "/brand/characters-zetro.svg",

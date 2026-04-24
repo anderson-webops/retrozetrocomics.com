@@ -63,8 +63,7 @@ interface HeroHighlight {
 }
 
 const defaultActions: HeroAction[] = [
-	{ label: "Browse the studio", style: "primary", to: "/studio" },
-	{ label: "Meet the cast", style: "secondary", to: "/characters" }
+	{ label: "Browse the studio", style: "primary", to: "/studio" }
 ];
 
 const defaultHighlights: HeroHighlight[] = [
@@ -142,6 +141,7 @@ function handleAction(action: HeroAction) {
 			</div>
 
 			<dl
+				v-if="heroHighlights.length"
 				class="welcome__highlights"
 				:class="`welcome__highlights--${props.highlightsLayout}`"
 			>

@@ -13,30 +13,12 @@ const store = useMainStore();
 					label: 'Start reading',
 					style: 'primary',
 					to: '/studio'
-				},
-				{
-					label: 'Meet the cast',
-					style: 'secondary',
-					to: '/characters'
 				}
 			]"
 			eyebrow="Friday-night transmission"
-			:highlights="[
-				{
-					term: 'Latest drop',
-					description: 'Start with the newest studio entry.'
-				},
-				{
-					term: 'World files',
-					description: 'Follow the bigger canon when you want more.'
-				},
-				{
-					term: 'Open threads',
-					description: 'Members can reply where discussion is open.'
-				}
-			]"
+			:highlights="[]"
 			image-alt="RetroZetro lead portrait"
-			message="Read the latest comic pages, dip into the boards behind them, and explore the notes and photos building the Retroverse."
+			message="Read the newest comic pages, boards, notes, and photos from the Retroverse."
 			title="RetroZetro Comics"
 			actions-placement="poster"
 			highlights-layout="stack"
@@ -46,10 +28,10 @@ const store = useMainStore();
 		<section class="home-showcase">
 			<header class="home-showcase__header">
 				<p class="home-showcase__eyebrow">Canon Files</p>
-				<h2>Start with the big signals</h2>
+				<h2>Start Here</h2>
 				<p>
-					The core arcs, rival, and homeworld file live here when you
-					want the wider story around the weekly drops.
+					Begin with the main arcs, Zorix, and Bitgam before diving
+					into new drops.
 				</p>
 			</header>
 
@@ -72,19 +54,14 @@ const store = useMainStore();
 
 		<section class="home-panels">
 			<div class="home-panel home-panel--accent">
-				<p class="home-panel__eyebrow">Go Deeper</p>
-				<h2>Want the wider studio story?</h2>
+				<p class="home-panel__eyebrow">About</p>
+				<h2>Inside the Studio</h2>
 				<p class="home-panel__summary">
-					Read the project background, then reach out only if you need
-					to.
+					Read the project background and the larger story files.
 				</p>
 				<div class="home-panel__actions">
-					<RouterLink to="/about">Read the studio story</RouterLink>
+					<RouterLink to="/about">Open About</RouterLink>
 				</div>
-				<p class="home-panel__footnote">
-					Questions or collaboration?
-					<RouterLink to="/contact">Contact the creator</RouterLink>.
-				</p>
 			</div>
 		</section>
 	</div>

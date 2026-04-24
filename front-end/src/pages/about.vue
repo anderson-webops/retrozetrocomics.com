@@ -129,11 +129,6 @@ function handleWorldEntryDiscard(entryId: string) {
 					label: 'Browse the archive',
 					style: 'primary',
 					to: '/studio'
-				},
-				{
-					label: 'Contact the creator',
-					style: 'secondary',
-					to: '/contact'
 				}
 			]"
 			eyebrow="Studio Origins"
@@ -149,11 +144,10 @@ function handleWorldEntryDiscard(entryId: string) {
 		<section class="about-page__story-section">
 			<header class="about-page__section-header">
 				<p class="about-page__eyebrow">Story Files</p>
-				<h2>Current arcs in the canon pipeline</h2>
+				<h2>Current Story Arcs</h2>
 				<p>
-					The site now carries the bigger narrative beats directly, so
-					readers can see where Exo, Rimlaw, the Apex Army, and the
-					Zego Order sit in the broader conflict.
+					These arcs frame the conflict between Exo, Rimlaw, the Apex
+					Army, and the Zego Order.
 				</p>
 			</header>
 
@@ -179,12 +173,8 @@ function handleWorldEntryDiscard(entryId: string) {
 		<section class="about-page__story-section">
 			<header class="about-page__section-header">
 				<p class="about-page__eyebrow">World Ledger</p>
-				<h2>Terms, worlds, and faction pressure</h2>
-				<p>
-					These files anchor the universe around the stories, from the
-					name used for outlaw crews to the homeworlds and
-					institutions under strain.
-				</p>
+				<h2>World Files</h2>
+				<p>Key terms, worlds, and factions behind the main arcs.</p>
 			</header>
 
 			<div class="about-page__world-grid">

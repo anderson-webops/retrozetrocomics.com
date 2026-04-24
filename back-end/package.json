@@ -10,6 +10,7 @@
 		"test": "vitest run",
 		"start": "node dist/server.js",
 		"build": "tsc -p tsconfig.json",
+		"typecheck": "tsc -p tsconfig.json --noEmit",
 		"watch": "tsc -w",
 		"dev": "tsx watch -r dotenv/config src/server.ts",
 		"up": "taze major -I",
@@ -35,7 +36,7 @@
 		"moment": "^2.30.1",
 		"mongoose": "^9.3.1",
 		"multer": "^2.1.1",
-		"nodemailer": "^8.0.3",
+		"nodemailer": "^8.0.6",
 		"readline-sync": "^1.4.10",
 		"zod": "^4.3.6"
 	},
@@ -54,5 +55,10 @@
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.57.1"
+	},
+	"overrides": {
+		"brace-expansion": "5.0.5",
+		"lodash": "4.18.1",
+		"path-to-regexp": "8.4.2"
 	}
 }

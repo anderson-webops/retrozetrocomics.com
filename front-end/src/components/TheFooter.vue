@@ -9,7 +9,7 @@ const session = useSessionStore();
 	<footer class="footer">
 		<div class="footer__brand">
 			<p class="footer__eyebrow">RetroZetro Comics</p>
-			<h2>Stay in the Retroverse</h2>
+			<h2>Retroverse Archive</h2>
 			<p>Comics, boards, notes, and studio photos from the same world.</p>
 		</div>
 

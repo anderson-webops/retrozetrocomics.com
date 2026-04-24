@@ -139,12 +139,12 @@ export async function updateCharactersPageContent(req: Request, res: Response) {
 				worldEntryCount: parsed.data.worldEntries.length
 			},
 			entityId: CHARACTERS_PAGE_KEY,
-			entityLabel: "Character and Threat Board",
+			entityLabel: "Character Board",
 			entityType: "site-content",
 			req,
 			summary: "Updated the character and threat board",
 			targetId: CHARACTERS_PAGE_KEY,
-			targetLabel: "Character and Threat Board",
+			targetLabel: "Character Board",
 			targetType: "site-content"
 		});
 	}

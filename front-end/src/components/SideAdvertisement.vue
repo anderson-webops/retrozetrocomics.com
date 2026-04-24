@@ -15,25 +15,13 @@ const isStudioJournalRoute = computed(() => route.path === "/studio");
 
 const panels = {
 	archive: {
-		ctaLabel: "See full journal",
+		ctaLabel: "Open Studio",
 		ctaTo: "/studio",
-		eyebrow: "New Here?",
+		eyebrow: "Browse",
 		items: [
 			{
-				label: "Start in Studio",
-				value: "See every recent drop"
-			},
-			{
-				label: "Filter by lane",
+				label: "Latest drops",
 				value: "Comics, boards, notes, photos"
-			},
-			{
-				label: "Open a post",
-				value: "Read the full entry"
-			},
-			{
-				label: "Keep exploring",
-				value: "Move from archive to world files"
 			}
 		]
 	},
@@ -43,16 +31,16 @@ const panels = {
 		eyebrow: "Community",
 		items: [
 			{
-				label: "Open threads",
-				value: "Only some posts invite replies"
+				label: "Replies",
+				value: "On selected posts"
 			},
 			{
-				label: "Member accounts",
-				value: "Sign in before joining the thread"
+				label: "Accounts",
+				value: "Required to comment"
 			},
 			{
 				label: "Moderated",
-				value: "Discussion stays focused on the work"
+				value: "Reviewed before public"
 			}
 		]
 	}
@@ -63,23 +51,11 @@ const panel = computed(() => {
 		return {
 			ctaLabel: "Jump to latest drops",
 			ctaTo: "/studio",
-			eyebrow: "Use the Journal",
+			eyebrow: "Journal",
 			items: [
 				{
-					label: "Start Wide",
-					value: "Browse every drop first"
-				},
-				{
-					label: "Use Filters",
-					value: "Sort by lane when needed"
-				},
-				{
-					label: "Open Posts",
-					value: "See full pages and notes"
-				},
-				{
-					label: "Join In",
-					value: "Members can comment on open threads"
+					label: "Latest drops",
+					value: "Search or filter the archive"
 				}
 			]
 		} as const;

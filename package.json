@@ -27,18 +27,29 @@
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^7.7.3",
+		"@unhead/dom": "2.1.13",
 		"@typescript-eslint/eslint-plugin": "^8.57.1",
 		"@typescript-eslint/parser": "^8.57.1",
 		"eslint": "^10.1.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-prettier": "^5.5.5",
 		"eslint-plugin-vue": "^10.8.0",
+		"follow-redirects": "1.16.0",
 		"globals": "^17.4.0",
+		"lodash": "4.18.1",
+		"path-to-regexp": "8.4.2",
 		"prettier": "^3.8.1",
 		"taze": "^19.10.0",
-		"typescript": "^5.9.3"
+		"typescript": "^5.9.3",
+		"unhead": "2.1.13",
+		"vite": "8.0.10"
 	},
 	"overrides": {
+		"brace-expansion": "5.0.5",
+		"defu": "6.1.7",
+		"follow-redirects": "1.16.0",
+		"lodash": "4.18.1",
+		"path-to-regexp": "8.4.2",
 		"picomatch": "4.0.4",
 		"anymatch": {
 			"picomatch": "2.3.2"

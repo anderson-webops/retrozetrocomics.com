@@ -171,8 +171,7 @@ watch(activeType, () => {
 			No drops match that search yet.
 		</p>
 		<p v-else-if="!posts.length" class="post-feed__state">
-			The archive is empty for now. Once the first drop is published, it
-			will land here.
+			No public drops are live yet.
 		</p>
 
 		<div v-else class="post-feed__grid">

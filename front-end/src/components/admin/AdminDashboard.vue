@@ -63,7 +63,6 @@ const restoredDraftHadFiles = ref(false);
 const saving = ref(false);
 const selectedPreviewMedia = ref<MediaAsset[]>([]);
 const showPreview = ref(false);
-const showStorageDetails = ref(false);
 const postActionLoadingId = ref("");
 const postRemovalConfirmationError = ref("");
 const postRemovalConfirmationInput = ref("");
@@ -1217,14 +1216,6 @@ onBeforeUnmount(() => {
 					can participate in the community.
 				</p>
 			</div>
-			<button
-				v-if="dashboard && !loading"
-				type="button"
-				class="admin-dashboard__secondary-action"
-				@click="showStorageDetails = true"
-			>
-				Storage setup notes
-			</button>
 		</header>
 
 		<p v-if="error" class="admin-dashboard__error">
@@ -1817,7 +1808,7 @@ onBeforeUnmount(() => {
 				class="admin-panel"
 			>
 				<header>
-					<h2>Character and Threat Board</h2>
+					<h2>Character Board</h2>
 					<p>
 						Edit the character board, hero copy, and world files
 						that feed the Characters page and the world-ledger
@@ -2568,70 +2559,6 @@ onBeforeUnmount(() => {
 
 	<Teleport to="body">
 		<div
-			v-if="showStorageDetails && dashboard"
-			class="admin-info-overlay"
-			@click.self="showStorageDetails = false"
-		>
-			<section class="admin-info-dialog">
-				<div class="admin-info-dialog__header">
-					<div>
-						<p class="admin-dashboard__eyebrow">Storage Setup</p>
-						<h2>Future bucket rollout notes</h2>
-						<p>
-							Advanced deployment detail for later media
-							infrastructure work. Not required for day-to-day
-							publishing.
-						</p>
-					</div>
-					<button
-						type="button"
-						class="admin-info-dialog__close"
-						@click="showStorageDetails = false"
-					>
-						Close
-					</button>
-				</div>
-
-				<div class="storage-grid">
-					<article class="storage-card">
-						<span>Write driver</span>
-						<strong>{{
-							dashboard.storage.activeWriteDriver
-						}}</strong>
-					</article>
-					<article class="storage-card">
-						<span>Key prefix</span>
-						<strong>{{ dashboard.storage.keyPrefix }}</strong>
-					</article>
-					<article class="storage-card">
-						<span>Local base</span>
-						<strong>{{
-							dashboard.storage.localPublicBaseUrl
-						}}</strong>
-					</article>
-					<article class="storage-card">
-						<span>AWS target</span>
-						<strong>
-							{{
-								dashboard.storage.s3PublicBaseUrl ||
-								"Not configured yet"
-							}}
-						</strong>
-					</article>
-				</div>
-
-				<p class="storage-summary">
-					{{ dashboard.storage.switchSummary }}
-				</p>
-				<p class="storage-summary storage-summary--muted">
-					{{ dashboard.storage.nextStep }}
-				</p>
-			</section>
-		</div>
-	</Teleport>
-
-	<Teleport to="body">
-		<div
 			v-if="pendingBoardRemoval"
 			class="admin-confirmation"
 			@click.self="closeBoardRemovalConfirmation"
@@ -3050,52 +2977,12 @@ onBeforeUnmount(() => {
 .board-editor,
 .review-list,
 .member-list,
-.post-list,
-.storage-grid {
+.post-list {
 	display: grid;
 	gap: 1rem;
 	list-style: none;
 	margin: 1rem 0 0;
 	padding: 0;
-}
-
-.storage-grid {
-	grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-}
-
-.storage-card {
-	display: grid;
-	gap: 0.4rem;
-	padding: 1rem;
-	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.04);
-}
-
-.storage-card span,
-.storage-summary {
-	margin: 0;
-}
-
-.storage-card span {
-	text-transform: uppercase;
-	letter-spacing: 0.1em;
-	font-size: 0.76rem;
-	color: rgba(255, 255, 255, 0.6);
-}
-
-.storage-card strong {
-	color: #fff4e7;
-	line-height: 1.5;
-}
-
-.storage-summary {
-	margin-top: 1rem;
-	line-height: 1.7;
-	color: rgba(255, 255, 255, 0.78);
-}
-
-.storage-summary--muted {
-	color: rgba(255, 255, 255, 0.62);
 }
 
 .publish-form label {

@@ -26,13 +26,6 @@ const openWorldEditorId = ref("");
 const savingCharacterId = ref("");
 const savingWorldEntryId = ref("");
 
-const characterHighlights = computed(() =>
-	content.value.characters.map(character => ({
-		description: character.specialty,
-		term: character.name
-	}))
-);
-
 onMounted(() => {
 	void load();
 });
@@ -116,7 +109,7 @@ function handleWorldEntryDiscard(entryId: string) {
 					}
 				}
 			]"
-			description="These page controls stay collapsed by default. Add or edit the character board right here, or open the full workspace when you need the broader admin panel."
+			description="Add or edit character cards from this page."
 			title="Character page controls"
 		/>
 
@@ -136,16 +129,11 @@ function handleWorldEntryDiscard(entryId: string) {
 					label: 'Browse current drops',
 					style: 'primary',
 					to: '/studio'
-				},
-				{
-					label: 'Contact the studio',
-					style: 'secondary',
-					to: '/contact'
 				}
 			]"
 			actions-placement="poster"
 			:eyebrow="content.eyebrow"
-			:highlights="characterHighlights"
+			:highlights="[]"
 			:image-candidates="[
 				content.heroImage,
 				content.heroImageFallback || ''

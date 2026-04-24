@@ -44,21 +44,11 @@ function handleSubmit() {
 					href: 'mailto:retrozetrocomics@gmail.com',
 					label: 'Email the studio',
 					style: 'primary'
-				},
-				{
-					label: 'Browse the archive',
-					style: 'secondary',
-					to: '/studio'
 				}
 			]"
 			actions-placement="poster"
 			eyebrow="Contact the Studio"
-			:highlights="
-				store.contact.channels.map(channel => ({
-					description: channel.note,
-					term: channel.label
-				}))
-			"
+			:highlights="[]"
 			:image-candidates="siteAssetCandidates.contactLogo"
 			image-alt="RetroZetro logo mark"
 			:message="store.contact.description"
@@ -88,8 +78,8 @@ function handleSubmit() {
 			</article>
 
 			<article class="contact-panel contact-panel--warm">
-				<p class="contact-panel__eyebrow">Best Uses</p>
-				<h2>Good reasons to reach out</h2>
+				<p class="contact-panel__eyebrow">Reach Out For</p>
+				<h2>Clear requests</h2>
 				<ul class="contact-panel__tags">
 					<li
 						v-for="inquiry in store.contact.inquiryTypes"

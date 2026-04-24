@@ -79,7 +79,7 @@ watch(
 						}
 					}
 				]"
-				description="Jump from the live post directly into its publishing workspace."
+				description="Edit this post or add another one."
 				title="Post controls"
 			/>
 			<PostPreviewPanel back-to="/studio" :post="post" />

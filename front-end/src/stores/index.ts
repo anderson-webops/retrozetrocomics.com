@@ -42,7 +42,7 @@ export const useMainStore = defineStore("main", {
 		characters: {
 			description:
 				"Track the heroes, rivals, and pressure points shaping the Retroverse as the Apex Army, the Star Hunters, and the Zego Order collide.",
-			title: "Character and Threat Board",
+			title: "Meet the Key Players",
 			character: [
 				{
 					description:
@@ -207,32 +207,27 @@ export const useMainStore = defineStore("main", {
 				{
 					href: "mailto:retrozetrocomics@gmail.com",
 					label: "Creator inbox",
-					note: "Best route for commissions, collaboration, and press.",
+					note: "Commissions, collaboration, and press.",
 					value: "retrozetrocomics@gmail.com"
 				}
 			],
 			description:
-				"Use the studio contact page for commissions, collaboration ideas, convention invites, press questions, or production follow-ups.",
+				"Send commissions, collaboration ideas, convention invites, or press questions.",
 			faq: [
 				{
-					answer: "Story collaboration, commissioned illustration, process interviews, and site feedback are all fair game.",
+					answer: "Include the project, timeline, budget if relevant, and any useful links.",
 					question: "What kinds of outreach are welcome?"
 				},
 				{
-					answer: "If you are writing about the work, include the project, outlet, deadline, and whether you need images, answers, or both.",
+					answer: "Include your outlet, deadline, and whether you need images, answers, or both.",
 					question: "What helps a press request get answered quickly?"
-				},
-				{
-					answer: "Not yet. The current site is focused on publication, archive growth, and community features, but the structure is ready to expand.",
-					question: "Is there merch or a storefront yet?"
 				}
 			],
 			inquiryTypes: [
-				"Commissioned character art",
-				"Podcast or interview requests",
-				"Convention programming",
-				"Technical feedback on the new site",
-				"General collaboration ideas"
+				"Commissions",
+				"Interviews",
+				"Convention invites",
+				"Collaborations"
 			],
 			title: "Contact the Studio"
 		}

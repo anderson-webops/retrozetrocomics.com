@@ -210,20 +210,23 @@ watch(
 				<h3>{{ arc.title }}</h3>
 				<p class="story-arc-card__summary">{{ arc.description }}</p>
 
-				<dl class="story-arc-card__beats-list">
-					<div
-						v-for="field in beatFields"
-						:key="field.key"
-						class="story-arc-card__beat-row"
-					>
-						<dt>{{ field.label }}</dt>
-						<dd>{{ arc[field.key] }}</dd>
-					</div>
-					<div class="story-arc-card__beat-row">
-						<dt>Additional note</dt>
-						<dd>{{ arc.note }}</dd>
-					</div>
-				</dl>
+				<details class="story-arc-card__beats-panel">
+					<summary>Story beats</summary>
+					<dl class="story-arc-card__beats-list">
+						<div
+							v-for="field in beatFields"
+							:key="field.key"
+							class="story-arc-card__beat-row"
+						>
+							<dt>{{ field.label }}</dt>
+							<dd>{{ arc[field.key] }}</dd>
+						</div>
+						<div class="story-arc-card__beat-row">
+							<dt>Additional note</dt>
+							<dd>{{ arc.note }}</dd>
+						</div>
+					</dl>
+				</details>
 			</template>
 		</article>
 	</section>
@@ -305,13 +308,25 @@ watch(
 	overflow-wrap: anywhere;
 }
 
+.story-arc-card__beats-panel {
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.04);
+	overflow: hidden;
+}
+
+.story-arc-card__beats-panel summary {
+	cursor: pointer;
+	padding: 0.9rem 1rem;
+	color: #fff4e7;
+	font-weight: 800;
+}
+
 .story-arc-card__beats-list {
 	display: grid;
 	gap: 0;
 	margin: 0;
-	padding: 0.3rem 0;
-	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.04);
+	padding: 0.2rem 0;
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .story-arc-card__beat-row {
