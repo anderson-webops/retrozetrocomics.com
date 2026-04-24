@@ -6,9 +6,8 @@ import mongoose from "mongoose";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 import { adminRouter } from "./routes/admin.js";
-import { authRouter, legacyAccountsRouter } from "./routes/auth.js";
+import { authRouter } from "./routes/auth.js";
 import { contactRouter } from "./routes/contact.js";
-import { postsRouter } from "./routes/posts.js";
 import { siteContentRouter } from "./routes/siteContent.js";
 import {
 	ensureUploadDirectories,
@@ -121,9 +120,7 @@ export function createApp() {
 	app.use("/uploads", express.static(uploadRoot));
 
 	apiRouter.use("/auth", authRouter);
-	apiRouter.use("/accounts", legacyAccountsRouter);
 	apiRouter.use("/contact", contactRouter);
-	apiRouter.use("/posts", postsRouter);
 	apiRouter.use("/admin", adminRouter);
 	apiRouter.use("/site-content", siteContentRouter);
 
@@ -131,8 +128,6 @@ export function createApp() {
 
 	// Keep legacy mounts during the transition to the explicit /api contract.
 	app.use("/auth", authRouter);
-	app.use("/accounts", legacyAccountsRouter);
-	app.use("/posts", postsRouter);
 	app.use("/admin", adminRouter);
 	app.use("/site-content", siteContentRouter);
 

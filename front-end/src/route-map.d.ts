@@ -62,27 +62,6 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/posts': RouteRecordInfo<
-      '/posts',
-      '/posts',
-      Record<never, never>,
-      Record<never, never>,
-      | '/posts/[slug]'
-    >,
-    '/posts/[slug]': RouteRecordInfo<
-      '/posts/[slug]',
-      '/posts/:slug',
-      { slug: ParamValue<true> },
-      { slug: ParamValue<false> },
-      | never
-    >,
-    '/studio/': RouteRecordInfo<
-      '/studio/',
-      '/studio',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
     '/studio/admin': RouteRecordInfo<
       '/studio/admin',
       '/studio/admin',
@@ -130,25 +109,6 @@ declare module 'vue-router/auto-routes' {
     'src/pages/contact.vue': {
       routes:
         | '/contact'
-      views:
-        | never
-    }
-    'src/pages/posts.vue': {
-      routes:
-        | '/posts'
-        | '/posts/[slug]'
-      views:
-        | 'default'
-    }
-    'src/pages/posts/[slug].vue': {
-      routes:
-        | '/posts/[slug]'
-      views:
-        | never
-    }
-    'src/pages/studio/index.vue': {
-      routes:
-        | '/studio/'
       views:
         | never
     }

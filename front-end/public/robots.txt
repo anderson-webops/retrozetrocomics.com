@@ -10,41 +10,41 @@ Disallow: /
 User-agent: Googlebot
 Allow: /
 Disallow: /api
-Disallow: /studio
+Disallow: /studio/admin
 
 User-agent: Bingbot
 Allow: /
 Disallow: /api
-Disallow: /studio
+Disallow: /studio/admin
 
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /api
-Disallow: /studio
+Disallow: /studio/admin
 
 User-agent: Claude-SearchBot
 Allow: /
 Disallow: /api
-Disallow: /studio
+Disallow: /studio/admin
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /api
-Disallow: /studio
+Disallow: /studio/admin
 
 User-agent: Perplexity-User
 Allow: /
 Disallow: /api
-Disallow: /studio
+Disallow: /studio/admin
 
 User-agent: Claude-User
 Allow: /
 Disallow: /api
-Disallow: /studio
+Disallow: /studio/admin
 
 User-agent: *
 Allow: /
 Disallow: /api
-Disallow: /studio
+Disallow: /studio/admin
 
 Sitemap: https://retrozetrocomics.com/sitemap.xml

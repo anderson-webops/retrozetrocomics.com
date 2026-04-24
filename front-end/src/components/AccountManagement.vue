@@ -5,53 +5,26 @@ import { reactive, ref, watch } from "vue";
 import { useSessionStore } from "@/stores/session";
 
 const session = useSessionStore();
-const { account, authModalMode, authModalOpen, authError, busy, captcha } =
-	storeToRefs(session);
+const { authModalOpen, authError, busy } = storeToRefs(session);
 
 const loginForm = reactive({
 	email: "",
 	password: ""
 });
 
-const signupForm = reactive({
-	captchaResponse: "",
-	email: "",
-	name: "",
-	password: "",
-	passwordConfirm: ""
-});
-
 const localError = ref("");
 
-const passwordsMatch = computed(
-	() => signupForm.password === signupForm.passwordConfirm
-);
-
-function resetForms() {
+function resetForm() {
 	loginForm.email = "";
 	loginForm.password = "";
-	signupForm.captchaResponse = "";
-	signupForm.email = "";
-	signupForm.name = "";
-	signupForm.password = "";
-	signupForm.passwordConfirm = "";
 	localError.value = "";
 }
 
 watch(authModalOpen, open => {
 	if (!open) {
-		resetForms();
+		resetForm();
 	}
 });
-
-watch(
-	() => [authModalOpen.value, authModalMode.value] as const,
-	async ([open, mode]) => {
-		if (open && mode === "signup" && !captcha.value) {
-			await session.refreshCaptcha();
-		}
-	}
-);
 
 async function submitLogin() {
 	localError.value = "";
@@ -60,29 +33,9 @@ async function submitLogin() {
 			email: loginForm.email,
 			password: loginForm.password
 		});
-		resetForms();
+		resetForm();
 	} catch {
 		localError.value = authError.value || "Unable to sign in right now.";
-	}
-}
-
-async function submitSignup() {
-	localError.value = "";
-	if (!passwordsMatch.value) {
-		localError.value = "Passwords do not match.";
-		return;
-	}
-
-	try {
-		await session.signup({
-			captchaResponse: signupForm.captchaResponse,
-			email: signupForm.email,
-			name: signupForm.name,
-			password: signupForm.password
-		});
-		resetForms();
-	} catch {
-		localError.value = authError.value || "Unable to create your account.";
 	}
 }
 </script>
@@ -96,13 +49,13 @@ async function submitSignup() {
 			@click.self="session.closeAuth()"
 		>
 			<div
-				class="auth-modal"
+				aria-labelledby="admin-login-heading"
 				aria-modal="true"
+				class="auth-modal"
 				role="dialog"
-				:aria-labelledby="`auth-heading-${authModalMode}`"
 			>
 				<button
-					aria-label="Close account dialog"
+					aria-label="Close admin sign-in dialog"
 					class="auth-modal__close"
 					type="button"
 					@click="session.closeAuth()"
@@ -111,53 +64,15 @@ async function submitSignup() {
 				</button>
 
 				<div class="auth-modal__hero">
-					<p class="auth-modal__eyebrow">Account</p>
-					<h2 :id="`auth-heading-${authModalMode}`">
-						{{
-							authModalMode === "login"
-								? "Welcome back"
-								: "Reader account"
-						}}
-					</h2>
+					<p class="auth-modal__eyebrow">Owner Access</p>
+					<h2 id="admin-login-heading">Admin sign in</h2>
 					<p>
-						{{
-							authModalMode === "login"
-								? "Sign in to reply on posts that allow comments."
-								: "Use a reader account when a post is open for replies."
-						}}
+						Sign in only when you need to edit site content or
+						review owner activity.
 					</p>
 				</div>
 
-				<div class="auth-modal__switcher">
-					<button
-						class="auth-modal__switch"
-						:class="{
-							'auth-modal__switch--active':
-								authModalMode === 'login'
-						}"
-						type="button"
-						@click="session.openAuth('login')"
-					>
-						Login
-					</button>
-					<button
-						class="auth-modal__switch"
-						:class="{
-							'auth-modal__switch--active':
-								authModalMode === 'signup'
-						}"
-						type="button"
-						@click="session.openAuth('signup')"
-					>
-						Register
-					</button>
-				</div>
-
-				<form
-					v-if="authModalMode === 'login'"
-					class="auth-form"
-					@submit.prevent="submitLogin"
-				>
+				<form class="auth-form" @submit.prevent="submitLogin">
 					<label>
 						<span>Email</span>
 						<input
@@ -188,131 +103,9 @@ async function submitSignup() {
 						:disabled="busy"
 						type="submit"
 					>
-						{{ busy ? "Signing in..." : "Sign In" }}
+						{{ busy ? "Signing in..." : "Sign in" }}
 					</button>
-
-					<p class="auth-form__meta">
-						New here?
-						<button
-							class="auth-form__link"
-							type="button"
-							@click="session.openAuth('signup')"
-						>
-							Register
-						</button>
-					</p>
 				</form>
-
-				<form v-else class="auth-form" @submit.prevent="submitSignup">
-					<label>
-						<span>Name</span>
-						<input
-							v-model="signupForm.name"
-							autocomplete="name"
-							maxlength="80"
-							minlength="2"
-							required
-							type="text"
-						/>
-					</label>
-
-					<label>
-						<span>Email</span>
-						<input
-							v-model="signupForm.email"
-							autocomplete="email"
-							required
-							type="email"
-						/>
-					</label>
-
-					<div class="auth-form__grid">
-						<label>
-							<span>Password</span>
-							<input
-								v-model="signupForm.password"
-								autocomplete="new-password"
-								minlength="8"
-								required
-								type="password"
-							/>
-						</label>
-
-						<label>
-							<span>Confirm Password</span>
-							<input
-								v-model="signupForm.passwordConfirm"
-								autocomplete="new-password"
-								minlength="8"
-								required
-								type="password"
-							/>
-						</label>
-					</div>
-
-					<div class="captcha-block">
-						<div class="captcha-block__image">
-							<img
-								v-if="captcha"
-								:alt="`Captcha prompt ${captcha.prompt}`"
-								:src="captcha.imageDataUrl"
-							/>
-						</div>
-						<div class="captcha-block__body">
-							<p>Solve the challenge to finish signing up.</p>
-							<label>
-								<span>Captcha Answer</span>
-								<input
-									v-model="signupForm.captchaResponse"
-									inputmode="numeric"
-									required
-									type="text"
-								/>
-							</label>
-							<button
-								class="auth-form__link auth-form__link--button"
-								type="button"
-								@click="session.refreshCaptcha()"
-							>
-								Refresh captcha
-							</button>
-						</div>
-					</div>
-
-					<p
-						v-if="localError || authError || !passwordsMatch"
-						class="auth-form__error"
-					>
-						{{
-							localError ||
-							authError ||
-							(!passwordsMatch ? "Passwords do not match." : "")
-						}}
-					</p>
-
-					<button
-						class="auth-form__submit"
-						:disabled="busy"
-						type="submit"
-					>
-						{{ busy ? "Creating account..." : "Create Account" }}
-					</button>
-
-					<p class="auth-form__meta">
-						Already a member?
-						<button
-							class="auth-form__link"
-							type="button"
-							@click="session.openAuth('login')"
-						>
-							Sign in instead
-						</button>
-					</p>
-				</form>
-
-				<div v-if="account" class="auth-modal__status">
-					Signed in as {{ account.name }}.
-				</div>
 			</div>
 		</div>
 	</Teleport>
@@ -322,208 +115,127 @@ async function submitSignup() {
 .auth-overlay {
 	position: fixed;
 	inset: 0;
-	z-index: 90;
+	z-index: 100;
 	display: grid;
 	place-items: center;
-	padding: 1.25rem;
-	background: rgba(8, 0, 15, 0.74);
-	backdrop-filter: blur(6px);
+	padding: 1rem;
+	background: rgba(4, 8, 16, 0.72);
+	backdrop-filter: blur(14px);
 }
 
 .auth-modal {
 	position: relative;
-	width: min(720px, 100%);
-	display: grid;
-	gap: 1.5rem;
-	padding: clamp(1.5rem, 4vw, 2.25rem);
+	width: min(100%, 28rem);
+	overflow: hidden;
+	border: 1px solid rgba(255, 255, 255, 0.12);
 	border-radius: var(--radius-panel);
-	background: rgba(12, 2, 20, 0.98);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	box-shadow: var(--shadow-modal);
-	color: #f6e8ff;
+	background: #101a2a;
+	box-shadow: 0 28px 70px rgba(0, 0, 0, 0.46);
+	color: #fff8ef;
 }
 
 .auth-modal__close {
 	position: absolute;
-	top: 1rem;
-	right: 1rem;
-	border: none;
-	background: transparent;
-	color: #ffb36f;
-	font-size: 2rem;
-	line-height: 1;
+	top: 0.8rem;
+	right: 0.8rem;
+	display: grid;
+	width: 2.25rem;
+	height: 2.25rem;
+	place-items: center;
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff8ef;
 	cursor: pointer;
+	font-size: 1.35rem;
+	line-height: 1;
 }
 
 .auth-modal__hero {
 	display: grid;
 	gap: 0.55rem;
+	padding: clamp(1.4rem, 5vw, 2rem);
+	background:
+		linear-gradient(135deg, rgba(255, 145, 77, 0.16), transparent 46%),
+		rgba(255, 255, 255, 0.04);
+}
+
+.auth-modal__hero h2,
+.auth-modal__hero p {
+	margin: 0;
 }
 
 .auth-modal__hero h2 {
-	margin: 0;
-	font-size: clamp(2rem, 5vw, 2.6rem);
+	font-size: clamp(1.6rem, 5vw, 2.2rem);
 }
 
 .auth-modal__hero p {
-	margin: 0;
+	max-width: 32ch;
 	color: rgba(255, 255, 255, 0.76);
 	line-height: 1.65;
 }
 
 .auth-modal__eyebrow {
-	margin: 0;
-	text-transform: uppercase;
-	letter-spacing: var(--tracking-eyebrow);
-	font-size: 0.78rem;
 	color: #ffb36f;
-}
-
-.auth-modal__switcher {
-	display: inline-grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	padding: 0.35rem;
-	border-radius: var(--radius-pill);
-	background: rgba(255, 255, 255, 0.07);
-}
-
-.auth-modal__switch {
-	border: none;
-	border-radius: var(--radius-pill);
-	background: transparent;
-	color: rgba(255, 255, 255, 0.65);
-	padding: 0.8rem 1rem;
-	font-weight: 700;
-	letter-spacing: var(--tracking-ui);
+	font-size: 0.76rem;
+	font-weight: 800;
+	letter-spacing: var(--tracking-eyebrow);
 	text-transform: uppercase;
-	cursor: pointer;
-}
-
-.auth-modal__switch--active {
-	background: #ff914d;
-	color: #1b0228;
 }
 
 .auth-form {
 	display: grid;
 	gap: 1rem;
+	padding: clamp(1.4rem, 5vw, 2rem);
 }
 
 .auth-form label {
 	display: grid;
 	gap: 0.45rem;
-}
-
-.auth-form span {
-	font-size: 0.85rem;
+	color: rgba(255, 255, 255, 0.72);
+	font-size: 0.78rem;
+	font-weight: 800;
+	letter-spacing: 0.08em;
 	text-transform: uppercase;
-	letter-spacing: var(--tracking-ui);
-	color: rgba(255, 255, 255, 0.68);
 }
 
 .auth-form input {
 	width: 100%;
-	padding: 0.95rem 1rem;
-	border-radius: var(--radius-field);
-	border: 1px solid rgba(255, 255, 255, 0.14);
-	background: rgba(255, 255, 255, 0.06);
-	color: #fdf7ff;
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	border-radius: var(--radius-control);
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff8ef;
+	font: inherit;
+	padding: 0.82rem 0.9rem;
 }
 
-.auth-form__grid {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 1rem;
+.auth-form input:focus {
+	border-color: #ffb36f;
+	outline: 3px solid rgba(255, 179, 111, 0.18);
 }
 
-.captcha-block {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-	gap: 1rem;
-	padding: 1rem;
-	border-radius: var(--radius-card);
-	background: rgba(255, 255, 255, 0.04);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.captcha-block__image {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0.75rem;
-	border-radius: var(--radius-field);
-	background: rgba(12, 2, 20, 0.65);
-}
-
-.captcha-block__image img {
-	width: 100%;
-	max-width: 260px;
-	display: block;
-}
-
-.captcha-block__body {
-	display: grid;
-	gap: 0.75rem;
-	align-content: start;
-}
-
-.captcha-block__body p {
+.auth-form__error {
 	margin: 0;
-	color: rgba(255, 255, 255, 0.74);
-	line-height: 1.6;
+	border: 1px solid rgba(255, 145, 77, 0.28);
+	border-radius: var(--radius-control);
+	background: rgba(255, 145, 77, 0.1);
+	color: #ffd2ae;
+	line-height: 1.55;
+	padding: 0.78rem 0.9rem;
 }
 
 .auth-form__submit {
 	border: none;
 	border-radius: var(--radius-pill);
-	padding: 0.9rem 1.2rem;
 	background: #ff914d;
 	color: #160021;
-	font-weight: 800;
-	text-transform: uppercase;
-	letter-spacing: var(--tracking-ui);
 	cursor: pointer;
+	font-weight: 900;
+	padding: 0.86rem 1.15rem;
 }
 
 .auth-form__submit:disabled {
-	opacity: 0.65;
-	cursor: progress;
-}
-
-.auth-form__error {
-	margin: 0;
-	color: #ffb8b8;
-	font-weight: 600;
-}
-
-.auth-form__meta {
-	margin: 0;
-	color: rgba(255, 255, 255, 0.68);
-}
-
-.auth-form__link {
-	border: none;
-	background: transparent;
-	color: #ffb36f;
-	font: inherit;
-	cursor: pointer;
-	padding: 0;
-}
-
-.auth-form__link--button {
-	justify-self: start;
-	font-weight: 700;
-}
-
-.auth-modal__status {
-	color: rgba(255, 255, 255, 0.72);
-	font-size: 0.92rem;
-}
-
-@media (max-width: 720px) {
-	.auth-form__grid,
-	.captcha-block {
-		grid-template-columns: 1fr;
-	}
+	cursor: wait;
+	opacity: 0.68;
 }
 </style>

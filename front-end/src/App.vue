@@ -28,7 +28,7 @@ const canonicalUrl = computed(() =>
 	new URL(route.path || "/", `${siteUrl}/`).toString()
 );
 const robotsContent = computed(() =>
-	/^\/studio(?:\/|$)|^\/api(?:\/|$)/.test(route.path)
+	/^\/studio\/admin(?:\/|$)|^\/api(?:\/|$)/.test(route.path)
 		? "noindex,nofollow"
 		: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
 );

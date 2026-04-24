@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import type { PropType } from "vue";
 import { siteAssetCandidates } from "@/lib/siteAssets";
-import { useSessionStore } from "@/stores/session";
 
 const props = defineProps({
 	actions: {
@@ -47,12 +46,9 @@ const props = defineProps({
 	}
 });
 
-const session = useSessionStore();
-
 interface HeroAction {
 	href?: string;
 	label: string;
-	mode?: "login" | "signup";
 	style?: "primary" | "secondary";
 	to?: string;
 }
@@ -87,12 +83,6 @@ const heroHighlights = computed(() => props.highlights ?? defaultHighlights);
 const resolvedImageCandidates = computed(() =>
 	props.imageCandidates?.length ? props.imageCandidates : [props.imageSrc]
 );
-
-function handleAction(action: HeroAction) {
-	if (action.mode) {
-		session.openAuth(action.mode);
-	}
-}
 </script>
 
 <template>
@@ -129,15 +119,6 @@ function handleAction(action: HeroAction) {
 					>
 						{{ action.label }}
 					</a>
-					<button
-						v-else
-						class="welcome__cta"
-						:class="`welcome__cta--${action.style || 'primary'}`"
-						type="button"
-						@click="handleAction(action)"
-					>
-						{{ action.label }}
-					</button>
 				</template>
 			</div>
 
@@ -185,15 +166,6 @@ function handleAction(action: HeroAction) {
 					>
 						{{ action.label }}
 					</a>
-					<button
-						v-else
-						class="welcome__cta"
-						:class="`welcome__cta--${action.style || 'primary'}`"
-						type="button"
-						@click="handleAction(action)"
-					>
-						{{ action.label }}
-					</button>
 				</template>
 			</div>
 		</div>

@@ -1,18 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
 
 import { Admin } from "../models/schemas/Admin.js";
-import { User } from "../models/schemas/User.js";
 
-export type SessionRole = "admin" | "user";
+export type SessionRole = "admin";
 
 export interface SessionState {
 	accountId?: string;
-	captcha?: {
-		expectedDigest: string;
-		issuedAt: number;
-		nonce: string;
-		prompt: string;
-	};
 	role?: SessionRole;
 }
 
@@ -43,36 +36,21 @@ export function clearSession(req: Request) {
 export async function getAuthenticatedAccount(req: Request) {
 	const session = getSessionState(req);
 
-	if (!session.accountId || !session.role) {
+	if (!session.accountId || session.role !== "admin") {
 		return null;
 	}
 
-	if (session.role === "admin") {
-		const admin = await Admin.findById(session.accountId);
-		if (!admin || admin.status !== "active") {
-			return null;
-		}
-
-		return {
-			email: admin.email,
-			id: admin.id,
-			name: admin.name,
-			role: "admin" as const,
-			status: admin.status
-		};
-	}
-
-	const user = await User.findById(session.accountId);
-	if (!user || user.status !== "active") {
+	const admin = await Admin.findById(session.accountId);
+	if (!admin || admin.status !== "active") {
 		return null;
 	}
 
 	return {
-		email: user.email,
-		id: user.id,
-		name: user.name,
-		role: "user" as const,
-		status: user.status
+		email: admin.email,
+		id: admin.id,
+		name: admin.name,
+		role: "admin" as const,
+		status: admin.status
 	};
 }
 
@@ -91,7 +69,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 export async function requireAdmin(req: Request, res: Response, next: NextFunction) {
 	const account = await getAuthenticatedAccount(req);
 
-	if (!account || account.role !== "admin") {
+	if (!account) {
 		clearSession(req);
 		return res.status(403).json({ message: "Admin access required" });
 	}

@@ -142,14 +142,14 @@ function handleWorldEntryDiscard(entryId: string) {
 					tone: 'ghost'
 				},
 				{
-					label: 'Open full board workspace',
+					label: 'Open owner console',
 					to: {
 						path: '/studio/admin',
-						query: { manage: '1', section: 'board' }
+						query: { section: 'content' }
 					}
 				}
 			]"
-			description="These page controls stay collapsed by default. Add or edit the character board right here, or open the full workspace when you need the broader admin panel."
+			description="These page controls stay collapsed by default. Add or edit the character board right here, or open the owner console for audit and storage details."
 			title="Character page controls"
 		/>
 

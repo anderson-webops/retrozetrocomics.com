@@ -14,54 +14,16 @@ import generateSitemap from "vite-ssg-sitemap";
 import { VueRouterAutoImports } from "vue-router/unplugin";
 import VueRouter from "vue-router/vite";
 
-import { resolveSsgApiBaseUrl } from "./src/lib/apiBase";
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteHostname = "https://retrozetrocomics.com";
 const sitemapExcludedRoutes = [
-	"/posts",
 	"/studio/admin",
 	"/:all(.*)"
 ];
-// Dynamic post detail and catch-all routes should resolve through a generic
-// static fallback like /index.html rather than placeholder prerender output.
-// Real published post routes are injected separately during the SSG pass.
 const staticRenderExcludedRoutes = [
-	"/posts",
-	"/posts/:slug",
+	"/studio",
 	"/:all(.*)"
 ];
-
-async function fetchPublishedPostRoutes() {
-	const apiBaseUrl = resolveSsgApiBaseUrl(process.env);
-
-	try {
-		const response = await fetch(`${apiBaseUrl}/posts?limit=200`, {
-			headers: {
-				accept: "application/json"
-			}
-		});
-
-		if (!response.ok) {
-			throw new Error(`Unexpected ${response.status} while fetching posts`);
-		}
-
-		const data = (await response.json()) as {
-			posts?: Array<{ slug?: string }>;
-		};
-
-		return (data.posts || [])
-			.map(post => post.slug?.trim())
-			.filter((slug): slug is string => Boolean(slug))
-			.map(slug => `/posts/${slug}`);
-	} catch (error) {
-		console.warn(
-			`[vite-ssg] Unable to fetch published post routes from ${apiBaseUrl}:`,
-			error
-		);
-		return [];
-	}
-}
 
 export default defineConfig(({ command }) => ({
 	resolve: {
@@ -134,13 +96,10 @@ export default defineConfig(({ command }) => ({
 		beastiesOptions: {
 			reduceInlineStyles: false
 		},
-		async includedRoutes(paths) {
-			const publishedPostRoutes = await fetchPublishedPostRoutes();
-			const staticRoutes = paths.filter(
+		includedRoutes(paths) {
+			return paths.filter(
 				path => !staticRenderExcludedRoutes.includes(path)
 			);
-
-			return [...new Set([...staticRoutes, ...publishedPostRoutes])];
 		},
 		onFinished() {
 			generateSitemap({

@@ -30,6 +30,16 @@ export const createApp = ViteSSG(
 	ctx => {
 		// ctx is the context where you can add global components or plugins
 		ctx.app.component("font-awesome-icon", FontAwesomeIcon);
+		ctx.router.beforeEach(to => {
+			if (to.path === "/studio") {
+				return {
+					path: "/studio/admin",
+					replace: true
+				};
+			}
+
+			return true;
+		});
 
 		// Auto-import and install all modules under `modules/`, if any
 		// install all modules under `modules/`

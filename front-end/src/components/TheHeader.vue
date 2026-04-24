@@ -86,19 +86,13 @@ watch(
 				<template v-if="session.isAuthenticated">
 					<div class="nav__account">
 						<div class="nav__identity">
-							<p class="nav__identity-label">
-								{{
-									session.isAdmin
-										? "Admin account"
-										: "Signed in"
-								}}
-							</p>
+							<p class="nav__identity-label">Admin account</p>
 							<p class="nav__welcome">
 								{{ session.account?.name }}
 							</p>
 						</div>
 
-						<div v-if="session.isAdmin" class="nav__utility">
+						<div class="nav__utility">
 							<RouterLink
 								class="nav__action nav__action--ghost nav__action--utility"
 								to="/studio/admin"
@@ -125,16 +119,6 @@ watch(
 						@click="session.logout()"
 					>
 						Logout
-					</button>
-				</template>
-
-				<template v-else>
-					<button
-						class="nav__action nav__action--ghost"
-						type="button"
-						@click="session.openAuth('login')"
-					>
-						Sign in
 					</button>
 				</template>
 			</div>

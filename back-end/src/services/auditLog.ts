@@ -5,9 +5,6 @@ import { AuditLog } from "../models/schemas/AuditLog.js";
 
 export type AuditLogCategory
 	= "auth"
-		| "comment"
-		| "member"
-		| "post"
 		| "site-content";
 
 interface AuditLogPayload {
