@@ -1,27 +1,27 @@
 <script lang="ts" setup>
 import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
 
-const archiveLanes = [
+const archiveSections = [
 	{
 		shortCopy: "Finished pages and chapters",
 		label: "Comics"
 	},
 	{
-		shortCopy: "Rough beats and shots",
+		shortCopy: "Rough scenes and pacing notes",
 		label: "Storyboards"
 	},
 	{
-		shortCopy: "Private notes and maps",
+		shortCopy: "Story notes and maps",
 		label: "Outlines"
 	},
 	{
-		shortCopy: "Studio mood and texture",
+		shortCopy: "Reference and process images",
 		label: "Photos"
 	}
 ];
 
 useHead({
-	title: "Studio Journal | RetroZetro Comics",
+	title: "Comics and Story Notes | RetroZetro Comics",
 	link: [
 		{
 			rel: "canonical",
@@ -32,16 +32,16 @@ useHead({
 		{
 			name: "description",
 			content:
-				"Browse the RetroZetro studio journal for published comics, storyboards, outlines, and photo dispatches."
+				"Read RetroZetro comics, storyboards, outlines, and process images in one place."
 		},
 		{
 			property: "og:title",
-			content: "Studio Journal | RetroZetro Comics"
+			content: "Comics and Story Notes | RetroZetro Comics"
 		},
 		{
 			property: "og:description",
 			content:
-				"Browse the RetroZetro studio journal for published comics, storyboards, outlines, and photo dispatches."
+				"Read RetroZetro comics, storyboards, outlines, and process images in one place."
 		},
 		{
 			property: "og:url",
@@ -49,12 +49,12 @@ useHead({
 		},
 		{
 			name: "twitter:title",
-			content: "Studio Journal | RetroZetro Comics"
+			content: "Comics and Story Notes | RetroZetro Comics"
 		},
 		{
 			name: "twitter:description",
 			content:
-				"Browse the RetroZetro studio journal for published comics, storyboards, outlines, and photo dispatches."
+				"Read RetroZetro comics, storyboards, outlines, and process images in one place."
 		}
 	]
 });
@@ -116,39 +116,39 @@ useHead({
 					}
 				}
 			]"
-			description="Use the live archive page to jump straight into the right publishing lane."
+			description="Open the correct editor for the type of post you want to publish."
 			title="Studio controls"
 		/>
 
 		<section class="studio-page__hero">
 			<div class="studio-page__hero-copy">
-				<p class="studio-page__eyebrow">Open Archive</p>
-				<h1>Studio Journal</h1>
+				<p class="studio-page__eyebrow">Read</p>
+				<h1>Comics and Story Notes</h1>
 				<p>
-					Browse finished comics, raw storyboard explorations,
-					outlines, and photo dispatches from the making of RetroZetro
-					Comics.
+					Start with finished pages, then use storyboards, outlines,
+					and process images for a closer look at how the Retroverse
+					is built.
 				</p>
 			</div>
 
 			<div class="studio-page__hero-panel">
 				<p class="studio-page__eyebrow studio-page__eyebrow--panel">
-					Archive Lanes
+					Sections
 				</p>
 				<ul>
-					<li v-for="lane in archiveLanes" :key="lane.label">
-						<span>{{ lane.label }}</span>
-						<strong>{{ lane.shortCopy }}</strong>
+					<li v-for="section in archiveSections" :key="section.label">
+						<span>{{ section.label }}</span>
+						<strong>{{ section.shortCopy }}</strong>
 					</li>
 				</ul>
 			</div>
 		</section>
 
 		<PostFeed
-			id="recent-drops"
+			id="recent-posts"
 			:limit="24"
-			subtitle="Everything the owner publishes lands here, including comics, outlines, and studio notes, with comments enabled where the post invites discussion."
-			title="All Recent Drops"
+			subtitle="Read the newest comics, storyboards, outlines, and process images."
+			title="Recent Posts"
 		/>
 	</div>
 </template>
@@ -226,7 +226,7 @@ useHead({
 	line-height: 1.5;
 }
 
-#recent-drops {
+#recent-posts {
 	scroll-margin-top: 1.5rem;
 }
 

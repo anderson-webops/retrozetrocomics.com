@@ -111,19 +111,19 @@ async function submitSignup() {
 				</button>
 
 				<div class="auth-modal__hero">
-					<p class="auth-modal__eyebrow">Retroverse Access</p>
+					<p class="auth-modal__eyebrow">Account</p>
 					<h2 :id="`auth-heading-${authModalMode}`">
 						{{
 							authModalMode === "login"
 								? "Welcome back"
-								: "Join the community"
+								: "Create an account"
 						}}
 					</h2>
 					<p>
 						{{
 							authModalMode === "login"
-								? "Sign in to comment on new drops and keep up with the latest creator notes."
-								: "Create an account to comment on comics, outlines, storyboard drafts, and photo journals."
+								? "Sign in to comment on posts that are open for replies."
+								: "Create an account to leave moderated comments on open posts."
 						}}
 					</p>
 				</div>

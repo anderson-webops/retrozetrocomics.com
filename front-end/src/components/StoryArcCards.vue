@@ -9,6 +9,7 @@ type StoryArcBeatKey =
 	| "midpoint"
 	| "resolution"
 	| "thirdPlotPoint";
+type StoryArcPublicFieldKey = "hook" | "incitingIncident" | "midpoint" | "note";
 
 const props = withDefaults(
 	defineProps<{
@@ -30,7 +31,7 @@ const emit = defineEmits<{
 	save: [arc: AboutStoryArc];
 }>();
 
-const beatFields: { key: StoryArcBeatKey; label: string }[] = [
+const editorBeatFields: { key: StoryArcBeatKey; label: string }[] = [
 	{ key: "hook", label: "Hook" },
 	{ key: "incitingIncident", label: "Inciting incident" },
 	{ key: "firstPlotPoint", label: "First plot point" },
@@ -38,6 +39,12 @@ const beatFields: { key: StoryArcBeatKey; label: string }[] = [
 	{ key: "thirdPlotPoint", label: "Third plot point" },
 	{ key: "climax", label: "Climax" },
 	{ key: "resolution", label: "Resolution" }
+];
+const publicBeatFields: { key: StoryArcPublicFieldKey; label: string }[] = [
+	{ key: "hook", label: "Opening conflict" },
+	{ key: "incitingIncident", label: "Complication" },
+	{ key: "midpoint", label: "Pressure point" },
+	{ key: "note", label: "Reader note" }
 ];
 
 const editingId = ref("");
@@ -153,7 +160,10 @@ watch(
 					</label>
 
 					<div class="story-arc-card__beats">
-						<label v-for="field in beatFields" :key="field.key">
+						<label
+							v-for="field in editorBeatFields"
+							:key="field.key"
+						>
 							<span>{{ field.label }}</span>
 							<textarea
 								v-model="draftArc[field.key]"
@@ -212,16 +222,12 @@ watch(
 
 				<dl class="story-arc-card__beats-list">
 					<div
-						v-for="field in beatFields"
+						v-for="field in publicBeatFields"
 						:key="field.key"
 						class="story-arc-card__beat-row"
 					>
 						<dt>{{ field.label }}</dt>
 						<dd>{{ arc[field.key] }}</dd>
-					</div>
-					<div class="story-arc-card__beat-row">
-						<dt>Additional note</dt>
-						<dd>{{ arc.note }}</dd>
 					</div>
 				</dl>
 			</template>

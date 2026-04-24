@@ -6,7 +6,7 @@ import { useMainStore } from "~/stores";
 const store = useMainStore();
 
 useHead({
-	title: "RetroZetro Comics | Comics, Storyboards, and Studio Drops",
+	title: "RetroZetro Comics | Comics, Characters, and Story Notes",
 	link: [
 		{
 			rel: "canonical",
@@ -17,16 +17,16 @@ useHead({
 		{
 			name: "description",
 			content:
-				"Read RetroZetro Comics, browse storyboard experiments, explore canon files, and follow new studio drops from the Retroverse."
+				"Read RetroZetro Comics, meet the cast, and follow the active stories of the Retroverse."
 		},
 		{
 			property: "og:title",
-			content: "RetroZetro Comics | Comics, Storyboards, and Studio Drops"
+			content: "RetroZetro Comics | Comics, Characters, and Story Notes"
 		},
 		{
 			property: "og:description",
 			content:
-				"Read RetroZetro Comics, browse storyboard experiments, explore canon files, and follow new studio drops from the Retroverse."
+				"Read RetroZetro Comics, meet the cast, and follow the active stories of the Retroverse."
 		},
 		{
 			property: "og:url",
@@ -34,12 +34,12 @@ useHead({
 		},
 		{
 			name: "twitter:title",
-			content: "RetroZetro Comics | Comics, Storyboards, and Studio Drops"
+			content: "RetroZetro Comics | Comics, Characters, and Story Notes"
 		},
 		{
 			name: "twitter:description",
 			content:
-				"Read RetroZetro Comics, browse storyboard experiments, explore canon files, and follow new studio drops from the Retroverse."
+				"Read RetroZetro Comics, meet the cast, and follow the active stories of the Retroverse."
 		}
 	]
 });
@@ -52,13 +52,12 @@ useHead({
 
 		<section class="home-showcase">
 			<header class="home-showcase__header">
-				<p class="home-showcase__eyebrow">Canon Files</p>
-				<h2>Active arcs, threat signals, and world entries</h2>
+				<p class="home-showcase__eyebrow">Stories and Worlds</p>
+				<h2>Start with the conflicts shaping the Retroverse</h2>
 				<p>
-					The site now carries the story material itself, not just the
-					publishing shell around it. Featured files can spotlight
-					major arcs, antagonists, and key worlds as the canon
-					expands.
+					The main arcs follow Exo, Zetro, the Star Hunters, and the
+					Apex Army as personal searches turn into wider fights over
+					trust, power, and hidden control.
 				</p>
 			</header>
 
@@ -81,14 +80,14 @@ useHead({
 
 		<section class="home-panels">
 			<div class="home-panel home-panel--accent">
-				<p class="home-panel__eyebrow">Go Deeper</p>
-				<h2>Follow the world beyond the archive</h2>
+				<p class="home-panel__eyebrow">Next Steps</p>
+				<h2>Keep reading without the tour</h2>
 				<p class="home-panel__summary">
-					Read the broader studio story or jump straight to the
-					creator contact page when you want the bigger picture.
+					Use the project notes for context, or reach out when you
+					have a specific commission, collaboration, or press request.
 				</p>
 				<div class="home-panel__actions">
-					<RouterLink to="/about">Read the studio story</RouterLink>
+					<RouterLink to="/about">Read the project notes</RouterLink>
 					<RouterLink to="/contact">Contact the creator</RouterLink>
 				</div>
 			</div>

@@ -35,7 +35,7 @@ const characterHighlights = computed(() =>
 );
 
 useHead({
-	title: "Characters and Threat Board | RetroZetro Comics",
+	title: "Characters and Factions | RetroZetro Comics",
 	link: [
 		{
 			rel: "canonical",
@@ -46,16 +46,16 @@ useHead({
 		{
 			name: "description",
 			content:
-				"Meet the key heroes, rivals, and world files shaping the Retroverse."
+				"Meet the key heroes, rivals, factions, and worlds shaping the Retroverse."
 		},
 		{
 			property: "og:title",
-			content: "Characters and Threat Board | RetroZetro Comics"
+			content: "Characters and Factions | RetroZetro Comics"
 		},
 		{
 			property: "og:description",
 			content:
-				"Meet the key heroes, rivals, and world files shaping the Retroverse."
+				"Meet the key heroes, rivals, factions, and worlds shaping the Retroverse."
 		},
 		{
 			property: "og:url",
@@ -63,12 +63,12 @@ useHead({
 		},
 		{
 			name: "twitter:title",
-			content: "Characters and Threat Board | RetroZetro Comics"
+			content: "Characters and Factions | RetroZetro Comics"
 		},
 		{
 			name: "twitter:description",
 			content:
-				"Meet the key heroes, rivals, and world files shaping the Retroverse."
+				"Meet the key heroes, rivals, factions, and worlds shaping the Retroverse."
 		}
 	]
 });
@@ -144,7 +144,7 @@ function handleWorldEntryDiscard(entryId: string) {
 					onClick: addCharacterInline
 				},
 				{
-					label: 'Add world file',
+					label: 'Add world note',
 					onClick: addWorldEntryInline,
 					tone: 'ghost'
 				},
@@ -173,7 +173,7 @@ function handleWorldEntryDiscard(entryId: string) {
 		<WelcomeSection
 			:actions="[
 				{
-					label: 'Browse current drops',
+					label: 'Read recent posts',
 					style: 'primary',
 					to: '/studio'
 				},

@@ -23,10 +23,10 @@ useHead(() => {
 	const currentPost = post.value;
 	const title = currentPost
 		? `${currentPost.title} | RetroZetro Comics`
-		: "Studio Post | RetroZetro Comics";
+		: "Post | RetroZetro Comics";
 	const description =
 		currentPost?.summary ||
-		"Read the latest comics, storyboards, outlines, and studio notes from RetroZetro Comics.";
+		"Read the latest comics, storyboards, outlines, and process notes from RetroZetro Comics.";
 
 	return {
 		title,
@@ -155,7 +155,7 @@ watch(
 						}
 					}
 				]"
-				description="Jump from the live post directly into its publishing workspace."
+				description="Open this post in the editor."
 				title="Post controls"
 			/>
 			<PostPreviewPanel back-to="/studio" :post="post" />

@@ -38,7 +38,7 @@ const props = defineProps({
 	},
 	message: {
 		default:
-			"New comics, storyboard experiments, outlines, and behind-the-scenes photo dispatches now live in a single interactive studio feed. Members can sign in to comment on open posts while admins moderate the conversation.",
+			"Read the latest comics, follow the active story arcs, and meet the characters and worlds shaping the Retroverse.",
 		type: String
 	},
 	title: {
@@ -63,22 +63,22 @@ interface HeroHighlight {
 }
 
 const defaultActions: HeroAction[] = [
-	{ label: "Enter the Studio", style: "primary", to: "/studio" },
-	{ label: "Create Account", mode: "signup", style: "secondary" }
+	{ label: "Read the Comics", style: "primary", to: "/studio" },
+	{ label: "Meet the Characters", style: "secondary", to: "/characters" }
 ];
 
 const defaultHighlights: HeroHighlight[] = [
 	{
-		description: "Fresh drops from every lane.",
-		term: "New Releases"
+		description: "Finished pages and story updates.",
+		term: "Comics"
 	},
 	{
-		description: "Draft notes, boards, and snapshots.",
-		term: "Creator Extras"
+		description: "Rough boards and process material.",
+		term: "Storyboards"
 	},
 	{
-		description: "Members can discuss open posts.",
-		term: "Community"
+		description: "Cast, factions, and world notes.",
+		term: "Characters"
 	}
 ];
 

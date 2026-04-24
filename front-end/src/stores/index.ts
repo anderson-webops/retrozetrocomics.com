@@ -6,48 +6,48 @@ export const useMainStore = defineStore("main", {
 		home: {
 			storylines: [
 				{
-					format: "Star Hunter investigation arc",
+					format: "Investigation arc",
 					image: "/brand/poster-the-list.svg",
-					status: "Exo leads Team Rimlaw",
+					status: "Exo and Team Rimlaw search for the truth",
 					summary:
-						"Exo searches an Apex Army moon base for the whereabouts of his mother and a missing friend, then realizes the case points to altered symbols and a hidden puppet master.",
+						"Exo returns to an Apex Army moon base looking for his mother and a missing friend. The clues point past one case toward a hidden hand.",
 					title: "The List"
 				},
 				{
-					format: "Sequel collapse arc",
+					format: "Rebellion arc",
 					image: "/brand/poster-fall-of-a-dream.svg",
-					status: "The Zego Order breaks Apex",
+					status: "The Apex Army fractures",
 					summary:
-						"The Apex Army is overtaken from within, forcing Giza, Oix, Diyo, and Exo into a sequel conflict built on rebellion, imposture, and a direct confrontation with Zego.",
+						"Trust inside the Apex Army breaks down as Giza, Oix, Diyo, and Exo face rebellion, deception, and Zego's growing influence.",
 					title: "The Fall of a Dream"
 				},
 				{
-					format: "Antagonist dossier",
+					format: "Antagonist profile",
 					image: "/brand/characters-zorix.svg",
-					status: "Cool, ruthless, direct",
+					status: "Controlled, ruthless, direct",
 					summary:
-						"Zorix moves with cold certainty, wastes no motion, and does not play around with anyone who gets between him and the next move.",
+						"Zorix uses calm pressure and direct command to turn every confrontation toward his next move.",
 					title: "Zorix"
 				},
 				{
-					format: "World file",
+					format: "World note",
 					image: "/brand/world-bitgam.svg",
-					status: "Fazo's homeworld in Gamborus",
+					status: "Fazo's homeworld",
 					summary:
-						"Bitgam is an ancient Gambit archive world populated by red-skinned residents with yellow-white eyes and exoskeletons, with history stretching back to the Great Manifested.",
+						"Bitgam is an old Gamborus world with deep recorded history and a people marked by red skin, yellow-white eyes, and exoskeletons.",
 					title: "Bitgam"
 				}
 			]
 		},
 		characters: {
 			description:
-				"Track the heroes, rivals, and pressure points shaping the Retroverse as the Apex Army, the Star Hunters, and the Zego Order collide.",
-			title: "Signal Crew and Threat Board",
+				"Meet the heroes, rivals, factions, and worlds behind the active RetroZetro stories.",
+			title: "Characters and Factions",
 			character: [
 				{
 					description:
-						"Zetro keeps charging toward the mess with enough heart to rally a block and enough stubbornness to make every clean exit impossible.",
-					frequency: "Hope against bad circuitry",
+						"Zetro is the heart of the story: brave, stubborn, and quick to step into danger when someone else needs help.",
+					frequency: "Hope under pressure",
 					fallbackImage: siteAssetCandidates.zetroPortrait[1],
 					image: siteAssetCandidates.zetroPortrait[0],
 					imgAlt: "Poster portrait of Zetro in orange and cyan tones",
@@ -57,8 +57,8 @@ export const useMainStore = defineStore("main", {
 				},
 				{
 					description:
-						"Kazay treats every room like a waveform to bend, slipping through systems and conversations before anyone notices what was taken.",
-					frequency: "Speed, style, and sabotage",
+						"Kazay is fast, stylish, and hard to pin down, built for missions where timing and misdirection matter.",
+					frequency: "Speed and misdirection",
 					fallbackImage: siteAssetCandidates.kazayPortrait[1],
 					image: siteAssetCandidates.kazayPortrait[0],
 					imgAlt: "Poster portrait of Kazay in cyan and amber tones",
@@ -68,8 +68,8 @@ export const useMainStore = defineStore("main", {
 				},
 				{
 					description:
-						"Exo hits like an emergency alarm and flies like one too, built for breakneck rescues, impact moves, and impossible recoveries.",
-					frequency: "Pressure and propulsion",
+						"Exo leads Team Rimlaw through dangerous searches, rescue attempts, and conflicts that keep pulling him back to the Apex Army.",
+					frequency: "Search and rescue",
 					fallbackImage: siteAssetCandidates.exoPortrait[1],
 					image: siteAssetCandidates.exoPortrait[0],
 					imgAlt: "Poster portrait of Exo in pale blue and gold tones",
@@ -79,8 +79,8 @@ export const useMainStore = defineStore("main", {
 				},
 				{
 					description:
-						"Shaman slows the room down, listens to what history left in the walls, and speaks only when the answer is worth carrying.",
-					frequency: "Memory, ritual, and repair",
+						"Shaman brings memory, healing, and spiritual judgment to a group that often moves faster than it can understand.",
+					frequency: "Memory and repair",
 					fallbackImage: siteAssetCandidates.shamanPortrait[1],
 					image: siteAssetCandidates.shamanPortrait[0],
 					imgAlt: "Poster portrait of Shaman in violet and gold tones",
@@ -90,8 +90,8 @@ export const useMainStore = defineStore("main", {
 				},
 				{
 					description:
-						"Zorix is cool-headed and ruthless. He does not play around, wastes no breath on theatrics, and goes straight to the point the second conflict starts moving.",
-					frequency: "Cold precision and intimidation",
+						"Zorix is controlled, ruthless, and direct, using fear and command to force every conflict toward his next move.",
+					frequency: "Control and intimidation",
 					image: siteAssetCandidates.zorixPortrait[0],
 					imgAlt: "Poster portrait of Zorix in crimson and obsidian tones",
 					name: "Zorix",
@@ -102,80 +102,80 @@ export const useMainStore = defineStore("main", {
 		},
 		about: {
 			description:
-				"RetroZetro Comics is a creator-driven universe built to hold the finished pages, the half-built ideas, and the canon files around Exo, the Star Hunters, the Apex Army, and the Zego Order in one place.",
-			title: "Inside the Studio",
+				"RetroZetro Comics follows heroes, outlaw crews, and damaged institutions caught between personal searches and a wider fight for control.",
+			title: "About RetroZetro",
 			values: [
 				{
-					body: "Every page, note, and photo should deepen the world.",
-					title: "World-first storytelling"
+					body: "The stories begin with characters under pressure.",
+					title: "Story first"
 				},
 				{
-					body: "Rough boards and finished pages belong in the same trail.",
-					title: "Process on the page"
+					body: "Background notes should help readers understand the worlds, not distract from them.",
+					title: "Useful context"
 				},
 				{
-					body: "New ideas should be able to go live while they still feel alive.",
-					title: "Publish while it's fresh"
+					body: "Characters, factions, and places should feel connected across every arc.",
+					title: "Connected worlds"
 				}
 			],
 			storyArcs: [
 				{
-					climax: "The Apex Army and the Star Hunter community finally work together to take down the Zego Order.",
+					climax: "The Star Hunters and the Apex Army have to decide whether they can trust each other long enough to face the real enemy.",
 					description:
-						"Team Rimlaw leader Exo uses an Apex Army moon base to search for the whereabouts of his mother. During the investigation, he also discovers that a friend has gone missing, turning the mission into a wider hunt.",
+						"Exo leads Team Rimlaw into an investigation tied to his mother, a missing friend, and crimes blamed on Apex Army members.",
 					firstPlotPoint:
-						"The mystery shifts from who committed the crimes to who is really acting as the puppet master behind them.",
-					hook: "The Star Hunters start taking down Apex Army members responsible for crimes on other planets.",
+						"The case grows from one disappearance into a pattern of altered symbols, false trails, and hidden influence.",
+					hook: "Star Hunters begin targeting Apex Army members accused of crimes across other worlds.",
 					incitingIncident:
-						"Exo notices the symbols tied to the case are different from what the crew expected, which suggests a deeper force at work.",
+						"Exo finds clues on an Apex Army moon base that do not match the story everyone expected.",
 					label: "Arc 01",
 					midpoint:
 						"Members of the Console of Orpex ask Rimlaw for help, pulling the crew into a conflict larger than one missing-person case.",
-					note: "In this universe, outlaw crews are known as Star Hunters.",
+					note: "Star Hunters are outlaw crews who operate outside official systems.",
 					resolution:
-						"Faith in the Apex Army is restored across the universe and the galaxy once the evidence against the Zego Order becomes undeniable.",
+						"The investigation exposes a deeper enemy and changes how the wider universe sees the Apex Army.",
 					thirdPlotPoint:
-						"Diyo discovers members of the group are dying and traces the pressure back to the EZ group.",
+						"Diyo uncovers deaths inside the group, pushing the search toward the force behind the manipulation.",
 					title: "The List"
 				},
 				{
-					climax: "Exo finally faces Zego.",
+					climax: "Exo is pushed toward a direct confrontation with Zego.",
 					description:
-						"The Apex Army has been overtaken by the Zego Order, and the split inside the organization pushes the story into open rebellion and collapse.",
+						"The Apex Army begins to fracture from the inside as the Zego Order's influence turns suspicion into open rebellion.",
 					firstPlotPoint:
-						"Diyo, Gojo's brother, warns the outlaw teams through telepathy that Apex Army members are dying under mysterious circumstances.",
-					hook: "The group tied to the Apex Army begins to rebel and divide as trust inside the system breaks apart.",
+						"Diyo warns the outlaw teams that Apex Army members are dying under mysterious circumstances.",
+					hook: "Trust inside the Apex Army breaks apart as allies question who is still acting freely.",
 					incitingIncident:
-						"Giza runs a DNA test after Pexus is bitten by his wife's pet, opening a line of suspicion that something is deeply wrong.",
+						"Giza finds evidence that someone close to the Army may not be who he appears to be.",
 					label: "Arc 02",
 					midpoint:
-						"Inside the Apex Army, Giza and Oix start planning how to expose the fake Pexus.",
+						"Giza and Oix begin working from inside the system to expose the deception before the Army collapses.",
 					note: "This story continues the larger conflict set up in The List.",
 					resolution:
-						"The war may be over, but the larger battle has only begun.",
+						"Even after the immediate fight ends, the damage inside the system leaves a larger battle ahead.",
 					thirdPlotPoint:
-						"The last fight against the imposter turns on the Ultimate Ultra Beam, a symbol of the dream of the mad creator.",
+						"The final push against the imposter forces the heroes to confront how far the corruption has reached.",
 					title: "The Fall of a Dream"
 				}
 			],
 			worldEntries: [
 				{
-					body: "In this universe, outlaw crews are called Star Hunters. The name gives them a specific place in the setting: hunted, mobile, and willing to go where official systems will not.",
+					body: "Star Hunters are outlaw crews who operate outside official systems. They are mobile, dangerous, and willing to chase threats that institutions avoid.",
 					facts: [
 						{
 							label: "Use",
-							value: "Street-name for outlaw teams in circulation"
+							value: "Outlaw crews operating beyond official systems"
 						}
 					],
-					label: "Term File",
+					label: "Term Note",
 					title: "Star Hunters"
 				},
 				{
-					body: "Bitgam is the homeworld where Fazo was born and raised. Gambit archives trace the planet back to the Great Manifested, giving it deep historical weight inside the larger setting.",
+					body: "Bitgam is Fazo's homeworld in Gamborus. Its recorded history reaches back to the Great Manifested, making it one of the setting's older known worlds.",
 					facts: [
 						{
 							label: "Residents",
-							value: "Gambit Pointe races with red skin, yellow and white eyes, and exoskeletons"
+							value: "Gambit Pointe races with red skin, yellow-white eyes, and exoskeletons"
 						},
 						{
 							label: "Region",
@@ -186,18 +186,18 @@ export const useMainStore = defineStore("main", {
 							value: "Present in Gambit archives since the Great Manifested"
 						}
 					],
-					label: "Planet File",
+					label: "World Note",
 					title: "Bitgam"
 				},
 				{
-					body: "The Apex Army sits at the center of both arcs, first as a force compromised by hidden manipulation and then as an institution fighting to restore its credibility once the Zego Order is exposed.",
+					body: "The Apex Army is powerful, visible, and deeply compromised by hidden manipulation. Its credibility becomes part of the conflict.",
 					facts: [
 						{
 							label: "Primary pressure",
 							value: "Internal corruption and loss of trust"
 						}
 					],
-					label: "Faction File",
+					label: "Faction Note",
 					title: "Apex Army"
 				}
 			]
@@ -207,15 +207,15 @@ export const useMainStore = defineStore("main", {
 				{
 					href: "mailto:retrozetrocomics@gmail.com",
 					label: "Creator inbox",
-					note: "Best route for commissions, collaboration, and press.",
+					note: "Use this for commissions, collaboration, press, and convention requests.",
 					value: "retrozetrocomics@gmail.com"
 				}
 			],
 			description:
-				"Use the studio contact page for commissions, collaboration ideas, convention invites, press questions, or production follow-ups.",
+				"Reach out for commissions, collaborations, convention programming, press, or a clear project question.",
 			faq: [
 				{
-					answer: "Story collaboration, commissioned illustration, process interviews, and site feedback are all fair game.",
+					answer: "Commissions, story collaboration, process interviews, convention programming, and press requests are welcome.",
 					question: "What kinds of outreach are welcome?"
 				},
 				{
@@ -223,18 +223,17 @@ export const useMainStore = defineStore("main", {
 					question: "What helps a press request get answered quickly?"
 				},
 				{
-					answer: "Not yet. The current site is focused on publication, archive growth, and community features, but the structure is ready to expand.",
-					question: "Is there merch or a storefront yet?"
+					answer: "Not yet. For now, use the contact form for commission and collaboration questions.",
+					question: "Are products available yet?"
 				}
 			],
 			inquiryTypes: [
 				"Commissioned character art",
 				"Podcast or interview requests",
 				"Convention programming",
-				"Technical feedback on the new site",
 				"General collaboration ideas"
 			],
-			title: "Contact the Studio"
+			title: "Contact RetroZetro"
 		}
 	}),
 

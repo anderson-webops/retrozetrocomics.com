@@ -14,8 +14,8 @@ const props = withDefaults(
 		limit: 12,
 		showViewAll: false,
 		subtitle:
-			"Latest comics, creator notes, outlines, and photo diaries from the Retroverse.",
-		title: "Latest From The Studio"
+			"Latest comics, storyboards, outlines, and process images from the Retroverse.",
+		title: "Latest Posts"
 	}
 );
 
@@ -27,7 +27,7 @@ const filters: Array<{ label: string; value: PostType | null }> = [
 	{ label: "Photos", value: "photo" }
 ];
 const allFilter = filters[0];
-const laneFilters = filters.slice(1);
+const formatFilters = filters.slice(1);
 
 const activeType = ref<PostType | null>(null);
 const posts = ref<PostSummary[]>([]);
@@ -36,13 +36,11 @@ const error = ref("");
 const hasResolved = ref(false);
 
 const filterDescriptions: Record<"all" | PostType, string> = {
-	all: "The live archive mixes finished comic pages, rough boards, working outlines, and photo dispatches in one stream.",
-	comic: "Finished comic drops, chapter releases, and polished narrative pages.",
-	outline:
-		"Open story files, plot maps, and owner notes that can stay private until they are ready for readers.",
-	photo: "Reference textures, studio snapshots, and atmosphere captured off the page.",
-	storyboard:
-		"Shot plans, pacing experiments, and early visual problem-solving."
+	all: "Browse every public post, or filter by the kind of material you want to read.",
+	comic: "Finished comic pages, chapters, and polished narrative work.",
+	outline: "Story notes, plot maps, and background material for active arcs.",
+	photo: "Reference images, studio snapshots, and visual process notes.",
+	storyboard: "Rough scenes, pacing tests, and visual planning."
 };
 
 const activeFilterDescription = computed(() =>
@@ -64,10 +62,10 @@ const emptyStateMessage = computed(() => {
 	}
 
 	if (activeType.value === "photo") {
-		return "No public photo drops are live yet.";
+		return "No public photo posts are live yet.";
 	}
 
-	return "No public studio drops are live yet.";
+	return "No public posts are live yet.";
 });
 
 async function loadPosts() {
@@ -109,7 +107,7 @@ watch(activeType, () => {
 	<section class="post-feed">
 		<header class="post-feed__header">
 			<div class="post-feed__intro">
-				<p class="post-feed__eyebrow">Creator Journal</p>
+				<p class="post-feed__eyebrow">Posts</p>
 				<h2>{{ title }}</h2>
 				<p>{{ subtitle }}</p>
 			</div>
@@ -135,7 +133,7 @@ watch(activeType, () => {
 					aria-label="Filter studio posts"
 				>
 					<button
-						v-for="filter in laneFilters"
+						v-for="filter in formatFilters"
 						:key="filter.label"
 						class="post-feed__filter"
 						:class="{
@@ -154,7 +152,7 @@ watch(activeType, () => {
 					class="post-feed__view-all"
 					to="/studio"
 				>
-					View full archive
+					View all posts
 				</RouterLink>
 			</div>
 		</header>
@@ -162,9 +160,7 @@ watch(activeType, () => {
 		<p v-if="error" class="post-feed__state post-feed__state--error">
 			{{ error }}
 		</p>
-		<p v-else-if="loading" class="post-feed__state">
-			Refreshing the journal feed...
-		</p>
+		<p v-else-if="loading" class="post-feed__state">Refreshing posts...</p>
 		<p v-else-if="hasResolved && !posts.length" class="post-feed__state">
 			{{ emptyStateMessage }}
 		</p>

@@ -3,8 +3,8 @@
 		<p class="not-found-copy__eyebrow">Signal Lost</p>
 		<h1>That page drifted off the map.</h1>
 		<p>
-			Try the studio archive, return to the homepage, or jump back to the
-			last page you were reading.
+			Try recent posts, return to the homepage, or jump back to the last
+			page you were reading.
 		</p>
 	</section>
 </template>

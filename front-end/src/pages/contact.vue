@@ -19,7 +19,7 @@ const responseTone = ref<"success" | "error">("success");
 const isSubmitting = ref(false);
 
 useHead({
-	title: "Contact the Studio | RetroZetro Comics",
+	title: "Contact | RetroZetro Comics",
 	link: [
 		{
 			rel: "canonical",
@@ -30,16 +30,16 @@ useHead({
 		{
 			name: "description",
 			content:
-				"Contact RetroZetro Comics for collaboration, commissions, interviews, and studio inquiries."
+				"Contact RetroZetro Comics for collaboration, commissions, interviews, and project questions."
 		},
 		{
 			property: "og:title",
-			content: "Contact the Studio | RetroZetro Comics"
+			content: "Contact | RetroZetro Comics"
 		},
 		{
 			property: "og:description",
 			content:
-				"Contact RetroZetro Comics for collaboration, commissions, interviews, and studio inquiries."
+				"Contact RetroZetro Comics for collaboration, commissions, interviews, and project questions."
 		},
 		{
 			property: "og:url",
@@ -47,12 +47,12 @@ useHead({
 		},
 		{
 			name: "twitter:title",
-			content: "Contact the Studio | RetroZetro Comics"
+			content: "Contact | RetroZetro Comics"
 		},
 		{
 			name: "twitter:description",
 			content:
-				"Contact RetroZetro Comics for collaboration, commissions, interviews, and studio inquiries."
+				"Contact RetroZetro Comics for collaboration, commissions, interviews, and project questions."
 		}
 	]
 });
@@ -65,7 +65,7 @@ async function handleSubmit() {
 		await api.post("/contact", form.value);
 		responseTone.value = "success";
 		responseMessage.value =
-			"Message sent. The studio will follow up through the email address you provided.";
+			"Message sent. RetroZetro will follow up through the email address you provided.";
 
 		form.value.subject = "";
 		form.value.name = "";
@@ -93,17 +93,17 @@ async function handleSubmit() {
 			:actions="[
 				{
 					href: 'mailto:retrozetrocomics@gmail.com',
-					label: 'Email the studio',
+					label: 'Email RetroZetro',
 					style: 'primary'
 				},
 				{
-					label: 'Browse the archive',
+					label: 'Read recent posts',
 					style: 'secondary',
 					to: '/studio'
 				}
 			]"
 			actions-placement="poster"
-			eyebrow="Contact the Studio"
+			eyebrow="Contact"
 			:highlights="
 				store.contact.channels.map(channel => ({
 					description: channel.note,
@@ -119,7 +119,7 @@ async function handleSubmit() {
 		<section class="contact-page__grid">
 			<article class="contact-panel">
 				<p class="contact-panel__eyebrow">Contact Channels</p>
-				<h2>Where to send what</h2>
+				<h2>Email</h2>
 				<ul class="contact-panel__list">
 					<li
 						v-for="channel in store.contact.channels"
@@ -140,7 +140,7 @@ async function handleSubmit() {
 
 			<article class="contact-panel contact-panel--warm">
 				<p class="contact-panel__eyebrow">Best Uses</p>
-				<h2>Good reasons to reach out</h2>
+				<h2>When to reach out</h2>
 				<ul class="contact-panel__tags">
 					<li
 						v-for="inquiry in store.contact.inquiryTypes"
@@ -175,7 +175,7 @@ async function handleSubmit() {
 				<textarea
 					id="message"
 					v-model="form.message"
-					placeholder="Tell the studio what you need, your timeline, and any links or references."
+					placeholder="Tell RetroZetro what you need, your timeline, and any links or references."
 					required
 					rows="7"
 				/>

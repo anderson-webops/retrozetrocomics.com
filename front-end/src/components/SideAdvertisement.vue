@@ -15,44 +15,44 @@ const isStudioJournalRoute = computed(() => route.path === "/studio");
 
 const panels = {
 	archive: {
-		ctaLabel: "See full journal",
+		ctaLabel: "Read recent posts",
 		ctaTo: "/studio",
-		eyebrow: "Archive Guide",
+		eyebrow: "Reading Guide",
 		items: [
 			{
 				label: "Comics",
-				value: "Final pages"
+				value: "Finished pages"
 			},
 			{
 				label: "Storyboards",
-				value: "Rough shots"
+				value: "Rough scenes"
 			},
 			{
 				label: "Outlines",
-				value: "Plot notes"
+				value: "Story context"
 			},
 			{
 				label: "Photos",
-				value: "Studio texture"
+				value: "Process images"
 			}
 		]
 	},
 	community: {
 		ctaLabel: "Admin console",
 		ctaTo: "/studio/admin",
-		eyebrow: "Community Rules",
+		eyebrow: "Commenting",
 		items: [
 			{
-				label: "Comment Access",
-				value: "Members only, with one clear identity per account"
+				label: "Access",
+				value: "Sign in before replying"
 			},
 			{
-				label: "Moderation Flow",
-				value: "Admins can approve, reject, hide, or suspend as needed"
+				label: "Review",
+				value: "Replies appear after moderation"
 			},
 			{
-				label: "Signup Gate",
-				value: "Captcha stays in front of new account creation"
+				label: "Focus",
+				value: "Keep comments tied to the work"
 			}
 		]
 	}
@@ -61,25 +61,25 @@ const panels = {
 const panel = computed(() => {
 	if (props.variant === "archive" && isStudioJournalRoute.value) {
 		return {
-			ctaLabel: "Jump to latest drops",
+			ctaLabel: "Jump to recent posts",
 			ctaTo: "/studio",
-			eyebrow: "Journal Tips",
+			eyebrow: "Reading Tips",
 			items: [
 				{
 					label: "Start Wide",
-					value: "Browse every drop first"
+					value: "Browse every post first"
 				},
 				{
 					label: "Use Filters",
-					value: "Sort by lane when needed"
+					value: "Narrow by format when needed"
 				},
 				{
 					label: "Open Posts",
 					value: "See full pages and notes"
 				},
 				{
-					label: "Join In",
-					value: "Members can comment on open threads"
+					label: "Reply",
+					value: "Sign in on posts that allow comments"
 				}
 			]
 		} as const;
@@ -97,9 +97,9 @@ const archiveCta = computed(() => {
 	}
 
 	return {
-		hashHref: "#recent-drops",
+		hashHref: "#recent-posts",
 		isHashLink: true,
-		label: "Jump to latest drops"
+		label: "Jump to recent posts"
 	};
 });
 
@@ -113,7 +113,7 @@ const showPanelCta = computed(() => {
 </script>
 
 <template>
-	<aside aria-label="Studio quick facts" class="side-ad">
+	<aside aria-label="Site quick facts" class="side-ad">
 		<p class="side-ad__eyebrow">{{ panel.eyebrow }}</p>
 		<div class="side-ad__frame">
 			<div

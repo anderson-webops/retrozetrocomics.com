@@ -6,9 +6,9 @@ const props = defineProps<{
 }>();
 
 const TYPE_LABELS: Record<PostSummary["type"], string> = {
-	comic: "Comic Drop",
-	outline: "Outline File",
-	photo: "Photo Log",
+	comic: "Comic",
+	outline: "Outline",
+	photo: "Photo",
 	storyboard: "Storyboard"
 };
 
@@ -54,7 +54,7 @@ const publishedLabel = computed(() => {
 						post.commentCount === 1 ? "" : "s"
 					}}
 				</p>
-				<p>{{ post.allowComments ? "Community open" : "Read-only" }}</p>
+				<p>{{ post.allowComments ? "Comments open" : "Read-only" }}</p>
 			</div>
 
 			<h3>{{ post.title }}</h3>

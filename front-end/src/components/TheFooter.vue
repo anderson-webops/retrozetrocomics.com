@@ -11,15 +11,15 @@ const session = useSessionStore();
 			<p class="footer__eyebrow">RetroZetro Comics</p>
 			<h2>Stay in the Retroverse</h2>
 			<p>
-				Comics, storyboard notes, and photo logs keep the archive moving
-				between issue launches.
+				Comics, characters, and story notes from the worlds around Zetro
+				and Exo.
 			</p>
 		</div>
 
 		<nav aria-label="Footer navigation" class="footer__links">
 			<h3>Explore</h3>
 			<div class="footer__link-list">
-				<RouterLink to="/studio">Studio archive</RouterLink>
+				<RouterLink to="/studio">Read posts</RouterLink>
 				<RouterLink to="/characters">Characters</RouterLink>
 				<RouterLink to="/about">About the project</RouterLink>
 				<RouterLink to="/contact">Contact</RouterLink>
@@ -27,7 +27,7 @@ const session = useSessionStore();
 		</nav>
 
 		<div class="footer__cta">
-			<h3>Community</h3>
+			<h3>Comments</h3>
 			<button
 				v-if="!session.isAuthenticated"
 				type="button"
@@ -35,20 +35,18 @@ const session = useSessionStore();
 			>
 				Create account
 			</button>
-			<p>
-				Signed-in members can join moderated discussion on open posts.
-			</p>
+			<p>Some posts are open for moderated reader comments.</p>
 		</div>
 
 		<div class="footer__contact">
 			<h3>Contact</h3>
 			<a
-				aria-label="Email the studio"
+				aria-label="Email RetroZetro"
 				class="footer__social"
 				href="mailto:retrozetrocomics@gmail.com"
 			>
 				<FontAwesomeIcon :icon="['fas', 'envelope']" size="2x" />
-				<span>Email the studio</span>
+				<span>Email RetroZetro</span>
 			</a>
 		</div>
 	</footer>

@@ -17,19 +17,16 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 			</RouterLink>
 			<div class="title-plate__text">
 				<span>RetroZetro Comics</span>
-				<p>
-					Comics, outline files, storyboard drops, and studio
-					dispatches from the neon future.
-				</p>
+				<p>Comics, characters, and story notes from the Retroverse.</p>
 			</div>
 		</div>
 
 		<div id="top-ad" class="title-plate__ad">
-			<p class="title-plate__eyebrow">Quick Tour</p>
+			<p class="title-plate__eyebrow">Start Here</p>
 			<ul class="title-plate__board">
-				<li>Studio journal for new drops.</li>
-				<li>Story files for the bigger canon.</li>
-				<li>Character board for cast and factions.</li>
+				<li>Read the newest comics and story notes.</li>
+				<li>Meet the cast and factions.</li>
+				<li>Use project notes for background.</li>
 			</ul>
 		</div>
 	</header>

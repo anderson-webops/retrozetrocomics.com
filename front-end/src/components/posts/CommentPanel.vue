@@ -52,11 +52,11 @@ async function submitComment() {
 	<section id="community-thread" class="comment-panel">
 		<header class="comment-panel__header">
 			<div>
-				<p class="comment-panel__eyebrow">Community Thread</p>
+				<p class="comment-panel__eyebrow">Reader Comments</p>
 				<h2>Comments</h2>
 			</div>
 			<p>
-				{{ comments.length }} visible response{{
+				{{ comments.length }} comment{{
 					comments.length === 1 ? "" : "s"
 				}}
 			</p>
@@ -67,9 +67,7 @@ async function submitComment() {
 				Comments are closed for this post.
 			</p>
 			<template v-else-if="!session.isAuthenticated">
-				<p class="comment-panel__notice">
-					Create an account or sign in to join the discussion.
-				</p>
+				<p class="comment-panel__notice">Sign in to leave a comment.</p>
 				<button
 					class="comment-panel__auth"
 					type="button"
@@ -83,14 +81,14 @@ async function submitComment() {
 					v-model="commentBody"
 					class="comment-panel__input"
 					maxlength="1000"
-					placeholder="Share your thoughts on this drop..."
+					placeholder="Share your thoughts on this post..."
 					rows="4"
 				/>
 				<div class="comment-panel__composer-footer">
 					<p class="comment-panel__hint">
 						{{
 							viewerCanComment
-								? "Comments from members go to moderation before appearing publicly."
+								? "Comments appear after moderation."
 								: "You cannot comment on this post."
 						}}
 					</p>
@@ -140,9 +138,7 @@ async function submitComment() {
 				</p>
 			</li>
 		</ul>
-		<p v-else class="comment-panel__empty">
-			No comments yet. Be the first member to respond.
-		</p>
+		<p v-else class="comment-panel__empty">No comments yet.</p>
 	</section>
 </template>
 

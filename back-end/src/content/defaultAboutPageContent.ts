@@ -2,31 +2,31 @@ export function createDefaultAboutPageContent() {
 	return {
 		storyArcs: [
 			{
-				climax: "The Apex Army and the Star Hunter community finally work together to take down the Zego Order.",
-				description: "Team Rimlaw leader Exo uses an Apex Army moon base to search for the whereabouts of his mother. During the investigation, he also discovers that a friend has gone missing, turning the mission into a wider hunt.",
-				firstPlotPoint: "The mystery shifts from who committed the crimes to who is really acting as the puppet master behind them.",
-				hook: "The Star Hunters start taking down Apex Army members responsible for crimes on other planets.",
+				climax: "The Star Hunters and the Apex Army have to decide whether they can trust each other long enough to face the real enemy.",
+				description: "Exo leads Team Rimlaw into an investigation tied to his mother, a missing friend, and crimes blamed on Apex Army members.",
+				firstPlotPoint: "The case grows from one disappearance into a pattern of altered symbols, false trails, and hidden influence.",
+				hook: "Star Hunters begin targeting Apex Army members accused of crimes across other worlds.",
 				id: "arc-the-list",
-				incitingIncident: "Exo notices the symbols tied to the case are different from what the crew expected, which suggests a deeper force at work.",
+				incitingIncident: "Exo finds clues on an Apex Army moon base that do not match the story everyone expected.",
 				label: "Arc 01",
 				midpoint: "Members of the Console of Orpex ask Rimlaw for help, pulling the crew into a conflict larger than one missing-person case.",
-				note: "In this universe, outlaw crews are known as Star Hunters.",
-				resolution: "Faith in the Apex Army is restored across the universe and the galaxy once the evidence against the Zego Order becomes undeniable.",
-				thirdPlotPoint: "Diyo discovers members of the group are dying and traces the pressure back to the EZ group.",
+				note: "Star Hunters are outlaw crews who operate outside official systems.",
+				resolution: "The investigation exposes a deeper enemy and changes how the wider universe sees the Apex Army.",
+				thirdPlotPoint: "Diyo uncovers deaths inside the group, pushing the search toward the force behind the manipulation.",
 				title: "The List"
 			},
 			{
-				climax: "Exo finally faces Zego.",
-				description: "The Apex Army has been overtaken by the Zego Order, and the split inside the organization pushes the story into open rebellion and collapse.",
-				firstPlotPoint: "Diyo, Gojo's brother, warns the outlaw teams through telepathy that Apex Army members are dying under mysterious circumstances.",
-				hook: "The group tied to the Apex Army begins to rebel and divide as trust inside the system breaks apart.",
+				climax: "Exo is pushed toward a direct confrontation with Zego.",
+				description: "The Apex Army begins to fracture from the inside as the Zego Order's influence turns suspicion into open rebellion.",
+				firstPlotPoint: "Diyo warns the outlaw teams that Apex Army members are dying under mysterious circumstances.",
+				hook: "Trust inside the Apex Army breaks apart as allies question who is still acting freely.",
 				id: "arc-fall-of-a-dream",
-				incitingIncident: "Giza runs a DNA test after Pexus is bitten by his wife's pet, opening a line of suspicion that something is deeply wrong.",
+				incitingIncident: "Giza finds evidence that someone close to the Army may not be who he appears to be.",
 				label: "Arc 02",
-				midpoint: "Inside the Apex Army, Giza and Oix start planning how to expose the fake Pexus.",
+				midpoint: "Giza and Oix begin working from inside the system to expose the deception before the Army collapses.",
 				note: "This story continues the larger conflict set up in The List.",
-				resolution: "The war may be over, but the larger battle has only begun.",
-				thirdPlotPoint: "The last fight against the imposter turns on the Ultimate Ultra Beam, a symbol of the dream of the mad creator.",
+				resolution: "Even after the immediate fight ends, the damage inside the system leaves a larger battle ahead.",
+				thirdPlotPoint: "The final push against the imposter forces the heroes to confront how far the corruption has reached.",
 				title: "The Fall of a Dream"
 			}
 		]

@@ -21,14 +21,14 @@ const communityAction = computed(() => {
 				kind: "current" as const,
 				label:
 					session.authModalMode === "signup"
-						? "Signup open"
+						? "Signup is open"
 						: "Sign in open"
 			};
 		}
 
 		return {
 			kind: "button" as const,
-			label: "Join the thread"
+			label: "Create an account"
 		};
 	}
 
@@ -57,7 +57,7 @@ const communityAction = computed(() => {
 
 	return {
 		kind: "current" as const,
-		label: "Member access active"
+		label: "Signed in"
 	};
 });
 
@@ -84,39 +84,38 @@ onMounted(() => {
 
 		<div v-if="isHomeRoute" id="title-plate" class="title-grid">
 			<aside class="title-grid__rail">
-				<p class="title-grid__eyebrow">Release Stack</p>
-				<h2>Choose a lane.</h2>
+				<p class="title-grid__eyebrow">Start Reading</p>
+				<h2>Begin with the story.</h2>
 				<ul class="title-grid__list">
-					<li>Comics for the core story.</li>
-					<li>Storyboards for rough pacing.</li>
-					<li>Outlines for working notes.</li>
-					<li>Photos for studio texture.</li>
+					<li>Read the latest comic pages.</li>
+					<li>Use story notes for context.</li>
+					<li>Meet the cast when a name is new.</li>
 				</ul>
 				<RouterLink
 					v-if="!isStudioJournalRoute"
 					class="title-grid__cta"
 					to="/studio"
 				>
-					Browse the archive
+					Read recent posts
 				</RouterLink>
 				<span
 					v-else
 					aria-current="page"
 					class="title-grid__cta title-grid__cta--current"
 				>
-					Archive open
+					Posts open
 				</span>
 			</aside>
 			<div class="title-grid__center">
 				<TitlePlate />
 			</div>
 			<aside class="title-grid__rail title-grid__rail--dark">
-				<p class="title-grid__eyebrow">Community</p>
-				<h2>Discussion stays readable.</h2>
+				<p class="title-grid__eyebrow">Reader Notes</p>
+				<h2>Comment where the story invites it.</h2>
 				<ul class="title-grid__list">
-					<li>Open posts can host comments.</li>
-					<li>Accounts keep the thread clear.</li>
-					<li>Moderation keeps the focus on the work.</li>
+					<li>Some posts are open for replies.</li>
+					<li>Accounts keep names consistent.</li>
+					<li>Moderation keeps comments on topic.</li>
 				</ul>
 				<button
 					v-if="communityAction.kind === 'button'"

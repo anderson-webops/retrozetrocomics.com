@@ -167,8 +167,8 @@ const editorModeLabel = computed(() =>
 );
 const editorModeDescription = computed(() =>
 	editorMode.value === "edit"
-		? "Revise outlines, comic drops, or studio updates after publish, then move them between public and private visibility as needed."
-		: "Publish comics, storyboard notes, outlines, and photo dispatches. Keep a post private while you revise it, then make it public when it is ready."
+		? "Revise outlines, comics, or studio updates after publish, then move them between public and private visibility as needed."
+		: "Publish comics, storyboard notes, outlines, and process images. Keep a post private while you revise it, then make it public when it is ready."
 );
 const editorSubmitLabel = computed(() => {
 	if (saving.value) {
@@ -249,14 +249,14 @@ const sectionOptions: Array<{
 }> = [
 	{
 		description:
-			"Add new drops and reopen published posts only when needed.",
+			"Add new posts and reopen published posts only when needed.",
 		key: "posts",
 		label: "Posts"
 	},
 	{
-		description: "Manage the character board and world-file content.",
+		description: "Manage character, faction, and world-note content.",
 		key: "board",
-		label: "Character Board"
+		label: "Characters"
 	},
 	{
 		description:
@@ -740,10 +740,10 @@ function removeWorldEntry(entryId: string) {
 	}
 
 	pendingBoardRemoval.value = {
-		confirmLabel: "Remove world file",
+		confirmLabel: "Remove world note",
 		description:
 			"This only affects the local board editor until you click Save board updates.",
-		itemLabel: entry.title || "this world file",
+		itemLabel: entry.title || "this world note",
 		type: "worldEntry",
 		entryId
 	};
@@ -929,7 +929,7 @@ async function loadBoardContent() {
 		boardContentError.value =
 			loadError?.response?.data?.message ||
 			loadError?.message ||
-			"Unable to load the character and threat board.";
+			"Unable to load character and faction content.";
 		const fallbackContent = createDefaultCharactersPageContent();
 		updateBoardSavedSnapshot(fallbackContent);
 		replaceBoardForm(fallbackContent);
@@ -1047,7 +1047,7 @@ async function saveBoardContent() {
 		boardContentError.value =
 			saveError?.response?.data?.message ||
 			saveError?.message ||
-			"Unable to save the character and threat board.";
+			"Unable to save character and faction content.";
 	} finally {
 		boardContentSaving.value = false;
 	}
@@ -1213,7 +1213,7 @@ onBeforeUnmount(() => {
 				<p class="admin-dashboard__eyebrow">Owner Console</p>
 				<h1>Studio Admin</h1>
 				<p>
-					Publish new drops, review incoming comments, and manage who
+					Publish new posts, review incoming comments, and manage who
 					can participate in the community.
 				</p>
 			</div>
@@ -1369,9 +1369,9 @@ onBeforeUnmount(() => {
 				<header>
 					<h2>Publishing workspace</h2>
 					<p>
-						New comics, storyboards, outlines, and photo drops all
-						flow through one editor, but it stays tucked away until
-						you open it.
+						New comics, storyboards, outlines, and process images
+						all flow through one editor, but it stays tucked away
+						until you open it.
 					</p>
 				</header>
 
@@ -1817,11 +1817,10 @@ onBeforeUnmount(() => {
 				class="admin-panel"
 			>
 				<header>
-					<h2>Character and Threat Board</h2>
+					<h2>Characters and Factions</h2>
 					<p>
-						Edit the character board, hero copy, and world files
-						that feed the Characters page and the world-ledger
-						surfaces.
+						Edit the character, faction, and world-note content that
+						feeds the Characters and About pages.
 					</p>
 				</header>
 
@@ -1836,7 +1835,7 @@ onBeforeUnmount(() => {
 						Add character
 					</button>
 					<button type="button" @click="openBoardWorkspace('world')">
-						Add world file
+						Add world note
 					</button>
 				</div>
 
@@ -2078,7 +2077,7 @@ onBeforeUnmount(() => {
 							</p>
 						</div>
 						<button type="button" @click="addWorldEntry">
-							Add world file
+							Add world note
 						</button>
 					</div>
 
@@ -2092,7 +2091,7 @@ onBeforeUnmount(() => {
 						>
 							<div class="board-editor__card-header">
 								<p class="publish-form__draft-eyebrow">
-									{{ entry.title || "New world file" }}
+									{{ entry.title || "New world note" }}
 								</p>
 								<button
 									type="button"

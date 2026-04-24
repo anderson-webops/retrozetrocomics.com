@@ -56,7 +56,7 @@ useHead({
 		{
 			name: "description",
 			content:
-				"Learn the studio ethos, active story arcs, and world ledger behind RetroZetro Comics."
+				"Learn the project context, active stories, and world details behind RetroZetro Comics."
 		},
 		{
 			property: "og:title",
@@ -65,7 +65,7 @@ useHead({
 		{
 			property: "og:description",
 			content:
-				"Learn the studio ethos, active story arcs, and world ledger behind RetroZetro Comics."
+				"Learn the project context, active stories, and world details behind RetroZetro Comics."
 		},
 		{
 			property: "og:url",
@@ -78,7 +78,7 @@ useHead({
 		{
 			name: "twitter:description",
 			content:
-				"Learn the studio ethos, active story arcs, and world ledger behind RetroZetro Comics."
+				"Learn the project context, active stories, and world details behind RetroZetro Comics."
 		}
 	]
 });
@@ -157,14 +157,14 @@ function handleWorldEntryDiscard(entryId: string) {
 			{{
 				aboutSaving
 					? "Saving story page changes..."
-					: "Saving world file changes..."
+					: "Saving world note changes..."
 			}}
 		</p>
 
 		<WelcomeSection
 			:actions="[
 				{
-					label: 'Browse the archive',
+					label: 'Read recent posts',
 					style: 'primary',
 					to: '/studio'
 				},
@@ -186,12 +186,12 @@ function handleWorldEntryDiscard(entryId: string) {
 
 		<section class="about-page__story-section">
 			<header class="about-page__section-header">
-				<p class="about-page__eyebrow">Story Files</p>
-				<h2>Current arcs in the canon pipeline</h2>
+				<p class="about-page__eyebrow">Stories</p>
+				<h2>The main stories in motion</h2>
 				<p>
-					The site now carries the bigger narrative beats directly, so
-					readers can see where Exo, Rimlaw, the Apex Army, and the
-					Zego Order sit in the broader conflict.
+					These arcs show how personal searches, damaged alliances,
+					and the Zego Order's influence pull the characters into
+					larger conflict.
 				</p>
 			</header>
 
@@ -216,12 +216,11 @@ function handleWorldEntryDiscard(entryId: string) {
 
 		<section class="about-page__story-section">
 			<header class="about-page__section-header">
-				<p class="about-page__eyebrow">World Ledger</p>
-				<h2>Terms, worlds, and faction pressure</h2>
+				<p class="about-page__eyebrow">World Notes</p>
+				<h2>Terms, places, and factions</h2>
 				<p>
-					These files anchor the universe around the stories, from the
-					name used for outlaw crews to the homeworlds and
-					institutions under strain.
+					These notes explain the names, places, and institutions a
+					reader will meet across the stories.
 				</p>
 			</header>
 

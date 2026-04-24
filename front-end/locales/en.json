@@ -2,17 +2,10 @@
   "button": {
     "about": "About",
     "back": "Back",
-    "go": "GO",
-    "home": "Home",
-    "toggle_dark": "Toggle dark mode",
-    "toggle_langs": "Change languages"
+    "home": "Home"
   },
-  "intro": {
-    "desc": "Opinionated Vite Starter Template",
-    "dynamic-route": "Demo of dynamic route",
-    "hi": "Hi, {name}!",
-    "aka": "Also known as",
-    "whats-your-name": "What's your name?"
+  "site": {
+    "description": "RetroZetro Comics collects stories, characters, and world notes from the Retroverse."
   },
   "not-found": "Not found"
 }

@@ -8,7 +8,7 @@ import {
 const defaultHeroImageAlt = "RetroZetro lead portrait";
 const siteUrl = "https://retrozetrocomics.com";
 const siteDescription =
-	"RetroZetro Comics publishes comics, storyboard drops, art archives, and studio dispatches for readers and collaborators.";
+	"RetroZetro Comics collects the stories, characters, and worlds behind Exo, Zetro, and the wider Retroverse.";
 const route = useRoute();
 const appleTouchIconHref = ref<string>(
 	siteAssetCandidates.favicons.appleTouch[0]
@@ -78,7 +78,7 @@ useHead(
 				{
 					name: "description",
 					content:
-						"RetroZetro Comics publishes comics, outline files, storyboard drops, and studio photo dispatches in one live archive."
+						"Read RetroZetro Comics, follow the active stories, and meet the characters and worlds behind the Retroverse."
 				},
 				{
 					name: "theme-color",

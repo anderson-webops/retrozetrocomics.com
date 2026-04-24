@@ -1,8 +1,8 @@
 export function createDefaultCharactersPageContent() {
 	return {
 		description:
-			"Track the heroes, rivals, and pressure points shaping the Retroverse as the Apex Army, the Star Hunters, and the Zego Order collide.",
-		eyebrow: "Character and Threat Board",
+			"Meet the heroes, rivals, factions, and worlds behind the active RetroZetro stories.",
+		eyebrow: "Characters and Factions",
 		heroImage: "/legacy-images/Zetro2.jpg",
 		heroImageAlt: "Zetro portrait",
 		heroImageFallback: "/brand/characters-zetro.svg",
@@ -10,9 +10,9 @@ export function createDefaultCharactersPageContent() {
 		characters: [
 			{
 				description:
-					"Zetro keeps charging toward the mess with enough heart to rally a block and enough stubbornness to make every clean exit impossible.",
+					"Zetro is the heart of the story: brave, stubborn, and quick to step into danger when someone else needs help.",
 				fallbackImage: "/brand/characters-zetro.svg",
-				frequency: "Hope against bad circuitry",
+				frequency: "Hope under pressure",
 				id: "zetro",
 				image: "/legacy-images/Zetro2.jpg",
 				imgAlt: "Poster portrait of Zetro in orange and cyan tones",
@@ -22,9 +22,9 @@ export function createDefaultCharactersPageContent() {
 			},
 			{
 				description:
-					"Kazay treats every room like a waveform to bend, slipping through systems and conversations before anyone notices what was taken.",
+					"Kazay is fast, stylish, and hard to pin down, built for missions where timing and misdirection matter.",
 				fallbackImage: "/brand/characters-kazay.svg",
-				frequency: "Speed, style, and sabotage",
+				frequency: "Speed and misdirection",
 				id: "kazay",
 				image: "/legacy-images/Kazay.jpg",
 				imgAlt: "Poster portrait of Kazay in cyan and amber tones",
@@ -34,9 +34,9 @@ export function createDefaultCharactersPageContent() {
 			},
 			{
 				description:
-					"Exo hits like an emergency alarm and flies like one too, built for breakneck rescues, impact moves, and impossible recoveries.",
+					"Exo leads Team Rimlaw through dangerous searches, rescue attempts, and conflicts that keep pulling him back to the Apex Army.",
 				fallbackImage: "/brand/characters-exo.svg",
-				frequency: "Pressure and propulsion",
+				frequency: "Search and rescue",
 				id: "exo",
 				image: "/legacy-images/Exo.jpg",
 				imgAlt: "Poster portrait of Exo in pale blue and gold tones",
@@ -46,9 +46,9 @@ export function createDefaultCharactersPageContent() {
 			},
 			{
 				description:
-					"Shaman slows the room down, listens to what history left in the walls, and speaks only when the answer is worth carrying.",
+					"Shaman brings memory, healing, and spiritual judgment to a group that often moves faster than it can understand.",
 				fallbackImage: "/brand/characters-shaman.svg",
-				frequency: "Memory, ritual, and repair",
+				frequency: "Memory and repair",
 				id: "shaman",
 				image: "/legacy-images/Shaman.jpg",
 				imgAlt: "Poster portrait of Shaman in violet and gold tones",
@@ -58,9 +58,9 @@ export function createDefaultCharactersPageContent() {
 			},
 			{
 				description:
-					"Zorix is cool-headed and ruthless. He does not play around, wastes no breath on theatrics, and goes straight to the point the second conflict starts moving.",
+					"Zorix is controlled, ruthless, and direct, using fear and command to force every conflict toward his next move.",
 				fallbackImage: "",
-				frequency: "Cold precision and intimidation",
+				frequency: "Control and intimidation",
 				id: "zorix",
 				image: "/brand/characters-zorix.svg",
 				imgAlt: "Poster portrait of Zorix in crimson and obsidian tones",
@@ -71,23 +71,23 @@ export function createDefaultCharactersPageContent() {
 		],
 		worldEntries: [
 			{
-				body: "In this universe, outlaw crews are called Star Hunters. The name gives them a specific place in the setting: hunted, mobile, and willing to go where official systems will not.",
+				body: "Star Hunters are outlaw crews who operate outside official systems. They are mobile, dangerous, and willing to chase threats that institutions avoid.",
 				facts: [
 					{
 						label: "Use",
-						value: "Street-name for outlaw teams in circulation"
+						value: "Outlaw crews operating beyond official systems"
 					}
 				],
 				id: "star-hunters",
-				label: "Term File",
+				label: "Term Note",
 				title: "Star Hunters"
 			},
 			{
-				body: "Bitgam is the homeworld where Fazo was born and raised. Gambit archives trace the planet back to the Great Manifested, giving it deep historical weight inside the larger setting.",
+				body: "Bitgam is Fazo's homeworld in Gamborus. Its recorded history reaches back to the Great Manifested, making it one of the setting's older known worlds.",
 				facts: [
 					{
 						label: "Residents",
-						value: "Gambit Pointe races with red skin, yellow and white eyes, and exoskeletons"
+						value: "Gambit Pointe races with red skin, yellow-white eyes, and exoskeletons"
 					},
 					{
 						label: "Region",
@@ -99,11 +99,11 @@ export function createDefaultCharactersPageContent() {
 					}
 				],
 				id: "bitgam",
-				label: "Planet File",
+				label: "World Note",
 				title: "Bitgam"
 			},
 			{
-				body: "The Apex Army sits at the center of both arcs, first as a force compromised by hidden manipulation and then as an institution fighting to restore its credibility once the Zego Order is exposed.",
+				body: "The Apex Army is powerful, visible, and deeply compromised by hidden manipulation. Its credibility becomes part of the conflict.",
 				facts: [
 					{
 						label: "Primary pressure",
@@ -111,7 +111,7 @@ export function createDefaultCharactersPageContent() {
 					}
 				],
 				id: "apex-army",
-				label: "Faction File",
+				label: "Faction Note",
 				title: "Apex Army"
 			}
 		]

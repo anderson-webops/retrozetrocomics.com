@@ -29,7 +29,7 @@ const props = withDefaults(
 		post: PreviewPost;
 	}>(),
 	{
-		backLabel: "Back to Studio",
+		backLabel: "Back to posts",
 		backTo: "",
 		mode: "live"
 	}
