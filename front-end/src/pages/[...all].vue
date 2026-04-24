@@ -35,7 +35,7 @@
 
 .not-found-copy__eyebrow {
 	text-transform: uppercase;
-	letter-spacing: 0.22em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 	font-weight: 800;
 	color: #ffd27d;

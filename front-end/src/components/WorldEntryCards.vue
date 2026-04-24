@@ -264,7 +264,7 @@ watch(
 	display: grid;
 	gap: 0.7rem;
 	padding: clamp(1.25rem, 4vw, 1.8rem);
-	border-radius: 24px;
+	border-radius: var(--radius-card);
 	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	min-width: 0;
@@ -285,7 +285,7 @@ watch(
 	min-width: 4.5rem;
 	height: 2.5rem;
 	padding: 0 1rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: rgba(124, 225, 246, 0.12);
 	border: 1px solid rgba(124, 225, 246, 0.22);
 	color: #dff9ff;
@@ -296,7 +296,7 @@ watch(
 
 .world-entry-card__eyebrow {
 	text-transform: uppercase;
-	letter-spacing: 0.16em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 	font-weight: 700;
 	color: #ffd27d;
@@ -340,14 +340,14 @@ watch(
 	display: grid;
 	gap: 0.25rem;
 	padding: 0.9rem 1rem;
-	border-radius: 18px;
+	border-radius: var(--radius-card);
 	background: rgba(255, 255, 255, 0.04);
 }
 
 .world-entry-card__facts-list dt {
 	color: #fff4e7;
 	font-size: 0.86rem;
-	letter-spacing: 0.04em;
+	letter-spacing: var(--tracking-ui);
 	text-transform: uppercase;
 }
 
@@ -372,7 +372,7 @@ watch(
 .world-entry-card__facts-header p {
 	margin: 0;
 	text-transform: uppercase;
-	letter-spacing: 0.14em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.72rem;
 	font-weight: 700;
 	color: rgba(255, 255, 255, 0.62);
@@ -381,7 +381,7 @@ watch(
 .world-entry-card__editor input,
 .world-entry-card__editor textarea {
 	width: 100%;
-	border-radius: 16px;
+	border-radius: var(--radius-field);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	background: rgba(10, 19, 36, 0.82);
 	color: #fff4e7;
@@ -418,7 +418,7 @@ watch(
 .world-entry-card__fact-row {
 	grid-template-columns: 1fr;
 	padding: 1rem;
-	border-radius: 18px;
+	border-radius: var(--radius-card);
 	background: rgba(255, 255, 255, 0.04);
 }
 
@@ -426,7 +426,7 @@ watch(
 .world-entry-card__facts-header button,
 .world-entry-card__actions button {
 	border: none;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	padding: 0.78rem 1rem;
 	font-weight: 800;
 	cursor: pointer;
@@ -434,7 +434,7 @@ watch(
 
 .world-entry-card__actions button:first-child,
 .world-entry-card__facts-header button {
-	background: linear-gradient(120deg, #ff914d, #ffd27d);
+	background: #ffd27d;
 	color: #1b0328;
 }
 

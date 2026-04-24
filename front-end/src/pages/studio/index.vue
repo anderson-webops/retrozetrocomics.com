@@ -121,17 +121,16 @@ useHead({
 <style scoped>
 .studio-page {
 	display: grid;
-	gap: 1.8rem;
+	gap: 1.35rem;
 }
 
 .studio-page__hero {
 	display: grid;
-	gap: 1rem;
-	padding: clamp(1.8rem, 4vw, 2.8rem);
-	border-radius: 28px;
+	gap: 0.8rem;
+	padding: clamp(1.5rem, 3vw, 2.2rem);
+	border-radius: var(--radius-panel);
 	background: rgba(9, 21, 38, 0.84);
-	box-shadow: 0 24px 50px rgba(6, 10, 17, 0.28);
-	backdrop-filter: blur(10px);
+	box-shadow: var(--shadow-panel);
 }
 
 .studio-page__hero h1,
@@ -152,7 +151,7 @@ useHead({
 
 .studio-page__eyebrow {
 	text-transform: uppercase;
-	letter-spacing: 0.28em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 	color: #ffb36f;
 }

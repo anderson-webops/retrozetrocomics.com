@@ -180,7 +180,7 @@ watch(
 .post-page__state {
 	margin: 0;
 	padding: 1rem 1.2rem;
-	border-radius: 18px;
+	border-radius: var(--radius-card);
 	background: var(--surface-panel);
 	color: #42516b;
 }

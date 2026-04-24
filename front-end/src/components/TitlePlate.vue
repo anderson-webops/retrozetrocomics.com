@@ -30,10 +30,9 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 	gap: 1.5rem;
 	padding: clamp(1.25rem, 3vw, 2rem);
 	background: var(--surface-panel);
-	border-radius: 20px;
+	border-radius: var(--radius-panel);
 	border: 1px solid rgba(8, 17, 31, 0.08);
-	box-shadow: 0 18px 36px rgba(8, 13, 26, 0.15);
-	backdrop-filter: blur(10px);
+	box-shadow: var(--shadow-soft);
 }
 
 .title-plate__brand {
@@ -50,8 +49,8 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 	width: 96px;
 	height: 96px;
 	background: rgba(8, 17, 31, 0.04);
-	border-radius: 18px;
-	box-shadow: 0 12px 20px rgba(8, 13, 26, 0.12);
+	border-radius: var(--radius-card);
+	box-shadow: var(--shadow-soft);
 }
 
 .title-plate__logo img {
@@ -64,14 +63,14 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 	font-size: clamp(1.6rem, 3vw, 2.2rem);
 	font-weight: 800;
 	font-family: var(--font-display);
-	letter-spacing: 0.08em;
+	letter-spacing: var(--tracking-ui);
 	text-transform: uppercase;
 }
 
 .title-plate__text p {
 	margin: 0.35rem 0 0;
 	font-size: 0.95rem;
-	letter-spacing: 0.05em;
+	letter-spacing: 0.02em;
 	text-transform: uppercase;
 	color: #31405a;
 }

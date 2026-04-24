@@ -45,10 +45,9 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 	padding: clamp(0.75rem, 2vw, 1.25rem) clamp(1rem, 5vw, 3rem);
 	background: rgba(9, 21, 38, 0.84);
 	border: 1px solid rgba(255, 255, 255, 0.08);
-	border-radius: 24px;
+	border-radius: var(--radius-shell);
 	color: #f4eaff;
-	box-shadow: 0 12px 24px rgba(7, 0, 18, 0.2);
-	backdrop-filter: blur(10px);
+	box-shadow: var(--shadow-shell);
 }
 
 .footer__brand {
@@ -60,7 +59,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 .footer__eyebrow {
 	margin: 0;
 	font-size: 0.76rem;
-	letter-spacing: 0.2em;
+	letter-spacing: var(--tracking-eyebrow);
 	text-transform: uppercase;
 	font-weight: 700;
 	color: #ffd27d;
@@ -100,7 +99,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 .footer__contact h3 {
 	color: #fff4e7;
 	text-transform: uppercase;
-	letter-spacing: 0.16em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 }
 

@@ -46,15 +46,9 @@ useHead({
 	justify-items: center;
 	max-width: 640px;
 	padding: clamp(2rem, 5vw, 3rem);
-	border-radius: 28px;
-	background:
-		radial-gradient(
-			circle at top,
-			rgba(255, 148, 89, 0.22),
-			transparent 32%
-		),
-		linear-gradient(140deg, rgba(9, 21, 38, 0.98), rgba(18, 38, 62, 0.95));
-	box-shadow: 0 28px 60px rgba(5, 10, 18, 0.34);
+	border-radius: var(--radius-panel);
+	background: rgba(9, 21, 38, 0.96);
+	box-shadow: var(--shadow-panel);
 	text-align: center;
 }
 
@@ -74,7 +68,7 @@ useHead({
 	align-items: center;
 	justify-content: center;
 	padding: 0.82rem 1.25rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: #ff9459;
 	color: #08111f;
 	font-weight: 800;

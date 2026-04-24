@@ -78,9 +78,9 @@ const isOpen = ref(false);
 <style scoped>
 .admin-inline-tools {
 	display: grid;
-	gap: 0.9rem;
-	padding: 1rem 1.1rem;
-	border-radius: 22px;
+	gap: 0.7rem;
+	padding: 0.85rem 1rem;
+	border-radius: var(--radius-panel);
 	background: rgba(124, 225, 246, 0.08);
 	border: 1px solid rgba(124, 225, 246, 0.18);
 }
@@ -116,7 +116,7 @@ const isOpen = ref(false);
 .admin-inline-tools__eyebrow {
 	margin: 0;
 	text-transform: uppercase;
-	letter-spacing: 0.18em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.74rem;
 	font-weight: 800;
 	color: #7ce1f6;
@@ -133,8 +133,8 @@ const isOpen = ref(false);
 	align-items: center;
 	justify-content: center;
 	border: none;
-	border-radius: 999px;
-	padding: 0.72rem 1rem;
+	border-radius: var(--radius-pill);
+	padding: 0.62rem 0.9rem;
 	background: rgba(255, 255, 255, 0.08);
 	color: #fff2df;
 	font-weight: 800;
@@ -145,8 +145,8 @@ const isOpen = ref(false);
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	padding: 0.72rem 1rem;
-	border-radius: 999px;
+	padding: 0.62rem 0.9rem;
+	border-radius: var(--radius-pill);
 	text-decoration: none;
 	font-weight: 800;
 	border: none;
@@ -154,7 +154,7 @@ const isOpen = ref(false);
 }
 
 .admin-inline-tools__action--primary {
-	background: linear-gradient(120deg, #ff914d, #ffd27d);
+	background: #ffd27d;
 	color: #08111f;
 }
 

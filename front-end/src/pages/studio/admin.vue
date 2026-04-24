@@ -37,9 +37,9 @@ onMounted(() => {
 <style scoped>
 .admin-gate {
 	display: grid;
-	gap: 1.15rem;
-	padding: clamp(2.2rem, 4vw, 3rem);
-	border-radius: 24px;
+	gap: 0.9rem;
+	padding: clamp(1.6rem, 3vw, 2.25rem);
+	border-radius: var(--radius-panel);
 	background: rgba(255, 255, 255, 0.06);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -61,7 +61,7 @@ onMounted(() => {
 
 .admin-gate__eyebrow {
 	text-transform: uppercase;
-	letter-spacing: 0.24em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 	color: #ffb36f;
 }
@@ -70,9 +70,9 @@ onMounted(() => {
 	justify-self: start;
 	margin-top: 0.9rem;
 	border: none;
-	border-radius: 999px;
-	padding: 0.78rem 1.1rem;
-	background: linear-gradient(120deg, #ff914d, #7a4bb4);
+	border-radius: var(--radius-pill);
+	padding: 0.7rem 1rem;
+	background: #ff914d;
 	color: #160021;
 	font-weight: 800;
 	cursor: pointer;

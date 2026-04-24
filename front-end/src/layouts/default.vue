@@ -48,10 +48,10 @@ onMounted(() => {
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
-	gap: clamp(2rem, 4vw, 3rem);
+	gap: clamp(1.35rem, 3vw, 2.25rem);
 	width: min(100%, 122rem);
 	margin-inline: auto;
-	padding: clamp(1.5rem, 4vw, 3rem);
+	padding: clamp(1rem, 3vw, 2rem);
 	background: transparent;
 	color: #f7eaff;
 	font-family: var(--font-body);
@@ -64,7 +64,7 @@ onMounted(() => {
 	justify-content: space-between;
 	gap: 1rem;
 	padding: 1rem 1.2rem;
-	border-radius: 22px;
+	border-radius: var(--radius-panel);
 	background: rgba(124, 225, 246, 0.1);
 	border: 1px solid rgba(124, 225, 246, 0.18);
 }
@@ -78,7 +78,7 @@ onMounted(() => {
 .admin-viewer-banner__eyebrow {
 	margin-bottom: 0.3rem !important;
 	text-transform: uppercase;
-	letter-spacing: 0.18em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.74rem;
 	font-weight: 800;
 	color: #7ce1f6 !important;
@@ -86,9 +86,9 @@ onMounted(() => {
 
 .admin-viewer-banner button {
 	border: none;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	padding: 0.72rem 1rem;
-	background: linear-gradient(120deg, #ff914d, #ffd27d);
+	background: #ffd27d;
 	color: #08111f;
 	font-weight: 800;
 	cursor: pointer;
@@ -116,10 +116,10 @@ onMounted(() => {
 }
 
 .page-slot {
-	padding: 0 clamp(1.5rem, 4vw, 2.5rem);
+	padding: 0 clamp(0.75rem, 2.5vw, 1.5rem);
 	display: flex;
 	flex-direction: column;
-	gap: clamp(2rem, 3vw, 3rem);
+	gap: clamp(1.35rem, 2.5vw, 2.15rem);
 	min-width: 0;
 }
 

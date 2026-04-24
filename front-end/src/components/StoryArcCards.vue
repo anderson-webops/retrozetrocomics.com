@@ -233,7 +233,7 @@ watch(
 	display: grid;
 	gap: 0.8rem;
 	padding: clamp(1.4rem, 4vw, 2rem);
-	border-radius: 24px;
+	border-radius: var(--radius-card);
 	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	min-width: 0;
@@ -254,7 +254,7 @@ watch(
 	min-width: 4.5rem;
 	height: 2.5rem;
 	padding: 0 1rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: rgba(124, 225, 246, 0.12);
 	border: 1px solid rgba(124, 225, 246, 0.22);
 	color: #dff9ff;
@@ -267,7 +267,7 @@ watch(
 .story-arc-card__editor span {
 	margin: 0;
 	text-transform: uppercase;
-	letter-spacing: 0.14em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.72rem;
 	font-weight: 700;
 	color: rgba(255, 255, 255, 0.62);
@@ -323,7 +323,7 @@ watch(
 .story-arc-card__editor input,
 .story-arc-card__editor textarea {
 	width: 100%;
-	border-radius: 16px;
+	border-radius: var(--radius-field);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	background: rgba(10, 19, 36, 0.82);
 	color: #fff4e7;
@@ -356,14 +356,14 @@ watch(
 .story-arc-card__actions button,
 .story-arc-card__danger {
 	border: none;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	padding: 0.78rem 1rem;
 	font-weight: 800;
 	cursor: pointer;
 }
 
 .story-arc-card__actions button:first-child {
-	background: linear-gradient(120deg, #ff914d, #ffd27d);
+	background: #ffd27d;
 	color: #1b0328;
 }
 

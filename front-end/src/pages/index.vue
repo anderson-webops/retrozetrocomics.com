@@ -86,7 +86,7 @@ useHead({
 
 .home-showcase {
 	padding: clamp(1.5rem, 4vw, 2.4rem);
-	border-radius: 24px;
+	border-radius: var(--radius-panel);
 }
 
 .home-showcase {
@@ -94,8 +94,7 @@ useHead({
 	gap: 1.4rem;
 	background: rgba(249, 234, 219, 0.96);
 	color: #0b1323;
-	box-shadow: 0 22px 40px rgba(8, 13, 26, 0.2);
-	backdrop-filter: blur(10px);
+	box-shadow: var(--shadow-panel);
 }
 
 .home-showcase__header {
@@ -113,7 +112,7 @@ useHead({
 
 .home-showcase__eyebrow {
 	text-transform: uppercase;
-	letter-spacing: 0.18em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 	font-weight: 700;
 }
@@ -144,7 +143,7 @@ useHead({
 	display: grid;
 	gap: 1rem;
 	padding: 1rem;
-	border-radius: 20px;
+	border-radius: var(--radius-card);
 	background: var(--surface-panel);
 	border: 1px solid rgba(11, 19, 35, 0.08);
 }
@@ -152,7 +151,7 @@ useHead({
 .home-showcase__card img {
 	width: 100%;
 	display: block;
-	border-radius: 16px;
+	border-radius: var(--radius-card);
 	background: #0b1323;
 }
 
@@ -164,7 +163,7 @@ useHead({
 .home-showcase__copy p:first-child,
 .home-showcase__copy span {
 	text-transform: uppercase;
-	letter-spacing: 0.08em;
+	letter-spacing: var(--tracking-ui);
 	font-size: 0.78rem;
 	font-weight: 700;
 }

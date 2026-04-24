@@ -147,10 +147,10 @@ async function submitComment() {
 	display: grid;
 	gap: 1.3rem;
 	padding: clamp(1.4rem, 4vw, 2rem);
-	border-radius: 24px;
+	border-radius: var(--radius-panel);
 	background: var(--surface-panel-strong);
 	border: 1px solid rgba(9, 21, 38, 0.08);
-	box-shadow: 0 18px 34px rgba(8, 13, 26, 0.12);
+	box-shadow: var(--shadow-soft);
 }
 
 .comment-panel__header {
@@ -175,7 +175,7 @@ async function submitComment() {
 
 .comment-panel__eyebrow {
 	text-transform: uppercase;
-	letter-spacing: 0.2em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.76rem;
 	color: #ff7d44;
 	margin-bottom: 0.4rem !important;
@@ -185,13 +185,13 @@ async function submitComment() {
 	display: grid;
 	gap: 0.85rem;
 	padding: 1.1rem;
-	border-radius: 20px;
+	border-radius: var(--radius-card);
 	background: #102038;
 }
 
 .comment-panel__input {
 	width: 100%;
-	border-radius: 18px;
+	border-radius: var(--radius-field);
 	border: 1px solid rgba(255, 255, 255, 0.12);
 	background: rgba(255, 255, 255, 0.08);
 	color: #fff7ef;
@@ -218,9 +218,9 @@ async function submitComment() {
 .comment-panel__submit,
 .comment-panel__auth {
 	border: none;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	padding: 0.75rem 1.15rem;
-	background: linear-gradient(120deg, #ff9459, #ffd27d);
+	background: #ffd27d;
 	color: #08111f;
 	font-weight: 800;
 	cursor: pointer;
@@ -243,7 +243,7 @@ async function submitComment() {
 	display: grid;
 	gap: 0.8rem;
 	padding: 1rem 1.1rem;
-	border-radius: 20px;
+	border-radius: var(--radius-card);
 	background: rgba(9, 21, 38, 0.04);
 }
 
@@ -269,7 +269,7 @@ async function submitComment() {
 	display: inline-flex;
 	align-items: center;
 	padding: 0.32rem 0.7rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
 	font-size: 0.74rem;

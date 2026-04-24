@@ -122,24 +122,18 @@ const publishedLabel = computed(() => {
 	display: grid;
 	gap: 0.9rem;
 	padding: clamp(1.6rem, 4vw, 2.6rem);
-	border-radius: 28px;
+	border-radius: var(--radius-panel);
 }
 
 .post-preview__hero {
-	background:
-		radial-gradient(
-			circle at top right,
-			rgba(255, 148, 89, 0.24),
-			transparent 34%
-		),
-		linear-gradient(140deg, rgba(9, 21, 38, 0.98), rgba(18, 38, 62, 0.95));
-	box-shadow: 0 24px 48px rgba(6, 10, 17, 0.28);
+	background: rgba(9, 21, 38, 0.96);
+	box-shadow: var(--shadow-panel);
 }
 
 .post-preview__content {
 	background: var(--surface-panel-strong);
 	border: 1px solid rgba(9, 21, 38, 0.08);
-	box-shadow: 0 20px 36px rgba(8, 13, 26, 0.12);
+	box-shadow: var(--shadow-soft);
 }
 
 .post-preview__back {
@@ -147,7 +141,7 @@ const publishedLabel = computed(() => {
 	display: inline-flex;
 	align-items: center;
 	padding: 0.68rem 0.95rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	text-decoration: none;
 	background: rgba(255, 255, 255, 0.08);
 	color: #ffd27d;
@@ -157,7 +151,7 @@ const publishedLabel = computed(() => {
 .post-preview__type {
 	margin: 0;
 	text-transform: uppercase;
-	letter-spacing: 0.24em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 	color: #ffb36f;
 }
@@ -190,10 +184,10 @@ const publishedLabel = computed(() => {
 	display: inline-flex;
 	align-items: center;
 	padding: 0.42rem 0.75rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: rgba(255, 255, 255, 0.08);
 	text-transform: uppercase;
-	letter-spacing: 0.1em;
+	letter-spacing: var(--tracking-ui);
 	font-size: 0.78rem;
 }
 
@@ -210,9 +204,9 @@ const publishedLabel = computed(() => {
 	height: auto;
 	max-height: min(75vh, 960px);
 	padding: 0.85rem;
-	border-radius: 24px;
+	border-radius: var(--radius-panel);
 	background: rgba(9, 21, 38, 0.08);
-	box-shadow: 0 18px 32px rgba(6, 10, 17, 0.24);
+	box-shadow: var(--shadow-soft);
 }
 
 .post-preview__copy p {
@@ -234,7 +228,7 @@ const publishedLabel = computed(() => {
 
 .post-preview__tags li {
 	padding: 0.42rem 0.76rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: rgba(124, 225, 246, 0.16);
 	color: #1d4f6a;
 }

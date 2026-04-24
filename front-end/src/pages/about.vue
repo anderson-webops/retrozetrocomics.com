@@ -269,7 +269,7 @@ function handleWorldEntryDiscard(entryId: string) {
 .about-page__story-card,
 .about-page__world-card {
 	padding: clamp(1.4rem, 4vw, 2rem);
-	border-radius: 24px;
+	border-radius: var(--radius-card);
 }
 
 .about-page__story-card,
@@ -290,7 +290,7 @@ function handleWorldEntryDiscard(entryId: string) {
 
 .about-page__story-section {
 	padding: clamp(1.4rem, 4vw, 2rem);
-	border-radius: 24px;
+	border-radius: var(--radius-panel);
 	background: rgba(255, 255, 255, 0.04);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -329,7 +329,7 @@ function handleWorldEntryDiscard(entryId: string) {
 
 .about-page__eyebrow {
 	text-transform: uppercase;
-	letter-spacing: 0.16em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 	font-weight: 700;
 	color: #ffd27d;
@@ -343,7 +343,7 @@ function handleWorldEntryDiscard(entryId: string) {
 
 .about-page__section-actions button {
 	border: none;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	padding: 0.72rem 1rem;
 	background: rgba(255, 255, 255, 0.08);
 	color: #fff2df;
@@ -364,7 +364,7 @@ function handleWorldEntryDiscard(entryId: string) {
 	display: grid;
 	gap: 0.25rem;
 	padding: 0.9rem 1rem;
-	border-radius: 18px;
+	border-radius: var(--radius-card);
 	background: rgba(255, 255, 255, 0.04);
 }
 
@@ -373,7 +373,7 @@ function handleWorldEntryDiscard(entryId: string) {
 .about-page__story-note strong {
 	color: #fff4e7;
 	font-size: 0.86rem;
-	letter-spacing: 0.04em;
+	letter-spacing: var(--tracking-ui);
 	text-transform: uppercase;
 }
 
@@ -390,7 +390,7 @@ function handleWorldEntryDiscard(entryId: string) {
 	display: grid;
 	gap: 0.3rem;
 	padding: 1rem;
-	border-radius: 18px;
+	border-radius: var(--radius-card);
 	background: rgba(124, 225, 246, 0.08);
 }
 

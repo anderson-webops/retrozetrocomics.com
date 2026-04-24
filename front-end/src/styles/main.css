@@ -5,25 +5,7 @@
 	--font-body: "Avenir Next", "Trebuchet MS", "Gill Sans", sans-serif;
 	--font-display: "Copperplate", "Impact", "Haettenschweiler", fantasy;
 	--font-copy: "Palatino Linotype", "Book Antiqua", serif;
-	--site-background:
-		radial-gradient(
-			circle at top left,
-			rgba(255, 148, 89, 0.16),
-			transparent 28%
-		),
-		radial-gradient(
-			circle at bottom right,
-			rgba(124, 225, 246, 0.14),
-			transparent 26%
-		),
-		repeating-linear-gradient(
-			135deg,
-			rgba(255, 255, 255, 0.02) 0,
-			rgba(255, 255, 255, 0.02) 1px,
-			transparent 1px,
-			transparent 18px
-		),
-		var(--surface-base);
+		--site-background: var(--surface-base);
 	--surface-base: #07111f;
 	--surface-panel: rgba(229, 215, 197, 0.94);
 	--surface-panel-strong: rgba(220, 205, 186, 0.96);
@@ -34,10 +16,21 @@
 	--ink-muted: #40506a;
 	--ink-soft: rgba(239, 244, 255, 0.8);
 	--accent-sun: #ff9459;
-	--accent-gold: #ffd27d;
-	--accent-cyan: #7ce1f6;
-	--accent-line: rgba(255, 255, 255, 0.12);
-}
+		--accent-gold: #ffd27d;
+		--accent-cyan: #7ce1f6;
+		--accent-line: rgba(255, 255, 255, 0.12);
+		--radius-shell: 16px;
+		--radius-panel: 14px;
+		--radius-card: 10px;
+		--radius-field: 8px;
+		--radius-pill: 999px;
+		--shadow-soft: 0 10px 24px rgba(8, 13, 26, 0.1);
+		--shadow-panel: 0 14px 32px rgba(8, 13, 26, 0.16);
+		--shadow-shell: 0 10px 22px rgba(7, 0, 18, 0.24);
+		--shadow-modal: 0 20px 48px rgba(0, 0, 0, 0.34);
+		--tracking-eyebrow: 0.08em;
+		--tracking-ui: 0.06em;
+	}
 
 html,
 body,
@@ -56,22 +49,6 @@ body {
 	font-family: var(--font-body);
 	font-size: 16px;
 	line-height: 1.6;
-}
-
-body::before {
-	content: "";
-	position: fixed;
-	inset: 0;
-	pointer-events: none;
-	background:
-		linear-gradient(
-			180deg,
-			rgba(255, 255, 255, 0.04),
-			transparent 18%,
-			transparent 82%,
-			rgba(255, 255, 255, 0.03)
-		);
-	mix-blend-mode: soft-light;
 }
 
 ::selection {
@@ -135,16 +112,16 @@ textarea {
 	width: 100%;
 }
 
-.item {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-	padding: 1.25rem;
-	border-radius: 18px;
-	background: var(--surface-panel);
-	border: 1px solid rgba(9, 21, 38, 0.08);
-	box-shadow: 0 18px 36px rgba(8, 13, 26, 0.12);
-}
+	.item {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: 1.25rem;
+		border-radius: var(--radius-card);
+		background: var(--surface-panel);
+		border: 1px solid rgba(9, 21, 38, 0.08);
+		box-shadow: var(--shadow-soft);
+	}
 
 .item p {
 	color: var(--ink-muted);

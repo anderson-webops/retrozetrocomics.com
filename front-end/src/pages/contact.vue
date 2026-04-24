@@ -191,19 +191,13 @@ async function handleSubmit() {
 	display: grid;
 	gap: 1rem;
 	padding: clamp(1.4rem, 4vw, 2rem);
-	border-radius: 24px;
+	border-radius: var(--radius-panel);
 	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .contact-panel--warm {
-	background:
-		radial-gradient(
-			circle at top right,
-			rgba(255, 148, 89, 0.2),
-			transparent 28%
-		),
-		rgba(255, 255, 255, 0.04);
+	background: rgba(255, 255, 255, 0.04);
 }
 
 .contact-panel h2,
@@ -230,7 +224,7 @@ async function handleSubmit() {
 
 .contact-panel__eyebrow {
 	text-transform: uppercase;
-	letter-spacing: 0.16em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 	font-weight: 700;
 	color: #ffd27d;
@@ -251,7 +245,7 @@ async function handleSubmit() {
 	display: grid;
 	gap: 0.3rem;
 	padding: 1rem;
-	border-radius: 18px;
+	border-radius: var(--radius-card);
 	background: rgba(255, 255, 255, 0.04);
 }
 
@@ -272,7 +266,7 @@ async function handleSubmit() {
 
 .contact-panel__tags li {
 	padding: 1rem;
-	border-radius: 18px;
+	border-radius: var(--radius-card);
 	background: rgba(255, 255, 255, 0.04);
 	color: rgba(239, 244, 255, 0.82);
 	line-height: 1.6;
@@ -287,7 +281,7 @@ async function handleSubmit() {
 .contact-form textarea {
 	width: 100%;
 	padding: 0.95rem 1rem;
-	border-radius: 16px;
+	border-radius: var(--radius-field);
 	border: 1px solid rgba(255, 255, 255, 0.14);
 	background: rgba(10, 18, 31, 0.5);
 	color: #eff4ff;
@@ -296,7 +290,7 @@ async function handleSubmit() {
 .contact-form button {
 	justify-self: start;
 	border: none;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	padding: 0.85rem 1.2rem;
 	background: #ff9459;
 	color: #08111f;

@@ -327,7 +327,7 @@ async function submitSignup() {
 	place-items: center;
 	padding: 1.25rem;
 	background: rgba(8, 0, 15, 0.74);
-	backdrop-filter: blur(12px);
+	backdrop-filter: blur(6px);
 }
 
 .auth-modal {
@@ -336,21 +336,10 @@ async function submitSignup() {
 	display: grid;
 	gap: 1.5rem;
 	padding: clamp(1.5rem, 4vw, 2.25rem);
-	border-radius: 24px;
-	background:
-		radial-gradient(
-			circle at top right,
-			rgba(255, 145, 77, 0.22),
-			transparent 38%
-		),
-		radial-gradient(
-			circle at bottom left,
-			rgba(122, 75, 180, 0.35),
-			transparent 45%
-		),
-		linear-gradient(165deg, rgba(26, 6, 40, 0.98), rgba(12, 2, 20, 0.98));
+	border-radius: var(--radius-panel);
+	background: rgba(12, 2, 20, 0.98);
 	border: 1px solid rgba(255, 255, 255, 0.1);
-	box-shadow: 0 26px 60px rgba(0, 0, 0, 0.4);
+	box-shadow: var(--shadow-modal);
 	color: #f6e8ff;
 }
 
@@ -385,7 +374,7 @@ async function submitSignup() {
 .auth-modal__eyebrow {
 	margin: 0;
 	text-transform: uppercase;
-	letter-spacing: 0.24em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 	color: #ffb36f;
 }
@@ -394,24 +383,24 @@ async function submitSignup() {
 	display: inline-grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	padding: 0.35rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: rgba(255, 255, 255, 0.07);
 }
 
 .auth-modal__switch {
 	border: none;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: transparent;
 	color: rgba(255, 255, 255, 0.65);
 	padding: 0.8rem 1rem;
 	font-weight: 700;
-	letter-spacing: 0.06em;
+	letter-spacing: var(--tracking-ui);
 	text-transform: uppercase;
 	cursor: pointer;
 }
 
 .auth-modal__switch--active {
-	background: linear-gradient(120deg, #ff914d, #7a4bb4);
+	background: #ff914d;
 	color: #1b0228;
 }
 
@@ -428,14 +417,14 @@ async function submitSignup() {
 .auth-form span {
 	font-size: 0.85rem;
 	text-transform: uppercase;
-	letter-spacing: 0.1em;
+	letter-spacing: var(--tracking-ui);
 	color: rgba(255, 255, 255, 0.68);
 }
 
 .auth-form input {
 	width: 100%;
 	padding: 0.95rem 1rem;
-	border-radius: 14px;
+	border-radius: var(--radius-field);
 	border: 1px solid rgba(255, 255, 255, 0.14);
 	background: rgba(255, 255, 255, 0.06);
 	color: #fdf7ff;
@@ -452,7 +441,7 @@ async function submitSignup() {
 	grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
 	gap: 1rem;
 	padding: 1rem;
-	border-radius: 18px;
+	border-radius: var(--radius-card);
 	background: rgba(255, 255, 255, 0.04);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -462,7 +451,7 @@ async function submitSignup() {
 	align-items: center;
 	justify-content: center;
 	padding: 0.75rem;
-	border-radius: 16px;
+	border-radius: var(--radius-field);
 	background: rgba(12, 2, 20, 0.65);
 }
 
@@ -486,13 +475,13 @@ async function submitSignup() {
 
 .auth-form__submit {
 	border: none;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	padding: 0.9rem 1.2rem;
-	background: linear-gradient(120deg, #ff914d, #7a4bb4);
+	background: #ff914d;
 	color: #160021;
 	font-weight: 800;
 	text-transform: uppercase;
-	letter-spacing: 0.14em;
+	letter-spacing: var(--tracking-ui);
 	cursor: pointer;
 }
 

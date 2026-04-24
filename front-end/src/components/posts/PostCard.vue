@@ -77,15 +77,11 @@ const publishedLabel = computed(() => {
 .post-card {
 	display: grid;
 	grid-template-rows: auto 1fr auto;
-	border-radius: 24px;
+	border-radius: var(--radius-panel);
 	overflow: hidden;
-	background: linear-gradient(
-		180deg,
-		rgba(236, 222, 205, 0.97),
-		rgba(219, 203, 184, 0.95)
-	);
+	background: var(--surface-panel);
 	border: 1px solid rgba(9, 21, 38, 0.08);
-	box-shadow: 0 20px 36px rgba(8, 13, 26, 0.14);
+	box-shadow: var(--shadow-soft);
 	color: #091526;
 }
 
@@ -93,11 +89,7 @@ const publishedLabel = computed(() => {
 	display: grid;
 	gap: 0.85rem;
 	padding: 0.95rem;
-	background: linear-gradient(
-		145deg,
-		rgba(9, 21, 38, 0.98),
-		rgba(18, 38, 62, 0.96)
-	);
+	background: rgba(9, 21, 38, 0.96);
 }
 
 .post-card__image {
@@ -105,7 +97,7 @@ const publishedLabel = computed(() => {
 	width: 100%;
 	height: auto;
 	max-height: 32rem;
-	border-radius: 18px;
+	border-radius: var(--radius-card);
 	object-fit: contain;
 	background: rgba(3, 9, 17, 0.74);
 	padding: 0.55rem;
@@ -116,14 +108,8 @@ const publishedLabel = computed(() => {
 	place-items: center;
 	width: 100%;
 	min-height: clamp(180px, 28vw, 260px);
-	border-radius: 18px;
-	background:
-		radial-gradient(
-			circle at top,
-			rgba(255, 148, 89, 0.65),
-			transparent 40%
-		),
-		rgba(255, 255, 255, 0.08);
+	border-radius: var(--radius-card);
+	background: rgba(255, 255, 255, 0.08);
 	color: #fff8ef;
 	font-size: 3rem;
 	font-weight: 800;
@@ -140,11 +126,11 @@ const publishedLabel = computed(() => {
 	display: inline-flex;
 	align-items: center;
 	padding: 0.35rem 0.75rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: rgba(228, 214, 196, 0.9);
 	color: #102038;
 	font-size: 0.75rem;
-	letter-spacing: 0.08em;
+	letter-spacing: var(--tracking-ui);
 	text-transform: uppercase;
 	font-weight: 800;
 }
@@ -161,7 +147,7 @@ const publishedLabel = computed(() => {
 	gap: 0.75rem;
 	font-size: 0.82rem;
 	text-transform: uppercase;
-	letter-spacing: 0.08em;
+	letter-spacing: var(--tracking-ui);
 	color: #5c6d86;
 }
 
@@ -193,7 +179,7 @@ const publishedLabel = computed(() => {
 
 .post-card__tags li {
 	padding: 0.35rem 0.65rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: rgba(124, 225, 246, 0.15);
 	color: #1d4f6a;
 	font-size: 0.82rem;
@@ -209,7 +195,7 @@ const publishedLabel = computed(() => {
 	justify-content: center;
 	width: 100%;
 	padding: 0.8rem 1.3rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	text-decoration: none;
 	background: #0f1e35;
 	color: #fff5e9;

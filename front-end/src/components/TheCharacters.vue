@@ -278,16 +278,10 @@ watch(
 	height: 100%;
 	padding: 1rem;
 	padding-top: 4.5rem;
-	border-radius: 24px;
-	background:
-		radial-gradient(
-			circle at top right,
-			rgba(255, 148, 89, 0.18),
-			transparent 26%
-		),
-		rgba(255, 255, 255, 0.05);
+	border-radius: var(--radius-card);
+	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid rgba(255, 255, 255, 0.08);
-	box-shadow: 0 22px 40px rgba(8, 13, 26, 0.16);
+	box-shadow: var(--shadow-soft);
 }
 
 .characters-grid__card--editing {
@@ -303,7 +297,7 @@ watch(
 	justify-content: center;
 	width: 4.5rem;
 	height: 2.5rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: rgba(124, 225, 246, 0.12);
 	border: 1px solid rgba(124, 225, 246, 0.2);
 	color: #dff9ff;
@@ -320,7 +314,7 @@ watch(
 	align-items: center;
 	justify-content: center;
 	min-height: 17rem;
-	border-radius: 22px;
+	border-radius: var(--radius-card);
 	background: rgba(255, 255, 255, 0.015);
 }
 
@@ -342,7 +336,7 @@ watch(
 
 .characters-grid__editor span {
 	text-transform: uppercase;
-	letter-spacing: 0.14em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.72rem;
 	font-weight: 700;
 	color: rgba(255, 255, 255, 0.62);
@@ -351,7 +345,7 @@ watch(
 .characters-grid__editor input,
 .characters-grid__editor textarea {
 	width: 100%;
-	border-radius: 16px;
+	border-radius: var(--radius-field);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	background: rgba(10, 19, 36, 0.82);
 	color: #fff4e7;
@@ -368,14 +362,14 @@ watch(
 
 .characters-grid__actions button {
 	border: none;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	padding: 0.72rem 1rem;
 	font-weight: 800;
 	cursor: pointer;
 }
 
 .characters-grid__actions button:first-child {
-	background: linear-gradient(120deg, #ff914d, #ffd27d);
+	background: #ffd27d;
 	color: #1b0328;
 }
 
@@ -394,7 +388,7 @@ watch(
 	max-height: 18rem;
 	height: auto;
 	display: block;
-	border-radius: 20px;
+	border-radius: var(--radius-card);
 	background: #08111f;
 }
 
@@ -412,7 +406,7 @@ watch(
 
 .characters-grid__role {
 	text-transform: uppercase;
-	letter-spacing: 0.16em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 	font-weight: 700;
 	color: #ffd27d;

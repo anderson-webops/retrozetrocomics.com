@@ -203,23 +203,22 @@ function handleAction(action: HeroAction) {
 <style scoped>
 .welcome {
 	display: grid;
-	gap: 2rem;
+	gap: 1.5rem;
 	grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
 	align-items: center;
-	padding: 3.5rem clamp(1rem, 4vw, 3rem);
+	padding: clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem);
 	background: rgba(9, 21, 38, 0.84);
-	border-radius: 24px;
+	border-radius: var(--radius-shell);
 	border: 1px solid rgba(255, 255, 255, 0.08);
-	box-shadow: 0 24px 60px rgba(10, 15, 28, 0.35);
+	box-shadow: var(--shadow-panel);
 	color: #fdf9ff;
-	backdrop-filter: blur(10px);
 }
 
 .welcome__content {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 1.5rem;
+	gap: 1.15rem;
 	min-width: 0;
 }
 
@@ -230,9 +229,9 @@ function handleAction(action: HeroAction) {
 	width: fit-content;
 	max-width: 100%;
 	padding: 0.48rem 1.35rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	font-size: clamp(0.72rem, 0.9vw, 0.82rem);
-	letter-spacing: 0.12em;
+	letter-spacing: var(--tracking-eyebrow);
 	line-height: 1.35;
 	text-transform: uppercase;
 	text-align: center;
@@ -245,10 +244,10 @@ function handleAction(action: HeroAction) {
 }
 
 .welcome__title {
-	font-size: clamp(2.6rem, 5vw, 4.1rem);
+	font-size: clamp(2.2rem, 4.5vw, 3.45rem);
 	font-weight: 800;
 	font-family: var(--font-display);
-	line-height: 0.98;
+	line-height: 1.04;
 	margin: 0;
 	color: #fff8ef;
 	text-wrap: balance;
@@ -256,7 +255,7 @@ function handleAction(action: HeroAction) {
 
 .welcome__description {
 	font-size: 1.08rem;
-	line-height: 1.85;
+	line-height: 1.7;
 	max-width: 48ch;
 	margin: 0;
 	color: rgba(239, 244, 255, 0.88);
@@ -267,7 +266,7 @@ function handleAction(action: HeroAction) {
 	flex-wrap: wrap;
 	gap: 0.75rem;
 	width: 100%;
-	justify-content: center;
+	justify-content: flex-start;
 }
 
 .welcome__cta {
@@ -276,7 +275,7 @@ function handleAction(action: HeroAction) {
 	justify-content: center;
 	min-height: 3rem;
 	padding: 0.75rem 1.8rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	font-weight: 700;
 	text-decoration: none;
 	border: none;
@@ -346,7 +345,7 @@ function handleAction(action: HeroAction) {
 	color: #ffd27d;
 	margin-bottom: 0.35rem;
 	text-transform: uppercase;
-	letter-spacing: 0.08em;
+	letter-spacing: var(--tracking-ui);
 	font-size: 0.8rem;
 }
 
@@ -367,10 +366,11 @@ function handleAction(action: HeroAction) {
 .welcome__poster-frame {
 	position: relative;
 	width: min(100%, 420px);
-	padding: 0.75rem;
-	border-radius: 22px;
-	background: linear-gradient(140deg, rgba(255, 148, 89, 0.8), #ffd27d);
-	box-shadow: 0 20px 50px rgba(8, 13, 26, 0.3);
+	padding: 0.45rem;
+	border-radius: var(--radius-panel);
+	background: rgba(255, 255, 255, 0.06);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	box-shadow: var(--shadow-soft);
 	max-width: 420px;
 }
 
@@ -380,20 +380,14 @@ function handleAction(action: HeroAction) {
 }
 
 .welcome__poster-frame::after {
-	content: "";
-	position: absolute;
-	inset: 12px;
-	border-radius: 18px;
-	border: 1px dashed rgba(255, 255, 255, 0.25);
-	pointer-events: none;
+	display: none;
 }
 
 .welcome__poster img {
 	display: block;
 	width: 100%;
 	height: auto;
-	border-radius: 14px;
-	box-shadow: 0 20px 36px rgba(17, 0, 24, 0.4);
+	border-radius: var(--radius-card);
 }
 
 @media (min-width: 1120px) {
@@ -404,7 +398,7 @@ function handleAction(action: HeroAction) {
 
 @media (max-width: 640px) {
 	.welcome {
-		padding: 2.5rem 1.25rem;
+		padding: 1.5rem 1rem;
 	}
 
 	.welcome__content {

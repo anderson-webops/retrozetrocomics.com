@@ -175,12 +175,11 @@ watch(activeType, () => {
 	display: grid;
 	gap: 1.8rem;
 	padding: clamp(1.6rem, 4vw, 2.8rem);
-	border-radius: 28px;
+	border-radius: var(--radius-panel);
 	background: var(--surface-panel);
 	border: 1px solid rgba(9, 21, 38, 0.08);
-	box-shadow: 0 24px 44px rgba(8, 13, 26, 0.16);
+	box-shadow: var(--shadow-panel);
 	color: #091526;
-	backdrop-filter: blur(10px);
 }
 
 .post-feed__header {
@@ -214,7 +213,7 @@ watch(activeType, () => {
 .post-feed__eyebrow {
 	margin-bottom: 0.45rem !important;
 	text-transform: uppercase;
-	letter-spacing: 0.18em;
+	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.78rem;
 	font-weight: 800;
 	color: #ff7d44 !important;
@@ -224,7 +223,7 @@ watch(activeType, () => {
 	display: grid;
 	gap: 1rem;
 	padding: 1.1rem;
-	border-radius: 22px;
+	border-radius: var(--radius-card);
 	background: rgba(9, 21, 38, 0.92);
 	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
@@ -245,7 +244,7 @@ watch(activeType, () => {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	padding: 0.72rem 1rem;
 	min-height: 3.35rem;
 	font-weight: 700;
@@ -258,7 +257,7 @@ watch(activeType, () => {
 }
 
 .post-feed__filter--active {
-	background: linear-gradient(120deg, #ff9459, #ffd27d);
+	background: #ffd27d;
 	color: #08111f;
 	border-color: transparent;
 }
@@ -276,7 +275,7 @@ watch(activeType, () => {
 .post-feed__state {
 	margin: 0;
 	padding: 1rem 1.2rem;
-	border-radius: 18px;
+	border-radius: var(--radius-card);
 	background: rgba(9, 21, 38, 0.9);
 	color: rgba(239, 244, 255, 0.82);
 }
