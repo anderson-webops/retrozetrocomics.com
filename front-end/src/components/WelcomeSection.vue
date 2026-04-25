@@ -338,7 +338,7 @@ const resolvedImageCandidates = computed(() =>
 .welcome__poster {
 	display: flex;
 	flex-direction: column;
-	align-items: flex-end;
+	align-items: center;
 	gap: 1rem;
 	justify-content: center;
 	width: 100%;
@@ -359,7 +359,7 @@ const resolvedImageCandidates = computed(() =>
 
 .welcome__actions--poster {
 	width: 100%;
-	justify-content: flex-end;
+	justify-content: center;
 }
 
 .welcome__poster-frame::after {
