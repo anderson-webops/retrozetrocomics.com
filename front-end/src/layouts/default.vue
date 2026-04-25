@@ -8,6 +8,7 @@ import SiteAdSlot from "~/components/SiteAdSlot.vue";
 const session = useSessionStore();
 const route = useRoute();
 const isAdminRoute = computed(() => route.path === "/studio/admin");
+const showAdSlots = import.meta.env.VITE_SHOW_AD_SLOTS === "true";
 const showAdminViewerBanner = computed(
 	() => session.isAdmin && session.adminViewerMode && !isAdminRoute.value
 );
@@ -20,7 +21,10 @@ onMounted(() => {
 <template>
 	<main class="site-shell">
 		<div class="site-frame">
-			<header class="site-masthead">
+			<header
+				class="site-masthead"
+				:class="{ 'site-masthead--ads-hidden': !showAdSlots }"
+			>
 				<RouterLink
 					aria-label="RetroZetro Comics home"
 					class="site-masthead__brand"
@@ -34,6 +38,7 @@ onMounted(() => {
 				</RouterLink>
 
 				<SiteAdSlot
+					v-if="showAdSlots"
 					class="site-masthead__ad"
 					label="Advertisement"
 					placement="top"
@@ -55,8 +60,12 @@ onMounted(() => {
 				</button>
 			</div>
 
-			<div class="content-grid">
+			<div
+				class="content-grid"
+				:class="{ 'content-grid--ads-hidden': !showAdSlots }"
+			>
 				<SiteAdSlot
+					v-if="showAdSlots"
 					class="content-grid__ad content-grid__ad--left"
 					label="Advertisement"
 					placement="side"
@@ -65,6 +74,7 @@ onMounted(() => {
 					<RouterView class="page-slot" />
 				</div>
 				<SiteAdSlot
+					v-if="showAdSlots"
 					class="content-grid__ad content-grid__ad--right"
 					label="Advertisement"
 					placement="side"
@@ -102,6 +112,11 @@ onMounted(() => {
 	align-items: center;
 	gap: clamp(1rem, 3vw, 2rem);
 	padding: 0 0 clamp(0.9rem, 2vw, 1.15rem);
+}
+
+.site-masthead--ads-hidden {
+	grid-template-columns: minmax(0, 1fr);
+	justify-items: center;
 }
 
 .site-masthead__brand {
@@ -184,6 +199,12 @@ onMounted(() => {
 	padding-top: clamp(0.75rem, 1.8vw, 1rem);
 }
 
+.content-grid--ads-hidden {
+	grid-template-columns: minmax(0, 1fr);
+	max-width: 980px;
+	margin-inline: auto;
+}
+
 .content-grid__ad {
 	min-width: 0;
 }
@@ -213,6 +234,10 @@ onMounted(() => {
 	overflow: hidden;
 	box-shadow: 0 22px 48px rgba(0, 0, 0, 0.38);
 	backdrop-filter: none;
+}
+
+.content-grid--ads-hidden .center-plate {
+	grid-column: 1;
 }
 
 .page-slot {

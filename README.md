@@ -26,6 +26,7 @@ npm run up
 - Use `npm run server` and `npm run serve` when you want the API and front-end started separately.
 - Static front-end builds now prerender published post pages and archive excerpts from the public API. If the build environment cannot reach the live site, set `VITE_SSG_API_BASE_URL` to an accessible API base URL such as `https://retrozetrocomics.com/api` before running `npm run -w front-end build`.
 - If you override the public site hostname during builds, also set `VITE_PUBLIC_SITE_ORIGIN` so canonical URLs and SSG API resolution stay correct.
+- Future ad placements are hidden by default so pre-approval builds do not show empty inventory. Set `VITE_SHOW_AD_SLOTS=true` only when visible ad slots should be rendered.
 - Use [`HEALTHCHECKS.md`](./HEALTHCHECKS.md) for deployment monitor targets instead of `/`.
 - The backend runtime user must have write access to `back-end/uploads` and `back-end/uploads/content`. Uploads are written under `back-end/uploads/content/YYYY-MM`, so deploys should provision those directories before the API starts.
 - The public contact form now submits through the backend. Set `CONTACT_FROM_EMAIL` and either `CONTACT_USE_SENDMAIL=true` or the `CONTACT_SMTP_*` settings. If `CONTACT_TO_EMAIL` is unset, submissions default to `contacts@jacobdanderson.net`; `CONTACT_BCC_EMAIL` stays optional so future alias-plus-BCC routing is a simple env change.
