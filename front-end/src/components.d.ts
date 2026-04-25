@@ -17,6 +17,7 @@ declare module 'vue' {
     ResolvedImage: typeof import('./components/ResolvedImage.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SiteAdSlot: typeof import('./components/SiteAdSlot.vue')['default']
     StoryArcCards: typeof import('./components/StoryArcCards.vue')['default']
     TheCharacters: typeof import('./components/TheCharacters.vue')['default']
     TheCounter: typeof import('./components/TheCounter.vue')['default']

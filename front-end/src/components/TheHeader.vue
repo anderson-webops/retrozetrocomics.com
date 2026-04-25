@@ -128,17 +128,17 @@ watch(
 
 <style scoped>
 .site-header {
-	background: rgba(9, 21, 38, 0.84);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-	border-radius: var(--radius-shell);
-	box-shadow: var(--shadow-shell);
+	background: #0b0108;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: var(--radius-card);
+	box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
 	overflow: hidden;
 }
 
 .nav {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: flex-start;
 	padding: clamp(0.65rem, 1.8vw, 1rem) clamp(0.9rem, 4vw, 2.25rem);
 	position: relative;
 	gap: 1rem;
@@ -202,8 +202,8 @@ watch(
 	margin: 0;
 	text-transform: uppercase;
 	letter-spacing: 0.1em;
-	flex: 1;
-	justify-content: center;
+	flex: 0 1 auto;
+	justify-content: flex-start;
 	min-width: 0;
 }
 
@@ -252,6 +252,7 @@ watch(
 	align-items: center;
 	justify-content: flex-end;
 	gap: 0.65rem;
+	margin-left: auto;
 	min-width: 0;
 }
 

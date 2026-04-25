@@ -174,10 +174,14 @@ const resolvedImageCandidates = computed(() =>
 
 <style scoped>
 .welcome {
+	container-type: inline-size;
 	display: grid;
 	gap: 1.5rem;
-	grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+	grid-template-columns: minmax(0, 1fr);
 	align-items: center;
+	min-width: 0;
+	max-width: 100%;
+	overflow: hidden;
 	padding: clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem);
 	background: rgba(9, 21, 38, 0.84);
 	border-radius: var(--radius-shell);
@@ -192,6 +196,7 @@ const resolvedImageCandidates = computed(() =>
 	align-items: flex-start;
 	gap: 1.15rem;
 	min-width: 0;
+	max-width: 100%;
 }
 
 .welcome__eyebrow {
@@ -221,8 +226,11 @@ const resolvedImageCandidates = computed(() =>
 	font-family: var(--font-display);
 	line-height: 1.04;
 	margin: 0;
+	max-width: 100%;
 	color: #fff8ef;
 	text-wrap: balance;
+	overflow-wrap: anywhere;
+	word-break: break-word;
 }
 
 .welcome__description {
@@ -333,11 +341,14 @@ const resolvedImageCandidates = computed(() =>
 	align-items: flex-end;
 	gap: 1rem;
 	justify-content: center;
+	width: 100%;
+	min-width: 0;
+	max-width: 100%;
 }
 
 .welcome__poster-frame {
 	position: relative;
-	width: min(100%, 420px);
+	width: 100%;
 	padding: 0.45rem;
 	border-radius: var(--radius-panel);
 	background: rgba(255, 255, 255, 0.06);
@@ -362,7 +373,7 @@ const resolvedImageCandidates = computed(() =>
 	border-radius: var(--radius-card);
 }
 
-@media (min-width: 1120px) {
+@container (min-width: 780px) {
 	.welcome {
 		grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.85fr);
 	}
@@ -371,6 +382,10 @@ const resolvedImageCandidates = computed(() =>
 @media (max-width: 640px) {
 	.welcome {
 		padding: 1.5rem 1rem;
+	}
+
+	.welcome__title {
+		font-size: clamp(1.85rem, 11vw, 2.45rem);
 	}
 
 	.welcome__content {
