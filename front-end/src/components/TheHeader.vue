@@ -121,6 +121,14 @@ watch(
 						Logout
 					</button>
 				</template>
+				<button
+					v-else
+					class="nav__action nav__action--ghost"
+					type="button"
+					@click="session.openAuth()"
+				>
+					Owner Sign In
+				</button>
 			</div>
 		</nav>
 	</header>

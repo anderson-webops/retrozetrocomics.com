@@ -194,4 +194,5 @@ useHead(
 
 <template>
 	<RouterView />
+	<AccountManagement />
 </template>
