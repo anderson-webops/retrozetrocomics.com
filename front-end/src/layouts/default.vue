@@ -73,8 +73,6 @@ onMounted(() => {
 
 			<TheFooter class="site-shell__footer" />
 		</div>
-
-		<AccountManagement />
 	</main>
 </template>
 
