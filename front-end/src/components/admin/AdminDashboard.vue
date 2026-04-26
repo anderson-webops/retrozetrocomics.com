@@ -408,11 +408,24 @@ onMounted(() => {
 .admin-dashboard {
 	display: grid;
 	gap: clamp(1.1rem, 3vw, 1.6rem);
+	width: 100%;
+	min-width: 0;
+	max-width: 100%;
+	container-type: inline-size;
+}
+
+.admin-dashboard > *,
+.admin-dashboard__actions,
+.admin-panel__heading,
+.content-link,
+.audit-item {
+	min-width: 0;
 }
 
 .admin-dashboard__hero,
 .admin-panel,
 .metric-card {
+	min-width: 0;
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	background: rgba(255, 255, 255, 0.06);
 	box-shadow: 0 22px 58px rgba(0, 0, 0, 0.24);
@@ -471,6 +484,7 @@ onMounted(() => {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	min-width: 0;
 	min-height: 2.7rem;
 	border: 1px solid rgba(255, 255, 255, 0.16);
 	border-radius: var(--radius-pill);
@@ -482,6 +496,8 @@ onMounted(() => {
 	font-weight: 900;
 	padding: 0.7rem 1rem;
 	text-decoration: none;
+	text-align: center;
+	white-space: normal;
 }
 
 .admin-dashboard__button--primary {
@@ -594,12 +610,14 @@ onMounted(() => {
 
 .content-link strong {
 	color: #fff1df;
+	overflow-wrap: anywhere;
 }
 
 .content-link small,
 .storage-summary {
 	color: rgba(255, 255, 255, 0.68);
 	line-height: 1.6;
+	overflow-wrap: anywhere;
 }
 
 .content-link span:last-child {
@@ -685,6 +703,7 @@ onMounted(() => {
 
 .audit-item__main strong {
 	color: #fff1df;
+	overflow-wrap: anywhere;
 }
 
 .audit-item__main p,
@@ -800,6 +819,45 @@ onMounted(() => {
 	border-radius: var(--radius-control);
 	background: rgba(255, 179, 111, 0.08);
 	padding: 0.85rem 1rem;
+}
+
+@container (max-width: 56rem) {
+	.admin-dashboard__hero,
+	.admin-panel__heading--split,
+	.audit-item {
+		grid-template-columns: 1fr;
+	}
+
+	.admin-dashboard__actions,
+	.audit-item__meta {
+		justify-content: start;
+		justify-items: start;
+	}
+
+	.admin-dashboard__grid,
+	.audit-filters {
+		grid-template-columns: 1fr;
+	}
+
+	.admin-dashboard__metrics {
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+	}
+
+	.admin-panel--content {
+		grid-column: auto;
+	}
+}
+
+@container (max-width: 40rem) {
+	.content-link,
+	.storage-dialog__list div {
+		grid-template-columns: 1fr;
+	}
+
+	.admin-dashboard__actions,
+	.admin-dashboard__button {
+		width: 100%;
+	}
 }
 
 @media (max-width: 980px) {

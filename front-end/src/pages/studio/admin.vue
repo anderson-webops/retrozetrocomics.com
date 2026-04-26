@@ -18,7 +18,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div v-if="session.isAdmin">
+	<div v-if="session.isAdmin" class="admin-page">
 		<AdminDashboard />
 	</div>
 	<section v-else class="admin-gate">
@@ -35,6 +35,12 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.admin-page {
+	width: 100%;
+	min-width: 0;
+	max-width: 100%;
+}
+
 .admin-gate {
 	display: grid;
 	gap: 0.9rem;
