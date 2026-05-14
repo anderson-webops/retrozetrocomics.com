@@ -118,7 +118,7 @@ useHead({
 }
 
 .home-showcase__eyebrow {
-	color: #ff7d44;
+	color: #9d360d;
 }
 
 .home-showcase__header h2 {
@@ -180,7 +180,7 @@ useHead({
 }
 
 .home-showcase__copy span {
-	color: #ff7d44;
+	color: #9d360d;
 }
 
 .home-showcase__copy p:last-child {
