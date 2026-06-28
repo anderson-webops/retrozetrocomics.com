@@ -55,12 +55,12 @@
 		"readdirp": {
 			"picomatch": "2.3.2"
 		},
-		"vite": "^8.0.8",
+		"vite": "^8.1.0",
 		"vue-router": "^5.0.4",
 		"follow-redirects": "1.16.0",
 		"@cypress/request": {
 			"uuid": "14.0.0",
-			"qs": "6.15.0"
+			"qs": "6.15.2"
 		}
 	}
 }
