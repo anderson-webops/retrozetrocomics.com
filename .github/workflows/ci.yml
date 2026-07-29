@@ -26,6 +26,8 @@ jobs:
 
       - name: Install deps
         run: npm ci
+        env:
+          CYPRESS_INSTALL_BINARY: 0
 
       # Root "lint" runs front-end and back-end lint
       - name: Lint
@@ -48,6 +50,8 @@ jobs:
 
       - name: Install deps
         run: npm ci
+        env:
+          CYPRESS_INSTALL_BINARY: 0
 
       # Only the front-end defines typecheck; call it directly
       - name: Typecheck (front-end)
@@ -80,6 +84,8 @@ jobs:
 
       - name: Install deps
         run: npm ci
+        env:
+          CYPRESS_INSTALL_BINARY: 0
 
       - name: Unit tests
         run: npm run -w front-end test:unit
@@ -94,6 +100,33 @@ jobs:
           node-version: 24.18.0
           cache: npm
           registry-url: https://registry.npmjs.org/
+
+      - name: Pin npm version
+        run: |
+          npm i -g npm@11.16.0
+          npm -v
+
+      # Restore the cached browser before npm runs Cypress's installer.
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install deps
+        run: npm ci
+
+      # Build site and run preview server for Cypress to hit.
+      - name: Build (front-end)
+        run: npm run -w front-end build
+
+      - name: Cypress
+        uses: cypress-io/github-action@v7.4.1
+        with:
+          install: false # we already ran npm ci
+          working-directory: front-end
+          config-file: cypress.config.ts
+          start: npm run preview -- --port 3333
+          wait-on: "http://localhost:3333"
 
   accessibility:
     runs-on: ubuntu-latest
@@ -112,6 +145,8 @@ jobs:
 
       - name: Install deps
         run: npm ci
+        env:
+          CYPRESS_INSTALL_BINARY: 0
 
       - name: Axe accessibility smoke checks
         run: npm run a11y
@@ -133,33 +168,8 @@ jobs:
 
       - name: Install deps
         run: npm ci
+        env:
+          CYPRESS_INSTALL_BINARY: 0
 
       - name: Build
         run: npm run build
-
-      - name: Pin npm version
-        run: |
-          npm i -g npm@11.16.0
-          npm -v
-
-      - name: Install deps
-        run: npm ci
-
-      # Cache Cypress binary
-      - uses: actions/cache@v6
-        with:
-          path: ~/.cache/Cypress
-          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
-      # Build site and run preview server for Cypress to hit
-      - name: Build (front-end)
-        run: npm run -w front-end build
-
-      - name: Cypress
-        uses: cypress-io/github-action@v7.4.1
-        with:
-          install: false # we already ran npm ci
-          working-directory: front-end
-          config-file: cypress.config.ts
-          start: npm run preview -- --port 3333
-          wait-on: "http://localhost:3333"

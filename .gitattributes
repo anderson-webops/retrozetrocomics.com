@@ -1,3 +1,4 @@
+.gitattributes text eol=lf
 *.css text eol=lf
 *.html text eol=lf
 *.js text eol=lf
@@ -5,3 +6,5 @@
 *.mjs text eol=lf
 *.ts text eol=lf
 *.vue text eol=lf
+.github/workflows/*.yml text eol=lf
+.github/workflows/*.yaml text eol=lf
