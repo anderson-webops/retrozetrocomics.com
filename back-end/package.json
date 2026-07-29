@@ -25,12 +25,17 @@
 	"author": "",
 	"license": "ISC",
 	"overrides": {
-		"vite": "^8.1.0",
-		"postcss": "8.5.10"
+		"vite": "8.1.5",
+		"postcss": "8.5.24",
+		"body-parser": "$body-parser",
+		"brace-expansion": "5.0.8",
+		"esbuild": "$esbuild",
+		"js-yaml": "4.3.0",
+		"qs": "6.15.3"
 	},
 	"dependencies": {
 		"argon2": "^0.44.0",
-		"body-parser": "^2.2.2",
+		"body-parser": "^2.3.0",
 		"cookie-session": "^2.1.1",
 		"dotenv": "^17.4.2",
 		"esbuild": "^0.28.1",
