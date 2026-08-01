@@ -104,8 +104,8 @@ jobs:
       - name: Install dependencies and Cypress
         run: |
           npm ci --include=optional --strict-allow-scripts
-          npx cypress install
-          npx cypress verify
+          env -u CYPRESS_INSTALL_BINARY npx cypress install
+          env -u CYPRESS_INSTALL_BINARY npx cypress verify
 
       - name: Build frontend
         run: npm run -w front-end build
@@ -175,7 +175,7 @@ jobs:
             fi
           done
 
-          docker run --rm -d \
+          docker run -d \
             --name retrozetro-test \
             --publish 127.0.0.1:8080:8080 \
             --env SESSION_SECRET=ci-container-session-secret-at-least-thirty-two-characters \
@@ -189,11 +189,15 @@ jobs:
             retrozetro:test \
             --input-type=module \
             -e 'import { createApp } from "./back-end/dist/app.js"; createApp().listen(8080);'
-          trap 'docker stop retrozetro-test' EXIT
+          trap 'docker rm --force retrozetro-test >/dev/null 2>&1 || true' EXIT
 
           for attempt in $(seq 1 30); do
             if curl --fail --silent --show-error http://127.0.0.1:8080/api/healthz >/dev/null; then
               break
+            fi
+            if test "$(docker inspect --format '{{.State.Running}}' retrozetro-test)" != "true"; then
+              docker logs retrozetro-test
+              exit 1
             fi
             if [ "$attempt" -eq 30 ]; then
               docker logs retrozetro-test
