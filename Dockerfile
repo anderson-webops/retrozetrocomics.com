@@ -82,8 +82,10 @@ RUN rm -rf /usr/local/lib/node_modules/npm \
     && install -d -m 0700 -o node -g node /app/back-end/uploads
 
 COPY --from=production-dependencies --chown=node:node /app/node_modules ./node_modules
+COPY --from=production-dependencies --chown=node:node /app/back-end/node_modules ./back-end/node_modules
 COPY --from=build-stage --chown=node:node /app/back-end/dist ./back-end/dist
 COPY --from=build-stage --chown=node:node /app/front-end/dist ./front-end/dist
+RUN node --input-type=module -e 'await import("./back-end/dist/app.js")'
 
 USER node
 
