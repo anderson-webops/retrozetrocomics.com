@@ -14,18 +14,18 @@
  */
 
 context("Navigation & page smoke-tests", () => {
-  beforeEach(() => {
-    cy.visit("/"); // -> Home
-  });
-  
-  it("loads the home page", () => {
-    cy.url().should("eq", `${Cypress.config().baseUrl}/`);
-    cy.contains("Retro").should("exist"); // <h1>
-  });
-  
-  it("header links work", () => {
-    // ---- About ---------------------------------------------------
-    /*		cy.contains("About").click();
+	beforeEach(() => {
+		cy.visit("/"); // -> Home
+	});
+
+	it("loads the home page", () => {
+		cy.url().should("eq", `${Cypress.config().baseUrl}/`);
+		cy.contains("Retro").should("exist"); // <h1>
+	});
+
+	it("header links work", () => {
+		// ---- About ---------------------------------------------------
+		/*		cy.contains("About").click();
         cy.url().should("eq", `${Cypress.config().baseUrl}/about`);
         cy.contains("Meet Jacob").should("exist");
     
@@ -39,14 +39,14 @@ context("Navigation & page smoke-tests", () => {
         cy.url().should("eq", `${Cypress.config().baseUrl}/payment`);
         cy.contains("Tuition & Payment").should("exist");
     */
-    // ---- back to Home -------------------------------------------
-    cy.contains("Home").click();
-    cy.url().should("eq", `${Cypress.config().baseUrl}/`);
-  });
-  
-  /*	it("shows a motivational quote on Home", () => {
+		// ---- back to Home -------------------------------------------
+		cy.contains("Home").click();
+		cy.url().should("eq", `${Cypress.config().baseUrl}/`);
+	});
+
+	/*	it("shows a motivational quote on Home", () => {
       cy.get(".quote")
         .should("exist")
         .and(($q) => expect($q.text().length).to.be.greaterThan(10)); // non-empty
-    });*/
+    }); */
 });

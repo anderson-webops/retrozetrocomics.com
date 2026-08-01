@@ -5,7 +5,6 @@ export type AuditLogOutcome = "failure" | "success";
 export interface AuditLogRecord {
 	action: string;
 	after: Record<string, unknown> | null;
-	actorEmail: string;
 	actorId: string;
 	actorName: string;
 	actorRole: AccountRole;
@@ -17,10 +16,8 @@ export interface AuditLogRecord {
 	entityLabel: string;
 	entityType: string;
 	id: string;
-	ipAddress: string;
 	outcome: AuditLogOutcome;
 	summary: string;
-	userAgent: string;
 }
 
 export interface CharacterBoardFact {

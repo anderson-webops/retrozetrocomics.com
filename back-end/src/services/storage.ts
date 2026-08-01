@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { mkdirSync } from "node:fs";
+import { chmodSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { env } from "node:process";
 import { fileURLToPath } from "node:url";
@@ -162,8 +162,10 @@ export function ensureUploadDirectories() {
 	const keyRoot = path.join(uploadRoot, getStorageKeyPrefix());
 
 	try {
-		mkdirSync(uploadRoot, { recursive: true });
-		mkdirSync(keyRoot, { recursive: true });
+		mkdirSync(uploadRoot, { mode: 0o700, recursive: true });
+		mkdirSync(keyRoot, { mode: 0o700, recursive: true });
+		chmodSync(uploadRoot, 0o700);
+		chmodSync(keyRoot, 0o700);
 	}
 	catch (error) {
 		throw toStorageUnavailableError(error, keyRoot);
@@ -239,7 +241,8 @@ const storage = multer.diskStorage({
 		const folder = path.join(uploadRoot, path.dirname(storageKey));
 
 		try {
-			mkdirSync(folder, { recursive: true });
+			mkdirSync(folder, { mode: 0o700, recursive: true });
+			chmodSync(folder, 0o700);
 			callback(null, folder);
 		}
 		catch (error) {

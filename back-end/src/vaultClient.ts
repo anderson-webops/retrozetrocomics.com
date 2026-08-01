@@ -1,27 +1,104 @@
-// vaultClient.ts
-import { env } from "node:process";
+const VAULT_TIMEOUT_MS = 5_000;
 
-const VAULT_ADDR = env.VAULT_ADDR || "http://127.0.0.1:8200";
-const VAULT_ROLEID = env.VAULT_ROLE_ID!;
-const VAULT_SECRET = env.VAULT_SECRET_ID!;
+export class VaultNotConfiguredError extends Error {
+	constructor() {
+		super("Vault credentials are not configured");
+		this.name = "VaultNotConfiguredError";
+	}
+}
 
-async function vaultLogin(): Promise<string> {
-	const r = await fetch(`${VAULT_ADDR}/v1/auth/approle/login`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ role_id: VAULT_ROLEID, secret_id: VAULT_SECRET })
+interface VaultConfig {
+	address: string;
+	roleId: string;
+	secretId: string;
+}
+
+function isTruthy(value?: string) {
+	return ["1", "true", "yes", "on"].includes(value?.trim().toLowerCase() || "");
+}
+
+function readVaultConfig(source: NodeJS.ProcessEnv = process.env): VaultConfig {
+	const address = source.VAULT_ADDR?.trim();
+	const roleId = source.VAULT_ROLE_ID?.trim();
+	const secretId = source.VAULT_SECRET_ID?.trim();
+
+	if (!address || !roleId || !secretId) {
+		throw new VaultNotConfiguredError();
+	}
+
+	const url = new URL(address);
+	const allowHttp = isTruthy(source.VAULT_ALLOW_HTTP);
+	if (url.protocol !== "https:" && !(allowHttp && url.protocol === "http:")) {
+		throw new TypeError("VAULT_ADDR must use HTTPS unless VAULT_ALLOW_HTTP is explicitly enabled");
+	}
+
+	return {
+		address: url.toString().replace(/\/+$/, ""),
+		roleId,
+		secretId
+	};
+}
+
+export function isVaultConfigured(source: NodeJS.ProcessEnv = process.env) {
+	return Boolean(
+		source.VAULT_ADDR?.trim()
+		&& source.VAULT_ROLE_ID?.trim()
+		&& source.VAULT_SECRET_ID?.trim()
+	);
+}
+
+async function fetchVaultJson(
+	url: string,
+	options: RequestInit,
+	operation: string
+) {
+	const response = await fetch(url, {
+		...options,
+		signal: AbortSignal.timeout(VAULT_TIMEOUT_MS)
 	});
-	if (!r.ok) throw new Error(`Vault login failed: ${r.status} ${await r.text()}`);
-	const data = await r.json();
-	return data.auth.client_token as string;
+
+	if (!response.ok) {
+		throw new Error(`${operation} failed with HTTP ${response.status}`);
+	}
+
+	return response.json() as Promise<Record<string, any>>;
+}
+
+async function vaultLogin(config: VaultConfig): Promise<string> {
+	const data = await fetchVaultJson(
+		`${config.address}/v1/auth/approle/login`,
+		{
+			body: JSON.stringify({
+				role_id: config.roleId,
+				secret_id: config.secretId
+			}),
+			headers: { "Content-Type": "application/json" },
+			method: "POST"
+		},
+		"Vault login"
+	);
+	const token = data.auth?.client_token;
+	if (typeof token !== "string" || !token) {
+		throw new Error("Vault login returned an invalid response");
+	}
+
+	return token;
 }
 
 export async function readMongoSecret() {
-	const token = await vaultLogin();
-	const r = await fetch(`${VAULT_ADDR}/v1/secret/data/retrozetro/mongodb`, {
-		headers: { "X-Vault-Token": token }
-	});
-	if (!r.ok) throw new Error(`Vault read failed: ${r.status} ${await r.text()}`);
-	const data = await r.json();
-	return data.data.data; // <- KV v2 payload
+	const config = readVaultConfig();
+	const token = await vaultLogin(config);
+	const data = await fetchVaultJson(
+		`${config.address}/v1/secret/data/retrozetro/mongodb`,
+		{
+			headers: { "X-Vault-Token": token }
+		},
+		"Vault secret read"
+	);
+	const uri = data.data?.data?.uri;
+	if (typeof uri !== "string" || !uri) {
+		throw new Error("Vault secret did not contain a MongoDB URI");
+	}
+
+	return { uri };
 }

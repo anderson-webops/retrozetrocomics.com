@@ -1,5 +1,5 @@
-import { effectScope, nextTick, reactive, ref } from "vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { effectScope, nextTick, reactive, ref } from "vue";
 import { useLocalDraft } from "../src/composables/useLocalDraft";
 
 function createStorageMock() {
@@ -54,11 +54,13 @@ describe("useLocalDraft()", () => {
 			hasFiles: boolean;
 			title: string;
 		};
-		let draft!: ReturnType<typeof useLocalDraft<{
-			content: string;
-			hasFiles: boolean;
-			title: string;
-		}>>;
+		let draft!: ReturnType<
+			typeof useLocalDraft<{
+				content: string;
+				hasFiles: boolean;
+				title: string;
+			}>
+		>;
 
 		const scope = effectScope();
 
@@ -69,9 +71,17 @@ describe("useLocalDraft()", () => {
 				title: ""
 			});
 
-			draft = useLocalDraft({
+			draft = useLocalDraft<{
+				content: string;
+				hasFiles: boolean;
+				title: string;
+			}>({
 				isEmpty(snapshot) {
-					return !snapshot.title && !snapshot.content && !snapshot.hasFiles;
+					return (
+						!snapshot.title &&
+						!snapshot.content &&
+						!snapshot.hasFiles
+					);
 				},
 				source: () => ({
 					content: form.content,
@@ -123,7 +133,11 @@ describe("useLocalDraft()", () => {
 
 			useLocalDraft({
 				isEmpty(snapshot) {
-					return !snapshot.title && !snapshot.content && !snapshot.hasFiles;
+					return (
+						!snapshot.title &&
+						!snapshot.content &&
+						!snapshot.hasFiles
+					);
 				},
 				source: () => ({
 					content: form.content,
@@ -165,16 +179,26 @@ describe("useLocalDraft()", () => {
 		);
 
 		const scope = effectScope();
-		let draft!: ReturnType<typeof useLocalDraft<{
-			content: string;
-			hasFiles: boolean;
-			title: string;
-		}>>;
+		let draft!: ReturnType<
+			typeof useLocalDraft<{
+				content: string;
+				hasFiles: boolean;
+				title: string;
+			}>
+		>;
 
 		scope.run(() => {
-			draft = useLocalDraft({
+			draft = useLocalDraft<{
+				content: string;
+				hasFiles: boolean;
+				title: string;
+			}>({
 				isEmpty(snapshot) {
-					return !snapshot.title && !snapshot.content && !snapshot.hasFiles;
+					return (
+						!snapshot.title &&
+						!snapshot.content &&
+						!snapshot.hasFiles
+					);
 				},
 				source: () => ({
 					content: "",
@@ -200,11 +224,13 @@ describe("useLocalDraft()", () => {
 			title: string;
 		};
 		let autosaveEnabled!: { value: boolean };
-		let draft!: ReturnType<typeof useLocalDraft<{
-			content: string;
-			hasFiles: boolean;
-			title: string;
-		}>>;
+		let draft!: ReturnType<
+			typeof useLocalDraft<{
+				content: string;
+				hasFiles: boolean;
+				title: string;
+			}>
+		>;
 
 		storage.setItem(
 			"retrozetro:test:drafts:edit:post-42",
@@ -234,7 +260,11 @@ describe("useLocalDraft()", () => {
 			draft = useLocalDraft({
 				enabled: () => autosaveEnabled.value,
 				isEmpty(snapshot) {
-					return !snapshot.title && !snapshot.content && !snapshot.hasFiles;
+					return (
+						!snapshot.title &&
+						!snapshot.content &&
+						!snapshot.hasFiles
+					);
 				},
 				source: () => ({
 					content: form.content,

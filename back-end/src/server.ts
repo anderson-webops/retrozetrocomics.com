@@ -5,15 +5,32 @@ import { createApp } from "./app.js";
 import { connectToMongo } from "./services/database.js";
 import "dotenv/config";
 
-async function main() {
-	await connectToMongo();
+function logServerError(message: string, error: unknown) {
+	console.error(message, {
+		error: error instanceof Error ? error.name : "UnknownError"
+	});
+}
 
+function readPort() {
+	const port = Number(env.PORT || 3006);
+	if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+		throw new TypeError("PORT must be an integer from 1 through 65535");
+	}
+
+	return port;
+}
+
+async function main() {
 	const app = createApp();
-	const PORT = Number(env.PORT || 3006);
+	const PORT = readPort();
+	await connectToMongo();
 
 	const server = app.listen(PORT, () => {
 		console.log(`Server listening on port ${PORT}!`);
 	});
+	server.requestTimeout = 30_000;
+	server.headersTimeout = 15_000;
+	server.keepAliveTimeout = 5_000;
 	let isShuttingDown = false;
 
 	const shutdown = async (signal: NodeJS.Signals) => {
@@ -26,7 +43,7 @@ async function main() {
 
 		try {
 			if (server.listening) {
-				await new Promise<void>((resolve, reject) => {
+				const gracefulClose = new Promise<void>((resolve, reject) => {
 					server.close((error) => {
 						if (error) {
 							reject(error);
@@ -36,6 +53,15 @@ async function main() {
 						resolve();
 					});
 				});
+				const forcedClose = new Promise<void>((resolve) => {
+					const timeout = setTimeout(() => {
+						server.closeAllConnections();
+						resolve();
+					}, 10_000);
+					timeout.unref();
+				});
+
+				await Promise.race([gracefulClose, forcedClose]);
 			}
 
 			if (mongoose.connection.readyState !== 0) {
@@ -46,7 +72,7 @@ async function main() {
 			exit(0);
 		}
 		catch (error) {
-			console.error("Graceful shutdown failed:", error);
+			logServerError("Graceful shutdown failed", error);
 			exit(1);
 		}
 	};
@@ -60,6 +86,6 @@ async function main() {
 }
 
 main().catch((error) => {
-	console.error(error);
+	logServerError("Server startup failed", error);
 	exit(1);
 });

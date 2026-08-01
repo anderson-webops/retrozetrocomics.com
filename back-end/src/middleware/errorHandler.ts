@@ -33,7 +33,13 @@ export function errorHandler(
 	res: Response,
 	_next: NextFunction
 ) {
-	console.error(error);
+	console.error("Request failed", {
+		code: (error as { code?: unknown } | null)?.code,
+		error: error instanceof Error ? error.name : "UnknownError",
+		...(process.env.NODE_ENV === "production"
+			? {}
+			: { message: error instanceof Error ? error.message : String(error) })
+	});
 
 	if (res.headersSent) {
 		return;
@@ -63,8 +69,8 @@ export function errorHandler(
 
 	return res.status(statusCode >= 400 && statusCode < 500 ? statusCode : 500).json({
 		message:
-			statusCode >= 400 && statusCode < 500 && error instanceof Error
-				? error.message
+			statusCode >= 400 && statusCode < 500
+				? "Request could not be completed"
 				: "Unexpected server error"
 	});
 }

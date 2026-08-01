@@ -2,19 +2,19 @@
 
 Express and MongoDB API for `retrozetrocomics.com`.
 
-## Standalone Backend Workflow
+## Backend Workflow
 
-The backend is intentionally runnable from inside `back-end/` for deploy and operations paths:
+Install only from the repository root so the authoritative workspace lockfile is always used:
 
 ```bash
-cd back-end
-npm ci --ignore-scripts
-npm run lint
-npm run build
-npm run test
+npm ci --include=optional --strict-allow-scripts
+npm run -w back-end lint
+npm run -w back-end typecheck
+npm run -w back-end build
+npm run -w back-end test
 ```
 
-`npm run ci:check` performs a dry-run `npm ci` lockfile validation so root-level checks can catch backend lock drift before deploy.
+There is intentionally no `back-end/package-lock.json`.
 
 ## Upload Storage
 
@@ -35,4 +35,19 @@ The backend now handles public contact form delivery.
 - `CONTACT_FROM_EMAIL` is required.
 - If `CONTACT_TO_EMAIL` is unset, messages go directly to `contacts@jacobdanderson.net`.
 - `CONTACT_BCC_EMAIL` is optional and can be added later if you want alias-based outbound mail with a monitoring copy.
-- Use either local sendmail (`CONTACT_USE_SENDMAIL=true`, optional `CONTACT_SENDMAIL_PATH`) or SMTP (`CONTACT_SMTP_HOST`, `CONTACT_SMTP_PORT`, `CONTACT_SMTP_SECURE`, `CONTACT_SMTP_REQUIRE_TLS`, `CONTACT_SMTP_USER`, `CONTACT_SMTP_PASS`).
+- Use either local sendmail (`CONTACT_USE_SENDMAIL=true`, optional `CONTACT_SENDMAIL_PATH`) or SMTP (`CONTACT_SMTP_HOST`, `CONTACT_SMTP_PORT`, `CONTACT_SMTP_SECURE`, `CONTACT_SMTP_USER`, `CONTACT_SMTP_PASS`).
+- SMTP always requires TLS 1.2 or newer and uses bounded connection/socket timeouts.
+
+## Admin Lifecycle
+
+The account tool is dry-run-first and supports `create`, `enable`, `disable`, `reset-password`, and
+`sanitize-audit-logs`. Add `--apply` only after reviewing the dry run:
+
+```bash
+npm run admin -- create --email admin@example.com --name "Site Admin"
+npm run admin -- create --email admin@example.com --name "Site Admin" --apply
+npm run admin -- sanitize-audit-logs
+npm run admin -- sanitize-audit-logs --apply
+```
+
+All status and password changes revoke existing sessions. The final active admin cannot be disabled.

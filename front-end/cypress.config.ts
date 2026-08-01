@@ -1,6 +1,5 @@
 import { defineConfig } from "cypress";
 
-
 export default defineConfig({
 	allowCypressEnv: false,
 	blockHosts: [
@@ -8,18 +7,17 @@ export default defineConfig({
 		"analytics.retrozetrocomics.com",
 		"pagead2.googlesyndication.com"
 	],
-  projectId: "d8k2m8",
+	projectId: "d8k2m8",
 	e2e: {
 		baseUrl: "http://localhost:3333",
 		chromeWebSecurity: false,
 		specPattern: "cypress/e2e/**/*.spec.*",
-		supportFile: false
-  },
-  
-  component: {
-    devServer: {
-      framework: "vue",
-      bundler: "vite"
-    }
-  }
+		supportFile: "cypress/support/e2e.ts"
+	},
+	component: {
+		devServer: {
+			framework: "vue",
+			bundler: "vite"
+		}
+	}
 });

@@ -30,11 +30,13 @@ contactRouter.post("/", contactRateLimiter, async (req, res) => {
 	}
 
 	try {
-		await sendContactMessage(parsedBody.data, req);
+		await sendContactMessage(parsedBody.data);
 		return res.status(202).json({ ok: true });
 	}
 	catch (error) {
-		console.error("Contact form email failed:", error);
+		console.error("Contact form email failed", {
+			error: error instanceof Error ? error.name : "UnknownError"
+		});
 		return res.status(502).json({
 			ok: false,
 			error: "The message could not be sent right now. Please try again later."

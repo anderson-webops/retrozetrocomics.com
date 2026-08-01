@@ -1,10 +1,11 @@
 // vite.config.ts
 import path from "node:path";
+import process from "node:process";
+
 import { fileURLToPath } from "node:url";
-
 import { unheadVueComposablesImports } from "@unhead/vue";
-import Vue from "@vitejs/plugin-vue";
 
+import Vue from "@vitejs/plugin-vue";
 import Unocss from "unocss/vite";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
@@ -16,14 +17,8 @@ import VueRouter from "vue-router/vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteHostname = "https://retrozetrocomics.com";
-const sitemapExcludedRoutes = [
-	"/studio/admin",
-	"/:all(.*)"
-];
-const staticRenderExcludedRoutes = [
-	"/studio",
-	"/:all(.*)"
-];
+const sitemapExcludedRoutes = ["/studio/admin", "/:all(.*)"];
+const staticRenderExcludedRoutes = ["/studio", "/:all(.*)"];
 
 export default defineConfig(({ command }) => ({
 	resolve: {
@@ -77,7 +72,7 @@ export default defineConfig(({ command }) => ({
 		}),
 
 		/* 6️⃣  CSS / Markdown / Misc */
-		Unocss(),
+		Unocss()
 	],
 
 	/* vitest */
@@ -96,9 +91,9 @@ export default defineConfig(({ command }) => ({
 		beastiesOptions: {
 			reduceInlineStyles: false
 		},
-		includedRoutes(paths) {
+		includedRoutes(paths: string[]) {
 			return paths.filter(
-				path => !staticRenderExcludedRoutes.includes(path)
+				(path: string) => !staticRenderExcludedRoutes.includes(path)
 			);
 		},
 		onFinished() {
@@ -135,4 +130,3 @@ export default defineConfig(({ command }) => ({
 		}
 	}
 }));
-

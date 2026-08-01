@@ -8,11 +8,25 @@ const adminSchema = new Schema(
 		name: { type: String, required: true, trim: true },
 		email: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
 		password: { type: String, required: true },
-		role: { type: String, default: "admin" },
+		passwordChangedAt: { type: Date, default: null },
+		role: {
+			type: String,
+			enum: ["admin"],
+			default: "admin",
+			immutable: true,
+			required: true
+		},
+		sessionVersion: {
+			type: Number,
+			default: 0,
+			min: 0,
+			required: true
+		},
 		status: {
 			type: String,
 			enum: ["active", "disabled"],
 			default: "active",
+			required: true,
 			index: true
 		}
 	},

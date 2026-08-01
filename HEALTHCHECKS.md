@@ -3,14 +3,14 @@
 Use these endpoints for monitoring. They do not require auth and do not redirect.
 
 ## Back-end (Express API)
-- `GET /healthz`
-  - returns `200 {"ok":true}`
-- `GET /readyz`
+- `GET /api/healthz` (with `/healthz` retained as a monitor alias)
+  - returns `200` with `ok`, release version, and full source revision
+- `GET /api/readyz` (with `/readyz` retained as a monitor alias)
   - returns `200 {"ready":true,"components":{"db":{"ok":true,"state":1}}}` when Mongo is connected and pingable
   - returns `503 {"ready":false,...}` when Mongo is unavailable
-- `GET /_dbinfo`
+- `GET /api/internal/dbinfo`
   - internal diagnostics only
-  - returns non-secret database metadata when allowed
-  - returns `403 {"ok":false,"error":"forbidden"}` for public requests without internal access
+  - requires the 32+ character `INTERNAL_DIAGNOSTICS_KEY` header in production
+  - returns `403` when configured but unauthorized and `404` when disabled
 
-Use `/healthz` and `/readyz` for monitors. Do not use `/`, login pages, or `/_dbinfo`.
+Use `/api/healthz` and `/api/readyz` for monitors. Do not use `/`, login pages, or diagnostics.

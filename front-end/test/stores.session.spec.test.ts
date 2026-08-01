@@ -99,7 +99,7 @@ describe("session store", () => {
 
 		await session.logout();
 
-		expect(apiMod.api.post).toHaveBeenCalledWith("/auth/logout");
+		expect(apiMod.api.post).toHaveBeenCalledWith("/auth/logout", {});
 		expect(session.account).toBeNull();
 	});
 });

@@ -28,7 +28,7 @@ export default base
 	.append(
 		// TypeScript
 		{
-			files: ["**/*.ts"],
+			files: ["src/**/*.ts"],
 			languageOptions: {
 				parser: ts.parser,
 				parserOptions: {
@@ -40,7 +40,38 @@ export default base
 		},
 
 		{
-			files: ["vite.config.{js,ts,mts}", "uno.config.ts"],
+			files: ["test/**/*.ts"],
+			languageOptions: {
+				parser: ts.parser,
+				parserOptions: {
+					project: "./tsconfig.test.json",
+					tsconfigRootDir
+				},
+				globals: { ...globals.browser, ...globals.node }
+			}
+		},
+
+		{
+			files: ["cypress/**/*.ts"],
+			languageOptions: {
+				parser: ts.parser,
+				parserOptions: {
+					project: "./cypress/tsconfig.json",
+					tsconfigRootDir
+				},
+				globals: { ...globals.browser, ...globals.node }
+			},
+			rules: {
+				"ts/no-namespace": "off"
+			}
+		},
+
+		{
+			files: [
+				"cypress.config.ts",
+				"vite.config.{js,ts,mts}",
+				"uno.config.ts"
+			],
 			languageOptions: {
 				parser: ts.parser,
 				parserOptions: {
@@ -67,7 +98,11 @@ export default base
 
 		// build / config scripts
 		{
-			files: ["**/*.{js,cjs,mjs}", "*.config.js", "vite.config.{js,ts,mts}"],
+			files: [
+				"**/*.{js,cjs,mjs}",
+				"*.config.js",
+				"vite.config.{js,ts,mts}"
+			],
 			languageOptions: { sourceType: "module" }
 		}
 	)

@@ -1,10 +1,10 @@
-import type { Request } from "express";
 import { env } from "node:process";
 import rateLimit from "express-rate-limit";
 import nodemailer from "nodemailer";
 import { z } from "zod";
 
 const truthyValues = new Set(["1", "true", "yes", "on"]);
+const emailAddressSchema = z.string().trim().email().max(320);
 
 function isEnabled(value?: string) {
 	return truthyValues.has(value?.trim().toLowerCase() || "");
@@ -15,11 +15,21 @@ function trimToUndefined(value?: string) {
 	return trimmed || undefined;
 }
 
-function parseAddressList(value?: string) {
+function parseEmailAddress(value: string, variableName: string) {
+	const parsed = emailAddressSchema.safeParse(value);
+	if (!parsed.success) {
+		throw new TypeError(`${variableName} must contain a valid email address`);
+	}
+
+	return parsed.data;
+}
+
+function parseAddressList(value: string | undefined, variableName: string) {
 	return value
 		?.split(",")
 		.map(part => part.trim())
-		.filter(Boolean);
+		.filter(Boolean)
+		.map(address => parseEmailAddress(address, variableName));
 }
 
 export const contactFormSchema = z.object({
@@ -40,13 +50,17 @@ export const contactRateLimiter = rateLimit({
 });
 
 function getContactMailConfig() {
-	const fromEmail = trimToUndefined(env.CONTACT_FROM_EMAIL);
-	if (!fromEmail) {
+	const rawFromEmail = trimToUndefined(env.CONTACT_FROM_EMAIL);
+	if (!rawFromEmail) {
 		return null;
 	}
+	const fromEmail = parseEmailAddress(rawFromEmail, "CONTACT_FROM_EMAIL");
 
-	const toEmail = trimToUndefined(env.CONTACT_TO_EMAIL) || "contacts@jacobdanderson.net";
-	const bccEmail = parseAddressList(env.CONTACT_BCC_EMAIL);
+	const toEmail = parseEmailAddress(
+		trimToUndefined(env.CONTACT_TO_EMAIL) || "contacts@jacobdanderson.net",
+		"CONTACT_TO_EMAIL"
+	);
+	const bccEmail = parseAddressList(env.CONTACT_BCC_EMAIL, "CONTACT_BCC_EMAIL");
 	const fromName = trimToUndefined(env.CONTACT_FROM_NAME) || "RetroZetro Comics";
 	const sendmailPath = trimToUndefined(env.CONTACT_SENDMAIL_PATH);
 	const useSendmail = isEnabled(env.CONTACT_USE_SENDMAIL) || !!sendmailPath;
@@ -71,13 +85,16 @@ function getContactMailConfig() {
 	}
 
 	const secure = isEnabled(env.CONTACT_SMTP_SECURE);
-	const port = Number.parseInt(env.CONTACT_SMTP_PORT || (secure ? "465" : "587"), 10);
-	if (!Number.isFinite(port)) {
+	const port = Number(env.CONTACT_SMTP_PORT || (secure ? "465" : "587"));
+	if (!Number.isInteger(port) || port < 1 || port > 65_535) {
 		throw new TypeError("Invalid CONTACT_SMTP_PORT");
 	}
 
 	const user = trimToUndefined(env.CONTACT_SMTP_USER);
 	const pass = trimToUndefined(env.CONTACT_SMTP_PASS);
+	if (Boolean(user) !== Boolean(pass)) {
+		throw new TypeError("CONTACT_SMTP_USER and CONTACT_SMTP_PASS must be configured together");
+	}
 
 	return {
 		fromEmail,
@@ -88,7 +105,14 @@ function getContactMailConfig() {
 			host,
 			port,
 			secure,
-			requireTLS: isEnabled(env.CONTACT_SMTP_REQUIRE_TLS),
+			connectionTimeout: 10_000,
+			greetingTimeout: 10_000,
+			requireTLS: true,
+			socketTimeout: 20_000,
+			tls: {
+				minVersion: "TLSv1.2",
+				rejectUnauthorized: true
+			},
 			...(user && pass ? { auth: { user, pass } } : {})
 		})
 	};
@@ -103,65 +127,67 @@ export function isContactMailConfigured() {
 	}
 }
 
-function formatHeaderLine(label: string, value?: string) {
-	return value ? `${label}: ${value}` : undefined;
+function escapeHtml(value: string) {
+	return value
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll("\"", "&quot;")
+		.replaceAll("'", "&#039;");
 }
 
-export async function sendContactMessage(
-	payload: ContactFormPayload,
-	requestContext: Pick<Request, "ip" | "headers">
-) {
+function sanitizeHeaderValue(value: string, maximumLength: number) {
+	return value
+		.replace(/[\r\n]+/g, " ")
+		.trim()
+		.slice(0, maximumLength);
+}
+
+export function buildContactMail(payload: ContactFormPayload, submittedAt = new Date().toISOString()) {
+	const safeName = sanitizeHeaderValue(payload.name, 120);
+	const safeSubject = sanitizeHeaderValue(payload.subject, 160);
+	const escapedName = escapeHtml(safeName);
+	const escapedEmail = escapeHtml(payload.email);
+	const escapedSubject = escapeHtml(safeSubject);
+	const escapedMessage = escapeHtml(payload.message).replaceAll("\n", "<br />");
+	const metadata = [
+		`Submitted: ${submittedAt}`,
+		`From name: ${safeName}`,
+		`From email: ${payload.email}`,
+		`Subject: ${safeSubject}`,
+		`Reply-To: ${payload.email}`
+	].join("\n");
+
+	return {
+		html: `
+			<p>A new contact form submission was received from <strong>${escapedName}</strong>.</p>
+			<p><strong>Email:</strong> ${escapedEmail}</p>
+			<p><strong>Subject:</strong> ${escapedSubject}</p>
+			<p><strong>Submitted:</strong> ${escapeHtml(submittedAt)}</p>
+			<hr />
+			<p>${escapedMessage}</p>
+		`,
+		subject: `[retrozetrocomics.com] Contact form from ${safeName}: ${safeSubject}`,
+		text: `${metadata}\n\nMessage:\n${payload.message}`
+	};
+}
+
+export async function sendContactMessage(payload: ContactFormPayload) {
 	const mailConfig = getContactMailConfig();
 	if (!mailConfig) {
 		throw new Error("Contact mail is not configured");
 	}
 
-	const submittedAt = new Date().toISOString();
-	const userAgent = trimToUndefined(requestContext.headers["user-agent"]);
-	const referer = trimToUndefined(
-		typeof requestContext.headers.referer === "string"
-			? requestContext.headers.referer
-			: Array.isArray(requestContext.headers.referer)
-				? requestContext.headers.referer[0]
-				: undefined
-	);
-
-	const metadata = [
-		formatHeaderLine("Submitted", submittedAt),
-		formatHeaderLine("From name", payload.name),
-		formatHeaderLine("From email", payload.email),
-		formatHeaderLine("Subject", payload.subject),
-		formatHeaderLine("Reply-To", payload.email),
-		formatHeaderLine("IP", requestContext.ip),
-		formatHeaderLine("User-Agent", userAgent),
-		formatHeaderLine("Referer", referer)
-	]
-		.filter(Boolean)
-		.join("\n");
-
-	const escapedMessage = payload.message
-		.replaceAll("&", "&amp;")
-		.replaceAll("<", "&lt;")
-		.replaceAll(">", "&gt;")
-		.replaceAll("\n", "<br />");
+	const message = buildContactMail(payload);
 
 	await mailConfig.transport.sendMail({
-		from: `"${mailConfig.fromName}" <${mailConfig.fromEmail}>`,
+		from: {
+			address: mailConfig.fromEmail,
+			name: sanitizeHeaderValue(mailConfig.fromName, 120)
+		},
 		to: mailConfig.toEmail,
 		...(mailConfig.bccEmail?.length ? { bcc: mailConfig.bccEmail } : {}),
 		replyTo: payload.email,
-		subject: `[retrozetrocomics.com] Contact form from ${payload.name}: ${payload.subject}`,
-		text: `${metadata}\n\nMessage:\n${payload.message}`,
-		html: `
-			<p>A new contact form submission was received from <strong>${payload.name}</strong>.</p>
-			<p><strong>Email:</strong> ${payload.email}</p>
-			<p><strong>Subject:</strong> ${payload.subject}</p>
-			<p><strong>Submitted:</strong> ${submittedAt}</p>
-			${requestContext.ip ? `<p><strong>IP:</strong> ${requestContext.ip}</p>` : ""}
-			${userAgent ? `<p><strong>User-Agent:</strong> ${userAgent}</p>` : ""}
-			${referer ? `<p><strong>Referer:</strong> ${referer}</p>` : ""}
-			<hr />
-			<p>${escapedMessage}</p>
-		`
+		...message
 	});
 }

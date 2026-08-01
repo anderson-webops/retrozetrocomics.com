@@ -107,7 +107,7 @@ export const useSessionStore = defineStore("session", {
 
 		async logout() {
 			try {
-				await api.post("/auth/logout");
+				await api.post("/auth/logout", {});
 			} finally {
 				this.account = null;
 			}

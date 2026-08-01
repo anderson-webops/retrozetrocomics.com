@@ -1,33 +1,33 @@
 // components/accountmanagement.login.spec.test.ts
 import { mount } from "@vue/test-utils";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import AccountManagement from "../src/components/AccountManagement.vue";
 import * as apiMod from "../src/api";
+import AccountManagement from "../src/components/AccountManagement.vue";
 import { useSessionStore } from "../src/stores/session";
 
 // Mock the axios client we export from "@/api"
 vi.mock("@/api", () => {
-  const mock = {
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
-    delete: vi.fn(),
-    defaults: { baseURL: "/api", withCredentials: true }
-  };
-  return { api: mock };
+	const mock = {
+		get: vi.fn(),
+		post: vi.fn(),
+		put: vi.fn(),
+		delete: vi.fn(),
+		defaults: { baseURL: "/api", withCredentials: true }
+	};
+	return { api: mock };
 });
 
-describe("AccountManagement.vue login (happy path)", () => {
+describe("accountManagement.vue login (happy path)", () => {
 	beforeEach(() => {
 		setActivePinia(createPinia());
 		vi.clearAllMocks();
 	});
 
-	it("logs in a member, updates the session store, and closes the modal", async () => {
+	it("logs in an administrator, updates the session store, and closes the modal", async () => {
 		const session = useSessionStore();
-		session.openAuth("login");
+		session.openAuth();
 
 		(apiMod.api.post as any).mockResolvedValueOnce({
 			data: {
@@ -35,7 +35,7 @@ describe("AccountManagement.vue login (happy path)", () => {
 					email: "user@example.com",
 					id: "u123",
 					name: "User",
-					role: "user",
+					role: "admin",
 					status: "active"
 				}
 			}

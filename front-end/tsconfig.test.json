@@ -1,0 +1,18 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"types": [
+			"vitest/globals",
+			"vue-router/auto-routes"
+		]
+	},
+	"include": [
+		"src",
+		"test"
+	],
+	"exclude": [
+		"cypress",
+		"dist",
+		"node_modules"
+	]
+}

@@ -1,135 +1,249 @@
+import { timingSafeEqual } from "node:crypto";
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { env } from "node:process";
+import { fileURLToPath } from "node:url";
+
 import cookieSession from "cookie-session";
 import express from "express";
 import helmet from "helmet";
 import mongoose from "mongoose";
 
+import {
+	readSecurityConfig,
+	SESSION_ABSOLUTE_LIFETIME_MS
+} from "./config/security.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { createRequestSecurityMiddleware } from "./middleware/requestSecurity.js";
 import { adminRouter } from "./routes/admin.js";
 import { authRouter } from "./routes/auth.js";
 import { contactRouter } from "./routes/contact.js";
 import { siteContentRouter } from "./routes/siteContent.js";
+import { readInlineScriptHashes } from "./services/contentSecurityPolicy.js";
 import {
 	ensureUploadDirectories,
 	uploadRoot
 } from "./services/storage.js";
 
-export function createApp() {
-	const app = express();
-	const apiRouter = express.Router();
-	const SESSION_SECRET = env.SESSION_SECRET;
-	const internalDiagnosticsKey = env.INTERNAL_DIAGNOSTICS_KEY;
-	const loopbackAddresses = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
+const backendRoot = path.resolve(
+	path.dirname(fileURLToPath(import.meta.url)),
+	".."
+);
+const defaultStaticRoot = path.resolve(backendRoot, "../front-end/dist");
 
-	if (!SESSION_SECRET) {
-		throw new Error("Missing SESSION_SECRET");
+function secretsMatch(expected: string | undefined, supplied: string | undefined) {
+	if (!expected || !supplied) {
+		return false;
 	}
 
-	app.set("trust proxy", 1);
+	const expectedBuffer = Buffer.from(expected);
+	const suppliedBuffer = Buffer.from(supplied);
+	return expectedBuffer.length === suppliedBuffer.length
+		&& timingSafeEqual(expectedBuffer, suppliedBuffer);
+}
+
+function healthHandler(
+	_req: express.Request,
+	res: express.Response
+) {
+	return res
+		.set("Cache-Control", "no-store")
+		.json({
+			ok: true,
+			revision: env.SOURCE_REVISION || "development",
+			version: env.RETROZETRO_RELEASE_VERSION || "development"
+		});
+}
+
+async function readinessHandler(
+	_req: express.Request,
+	res: express.Response
+) {
+	const connection = mongoose.connection;
+	const state = connection.readyState;
+	if (state !== 1 || !connection.db) {
+		return res.status(503).set("Cache-Control", "no-store").json({
+			components: {
+				db: { ok: false, state }
+			},
+			ready: false
+		});
+	}
+
+	try {
+		await connection.db.admin().ping();
+		return res.set("Cache-Control", "no-store").json({
+			components: {
+				db: { ok: true, state }
+			},
+			ready: true
+		});
+	}
+	catch {
+		return res.status(503).set("Cache-Control", "no-store").json({
+			components: {
+				db: { ok: false, state }
+			},
+			ready: false
+		});
+	}
+}
+
+export function createApp() {
+	const config = readSecurityConfig();
+	const app = express();
+	const apiRouter = express.Router();
+	const staticRoot = env.STATIC_SITE_DIR?.trim()
+		? path.resolve(env.STATIC_SITE_DIR)
+		: defaultStaticRoot;
+	const inlineScriptHashes = readInlineScriptHashes(staticRoot);
+
+	app.disable("x-powered-by");
+	app.set("trust proxy", config.trustProxyHops || false);
 
 	app.use(
 		helmet({
-			crossOriginResourcePolicy: false
+			contentSecurityPolicy: {
+				directives: {
+					baseUri: ["'self'"],
+					connectSrc: [
+						"'self'",
+						"https://analytics.retrozetrocomics.com",
+						"https://analytics.jacobdanderson.net",
+						"https://pagead2.googlesyndication.com",
+						"https://googleads.g.doubleclick.net",
+						"https://www.google.com"
+					],
+					defaultSrc: ["'self'"],
+					fontSrc: ["'self'", "data:"],
+					formAction: ["'self'"],
+					frameAncestors: ["'none'"],
+					frameSrc: [
+						"https://googleads.g.doubleclick.net",
+						"https://tpc.googlesyndication.com"
+					],
+					imgSrc: [
+						"'self'",
+						"data:",
+						"blob:",
+						"https://*.doubleclick.net",
+						"https://*.googlesyndication.com",
+						"https://*.googleusercontent.com"
+					],
+					objectSrc: ["'none'"],
+					scriptSrc: [
+						"'self'",
+						...inlineScriptHashes,
+						"https://pagead2.googlesyndication.com",
+						"https://analytics.retrozetrocomics.com",
+						"https://analytics.jacobdanderson.net"
+					],
+					scriptSrcAttr: ["'none'"],
+					styleSrc: ["'self'", "'unsafe-inline'"],
+					upgradeInsecureRequests: config.isProduction ? [] : null
+				}
+			},
+			crossOriginEmbedderPolicy: false,
+			crossOriginResourcePolicy: { policy: "cross-origin" },
+			referrerPolicy: { policy: "strict-origin-when-cross-origin" }
 		})
 	);
-
-	app.use(express.json({ limit: "1mb" }));
+	app.use(createRequestSecurityMiddleware(config));
+	app.use(express.json({ limit: "1mb", strict: true }));
 	app.use(express.urlencoded({ extended: false, limit: "1mb" }));
-
-	const isProd = env.NODE_ENV === "production";
-	const isCrossSite = Boolean(env.CROSS_SITE);
-
 	app.use(
 		cookieSession({
-			name: "retrozetro-session",
-			keys: [SESSION_SECRET],
-			maxAge: 7 * 24 * 60 * 60 * 1000,
 			httpOnly: true,
-			sameSite: isProd && isCrossSite ? "none" : "lax",
-			secure: isProd
+			keys: [...config.sessionKeys],
+			maxAge: SESSION_ABSOLUTE_LIFETIME_MS,
+			name: config.sessionCookieName,
+			overwrite: true,
+			path: "/",
+			sameSite: "strict",
+			secure: config.isProduction
 		})
 	);
 
 	ensureUploadDirectories();
 
-	app.get("/healthz", (_req, res) => {
-		res.set("Cache-Control", "no-store");
-		res.json({ ok: true });
-	});
+	apiRouter.get("/healthz", healthHandler);
+	apiRouter.get("/readyz", readinessHandler);
+	apiRouter.get("/internal/dbinfo", (req, res) => {
+		const suppliedKey = req.get("x-internal-diagnostics-key");
+		const isAllowed = config.isProduction
+			? secretsMatch(config.diagnosticsKey, suppliedKey)
+			: (
+					secretsMatch(config.diagnosticsKey, suppliedKey)
+					|| req.socket.remoteAddress === "127.0.0.1"
+					|| req.socket.remoteAddress === "::1"
+				);
 
-	app.get("/readyz", async (_req, res) => {
-		const connection = mongoose.connection;
-		const state = connection.readyState;
-		if (state !== 1 || !connection.db) {
-			return res.status(503).set("Cache-Control", "no-store").json({
-				ready: false,
-				components: {
-					db: { ok: false, state }
-				}
-			});
+		if (!isAllowed) {
+			return res.status(config.diagnosticsKey ? 403 : 404)
+				.set("Cache-Control", "no-store")
+				.json({ error: config.diagnosticsKey ? "forbidden" : "not_found", ok: false });
 		}
 
-		try {
-			await connection.db.admin().ping();
-			return res.set("Cache-Control", "no-store").json({
-				ready: true,
-				components: {
-					db: { ok: true, state }
-				}
-			});
-		}
-		catch (error) {
-			return res.status(503).set("Cache-Control", "no-store").json({
-				ready: false,
-				components: {
-					db: {
-						ok: false,
-						state,
-						error: error instanceof Error ? error.message : "db-ping-failed"
-					}
-				}
-			});
-		}
-	});
-
-	app.get("/_dbinfo", (req, res) => {
-		const connection = mongoose.connection;
-		const forwardedFor = req.headers["x-forwarded-for"];
-		const forwardedIp = typeof forwardedFor === "string"
-			? forwardedFor.split(",")[0]?.trim()
-			: Array.isArray(forwardedFor)
-				? forwardedFor[0]?.trim()
-				: undefined;
-		const clientIp = forwardedIp || req.ip || req.socket.remoteAddress || "";
-		const isInternalRequest = env.NODE_ENV !== "production"
-			|| (internalDiagnosticsKey && req.get("x-internal-diagnostics-key") === internalDiagnosticsKey)
-			|| loopbackAddresses.has(clientIp);
-
-		if (!isInternalRequest) {
-			return res.status(403).set("Cache-Control", "no-store").json({ ok: false, error: "forbidden" });
-		}
-
-		res.set("Cache-Control", "no-store").json({
-			databaseName: connection.db?.databaseName ?? null,
-			host: connection.host || null,
-			name: connection.name || null,
-			readyState: connection.readyState
+		return res.set("Cache-Control", "no-store").json({
+			databaseName: mongoose.connection.db?.databaseName ?? null,
+			readyState: mongoose.connection.readyState
 		});
 	});
-
-	app.use("/uploads", express.static(uploadRoot));
 
 	apiRouter.use("/auth", authRouter);
 	apiRouter.use("/contact", contactRouter);
 	apiRouter.use("/admin", adminRouter);
 	apiRouter.use("/site-content", siteContentRouter);
+	apiRouter.use((_req, res) => {
+		res.status(404).json({ message: "API route not found" });
+	});
 
 	app.use("/api", apiRouter);
+	app.get("/healthz", healthHandler);
+	app.get("/readyz", readinessHandler);
+	app.use(
+		"/uploads",
+		express.static(uploadRoot, {
+			dotfiles: "deny",
+			fallthrough: false,
+			index: false,
+			maxAge: "1h"
+		})
+	);
 
-	// Keep legacy mounts during the transition to the explicit /api contract.
-	app.use("/auth", authRouter);
-	app.use("/admin", adminRouter);
-	app.use("/site-content", siteContentRouter);
+	if (existsSync(staticRoot)) {
+		app.use(
+			express.static(staticRoot, {
+				dotfiles: "deny",
+				index: false,
+				setHeaders(response, filePath) {
+					if (filePath.endsWith(".html") || filePath.endsWith("/release.json")) {
+						response.setHeader("Cache-Control", "no-store");
+					}
+					else if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+						response.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+					}
+				}
+			})
+		);
+
+		app.get("*path", (req, res, next) => {
+			if (!req.accepts("html")) {
+				return res.status(404).json({ message: "Not found" });
+			}
+
+			return res.sendFile(path.join(staticRoot, "index.html"), (error) => {
+				if (error) {
+					next(error);
+				}
+			});
+		});
+	}
+	else {
+		app.use((_req, res) => {
+			res.status(404).json({ message: "Not found" });
+		});
+	}
 
 	app.use(errorHandler);
 

@@ -29,7 +29,6 @@ function serializeAuditLog(log: AuditLogDocument) {
 	return {
 		action: log.action,
 		after: log.after || null,
-		actorEmail: log.actorEmail,
 		actorId: log.actorId,
 		actorName: log.actorName,
 		actorRole: log.actorRole,
@@ -41,10 +40,8 @@ function serializeAuditLog(log: AuditLogDocument) {
 		entityLabel: log.entityLabel || log.targetLabel || "",
 		entityType: log.entityType || log.targetType || "",
 		id: log.id,
-		ipAddress: log.ipAddress,
 		outcome: log.outcome,
-		summary: log.summary,
-		userAgent: log.userAgent
+		summary: log.summary
 	};
 }
 
@@ -115,7 +112,6 @@ export async function listAuditLogs(req: Request, res: Response) {
 	if (parsed.data.search) {
 		const searchPattern = new RegExp(escapeRegex(parsed.data.search), "i");
 		filter.$or = [
-			{ actorEmail: searchPattern },
 			{ actorName: searchPattern },
 			{ entityLabel: searchPattern },
 			{ summary: searchPattern },

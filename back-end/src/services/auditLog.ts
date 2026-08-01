@@ -10,7 +10,7 @@ export type AuditLogCategory
 interface AuditLogPayload {
 	action: string;
 	after?: Record<string, unknown> | null;
-	actor: Pick<AuthAccount, "email" | "id" | "name" | "role">;
+	actor: Pick<AuthAccount, "id" | "name" | "role">;
 	before?: Record<string, unknown> | null;
 	category: AuditLogCategory;
 	details?: Record<string, unknown>;
@@ -18,17 +18,17 @@ interface AuditLogPayload {
 	entityLabel?: string;
 	entityType?: string;
 	outcome?: "failure" | "success";
-	req: Request;
+	req?: Request;
 	summary: string;
 	targetId?: string;
 	targetLabel?: string;
 	targetType?: string;
 }
 
+const SENSITIVE_KEY_PATTERN = /email|ip(address)?|password|secret|token|user.?agent/i;
+
 function sanitizeDetails(details: Record<string, unknown> = {}) {
-	return Object.fromEntries(
-		Object.entries(details).filter(([, value]) => value !== undefined)
-	);
+	return sanitizeUnknown(details) as Record<string, unknown>;
 }
 
 function sanitizeSnapshot(
@@ -59,6 +59,7 @@ function sanitizeUnknown(value: unknown): unknown {
 	if (typeof value === "object") {
 		return Object.fromEntries(
 			Object.entries(value)
+				.filter(([key]) => !SENSITIVE_KEY_PATTERN.test(key))
 				.map(([key, item]) => [key, sanitizeUnknown(item)] as const)
 				.filter(([, item]) => item !== undefined)
 		);
@@ -75,25 +76,11 @@ function sanitizeUnknown(value: unknown): unknown {
 	return String(value);
 }
 
-function readIpAddress(req: Request) {
-	const forwarded = req.headers["x-forwarded-for"];
-	if (typeof forwarded === "string") {
-		return forwarded.split(",")[0]?.trim() || req.ip || "";
-	}
-
-	if (Array.isArray(forwarded) && forwarded.length) {
-		return forwarded[0] || req.ip || "";
-	}
-
-	return req.ip || "";
-}
-
 export async function recordAuditLog(payload: AuditLogPayload) {
 	try {
 		await AuditLog.create({
 			action: payload.action,
 			after: sanitizeSnapshot(payload.after),
-			actorEmail: payload.actor.email,
 			actorId: payload.actor.id,
 			actorName: payload.actor.name,
 			actorRole: payload.actor.role,
@@ -103,24 +90,16 @@ export async function recordAuditLog(payload: AuditLogPayload) {
 			entityId: payload.entityId || payload.targetId || "",
 			entityLabel: payload.entityLabel || payload.targetLabel || "",
 			entityType: payload.entityType || payload.targetType || "",
-			ipAddress: readIpAddress(payload.req),
 			outcome: payload.outcome || "success",
 			summary: payload.summary,
 			targetId: payload.targetId || "",
 			targetLabel: payload.targetLabel || "",
-			targetType: payload.targetType || "",
-			userAgent: reqHeaderValue(payload.req.headers["user-agent"])
+			targetType: payload.targetType || ""
 		});
 	}
 	catch (error) {
-		console.error("Failed to record audit log", error);
+		console.error("Failed to record audit log", {
+			error: error instanceof Error ? error.name : "UnknownError"
+		});
 	}
-}
-
-function reqHeaderValue(value: string | string[] | undefined) {
-	if (Array.isArray(value)) {
-		return value[0] || "";
-	}
-
-	return value || "";
 }

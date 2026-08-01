@@ -344,7 +344,7 @@ onMounted(() => {
 						</span>
 						<strong>{{ log.summary || log.action }}</strong>
 						<p>
-							{{ log.actorName || log.actorEmail || "Admin" }}
+							{{ log.actorName || "Admin" }}
 							<span aria-hidden="true">/</span>
 							{{ formatDate(log.createdAt) }}
 						</p>

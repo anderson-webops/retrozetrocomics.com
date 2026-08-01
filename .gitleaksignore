@@ -1,0 +1,4 @@
+# Historical backend environment file removed from the tracked tree. The exposed
+# session key has already changed locally; the historical Vault AppRole SecretID
+# must be revoked before production promotion. See the 2026-07-29 security audit.
+8b8a2a4d431f1a2599a69ac0a56c0423285b9332:back-end/.env:generic-api-key:7

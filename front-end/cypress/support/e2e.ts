@@ -13,5 +13,26 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
+import { createDefaultAboutPageContent } from "../../src/content/defaultAboutPageContent";
+
+import { createDefaultCharactersPageContent } from "../../src/content/defaultCharactersPageContent";
 // Import commands.js using ES2015 syntax:
 import "./commands";
+
+beforeEach(() => {
+	cy.intercept("GET", "/api/auth/me", {
+		body: {
+			account: null,
+			authenticated: false
+		},
+		statusCode: 200
+	});
+	cy.intercept("GET", "/api/site-content/about", {
+		body: { content: createDefaultAboutPageContent() },
+		statusCode: 200
+	});
+	cy.intercept("GET", "/api/site-content/characters", {
+		body: { content: createDefaultCharactersPageContent() },
+		statusCode: 200
+	});
+});

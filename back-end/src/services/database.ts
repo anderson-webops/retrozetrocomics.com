@@ -1,29 +1,33 @@
 import { env } from "node:process";
 import mongoose from "mongoose";
 
-import { readMongoSecret } from "../vaultClient.js";
+import { isVaultConfigured, readMongoSecret } from "../vaultClient.js";
 
 export async function connectToMongo() {
 	let mongoUri: string | undefined;
 
-	try {
-		const { uri } = await readMongoSecret();
-		mongoUri = uri;
-	}
-	catch (error) {
-		const message = `${error ?? ""}`;
-		if (!message.includes("Failed to fetch") && !message.includes("connect ECONNREFUSED")) {
-			console.log("");
+	if (isVaultConfigured()) {
+		try {
+			const { uri } = await readMongoSecret();
+			mongoUri = uri;
 		}
-
-		mongoUri = env.MONGODB_URI;
+		catch (error) {
+			console.warn("Vault MongoDB lookup failed; evaluating direct configuration", {
+				error: error instanceof Error ? error.name : "UnknownError"
+			});
+		}
 	}
+
+	mongoUri ||= env.MONGODB_URI?.trim();
 
 	if (!mongoUri) {
-		throw new Error("No MongoDB URI available (Vault and MONGODB_URI missing)");
+		throw new Error("MongoDB configuration is unavailable");
 	}
 
-	await mongoose.connect(mongoUri);
+	await mongoose.connect(mongoUri, {
+		connectTimeoutMS: 10_000,
+		serverSelectionTimeoutMS: 10_000
+	});
 	console.log("Connected to MongoDB");
 
 	return mongoose.connection;

@@ -13,11 +13,6 @@ const auditLogSchema = new Schema(
 			type: Schema.Types.Mixed,
 			default: null
 		},
-		actorEmail: {
-			type: String,
-			default: "",
-			trim: true
-		},
 		actorId: {
 			type: String,
 			default: "",
@@ -66,10 +61,6 @@ const auditLogSchema = new Schema(
 			index: true,
 			trim: true
 		},
-		ipAddress: {
-			type: String,
-			default: ""
-		},
 		outcome: {
 			type: String,
 			enum: ["failure", "success"],
@@ -96,10 +87,6 @@ const auditLogSchema = new Schema(
 			type: String,
 			default: "",
 			trim: true
-		},
-		userAgent: {
-			type: String,
-			default: ""
 		}
 	},
 	{

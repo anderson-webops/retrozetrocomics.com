@@ -14,7 +14,7 @@
 
 ## Build, Test, and Development Commands
 
-- `npm install` (root) installs all workspace dependencies using the pinned `npm@11` toolchain. Avoid mixing package
+- `npm install` (root) installs all workspace dependencies using the pinned `npm@12` toolchain. Avoid mixing package
   managers.
 - `npm run dev` starts the front-end dev server on port 3333; `npm run serve` runs the same build with `--host` enabled
   for LAN previews.
@@ -41,8 +41,7 @@
   in `__snapshots__/` and should be reviewed line-by-line.
 - Cypress specs should stub network calls against the Express test server; store fixtures under
   `front-end/cypress/fixtures/`.
-- Back-end tests are not yet wired up—when adding them, place suites under a new `back-end/test/` tree and update
-  `npm run -w back-end test` to execute them (prefer Vitest + Supertest for HTTP coverage).
+- Back-end Vitest suites live in `back-end/test/`; run them with `npm run -w back-end test`.
 - Aim to cover new endpoints, Pinia stores, and critical user flows before requesting review; document any intentionally
   skipped scenarios in the PR.
 
@@ -57,9 +56,9 @@
 
 ## Security & Configuration Tips
 
-- The API expects secrets via environment variables: `SESSION_SECRET`, Mongo credentials (`MONGODB_URI` or Vault via
-  `VAULT_ROLE_ID`/`VAULT_SECRET_ID`), and optional `CROSS_SITE` to adjust cookie policy. Load them through `.env` files
-  excluded from version control.
+- The API expects a 32+ character `SESSION_SECRET`, exact `PUBLIC_SITE_ORIGIN`/`ALLOWED_ORIGINS`, and Mongo credentials
+  (`MONGODB_URI` or fully configured Vault). `TRUST_PROXY_HOPS` must match the known reverse-proxy topology and defaults
+  to zero. Load secrets through `.env` files excluded from version control.
 - `npm run server` already loads `dotenv/config` and will attempt Vault retrieval via `src/vaultClient.ts`; validate
   both code paths when changing auth or persistence.
 - Never commit real credentials or production endpoints. Scrub logs before sharing, and verify rate limiting when
@@ -83,6 +82,7 @@
 ## Dependency & Lockfile Discipline
 
 - Treat the repo-root `npm ci` path as the source of truth for deploy readiness.
+- Keep only the root `package-lock.json`; nested workspace lockfiles and pnpm workspace files are unsupported.
 - Any time `package.json`, any workspace `package.json`, dependency ranges, `package-lock.json`, or dependency update tooling changes, verify lockfile parity from the repo root before committing.
 - Do not rely on `npm install` fallback as success. A change is not deploy-ready unless root `npm ci` succeeds.
 

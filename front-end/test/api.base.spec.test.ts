@@ -16,7 +16,9 @@ describe("api base resolution", () => {
 	});
 
 	it("expands relative API paths to absolute URLs for SSG", () => {
-		expect(resolveSsgApiBaseUrl({})).toBe("https://retrozetrocomics.com/api");
+		expect(resolveSsgApiBaseUrl({})).toBe(
+			"https://retrozetrocomics.com/api"
+		);
 		expect(
 			resolveSsgApiBaseUrl({
 				VITE_PUBLIC_SITE_ORIGIN: "https://preview.retrozetrocomics.com",

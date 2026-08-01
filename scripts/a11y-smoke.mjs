@@ -192,12 +192,13 @@ function processIsRunning(child) {
 function waitForProcessExit(child, timeoutMs) {
 	if (!processIsRunning(child)) return Promise.resolve(true);
 
-	return new Promise(resolveWait => {
+	return new Promise((resolveWait) => {
+		let timeout;
 		const onExit = () => {
 			clearTimeout(timeout);
 			resolveWait(true);
 		};
-		const timeout = setTimeout(() => {
+		timeout = setTimeout(() => {
 			child.off("exit", onExit);
 			resolveWait(false);
 		}, timeoutMs);
