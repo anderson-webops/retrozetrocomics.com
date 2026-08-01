@@ -10,21 +10,11 @@ useHead({
 <template>
 	<main class="not-found-shell">
 		<div class="not-found-shell__frame">
-			<ResolvedImage
-				alt="RetroZetro mark"
-				:candidates="siteAssetCandidates.logo"
-				class="not-found-shell__logo"
-			/>
+			<ResolvedImage alt="RetroZetro mark" :candidates="siteAssetCandidates.logo" class="not-found-shell__logo" />
 			<RouterView />
 			<div class="not-found-shell__actions">
-				<RouterLink class="not-found-shell__cta" to="/">
-					Go home
-				</RouterLink>
-				<button
-					class="not-found-shell__cta not-found-shell__cta--ghost"
-					type="button"
-					@click="router.back()"
-				>
+				<RouterLink class="not-found-shell__cta" to="/"> Go home </RouterLink>
+				<button class="not-found-shell__cta not-found-shell__cta--ghost" type="button" @click="router.back()">
 					Go back
 				</button>
 			</div>

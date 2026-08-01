@@ -28,9 +28,7 @@ const draftEntry = ref<CharacterBoardWorldEntry | null>(null);
 const session = useSessionStore();
 const canEdit = computed(() => props.inlineEditing && session.showAdminTools);
 
-function cloneWorldEntry(
-	entry: CharacterBoardWorldEntry
-): CharacterBoardWorldEntry {
+function cloneWorldEntry(entry: CharacterBoardWorldEntry): CharacterBoardWorldEntry {
 	return JSON.parse(JSON.stringify(entry)) as CharacterBoardWorldEntry;
 }
 
@@ -112,38 +110,20 @@ watch(
 				'world-entry-card--editing': editingId === entry.id
 			}"
 		>
-			<button
-				v-if="canEdit"
-				type="button"
-				class="world-entry-card__edit"
-				@click="startEditing(entry)"
-			>
+			<button v-if="canEdit" type="button" class="world-entry-card__edit" @click="startEditing(entry)">
 				{{ editingId === entry.id ? "Editing" : "Edit" }}
 			</button>
 
 			<template v-if="canEdit && editingId === entry.id && draftEntry">
-				<form
-					class="world-entry-card__editor"
-					@submit.prevent="submitEntry"
-				>
+				<form class="world-entry-card__editor" @submit.prevent="submitEntry">
 					<div class="world-entry-card__editor-grid">
 						<label>
 							<span>Label</span>
-							<input
-								v-model="draftEntry.label"
-								maxlength="80"
-								required
-								type="text"
-							/>
+							<input v-model="draftEntry.label" maxlength="80" required type="text" />
 						</label>
 						<label>
 							<span>Title</span>
-							<input
-								v-model="draftEntry.title"
-								maxlength="120"
-								required
-								type="text"
-							/>
+							<input v-model="draftEntry.title" maxlength="120" required type="text" />
 						</label>
 					</div>
 
@@ -155,9 +135,7 @@ watch(
 					<div class="world-entry-card__facts">
 						<div class="world-entry-card__facts-header">
 							<p>Facts</p>
-							<button type="button" @click="addFact">
-								Add fact
-							</button>
+							<button type="button" @click="addFact">Add fact</button>
 						</div>
 
 						<div
@@ -167,19 +145,11 @@ watch(
 						>
 							<label>
 								<span>Label</span>
-								<input
-									v-model="fact.label"
-									maxlength="80"
-									type="text"
-								/>
+								<input v-model="fact.label" maxlength="80" type="text" />
 							</label>
 							<label>
 								<span>Value</span>
-								<input
-									v-model="fact.value"
-									maxlength="220"
-									type="text"
-								/>
+								<input v-model="fact.value" maxlength="220" type="text" />
 							</label>
 							<button
 								type="button"
@@ -194,35 +164,20 @@ watch(
 
 					<div class="world-entry-card__footer">
 						<div class="world-entry-card__actions">
-							<button
-								type="submit"
-								:disabled="props.savingId === entry.id"
-							>
-								{{
-									props.savingId === entry.id
-										? "Saving..."
-										: "Save"
-								}}
+							<button type="submit" :disabled="props.savingId === entry.id">
+								{{ props.savingId === entry.id ? "Saving..." : "Save" }}
 							</button>
-							<button type="button" @click="closeEditor">
-								Cancel edits
-							</button>
+							<button type="button" @click="closeEditor">Cancel edits</button>
 						</div>
 						<div class="world-entry-card__danger-zone">
 							<button
 								type="button"
 								class="world-entry-card__danger"
 								@click="
-									removalArmedId === entry.id
-										? emit('remove', entry.id)
-										: (removalArmedId = entry.id)
+									removalArmedId === entry.id ? emit('remove', entry.id) : (removalArmedId = entry.id)
 								"
 							>
-								{{
-									removalArmedId === entry.id
-										? "Confirm remove entry"
-										: "Remove entry"
-								}}
+								{{ removalArmedId === entry.id ? "Confirm remove entry" : "Remove entry" }}
 							</button>
 						</div>
 					</div>
@@ -234,10 +189,7 @@ watch(
 				<h2>{{ entry.title }}</h2>
 				<p>{{ entry.body }}</p>
 
-				<dl
-					v-if="entry.facts?.length"
-					class="world-entry-card__facts-list"
-				>
+				<dl v-if="entry.facts?.length" class="world-entry-card__facts-list">
 					<div v-for="fact in entry.facts" :key="fact.label">
 						<dt>{{ fact.label }}</dt>
 						<dd>{{ fact.value }}</dd>

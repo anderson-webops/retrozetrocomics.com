@@ -4,8 +4,7 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 
 export function createDefaultCharactersPageContent(): CharactersPageContent {
 	return {
-		description:
-			"Meet the characters, factions, and worlds driving The List and The Fall of a Dream.",
+		description: "Meet the characters, factions, and worlds driving The List and The Fall of a Dream.",
 		eyebrow: "Characters and Factions",
 		heroImage: siteAssetCandidates.zetroPortrait[0],
 		heroImageAlt: "Zetro portrait",
@@ -13,8 +12,7 @@ export function createDefaultCharactersPageContent(): CharactersPageContent {
 		title: "Meet the Characters",
 		characters: [
 			{
-				description:
-					"Zetro is brave, stubborn, and quick to step into danger.",
+				description: "Zetro is brave, stubborn, and quick to step into danger.",
 				fallbackImage: siteAssetCandidates.zetroPortrait[1],
 				frequency: "Hope under pressure",
 				id: "zetro",
@@ -25,8 +23,7 @@ export function createDefaultCharactersPageContent(): CharactersPageContent {
 				specialty: "Frontline improvisation"
 			},
 			{
-				description:
-					"Kazay handles missions built on timing and misdirection.",
+				description: "Kazay handles missions built on timing and misdirection.",
 				fallbackImage: siteAssetCandidates.kazayPortrait[1],
 				frequency: "Speed and misdirection",
 				id: "kazay",
@@ -37,8 +34,7 @@ export function createDefaultCharactersPageContent(): CharactersPageContent {
 				specialty: "Covert entry and extraction"
 			},
 			{
-				description:
-					"Exo leads Team Rimlaw through searches that keep pulling him back to the Apex Army.",
+				description: "Exo leads Team Rimlaw through searches that keep pulling him back to the Apex Army.",
 				fallbackImage: siteAssetCandidates.exoPortrait[1],
 				frequency: "Search and rescue",
 				id: "exo",
@@ -49,8 +45,7 @@ export function createDefaultCharactersPageContent(): CharactersPageContent {
 				specialty: "Orbital pursuit and lift"
 			},
 			{
-				description:
-					"Shaman brings memory, healing, and spiritual judgment.",
+				description: "Shaman brings memory, healing, and spiritual judgment.",
 				fallbackImage: siteAssetCandidates.shamanPortrait[1],
 				frequency: "Memory and repair",
 				id: "shaman",
@@ -61,8 +56,7 @@ export function createDefaultCharactersPageContent(): CharactersPageContent {
 				specialty: "Healing and spiritual cartography"
 			},
 			{
-				description:
-					"Zorix uses fear and command to force each conflict toward his next move.",
+				description: "Zorix uses fear and command to force each conflict toward his next move.",
 				fallbackImage: "",
 				frequency: "Control and intimidation",
 				id: "zorix",
@@ -122,8 +116,6 @@ export function createDefaultCharactersPageContent(): CharactersPageContent {
 	};
 }
 
-export function cloneCharactersPageContent(
-	content: CharactersPageContent
-): CharactersPageContent {
+export function cloneCharactersPageContent(content: CharactersPageContent): CharactersPageContent {
 	return JSON.parse(JSON.stringify(content)) as CharactersPageContent;
 }

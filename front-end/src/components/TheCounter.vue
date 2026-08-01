@@ -26,7 +26,6 @@ function decrement() {
 
 <template>
 	<div>
-		{{ count }} <button class="inc" @click="increment">+</button
-		><button class="dec" @click="decrement">-</button>
+		{{ count }} <button class="inc" @click="increment">+</button><button class="dec" @click="decrement">-</button>
 	</div>
 </template>

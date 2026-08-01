@@ -8,9 +8,7 @@ import SiteAdSlot from "~/components/SiteAdSlot.vue";
 const session = useSessionStore();
 const route = useRoute();
 const isAdminRoute = computed(() => route.path === "/studio/admin");
-const showAdminViewerBanner = computed(
-	() => session.isAdmin && session.adminViewerMode && !isAdminRoute.value
-);
+const showAdminViewerBanner = computed(() => session.isAdmin && session.adminViewerMode && !isAdminRoute.value);
 
 onMounted(() => {
 	void session.bootstrapSession();
@@ -21,23 +19,12 @@ onMounted(() => {
 	<main class="site-shell">
 		<div class="site-frame">
 			<header class="site-masthead">
-				<RouterLink
-					aria-label="RetroZetro Comics home"
-					class="site-masthead__brand"
-					to="/"
-				>
-					<ResolvedImage
-						alt="RetroZetro Comics logo"
-						:candidates="siteAssetCandidates.logo"
-					/>
+				<RouterLink aria-label="RetroZetro Comics home" class="site-masthead__brand" to="/">
+					<ResolvedImage alt="RetroZetro Comics logo" :candidates="siteAssetCandidates.logo" />
 					<span>RetroZetro Comics</span>
 				</RouterLink>
 
-				<SiteAdSlot
-					class="site-masthead__ad"
-					label="Advertisement"
-					placement="top"
-				/>
+				<SiteAdSlot class="site-masthead__ad" label="Advertisement" placement="top" />
 			</header>
 
 			<TheHeader class="site-frame__nav" />
@@ -45,30 +32,17 @@ onMounted(() => {
 			<div v-if="showAdminViewerBanner" class="admin-viewer-banner">
 				<div>
 					<p class="admin-viewer-banner__eyebrow">Viewer Mode</p>
-					<p>
-						Public edit tools are hidden so you can browse the site
-						more like a regular visitor.
-					</p>
+					<p>Public edit tools are hidden so you can browse the site more like a regular visitor.</p>
 				</div>
-				<button type="button" @click="session.toggleAdminViewerMode()">
-					Turn edit tools back on
-				</button>
+				<button type="button" @click="session.toggleAdminViewerMode()">Turn edit tools back on</button>
 			</div>
 
 			<div class="content-grid">
-				<SiteAdSlot
-					class="content-grid__ad content-grid__ad--left"
-					label="Advertisement"
-					placement="side"
-				/>
+				<SiteAdSlot class="content-grid__ad content-grid__ad--left" label="Advertisement" placement="side" />
 				<div id="center-plate" class="center-plate">
 					<RouterView class="page-slot" />
 				</div>
-				<SiteAdSlot
-					class="content-grid__ad content-grid__ad--right"
-					label="Advertisement"
-					placement="side"
-				/>
+				<SiteAdSlot class="content-grid__ad content-grid__ad--right" label="Advertisement" placement="side" />
 			</div>
 
 			<TheFooter class="site-shell__footer" />

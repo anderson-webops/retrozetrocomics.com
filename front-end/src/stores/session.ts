@@ -18,8 +18,7 @@ export const useSessionStore = defineStore("session", {
 	}),
 
 	getters: {
-		showAdminTools: state =>
-			state.account?.role === "admin" && !state.adminViewerMode,
+		showAdminTools: state => state.account?.role === "admin" && !state.adminViewerMode,
 		isAdmin: state => state.account?.role === "admin",
 		isAuthenticated: state => Boolean(state.account)
 	},
@@ -31,8 +30,7 @@ export const useSessionStore = defineStore("session", {
 			}
 
 			if (typeof window !== "undefined") {
-				this.adminViewerMode =
-					window.localStorage.getItem(ADMIN_VIEWER_MODE_KEY) === "1";
+				this.adminViewerMode = window.localStorage.getItem(ADMIN_VIEWER_MODE_KEY) === "1";
 			}
 
 			this.adminViewerModeReady = true;
@@ -42,10 +40,7 @@ export const useSessionStore = defineStore("session", {
 			this.adminViewerMode = nextValue;
 
 			if (typeof window !== "undefined") {
-				window.localStorage.setItem(
-					ADMIN_VIEWER_MODE_KEY,
-					nextValue ? "1" : "0"
-				);
+				window.localStorage.setItem(ADMIN_VIEWER_MODE_KEY, nextValue ? "1" : "0");
 			}
 		},
 
@@ -87,18 +82,12 @@ export const useSessionStore = defineStore("session", {
 			this.busy = true;
 			this.authError = "";
 			try {
-				const { data } = await api.post<{ account: SiteAccount }>(
-					"/auth/login",
-					payload
-				);
+				const { data } = await api.post<{ account: SiteAccount }>("/auth/login", payload);
 				this.account = data.account;
 				this.closeAuth();
 				return data.account;
 			} catch (error: any) {
-				this.authError =
-					error?.response?.data?.message ||
-					error?.message ||
-					"Unable to sign in.";
+				this.authError = error?.response?.data?.message || error?.message || "Unable to sign in.";
 				throw error;
 			} finally {
 				this.busy = false;

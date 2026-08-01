@@ -20,14 +20,10 @@ export function normalizeApiBaseUrl(rawBaseUrl = "/api", siteOrigin?: string) {
 	const origin = trimTrailingSlash(siteOrigin || defaultSiteOrigin);
 	const pathname = baseUrl.startsWith("/") ? baseUrl : `/${baseUrl}`;
 
-	return new URL(pathname, origin)
-		.toString()
-		.replace(trailingSlashPattern, "");
+	return new URL(pathname, origin).toString().replace(trailingSlashPattern, "");
 }
 
-export function resolveClientApiBaseUrl(
-	env: Record<string, string | undefined>
-) {
+export function resolveClientApiBaseUrl(env: Record<string, string | undefined>) {
 	return normalizeApiBaseUrl(env.VITE_API_BASE_URL || "/api");
 }
 

@@ -1,8 +1,5 @@
 <script lang="ts" setup>
-import type {
-	CharacterBoardProfile,
-	CharacterBoardWorldEntry
-} from "@/types/site";
+import type { CharacterBoardProfile, CharacterBoardWorldEntry } from "@/types/site";
 import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import { useCharactersPageContentEditor } from "@/composables/useCharactersPageContentEditor";
 import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
@@ -38,8 +35,7 @@ useHead({
 	meta: [
 		{
 			name: "description",
-			content:
-				"Meet the characters, factions, and worlds driving The List and The Fall of a Dream."
+			content: "Meet the characters, factions, and worlds driving The List and The Fall of a Dream."
 		},
 		{
 			property: "og:title",
@@ -47,8 +43,7 @@ useHead({
 		},
 		{
 			property: "og:description",
-			content:
-				"Meet the characters, factions, and worlds driving The List and The Fall of a Dream."
+			content: "Meet the characters, factions, and worlds driving The List and The Fall of a Dream."
 		},
 		{
 			property: "og:url",
@@ -60,8 +55,7 @@ useHead({
 		},
 		{
 			name: "twitter:description",
-			content:
-				"Meet the characters, factions, and worlds driving The List and The Fall of a Dream."
+			content: "Meet the characters, factions, and worlds driving The List and The Fall of a Dream."
 		}
 	]
 });
@@ -153,15 +147,10 @@ function handleWorldEntryDiscard(entryId: string) {
 			title="Character page controls"
 		/>
 
-		<p
-			v-if="boardError"
-			class="characters-page__status characters-page__status--error"
-		>
+		<p v-if="boardError" class="characters-page__status characters-page__status--error">
 			{{ boardError }}
 		</p>
-		<p v-else-if="boardSaving" class="characters-page__status">
-			Saving board changes...
-		</p>
+		<p v-else-if="boardSaving" class="characters-page__status">Saving board changes...</p>
 
 		<WelcomeSection
 			:actions="[
@@ -179,10 +168,7 @@ function handleWorldEntryDiscard(entryId: string) {
 			actions-placement="poster"
 			:eyebrow="content.eyebrow"
 			:highlights="[]"
-			:image-candidates="[
-				content.heroImage,
-				content.heroImageFallback || ''
-			]"
+			:image-candidates="[content.heroImage, content.heroImageFallback || '']"
 			:image-alt="content.heroImageAlt"
 			:message="content.description"
 			:title="content.title"

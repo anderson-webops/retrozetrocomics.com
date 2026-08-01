@@ -35,11 +35,7 @@ const isOpen = ref(false);
 				<h2>{{ props.title }}</h2>
 				<p>{{ props.description }}</p>
 			</div>
-			<button
-				type="button"
-				class="admin-inline-tools__toggle"
-				@click="isOpen = !isOpen"
-			>
+			<button type="button" class="admin-inline-tools__toggle" @click="isOpen = !isOpen">
 				{{ isOpen ? "Hide controls" : "Open controls" }}
 			</button>
 		</div>

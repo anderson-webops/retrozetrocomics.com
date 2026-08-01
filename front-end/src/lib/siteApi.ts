@@ -28,14 +28,8 @@ export async function fetchAuditLogs(filters: AuditLogFilters = {}) {
 	}>("/admin/audit-logs", {
 		params: {
 			action: filters.action || undefined,
-			actorRole:
-				filters.actorRole && filters.actorRole !== "all"
-					? filters.actorRole
-					: undefined,
-			category:
-				filters.category && filters.category !== "all"
-					? filters.category
-					: undefined,
+			actorRole: filters.actorRole && filters.actorRole !== "all" ? filters.actorRole : undefined,
+			category: filters.category && filters.category !== "all" ? filters.category : undefined,
 			limit: filters.limit,
 			search: filters.search || undefined
 		}
@@ -45,33 +39,21 @@ export async function fetchAuditLogs(filters: AuditLogFilters = {}) {
 }
 
 export async function fetchCharactersPageContent() {
-	const { data } = await api.get<{ content: CharactersPageContent }>(
-		"/site-content/characters"
-	);
+	const { data } = await api.get<{ content: CharactersPageContent }>("/site-content/characters");
 	return data.content;
 }
 
 export async function fetchAboutPageContent() {
-	const { data } = await api.get<{ content: AboutPageContent }>(
-		"/site-content/about"
-	);
+	const { data } = await api.get<{ content: AboutPageContent }>("/site-content/about");
 	return data.content;
 }
 
-export async function updateCharactersPageContent(
-	payload: CharactersPageContent
-) {
-	const { data } = await api.patch<{ content: CharactersPageContent }>(
-		"/admin/site-content/characters",
-		payload
-	);
+export async function updateCharactersPageContent(payload: CharactersPageContent) {
+	const { data } = await api.patch<{ content: CharactersPageContent }>("/admin/site-content/characters", payload);
 	return data.content;
 }
 
 export async function updateAboutPageContent(payload: AboutPageContent) {
-	const { data } = await api.patch<{ content: AboutPageContent }>(
-		"/admin/site-content/about",
-		payload
-	);
+	const { data } = await api.patch<{ content: AboutPageContent }>("/admin/site-content/about", payload);
 	return data.content;
 }

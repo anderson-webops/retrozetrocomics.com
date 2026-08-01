@@ -46,36 +46,18 @@ export const siteAssetCandidates = {
 	aboutHero: ["/legacy-images/Zetro2.jpg", "/brand/poster-retrozetro.svg"],
 	contactLogo: ["/legacy-images/Original_Icon.png", "/brand/logo-mark.svg"],
 	favicons: {
-		android192: [
-			"/legacy-favicons/android-chrome-192x192.png",
-			"/Favicons/android-chrome-192x192.png"
-		],
-		android512: [
-			"/legacy-favicons/android-chrome-512x512.png",
-			"/Favicons/android-chrome-512x512.png"
-		],
-		appleTouch: [
-			"/legacy-favicons/apple-touch-icon.png",
-			"/Favicons/apple-touch-icon.png"
-		],
-		favicon16: [
-			"/legacy-favicons/favicon-16x16.png",
-			"/Favicons/favicon-16x16.png"
-		],
-		favicon32: [
-			"/legacy-favicons/favicon-32x32.png",
-			"/Favicons/favicon-32x32.png"
-		],
+		android192: ["/legacy-favicons/android-chrome-192x192.png", "/Favicons/android-chrome-192x192.png"],
+		android512: ["/legacy-favicons/android-chrome-512x512.png", "/Favicons/android-chrome-512x512.png"],
+		appleTouch: ["/legacy-favicons/apple-touch-icon.png", "/Favicons/apple-touch-icon.png"],
+		favicon16: ["/legacy-favicons/favicon-16x16.png", "/Favicons/favicon-16x16.png"],
+		favicon32: ["/legacy-favicons/favicon-32x32.png", "/Favicons/favicon-32x32.png"],
 		faviconIco: ["/legacy-favicons/favicon.ico", "/Favicons/favicon.ico"],
 		manifest: ["/legacy-favicons/site.webmanifest"]
 	},
 	hero: ["/legacy-images/Zetro2.jpg", "/brand/hero-collage.svg"],
 	kazayPortrait: ["/legacy-images/Kazay.jpg", "/brand/characters-kazay.svg"],
 	logo: ["/legacy-images/Original_Icon.png", "/brand/logo-mark.svg"],
-	shamanPortrait: [
-		"/legacy-images/Shaman.jpg",
-		"/brand/characters-shaman.svg"
-	],
+	shamanPortrait: ["/legacy-images/Shaman.jpg", "/brand/characters-shaman.svg"],
 	socialPreview: ["/legacy-images/Zetro2.jpg", "/brand/hero-collage.svg"],
 	zetroPortrait: ["/legacy-images/Zetro2.jpg", "/brand/characters-zetro.svg"],
 	exoPortrait: ["/legacy-images/Exo.jpg", "/brand/characters-exo.svg"],
@@ -86,9 +68,7 @@ export function toAbsoluteSiteUrl(path: string) {
 	return new URL(path, siteOrigin).toString();
 }
 
-export async function resolvePreferredLocalAsset(
-	candidates: readonly string[]
-) {
+export async function resolvePreferredLocalAsset(candidates: readonly string[]) {
 	const availableCandidates = uniqueCandidates(candidates);
 	if (availableCandidates.length === 0) {
 		return "";

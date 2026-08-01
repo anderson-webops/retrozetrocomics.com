@@ -2,13 +2,7 @@
 import type { AboutStoryArc } from "@/types/site";
 
 type StoryArcBeatKey =
-	| "climax"
-	| "firstPlotPoint"
-	| "hook"
-	| "incitingIncident"
-	| "midpoint"
-	| "resolution"
-	| "thirdPlotPoint";
+	"climax" | "firstPlotPoint" | "hook" | "incitingIncident" | "midpoint" | "resolution" | "thirdPlotPoint";
 
 const props = withDefaults(
 	defineProps<{
@@ -97,71 +91,39 @@ watch(
 </script>
 
 <template>
-	<section
-		class="story-arc-grid"
-		:class="{ 'story-arc-grid--editing': inlineEditing && !!editingId }"
-	>
+	<section class="story-arc-grid" :class="{ 'story-arc-grid--editing': inlineEditing && !!editingId }">
 		<article
 			v-for="arc in props.items"
 			:key="arc.id"
 			class="story-arc-card"
 			:class="{ 'story-arc-card--editing': editingId === arc.id }"
 		>
-			<button
-				v-if="inlineEditing"
-				type="button"
-				class="story-arc-card__edit"
-				@click="startEditing(arc)"
-			>
+			<button v-if="inlineEditing" type="button" class="story-arc-card__edit" @click="startEditing(arc)">
 				{{ editingId === arc.id ? "Editing" : "Edit" }}
 			</button>
 
 			<template v-if="inlineEditing && editingId === arc.id && draftArc">
-				<form
-					class="story-arc-card__editor"
-					@submit.prevent="submitArc"
-				>
+				<form class="story-arc-card__editor" @submit.prevent="submitArc">
 					<div class="story-arc-card__editor-grid">
 						<label>
 							<span>Label</span>
-							<input
-								v-model="draftArc.label"
-								maxlength="80"
-								required
-								type="text"
-							/>
+							<input v-model="draftArc.label" maxlength="80" required type="text" />
 						</label>
 						<label>
 							<span>Title</span>
-							<input
-								v-model="draftArc.title"
-								maxlength="120"
-								required
-								type="text"
-							/>
+							<input v-model="draftArc.title" maxlength="120" required type="text" />
 						</label>
 					</div>
 
 					<label>
 						<span>Summary</span>
-						<textarea
-							v-model="draftArc.description"
-							required
-							rows="4"
-						/>
+						<textarea v-model="draftArc.description" required rows="4" />
 					</label>
 
 					<div class="story-arc-card__beats">
-						<label
-							v-for="field in editorBeatFields"
-							:key="field.key"
-						>
+						<label v-for="field in editorBeatFields" :key="field.key">
 							<span>{{ field.label }}</span>
-							<textarea
-								v-model="draftArc[field.key]"
-								required
-								rows="3"
-							/>
+							<textarea v-model="draftArc[field.key]" required rows="3" />
 						</label>
 					</div>
 
@@ -172,35 +134,18 @@ watch(
 
 					<div class="story-arc-card__footer">
 						<div class="story-arc-card__actions">
-							<button
-								type="submit"
-								:disabled="props.savingId === arc.id"
-							>
-								{{
-									props.savingId === arc.id
-										? "Saving..."
-										: "Save"
-								}}
+							<button type="submit" :disabled="props.savingId === arc.id">
+								{{ props.savingId === arc.id ? "Saving..." : "Save" }}
 							</button>
-							<button type="button" @click="closeEditor">
-								Cancel edits
-							</button>
+							<button type="button" @click="closeEditor">Cancel edits</button>
 						</div>
 						<div class="story-arc-card__danger-zone">
 							<button
 								type="button"
 								class="story-arc-card__danger"
-								@click="
-									removalArmedId === arc.id
-										? emit('remove', arc.id)
-										: (removalArmedId = arc.id)
-								"
+								@click="removalArmedId === arc.id ? emit('remove', arc.id) : (removalArmedId = arc.id)"
 							>
-								{{
-									removalArmedId === arc.id
-										? "Confirm remove arc"
-										: "Remove arc"
-								}}
+								{{ removalArmedId === arc.id ? "Confirm remove arc" : "Remove arc" }}
 							</button>
 						</div>
 					</div>

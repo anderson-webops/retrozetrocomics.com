@@ -42,18 +42,8 @@ async function submitLogin() {
 
 <template>
 	<Teleport to="body">
-		<div
-			v-if="authModalOpen"
-			class="auth-overlay"
-			role="presentation"
-			@click.self="session.closeAuth()"
-		>
-			<div
-				aria-labelledby="admin-login-heading"
-				aria-modal="true"
-				class="auth-modal"
-				role="dialog"
-			>
+		<div v-if="authModalOpen" class="auth-overlay" role="presentation" @click.self="session.closeAuth()">
+			<div aria-labelledby="admin-login-heading" aria-modal="true" class="auth-modal" role="dialog">
 				<button
 					aria-label="Close admin sign-in dialog"
 					class="auth-modal__close"
@@ -66,21 +56,13 @@ async function submitLogin() {
 				<div class="auth-modal__hero">
 					<p class="auth-modal__eyebrow">Owner Access</p>
 					<h2 id="admin-login-heading">Admin sign in</h2>
-					<p>
-						Sign in only when you need to edit site content or
-						review owner activity.
-					</p>
+					<p>Sign in only when you need to edit site content or review owner activity.</p>
 				</div>
 
 				<form class="auth-form" @submit.prevent="submitLogin">
 					<label>
 						<span>Email</span>
-						<input
-							v-model="loginForm.email"
-							autocomplete="email"
-							required
-							type="email"
-						/>
+						<input v-model="loginForm.email" autocomplete="email" required type="email" />
 					</label>
 
 					<label>
@@ -98,11 +80,7 @@ async function submitLogin() {
 						{{ localError || authError }}
 					</p>
 
-					<button
-						class="auth-form__submit"
-						:disabled="busy"
-						type="submit"
-					>
+					<button class="auth-form__submit" :disabled="busy" type="submit">
 						{{ busy ? "Signing in..." : "Sign in" }}
 					</button>
 				</form>
@@ -155,9 +133,7 @@ async function submitLogin() {
 	display: grid;
 	gap: 0.55rem;
 	padding: clamp(1.4rem, 5vw, 2rem);
-	background:
-		linear-gradient(135deg, rgba(255, 145, 77, 0.16), transparent 46%),
-		rgba(255, 255, 255, 0.04);
+	background: linear-gradient(135deg, rgba(255, 145, 77, 0.16), transparent 46%), rgba(255, 255, 255, 0.04);
 }
 
 .auth-modal__hero h2,

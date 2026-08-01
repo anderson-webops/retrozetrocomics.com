@@ -29,8 +29,7 @@ useHead({
 	meta: [
 		{
 			name: "description",
-			content:
-				"Contact RetroZetro Comics for collaboration, commissions, interviews, and project questions."
+			content: "Contact RetroZetro Comics for collaboration, commissions, interviews, and project questions."
 		},
 		{
 			property: "og:title",
@@ -38,8 +37,7 @@ useHead({
 		},
 		{
 			property: "og:description",
-			content:
-				"Contact RetroZetro Comics for collaboration, commissions, interviews, and project questions."
+			content: "Contact RetroZetro Comics for collaboration, commissions, interviews, and project questions."
 		},
 		{
 			property: "og:url",
@@ -51,8 +49,7 @@ useHead({
 		},
 		{
 			name: "twitter:description",
-			content:
-				"Contact RetroZetro Comics for collaboration, commissions, interviews, and project questions."
+			content: "Contact RetroZetro Comics for collaboration, commissions, interviews, and project questions."
 		}
 	]
 });
@@ -64,8 +61,7 @@ async function handleSubmit() {
 	try {
 		await api.post("/contact", form.value);
 		responseTone.value = "success";
-		responseMessage.value =
-			"Message sent. RetroZetro will follow up through the email address you provided.";
+		responseMessage.value = "Message sent. RetroZetro will follow up through the email address you provided.";
 
 		form.value.subject = "";
 		form.value.name = "";
@@ -75,12 +71,9 @@ async function handleSubmit() {
 	} catch (error: unknown) {
 		console.error("RetroZetro contact form failed:", error);
 		responseTone.value = "error";
-		const response = (error as { response?: { data?: { error?: string } } })
-			.response;
+		const response = (error as { response?: { data?: { error?: string } } }).response;
 		const errorMessage = response?.data?.error;
-		responseMessage.value =
-			errorMessage ||
-			"The message could not be sent right now. Please try again later.";
+		responseMessage.value = errorMessage || "The message could not be sent right now. Please try again later.";
 	} finally {
 		isSubmitting.value = false;
 	}
@@ -150,11 +143,7 @@ async function handleSubmit() {
 				<p
 					v-if="responseMessage"
 					class="contact-form__response"
-					:class="
-						responseTone === 'error'
-							? 'contact-form__response--error'
-							: ''
-					"
+					:class="responseTone === 'error' ? 'contact-form__response--error' : ''"
 				>
 					{{ responseMessage }}
 				</p>

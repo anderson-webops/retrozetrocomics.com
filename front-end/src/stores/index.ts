@@ -32,20 +32,17 @@ export const useMainStore = defineStore("main", {
 					format: "World note",
 					image: "/brand/world-bitgam.svg",
 					status: "Fazo's homeworld",
-					summary:
-						"Bitgam is an old Gamborus world tied to the Great Manifested.",
+					summary: "Bitgam is an old Gamborus world tied to the Great Manifested.",
 					title: "Bitgam"
 				}
 			]
 		},
 		characters: {
-			description:
-				"Meet the characters, factions, and worlds driving The List and The Fall of a Dream.",
+			description: "Meet the characters, factions, and worlds driving The List and The Fall of a Dream.",
 			title: "Meet the Characters",
 			character: [
 				{
-					description:
-						"Zetro is brave, stubborn, and quick to step into danger.",
+					description: "Zetro is brave, stubborn, and quick to step into danger.",
 					frequency: "Hope under pressure",
 					fallbackImage: siteAssetCandidates.zetroPortrait[1],
 					image: siteAssetCandidates.zetroPortrait[0],
@@ -55,8 +52,7 @@ export const useMainStore = defineStore("main", {
 					specialty: "Frontline improvisation"
 				},
 				{
-					description:
-						"Kazay handles missions built on timing and misdirection.",
+					description: "Kazay handles missions built on timing and misdirection.",
 					frequency: "Speed and misdirection",
 					fallbackImage: siteAssetCandidates.kazayPortrait[1],
 					image: siteAssetCandidates.kazayPortrait[0],
@@ -66,8 +62,7 @@ export const useMainStore = defineStore("main", {
 					specialty: "Covert entry and extraction"
 				},
 				{
-					description:
-						"Exo leads Team Rimlaw through searches that keep pulling him back to the Apex Army.",
+					description: "Exo leads Team Rimlaw through searches that keep pulling him back to the Apex Army.",
 					frequency: "Search and rescue",
 					fallbackImage: siteAssetCandidates.exoPortrait[1],
 					image: siteAssetCandidates.exoPortrait[0],
@@ -77,8 +72,7 @@ export const useMainStore = defineStore("main", {
 					specialty: "Orbital pursuit and lift"
 				},
 				{
-					description:
-						"Shaman brings memory, healing, and spiritual judgment.",
+					description: "Shaman brings memory, healing, and spiritual judgment.",
 					frequency: "Memory and repair",
 					fallbackImage: siteAssetCandidates.shamanPortrait[1],
 					image: siteAssetCandidates.shamanPortrait[0],
@@ -88,8 +82,7 @@ export const useMainStore = defineStore("main", {
 					specialty: "Healing and spiritual cartography"
 				},
 				{
-					description:
-						"Zorix uses fear and command to force each conflict toward his next move.",
+					description: "Zorix uses fear and command to force each conflict toward his next move.",
 					frequency: "Control and intimidation",
 					image: siteAssetCandidates.zorixPortrait[0],
 					imgAlt: "Poster portrait of Zorix in crimson and obsidian tones",
@@ -139,8 +132,7 @@ export const useMainStore = defineStore("main", {
 				},
 				{
 					climax: "Exo is pushed toward a direct confrontation with Zego.",
-					description:
-						"The Apex Army fractures as the Zego Order turns suspicion into rebellion.",
+					description: "The Apex Army fractures as the Zego Order turns suspicion into rebellion.",
 					firstPlotPoint:
 						"Diyo warns the outlaw teams that Apex Army members are dying under mysterious circumstances.",
 					hook: "Trust inside the Apex Army breaks apart as allies question who is still acting freely.",
@@ -202,8 +194,7 @@ export const useMainStore = defineStore("main", {
 			]
 		},
 		contact: {
-			description:
-				"Reach out for commissions, collaboration, press, or project questions.",
+			description: "Reach out for commissions, collaboration, press, or project questions.",
 			faq: [
 				{
 					answer: "Commissions, story collaboration, process interviews, convention programming, and press requests are welcome.",
@@ -223,7 +214,6 @@ export const useMainStore = defineStore("main", {
 	},
 
 	getters: {
-		comicNames: state =>
-			state.characters.character.map(character => character.name)
+		comicNames: state => state.characters.character.map(character => character.name)
 	}
 });

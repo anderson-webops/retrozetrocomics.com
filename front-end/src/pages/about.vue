@@ -12,10 +12,8 @@ import { useMainStore } from "~/stores";
 
 const store = useMainStore();
 const session = useSessionStore();
-const { content: aboutPageContent, load: loadAboutPageContent } =
-	useAboutPageContent();
-const { content: charactersPageContent, load: loadCharactersPageContent } =
-	useCharactersPageContent();
+const { content: aboutPageContent, load: loadAboutPageContent } = useAboutPageContent();
+const { content: charactersPageContent, load: loadCharactersPageContent } = useCharactersPageContent();
 const {
 	addStoryArcDraft,
 	discardStoryArcDraft,
@@ -55,8 +53,7 @@ useHead({
 	meta: [
 		{
 			name: "description",
-			content:
-				"Learn the project context, active stories, and world details behind RetroZetro Comics."
+			content: "Learn the project context, active stories, and world details behind RetroZetro Comics."
 		},
 		{
 			property: "og:title",
@@ -64,8 +61,7 @@ useHead({
 		},
 		{
 			property: "og:description",
-			content:
-				"Learn the project context, active stories, and world details behind RetroZetro Comics."
+			content: "Learn the project context, active stories, and world details behind RetroZetro Comics."
 		},
 		{
 			property: "og:url",
@@ -77,8 +73,7 @@ useHead({
 		},
 		{
 			name: "twitter:description",
-			content:
-				"Learn the project context, active stories, and world details behind RetroZetro Comics."
+			content: "Learn the project context, active stories, and world details behind RetroZetro Comics."
 		}
 	]
 });
@@ -147,18 +142,11 @@ function handleWorldEntryDiscard(entryId: string) {
 
 <template>
 	<div class="page about-page">
-		<p
-			v-if="aboutError || boardError"
-			class="about-page__status about-page__status--error"
-		>
+		<p v-if="aboutError || boardError" class="about-page__status about-page__status--error">
 			{{ aboutError || boardError }}
 		</p>
 		<p v-else-if="aboutSaving || boardSaving" class="about-page__status">
-			{{
-				aboutSaving
-					? "Saving story page changes..."
-					: "Saving world note changes..."
-			}}
+			{{ aboutSaving ? "Saving story page changes..." : "Saving world note changes..." }}
 		</p>
 
 		<WelcomeSection
@@ -189,8 +177,8 @@ function handleWorldEntryDiscard(entryId: string) {
 				<p class="about-page__eyebrow">Stories</p>
 				<h2>The current conflicts</h2>
 				<p>
-					The List begins with Exo's search. The Fall of a Dream shows
-					what happens when the Apex Army starts breaking from inside.
+					The List begins with Exo's search. The Fall of a Dream shows what happens when the Apex Army starts
+					breaking from inside.
 				</p>
 			</header>
 
@@ -205,10 +193,7 @@ function handleWorldEntryDiscard(entryId: string) {
 					@save="handleStoryArcSave"
 				/>
 			</div>
-			<div
-				v-if="session.showAdminTools"
-				class="about-page__section-actions"
-			>
+			<div v-if="session.showAdminTools" class="about-page__section-actions">
 				<button type="button" @click="addStoryArcInline">Add</button>
 			</div>
 		</section>
@@ -217,10 +202,7 @@ function handleWorldEntryDiscard(entryId: string) {
 			<header class="about-page__section-header">
 				<p class="about-page__eyebrow">World Notes</p>
 				<h2>Terms, places, and factions</h2>
-				<p>
-					These notes explain the names, places, and institutions a
-					reader will meet across the stories.
-				</p>
+				<p>These notes explain the names, places, and institutions a reader will meet across the stories.</p>
 			</header>
 
 			<div class="about-page__world-grid">
@@ -234,10 +216,7 @@ function handleWorldEntryDiscard(entryId: string) {
 					@save="handleWorldEntrySave"
 				/>
 			</div>
-			<div
-				v-if="session.showAdminTools"
-				class="about-page__section-actions"
-			>
+			<div v-if="session.showAdminTools" class="about-page__section-actions">
 				<button type="button" @click="addWorldEntryInline">Add</button>
 			</div>
 		</section>

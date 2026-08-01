@@ -29,12 +29,8 @@ export function useLocalDraft<T>({
 	const savedAt = ref<string | null>(null);
 
 	const isClient = typeof window !== "undefined";
-	const isAutosaveEnabled = computed(() =>
-		typeof enabled === "function" ? enabled() : enabled
-	);
-	const resolvedStorageKey = computed(() =>
-		typeof storageKey === "function" ? storageKey() : storageKey
-	);
+	const isAutosaveEnabled = computed(() => (typeof enabled === "function" ? enabled() : enabled));
+	const resolvedStorageKey = computed(() => (typeof storageKey === "function" ? storageKey() : storageKey));
 
 	function readDraft(targetStorageKey = resolvedStorageKey.value) {
 		if (!isClient) return null;
@@ -81,10 +77,7 @@ export function useLocalDraft<T>({
 		savedAt.value = null;
 	}
 
-	function saveNow(
-		snapshot = source(),
-		targetStorageKey = resolvedStorageKey.value
-	) {
+	function saveNow(snapshot = source(), targetStorageKey = resolvedStorageKey.value) {
 		if (!isClient) return;
 
 		if (isEmpty(snapshot)) {
@@ -95,10 +88,7 @@ export function useLocalDraft<T>({
 		const draftSnapshot = snapshot as { hasFiles?: boolean };
 
 		const record: StoredLocalDraft<T> = {
-			hasFiles:
-				typeof draftSnapshot.hasFiles === "boolean"
-					? Boolean(draftSnapshot.hasFiles)
-					: false,
+			hasFiles: typeof draftSnapshot.hasFiles === "boolean" ? Boolean(draftSnapshot.hasFiles) : false,
 			savedAt: new Date().toISOString(),
 			value: snapshot,
 			version: 1
@@ -159,10 +149,7 @@ export function useLocalDraft<T>({
 		onScopeDispose(() => {
 			window.removeEventListener("beforeunload", flushDraft);
 			window.removeEventListener("pagehide", flushDraft);
-			document.removeEventListener(
-				"visibilitychange",
-				handleVisibilityChange
-			);
+			document.removeEventListener("visibilitychange", handleVisibilityChange);
 		});
 	}
 

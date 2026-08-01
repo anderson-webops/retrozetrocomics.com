@@ -31,9 +31,7 @@ const editingId = ref("");
 const removalArmedId = ref("");
 const draftCharacter = ref<CharacterBoardProfile | null>(null);
 
-function isDefinedImageCandidate(
-	candidate: string | undefined
-): candidate is string {
+function isDefinedImageCandidate(candidate: string | undefined): candidate is string {
 	return Boolean(candidate);
 }
 
@@ -114,119 +112,58 @@ watch(
 				</button>
 
 				<template
-					v-if="
-						session.showAdminTools &&
-						props.inlineEditing &&
-						editingId === item.id &&
-						draftCharacter
-					"
+					v-if="session.showAdminTools && props.inlineEditing && editingId === item.id && draftCharacter"
 				>
-					<form
-						class="characters-grid__editor"
-						@submit.prevent="submitCharacter"
-					>
+					<form class="characters-grid__editor" @submit.prevent="submitCharacter">
 						<div class="characters-grid__editor-grid">
 							<label>
 								<span>Name</span>
-								<input
-									v-model="draftCharacter.name"
-									maxlength="80"
-									required
-									type="text"
-								/>
+								<input v-model="draftCharacter.name" maxlength="80" required type="text" />
 							</label>
 							<label>
 								<span>Role</span>
-								<input
-									v-model="draftCharacter.role"
-									maxlength="80"
-									required
-									type="text"
-								/>
+								<input v-model="draftCharacter.role" maxlength="80" required type="text" />
 							</label>
 							<label>
 								<span>Specialty</span>
-								<input
-									v-model="draftCharacter.specialty"
-									maxlength="120"
-									required
-									type="text"
-								/>
+								<input v-model="draftCharacter.specialty" maxlength="120" required type="text" />
 							</label>
 							<label>
 								<span>Secondary line</span>
-								<input
-									v-model="draftCharacter.frequency"
-									maxlength="120"
-									required
-									type="text"
-								/>
+								<input v-model="draftCharacter.frequency" maxlength="120" required type="text" />
 							</label>
 							<label>
 								<span>Image URL</span>
-								<input
-									v-model="draftCharacter.image"
-									maxlength="260"
-									required
-									type="text"
-								/>
+								<input v-model="draftCharacter.image" maxlength="260" required type="text" />
 							</label>
 							<label>
 								<span>Fallback image</span>
-								<input
-									v-model="draftCharacter.fallbackImage"
-									maxlength="260"
-									type="text"
-								/>
+								<input v-model="draftCharacter.fallbackImage" maxlength="260" type="text" />
 							</label>
 							<label class="characters-grid__editor-span">
 								<span>Image alt text</span>
-								<input
-									v-model="draftCharacter.imgAlt"
-									maxlength="180"
-									required
-									type="text"
-								/>
+								<input v-model="draftCharacter.imgAlt" maxlength="180" required type="text" />
 							</label>
 						</div>
 
 						<label>
 							<span>Description</span>
-							<textarea
-								v-model="draftCharacter.description"
-								required
-								rows="6"
-							/>
+							<textarea v-model="draftCharacter.description" required rows="6" />
 						</label>
 
 						<div class="characters-grid__actions">
-							<button
-								type="submit"
-								:disabled="props.savingId === item.id"
-							>
-								{{
-									props.savingId === item.id
-										? "Saving..."
-										: "Save"
-								}}
+							<button type="submit" :disabled="props.savingId === item.id">
+								{{ props.savingId === item.id ? "Saving..." : "Save" }}
 							</button>
-							<button type="button" @click="closeEditor">
-								Cancel
-							</button>
+							<button type="button" @click="closeEditor">Cancel</button>
 							<button
 								type="button"
 								class="characters-grid__danger"
 								@click="
-									removalArmedId === item.id
-										? emit('remove', item.id)
-										: (removalArmedId = item.id)
+									removalArmedId === item.id ? emit('remove', item.id) : (removalArmedId = item.id)
 								"
 							>
-								{{
-									removalArmedId === item.id
-										? "Confirm remove"
-										: "Remove"
-								}}
+								{{ removalArmedId === item.id ? "Confirm remove" : "Remove" }}
 							</button>
 						</div>
 					</form>
@@ -236,12 +173,7 @@ watch(
 					<div class="characters-grid__media">
 						<ResolvedImage
 							:alt="item.imgAlt"
-							:candidates="
-								definedImageCandidates([
-									item.image,
-									item.fallbackImage
-								])
-							"
+							:candidates="definedImageCandidates([item.image, item.fallbackImage])"
 							class="characters-grid__image"
 						/>
 					</div>

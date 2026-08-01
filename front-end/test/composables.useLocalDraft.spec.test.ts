@@ -77,11 +77,7 @@ describe("useLocalDraft()", () => {
 				title: string;
 			}>({
 				isEmpty(snapshot) {
-					return (
-						!snapshot.title &&
-						!snapshot.content &&
-						!snapshot.hasFiles
-					);
+					return !snapshot.title && !snapshot.content && !snapshot.hasFiles;
 				},
 				source: () => ({
 					content: form.content,
@@ -133,11 +129,7 @@ describe("useLocalDraft()", () => {
 
 			useLocalDraft({
 				isEmpty(snapshot) {
-					return (
-						!snapshot.title &&
-						!snapshot.content &&
-						!snapshot.hasFiles
-					);
+					return !snapshot.title && !snapshot.content && !snapshot.hasFiles;
 				},
 				source: () => ({
 					content: form.content,
@@ -194,11 +186,7 @@ describe("useLocalDraft()", () => {
 				title: string;
 			}>({
 				isEmpty(snapshot) {
-					return (
-						!snapshot.title &&
-						!snapshot.content &&
-						!snapshot.hasFiles
-					);
+					return !snapshot.title && !snapshot.content && !snapshot.hasFiles;
 				},
 				source: () => ({
 					content: "",
@@ -260,11 +248,7 @@ describe("useLocalDraft()", () => {
 			draft = useLocalDraft({
 				enabled: () => autosaveEnabled.value,
 				isEmpty(snapshot) {
-					return (
-						!snapshot.title &&
-						!snapshot.content &&
-						!snapshot.hasFiles
-					);
+					return !snapshot.title && !snapshot.content && !snapshot.hasFiles;
 				},
 				source: () => ({
 					content: form.content,

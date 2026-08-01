@@ -15,8 +15,7 @@ useHead({
 	meta: [
 		{
 			name: "description",
-			content:
-				"Explore RetroZetro Comics, the cast, and the current conflicts of the Retroverse."
+			content: "Explore RetroZetro Comics, the cast, and the current conflicts of the Retroverse."
 		},
 		{
 			property: "og:title",
@@ -24,8 +23,7 @@ useHead({
 		},
 		{
 			property: "og:description",
-			content:
-				"Explore RetroZetro Comics, the cast, and the current conflicts of the Retroverse."
+			content: "Explore RetroZetro Comics, the cast, and the current conflicts of the Retroverse."
 		},
 		{
 			property: "og:url",
@@ -37,8 +35,7 @@ useHead({
 		},
 		{
 			name: "twitter:description",
-			content:
-				"Explore RetroZetro Comics, the cast, and the current conflicts of the Retroverse."
+			content: "Explore RetroZetro Comics, the cast, and the current conflicts of the Retroverse."
 		}
 	]
 });
@@ -53,18 +50,13 @@ useHead({
 				<p class="home-showcase__eyebrow">Current Conflicts</p>
 				<h2>Two storylines drive the Retroverse</h2>
 				<p>
-					Exo's search in The List exposes a hidden enemy. The Fall of
-					a Dream follows the damage when that influence reaches the
-					Apex Army itself.
+					Exo's search in The List exposes a hidden enemy. The Fall of a Dream follows the damage when that
+					influence reaches the Apex Army itself.
 				</p>
 			</header>
 
 			<div class="home-showcase__grid">
-				<article
-					v-for="story in store.home.storylines"
-					:key="story.title"
-					class="home-showcase__card"
-				>
+				<article v-for="story in store.home.storylines" :key="story.title" class="home-showcase__card">
 					<img :alt="story.title" :src="story.image" />
 					<div class="home-showcase__copy">
 						<p>{{ story.format }}</p>

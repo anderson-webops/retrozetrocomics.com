@@ -14,13 +14,9 @@ const props = defineProps({
 
 const currentIndex = ref(0);
 
-const normalizedCandidates = computed(() => [
-	...new Set(props.candidates.filter(Boolean))
-]);
+const normalizedCandidates = computed(() => [...new Set(props.candidates.filter(Boolean))]);
 
-const currentSrc = computed(
-	() => normalizedCandidates.value[currentIndex.value] || ""
-);
+const currentSrc = computed(() => normalizedCandidates.value[currentIndex.value] || "");
 
 watch(
 	normalizedCandidates,

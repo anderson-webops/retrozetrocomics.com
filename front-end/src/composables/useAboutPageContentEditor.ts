@@ -5,9 +5,7 @@ import { updateAboutPageContent } from "@/lib/siteApi";
 import { useAboutPageContent } from "./useAboutPageContent";
 
 function nextDraftId(prefix: string) {
-	return `${prefix}-${Date.now().toString(36)}-${Math.random()
-		.toString(36)
-		.slice(2, 7)}`;
+	return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
 function isBlankStoryArc(arc: AboutStoryArc) {
@@ -60,9 +58,7 @@ export function useAboutPageContentEditor() {
 			return savedContent;
 		} catch (saveError: any) {
 			error.value =
-				saveError?.response?.data?.message ||
-				saveError?.message ||
-				"Unable to save the about page content.";
+				saveError?.response?.data?.message || saveError?.message || "Unable to save the about page content.";
 			throw saveError;
 		} finally {
 			saving.value = false;
@@ -88,17 +84,13 @@ export function useAboutPageContentEditor() {
 		}
 
 		const nextContent = cloneAboutPageContent(content.value);
-		nextContent.storyArcs = nextContent.storyArcs.filter(
-			arc => arc.id !== arcId
-		);
+		nextContent.storyArcs = nextContent.storyArcs.filter(arc => arc.id !== arcId);
 		apply(nextContent);
 	}
 
 	function saveStoryArc(arc: AboutStoryArc) {
 		return persist(nextContent => {
-			const index = nextContent.storyArcs.findIndex(
-				currentArc => currentArc.id === arc.id
-			);
+			const index = nextContent.storyArcs.findIndex(currentArc => currentArc.id === arc.id);
 			if (index >= 0) {
 				nextContent.storyArcs[index] = arc;
 				return;
@@ -115,9 +107,7 @@ export function useAboutPageContentEditor() {
 		}
 
 		return persist(nextContent => {
-			nextContent.storyArcs = nextContent.storyArcs.filter(
-				arc => arc.id !== arcId
-			);
+			nextContent.storyArcs = nextContent.storyArcs.filter(arc => arc.id !== arcId);
 		});
 	}
 

@@ -24,13 +24,8 @@ onMounted(() => {
 	<section v-else class="admin-gate">
 		<p class="admin-gate__eyebrow">Restricted</p>
 		<h1>Admin access required</h1>
-		<p>
-			Only the site owner or another admin account can open the content
-			console.
-		</p>
-		<button type="button" @click="session.openAuth()">
-			Sign in as admin
-		</button>
+		<p>Only the site owner or another admin account can open the content console.</p>
+		<button type="button" @click="session.openAuth()">Sign in as admin</button>
 	</section>
 </template>
 

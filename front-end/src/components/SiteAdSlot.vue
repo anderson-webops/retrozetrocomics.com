@@ -12,11 +12,7 @@ const props = withDefaults(
 </script>
 
 <template>
-	<aside
-		:aria-label="props.label"
-		class="site-ad-slot"
-		:class="`site-ad-slot--${props.placement}`"
-	>
+	<aside :aria-label="props.label" class="site-ad-slot" :class="`site-ad-slot--${props.placement}`">
 		<span>{{ props.label }}</span>
 	</aside>
 </template>

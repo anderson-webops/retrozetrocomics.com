@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-	normalizeApiBaseUrl,
-	resolveClientApiBaseUrl,
-	resolveSsgApiBaseUrl
-} from "../src/lib/apiBase";
+import { normalizeApiBaseUrl, resolveClientApiBaseUrl, resolveSsgApiBaseUrl } from "../src/lib/apiBase";
 
 describe("api base resolution", () => {
 	it("keeps client-side relative API paths relative", () => {
@@ -16,9 +12,7 @@ describe("api base resolution", () => {
 	});
 
 	it("expands relative API paths to absolute URLs for SSG", () => {
-		expect(resolveSsgApiBaseUrl({})).toBe(
-			"https://retrozetrocomics.com/api"
-		);
+		expect(resolveSsgApiBaseUrl({})).toBe("https://retrozetrocomics.com/api");
 		expect(
 			resolveSsgApiBaseUrl({
 				VITE_PUBLIC_SITE_ORIGIN: "https://preview.retrozetrocomics.com",
@@ -28,11 +22,8 @@ describe("api base resolution", () => {
 	});
 
 	it("preserves explicit absolute API URLs", () => {
-		expect(
-			normalizeApiBaseUrl(
-				"https://api.retrozetrocomics.com/v1/",
-				"https://retrozetrocomics.com"
-			)
-		).toBe("https://api.retrozetrocomics.com/v1");
+		expect(normalizeApiBaseUrl("https://api.retrozetrocomics.com/v1/", "https://retrozetrocomics.com")).toBe(
+			"https://api.retrozetrocomics.com/v1"
+		);
 	});
 });

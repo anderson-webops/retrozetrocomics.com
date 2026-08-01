@@ -1,32 +1,20 @@
 <script lang="ts" setup>
-import {
-	resolvePreferredLocalAsset,
-	siteAssetCandidates,
-	toAbsoluteSiteUrl
-} from "@/lib/siteAssets";
+import { resolvePreferredLocalAsset, siteAssetCandidates, toAbsoluteSiteUrl } from "@/lib/siteAssets";
 
 const defaultHeroImageAlt = "RetroZetro lead portrait";
 const siteUrl = "https://retrozetrocomics.com";
 const siteDescription =
 	"RetroZetro Comics collects the stories, characters, and worlds behind Exo, Zetro, and the wider Retroverse.";
 const route = useRoute();
-const appleTouchIconHref = ref<string>(
-	siteAssetCandidates.favicons.appleTouch[0]
-);
+const appleTouchIconHref = ref<string>(siteAssetCandidates.favicons.appleTouch[0]);
 const favicon16Href = ref<string>(siteAssetCandidates.favicons.favicon16[0]);
 const favicon32Href = ref<string>(siteAssetCandidates.favicons.favicon32[0]);
 const faviconIcoHref = ref<string>(siteAssetCandidates.favicons.faviconIco[0]);
-const manifestHref = ref<string>(
-	siteAssetCandidates.favicons.manifest[0] || ""
-);
+const manifestHref = ref<string>(siteAssetCandidates.favicons.manifest[0] || "");
 const socialPreviewPath = ref<string>(siteAssetCandidates.socialPreview[0]);
 
-const defaultSocialImageUrl = computed(() =>
-	toAbsoluteSiteUrl(socialPreviewPath.value)
-);
-const canonicalUrl = computed(() =>
-	new URL(route.path || "/", `${siteUrl}/`).toString()
-);
+const defaultSocialImageUrl = computed(() => toAbsoluteSiteUrl(socialPreviewPath.value));
+const canonicalUrl = computed(() => new URL(route.path || "/", `${siteUrl}/`).toString());
 const robotsContent = computed(() =>
 	/^\/studio\/admin(?:\/|$)|^\/api(?:\/|$)/.test(route.path)
 		? "noindex,nofollow"
@@ -50,24 +38,12 @@ const structuredData = computed(() => [
 ]);
 
 onMounted(async () => {
-	appleTouchIconHref.value = await resolvePreferredLocalAsset(
-		siteAssetCandidates.favicons.appleTouch
-	);
-	favicon16Href.value = await resolvePreferredLocalAsset(
-		siteAssetCandidates.favicons.favicon16
-	);
-	favicon32Href.value = await resolvePreferredLocalAsset(
-		siteAssetCandidates.favicons.favicon32
-	);
-	faviconIcoHref.value = await resolvePreferredLocalAsset(
-		siteAssetCandidates.favicons.faviconIco
-	);
-	manifestHref.value = await resolvePreferredLocalAsset(
-		siteAssetCandidates.favicons.manifest
-	);
-	socialPreviewPath.value = await resolvePreferredLocalAsset(
-		siteAssetCandidates.socialPreview
-	);
+	appleTouchIconHref.value = await resolvePreferredLocalAsset(siteAssetCandidates.favicons.appleTouch);
+	favicon16Href.value = await resolvePreferredLocalAsset(siteAssetCandidates.favicons.favicon16);
+	favicon32Href.value = await resolvePreferredLocalAsset(siteAssetCandidates.favicons.favicon32);
+	faviconIcoHref.value = await resolvePreferredLocalAsset(siteAssetCandidates.favicons.faviconIco);
+	manifestHref.value = await resolvePreferredLocalAsset(siteAssetCandidates.favicons.manifest);
+	socialPreviewPath.value = await resolvePreferredLocalAsset(siteAssetCandidates.socialPreview);
 });
 
 useHead(
@@ -171,14 +147,12 @@ useHead(
 							{
 								defer: true,
 								src: "https://analytics.retrozetrocomics.com/script.js",
-								"data-website-id":
-									"568434bd-9bbe-44f9-9537-3bb0cb65f242"
+								"data-website-id": "568434bd-9bbe-44f9-9537-3bb0cb65f242"
 							},
 							{
 								defer: true,
 								src: "https://analytics.jacobdanderson.net/script.js",
-								"data-website-id":
-									"0085594f-0e98-4159-ba2b-4fc8fcd717cb"
+								"data-website-id": "0085594f-0e98-4159-ba2b-4fc8fcd717cb"
 							}
 						]
 					: []),

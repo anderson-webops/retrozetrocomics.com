@@ -61,22 +61,14 @@ watch(
 				<span class="sr-only">Toggle navigation</span>
 			</button>
 
-			<ul
-				id="primary-navigation"
-				:class="{ 'nav__links--expanded': isExpanded }"
-				class="nav__links"
-			>
+			<ul id="primary-navigation" :class="{ 'nav__links--expanded': isExpanded }" class="nav__links">
 				<li
 					v-for="link in links"
 					:key="link.path"
 					class="nav__item"
 					:class="[{ 'nav__item--active': isActive(link.path) }]"
 				>
-					<RouterLink
-						class="nav__link"
-						:to="link.path"
-						@click="closeMenu"
-					>
+					<RouterLink class="nav__link" :to="link.path" @click="closeMenu">
 						{{ link.name }}
 					</RouterLink>
 				</li>
@@ -93,10 +85,7 @@ watch(
 						</div>
 
 						<div class="nav__utility">
-							<RouterLink
-								class="nav__action nav__action--ghost nav__action--utility"
-								to="/studio/admin"
-							>
+							<RouterLink class="nav__action nav__action--ghost nav__action--utility" to="/studio/admin">
 								Admin
 							</RouterLink>
 							<button
@@ -104,29 +93,16 @@ watch(
 								type="button"
 								@click="session.toggleAdminViewerMode()"
 							>
-								{{
-									session.adminViewerMode
-										? "Edit Tools"
-										: "Viewer Mode"
-								}}
+								{{ session.adminViewerMode ? "Edit Tools" : "Viewer Mode" }}
 							</button>
 						</div>
 					</div>
 
-					<button
-						class="nav__action nav__action--primary"
-						type="button"
-						@click="session.logout()"
-					>
+					<button class="nav__action nav__action--primary" type="button" @click="session.logout()">
 						Logout
 					</button>
 				</template>
-				<button
-					v-else
-					class="nav__action nav__action--ghost"
-					type="button"
-					@click="session.openAuth()"
-				>
+				<button v-else class="nav__action nav__action--ghost" type="button" @click="session.openAuth()">
 					Owner Sign In
 				</button>
 			</div>

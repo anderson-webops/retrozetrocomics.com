@@ -96,10 +96,7 @@ const resolvedImageCandidates = computed(() =>
 				{{ message }}
 			</p>
 
-			<div
-				v-if="props.actionsPlacement === 'content'"
-				class="welcome__actions"
-			>
+			<div v-if="props.actionsPlacement === 'content'" class="welcome__actions">
 				<template v-for="action in heroActions" :key="action.label">
 					<RouterLink
 						v-if="action.to"
@@ -138,15 +135,9 @@ const resolvedImageCandidates = computed(() =>
 
 		<div class="welcome__poster" role="presentation">
 			<div class="welcome__poster-frame">
-				<ResolvedImage
-					:alt="imageAlt"
-					:candidates="resolvedImageCandidates"
-				/>
+				<ResolvedImage :alt="imageAlt" :candidates="resolvedImageCandidates" />
 			</div>
-			<div
-				v-if="props.actionsPlacement === 'poster'"
-				class="welcome__actions welcome__actions--poster"
-			>
+			<div v-if="props.actionsPlacement === 'poster'" class="welcome__actions welcome__actions--poster">
 				<template v-for="action in heroActions" :key="action.label">
 					<RouterLink
 						v-if="action.to"

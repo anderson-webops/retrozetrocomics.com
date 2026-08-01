@@ -25,14 +25,12 @@ export function createDefaultAboutPageContent(): AboutPageContent {
 			},
 			{
 				climax: "Exo is pushed toward a direct confrontation with Zego.",
-				description:
-					"The Apex Army fractures as the Zego Order turns suspicion into rebellion.",
+				description: "The Apex Army fractures as the Zego Order turns suspicion into rebellion.",
 				firstPlotPoint:
 					"Diyo warns the outlaw teams that Apex Army members are dying under mysterious circumstances.",
 				hook: "Trust inside the Apex Army breaks apart as allies question who is still acting freely.",
 				id: "arc-fall-of-a-dream",
-				incitingIncident:
-					"Giza finds evidence that someone close to the Army may not be who he appears to be.",
+				incitingIncident: "Giza finds evidence that someone close to the Army may not be who he appears to be.",
 				label: "Arc 02",
 				midpoint:
 					"Giza and Oix begin working from inside the system to expose the deception before the Army collapses.",
@@ -47,8 +45,6 @@ export function createDefaultAboutPageContent(): AboutPageContent {
 	};
 }
 
-export function cloneAboutPageContent(
-	content: AboutPageContent
-): AboutPageContent {
+export function cloneAboutPageContent(content: AboutPageContent): AboutPageContent {
 	return JSON.parse(JSON.stringify(content)) as AboutPageContent;
 }

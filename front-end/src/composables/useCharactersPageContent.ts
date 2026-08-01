@@ -1,14 +1,9 @@
 import type { CharactersPageContent } from "@/types/site";
 
-import {
-	cloneCharactersPageContent,
-	createDefaultCharactersPageContent
-} from "@/content/defaultCharactersPageContent";
+import { cloneCharactersPageContent, createDefaultCharactersPageContent } from "@/content/defaultCharactersPageContent";
 import { fetchCharactersPageContent } from "@/lib/siteApi";
 
-const content = ref<CharactersPageContent>(
-	createDefaultCharactersPageContent()
-);
+const content = ref<CharactersPageContent>(createDefaultCharactersPageContent());
 const error = ref("");
 const isLoaded = ref(false);
 const loading = ref(false);

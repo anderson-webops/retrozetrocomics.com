@@ -92,9 +92,7 @@ export default defineConfig(({ command }) => ({
 			reduceInlineStyles: false
 		},
 		includedRoutes(paths: string[]) {
-			return paths.filter(
-				(path: string) => !staticRenderExcludedRoutes.includes(path)
-			);
+			return paths.filter((path: string) => !staticRenderExcludedRoutes.includes(path));
 		},
 		onFinished() {
 			generateSitemap({

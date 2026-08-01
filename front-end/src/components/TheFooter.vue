@@ -21,11 +21,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 		<div class="footer__contact">
 			<h3>Contact</h3>
-			<a
-				aria-label="Email RetroZetro"
-				class="footer__social"
-				href="mailto:retrozetrocomics@gmail.com"
-			>
+			<a aria-label="Email RetroZetro" class="footer__social" href="mailto:retrozetrocomics@gmail.com">
 				<FontAwesomeIcon :icon="['fas', 'envelope']" size="2x" />
 				<span>Email RetroZetro</span>
 			</a>

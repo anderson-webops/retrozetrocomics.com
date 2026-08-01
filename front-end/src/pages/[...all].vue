@@ -2,10 +2,7 @@
 	<section class="not-found-copy">
 		<p class="not-found-copy__eyebrow">Signal Lost</p>
 		<h1>That page drifted off the map.</h1>
-		<p>
-			Return to the homepage, meet the characters, or use the contact
-			page.
-		</p>
+		<p>Return to the homepage, meet the characters, or use the contact page.</p>
 	</section>
 </template>
 

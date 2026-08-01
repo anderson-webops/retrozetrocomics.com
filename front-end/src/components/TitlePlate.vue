@@ -5,15 +5,8 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 <template>
 	<header class="title-plate">
 		<div class="title-plate__brand">
-			<RouterLink
-				aria-label="Return home"
-				class="title-plate__logo"
-				to="/"
-			>
-				<ResolvedImage
-					alt="RetroZetro Comics Logo"
-					:candidates="siteAssetCandidates.logo"
-				/>
+			<RouterLink aria-label="Return home" class="title-plate__logo" to="/">
+				<ResolvedImage alt="RetroZetro Comics Logo" :candidates="siteAssetCandidates.logo" />
 			</RouterLink>
 			<div class="title-plate__text">
 				<span>RetroZetro Comics</span>

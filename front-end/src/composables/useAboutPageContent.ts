@@ -1,9 +1,6 @@
 import type { AboutPageContent } from "@/types/site";
 
-import {
-	cloneAboutPageContent,
-	createDefaultAboutPageContent
-} from "@/content/defaultAboutPageContent";
+import { cloneAboutPageContent, createDefaultAboutPageContent } from "@/content/defaultAboutPageContent";
 import { fetchAboutPageContent } from "@/lib/siteApi";
 
 const content = ref<AboutPageContent>(createDefaultAboutPageContent());
@@ -25,9 +22,7 @@ export function useAboutPageContent() {
 			isLoaded.value = true;
 		} catch (loadError: any) {
 			error.value =
-				loadError?.response?.data?.message ||
-				loadError?.message ||
-				"Unable to load the about page content.";
+				loadError?.response?.data?.message || loadError?.message || "Unable to load the about page content.";
 			if (!isLoaded.value) {
 				content.value = createDefaultAboutPageContent();
 			}

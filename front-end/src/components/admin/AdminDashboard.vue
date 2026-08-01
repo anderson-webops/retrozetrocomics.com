@@ -1,9 +1,5 @@
 <script lang="ts" setup>
-import type {
-	AuditLogCategory,
-	AuditLogRecord,
-	DashboardData
-} from "@/types/site";
+import type { AuditLogCategory, AuditLogRecord, DashboardData } from "@/types/site";
 import { computed, onMounted, reactive, ref } from "vue";
 
 import { fetchAuditLogs, fetchDashboard } from "@/lib/siteApi";
@@ -62,10 +58,7 @@ const storageRows = computed(() => {
 		["S3 public base", storage.s3PublicBaseUrl || "Not set"],
 		["Local public base", storage.localPublicBaseUrl || "Not set"],
 		["Key prefix", storage.keyPrefix || "Not set"],
-		[
-			"Provider routing",
-			storage.providerRoutingReady ? "Ready" : "Not ready"
-		],
+		["Provider routing", storage.providerRoutingReady ? "Ready" : "Not ready"],
 		["Switch ready", storage.switchReady ? "Ready" : "Not ready"]
 	] satisfies Array<[string, string]>;
 });
@@ -76,10 +69,7 @@ async function loadDashboard() {
 	try {
 		dashboard.value = await fetchDashboard();
 	} catch (error: any) {
-		dashboardError.value =
-			error?.response?.data?.message ||
-			error?.message ||
-			"Unable to load admin data.";
+		dashboardError.value = error?.response?.data?.message || error?.message || "Unable to load admin data.";
 	} finally {
 		dashboardLoading.value = false;
 	}
@@ -93,10 +83,7 @@ async function loadAuditLogs() {
 		auditLogs.value = data.logs;
 		actionOptions.value = data.actionOptions;
 	} catch (error: any) {
-		auditError.value =
-			error?.response?.data?.message ||
-			error?.message ||
-			"Unable to load activity.";
+		auditError.value = error?.response?.data?.message || error?.message || "Unable to load activity.";
 	} finally {
 		auditLoading.value = false;
 	}
@@ -142,10 +129,7 @@ onMounted(() => {
 			<div>
 				<p class="admin-dashboard__eyebrow">Owner Console</p>
 				<h1>Site content tools</h1>
-				<p>
-					Editable public pages, owner activity, and storage
-					readiness.
-				</p>
+				<p>Editable public pages, owner activity, and storage readiness.</p>
 			</div>
 
 			<div class="admin-dashboard__actions">
@@ -155,10 +139,7 @@ onMounted(() => {
 				>
 					Edit Characters
 				</RouterLink>
-				<RouterLink
-					class="admin-dashboard__button"
-					:to="{ path: '/about', query: { manage: '1' } }"
-				>
+				<RouterLink class="admin-dashboard__button" :to="{ path: '/about', query: { manage: '1' } }">
 					Edit Story Files
 				</RouterLink>
 				<button
@@ -167,28 +148,17 @@ onMounted(() => {
 					type="button"
 					@click="refreshAll"
 				>
-					{{
-						dashboardLoading || auditLoading
-							? "Refreshing..."
-							: "Refresh"
-					}}
+					{{ dashboardLoading || auditLoading ? "Refreshing..." : "Refresh" }}
 				</button>
 			</div>
 		</header>
 
-		<p
-			v-if="dashboardError"
-			class="admin-dashboard__status admin-dashboard__status--error"
-		>
+		<p v-if="dashboardError" class="admin-dashboard__status admin-dashboard__status--error">
 			{{ dashboardError }}
 		</p>
 
 		<div class="admin-dashboard__metrics" aria-label="Content totals">
-			<article
-				v-for="metric in metricCards"
-				:key="metric.label"
-				class="metric-card"
-			>
+			<article v-for="metric in metricCards" :key="metric.label" class="metric-card">
 				<p>{{ metric.label }}</p>
 				<strong>{{ dashboardLoading ? "-" : metric.value }}</strong>
 			</article>
@@ -202,24 +172,15 @@ onMounted(() => {
 				</div>
 
 				<div class="content-links">
-					<RouterLink
-						class="content-link"
-						:to="{ path: '/characters', query: { manage: '1' } }"
-					>
+					<RouterLink class="content-link" :to="{ path: '/characters', query: { manage: '1' } }">
 						<span>
 							<strong>Characters and factions</strong>
-							<small
-								>Character cards, hero copy, and world
-								notes.</small
-							>
+							<small>Character cards, hero copy, and world notes.</small>
 						</span>
 						<span aria-hidden="true">Open</span>
 					</RouterLink>
 
-					<RouterLink
-						class="content-link"
-						:to="{ path: '/about', query: { manage: '1' } }"
-					>
+					<RouterLink class="content-link" :to="{ path: '/about', query: { manage: '1' } }">
 						<span>
 							<strong>About story files</strong>
 							<small>Story arc summaries and plot beats.</small>
@@ -236,10 +197,7 @@ onMounted(() => {
 				</div>
 
 				<p class="storage-summary">
-					{{
-						dashboard?.storage.switchSummary ||
-						"Storage status is loading."
-					}}
+					{{ dashboard?.storage.switchSummary || "Storage status is loading." }}
 				</p>
 
 				<button
@@ -270,21 +228,13 @@ onMounted(() => {
 			<form class="audit-filters" @submit.prevent="loadAuditLogs">
 				<label>
 					<span>Search</span>
-					<input
-						v-model="filters.search"
-						placeholder="Actor, target, or summary"
-						type="search"
-					/>
+					<input v-model="filters.search" placeholder="Actor, target, or summary" type="search" />
 				</label>
 
 				<label>
 					<span>Category</span>
 					<select v-model="filters.category">
-						<option
-							v-for="option in categoryOptions"
-							:key="option.value"
-							:value="option.value"
-						>
+						<option v-for="option in categoryOptions" :key="option.value" :value="option.value">
 							{{ option.label }}
 						</option>
 					</select>
@@ -294,11 +244,7 @@ onMounted(() => {
 					<span>Action</span>
 					<select v-model="filters.action">
 						<option value="">All actions</option>
-						<option
-							v-for="action in actionOptions"
-							:key="action"
-							:value="action"
-						>
+						<option v-for="action in actionOptions" :key="action" :value="action">
 							{{ action }}
 						</option>
 					</select>
@@ -323,19 +269,12 @@ onMounted(() => {
 				</button>
 			</form>
 
-			<p
-				v-if="auditError"
-				class="admin-dashboard__status admin-dashboard__status--error"
-			>
+			<p v-if="auditError" class="admin-dashboard__status admin-dashboard__status--error">
 				{{ auditError }}
 			</p>
 
-			<div v-if="auditLoading" class="audit-empty">
-				Loading activity...
-			</div>
-			<div v-else-if="!auditLogs.length" class="audit-empty">
-				No matching activity yet.
-			</div>
+			<div v-if="auditLoading" class="audit-empty">Loading activity...</div>
+			<div v-else-if="!auditLogs.length" class="audit-empty">No matching activity yet.</div>
 			<ol v-else class="audit-list">
 				<li v-for="log in auditLogs" :key="log.id" class="audit-item">
 					<div class="audit-item__main">
@@ -381,9 +320,7 @@ onMounted(() => {
 
 					<p class="admin-dashboard__eyebrow">Storage Details</p>
 					<h2 id="storage-dialog-heading">Asset infrastructure</h2>
-					<p>
-						Deployment details for future asset infrastructure work.
-					</p>
+					<p>Deployment details for future asset infrastructure work.</p>
 
 					<dl class="storage-dialog__list">
 						<div v-for="[label, value] in storageRows" :key="label">
@@ -392,10 +329,7 @@ onMounted(() => {
 						</div>
 					</dl>
 
-					<p
-						v-if="dashboard?.storage.nextStep"
-						class="storage-dialog__next"
-					>
+					<p v-if="dashboard?.storage.nextStep" class="storage-dialog__next">
 						{{ dashboard.storage.nextStep }}
 					</p>
 				</section>
