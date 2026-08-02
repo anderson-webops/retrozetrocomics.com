@@ -57,6 +57,7 @@ jobs:
           npm run audit:signatures
           npm run verify:dependency-graph
           npm run verify:deploy-assets
+          npm run verify:install-scripts
           npm run verify:native-lock
           npm run verify:platform-install
           npm run lint

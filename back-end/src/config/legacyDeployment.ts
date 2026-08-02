@@ -114,21 +114,13 @@ export function applyLegacyDeploymentDefaults(
 		}
 	}
 
-	const identityKeys = [
-		"DEPLOYED_AT",
-		"RETROZETRO_RELEASE_VERSION",
-		"SOURCE_REVISION"
-	] as const;
-	const configuredIdentityKeys = identityKeys.filter(key => !isBlank(source[key]));
-	if (configuredIdentityKeys.length > 0 && configuredIdentityKeys.length < identityKeys.length) {
-		throw new TypeError("Legacy release identity must be configured completely or derived from release.json");
-	}
-	if (configuredIdentityKeys.length === 0) {
-		const release = readStaticReleaseMetadata(runtimeStaticRoot);
-		source.DEPLOYED_AT = release.releasedAt;
-		source.RETROZETRO_RELEASE_VERSION = release.version;
-		source.SOURCE_REVISION = release.revision;
-	}
+	// The legacy service can retain stale identity variables across an atomic
+	// static promotion. Its installed release descriptor is the authoritative
+	// identity for this exact compatibility layout.
+	const release = readStaticReleaseMetadata(runtimeStaticRoot);
+	source.DEPLOYED_AT = release.releasedAt;
+	source.RETROZETRO_RELEASE_VERSION = release.version;
+	source.SOURCE_REVISION = release.revision;
 
 	return true;
 }

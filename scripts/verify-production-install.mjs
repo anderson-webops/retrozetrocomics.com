@@ -7,13 +7,21 @@ import process from "node:process";
 
 const repositoryRoot = new URL("../", import.meta.url);
 const temporaryDirectory = await mkdtemp(join(tmpdir(), "retrozetro-production-"));
-const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
+const npmExecPath = process.env.npm_execpath;
+
+if (!npmExecPath) {
+	throw new Error("Run production-install verification through npm so the selected npm executable is known.");
+}
 
 function runNpm(arguments_) {
-	const result = spawnSync(npmCommand, arguments_, {
+	const env = { ...process.env };
+	delete env.npm_config_global_ignore_file;
+	delete env.NPM_CONFIG_GLOBAL_IGNORE_FILE;
+
+	const result = spawnSync(process.execPath, [npmExecPath, ...arguments_], {
 		cwd: temporaryDirectory,
 		encoding: "utf8",
-		env: process.env,
+		env,
 		maxBuffer: 10 * 1024 * 1024
 	});
 	if (result.stdout) process.stdout.write(result.stdout);
