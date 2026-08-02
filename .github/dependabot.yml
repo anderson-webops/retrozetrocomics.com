@@ -1,4 +1,5 @@
 version: 2
+
 updates:
   - package-ecosystem: npm
     directory: /
@@ -8,17 +9,29 @@ updates:
       time: "09:00"
       timezone: America/New_York
     open-pull-requests-limit: 10
+    ignore:
+      # Keep editor/compiler types aligned with the Node 24 LTS and
+      # TypeScript 6 production toolchain until those baselines move.
+      - dependency-name: "@types/node"
+        update-types: [version-update:semver-major]
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+      # These packages must exactly match the transitive native loader that
+      # consumes them. Update them only through the native-lock workflow.
+      - dependency-name: "@esbuild/linux-*"
+      - dependency-name: "@oxc-parser/binding-linux-*"
+      - dependency-name: "@oxfmt/binding-linux-*"
+      - dependency-name: "@rolldown/binding-linux-*"
+      - dependency-name: "@rollup/rollup-linux-*"
+      - dependency-name: "@unrs/resolver-binding-linux-*"
+      - dependency-name: "lightningcss-linux-*"
     groups:
       npm-development:
         dependency-type: development
-        update-types:
-          - minor
-          - patch
+        update-types: [minor, patch]
       npm-production:
         dependency-type: production
-        update-types:
-          - minor
-          - patch
+        update-types: [minor, patch]
 
   - package-ecosystem: github-actions
     directory: /
@@ -27,3 +40,6 @@ updates:
       day: monday
       time: "09:30"
       timezone: America/New_York
+    groups:
+      actions:
+        patterns: ["*"]
