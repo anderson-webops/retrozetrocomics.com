@@ -14,6 +14,24 @@ function mongoAuthority(uri: string) {
 	return uri.replace(/^mongodb(?:\+srv)?:\/\//, "").split(/[/?]/)[0] || "";
 }
 
+function canonicalizeLocalhost(uri: string) {
+	const scheme = "mongodb://";
+	if (!uri.startsWith(scheme)) {
+		return uri;
+	}
+
+	const authority = mongoAuthority(uri);
+	const at = authority.lastIndexOf("@");
+	const host = at >= 0 ? authority.slice(at + 1) : authority;
+	const match = /^localhost(?<port>:\d+)?$/i.exec(host);
+	if (!match) {
+		return uri;
+	}
+
+	const hostOffset = scheme.length + (at >= 0 ? at + 1 : 0);
+	return `${uri.slice(0, hostOffset)}127.0.0.1${match.groups?.port || ""}${uri.slice(scheme.length + authority.length)}`;
+}
+
 function hasStrongCredentials(uri: string) {
 	const authority = mongoAuthority(uri);
 	const at = authority.lastIndexOf("@");
@@ -102,22 +120,23 @@ export function validateMongoUri(uri: string, isProduction: boolean) {
 	if (!isProduction) {
 		return uri;
 	}
+	const canonicalUri = canonicalizeLocalhost(uri);
 
-	if (!hasStrongCredentials(uri)) {
+	if (!hasStrongCredentials(canonicalUri)) {
 		throw new RuntimeConfigurationError(
 			"Production MongoDB requires strong non-placeholder credentials"
 		);
 	}
-	if (!hostsAreLoopback(uri) && !usesTls(uri)) {
+	if (!hostsAreLoopback(canonicalUri) && !usesTls(canonicalUri)) {
 		throw new RuntimeConfigurationError(
 			"Production MongoDB must use TLS unless every host is a literal loopback address"
 		);
 	}
-	if (weakensTls(uri)) {
+	if (weakensTls(canonicalUri)) {
 		throw new RuntimeConfigurationError(
 			"Production MongoDB TLS verification cannot be disabled"
 		);
 	}
 
-	return uri;
+	return canonicalUri;
 }

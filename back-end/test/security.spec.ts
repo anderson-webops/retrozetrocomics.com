@@ -235,6 +235,10 @@ describe("production runtime configuration", () => {
 			true
 		)).toContain("127.0.0.1");
 		expect(validateMongoUri(
+			`mongodb://retro:${password}@localhost:27017/retrozetro`,
+			true
+		)).toBe(`mongodb://retro:${password}@127.0.0.1:27017/retrozetro`);
+		expect(validateMongoUri(
 			`mongodb://retro:${password}@db.example.com:27017/retrozetro?tls=true`,
 			true
 		)).toContain("tls=true");
@@ -244,6 +248,10 @@ describe("production runtime configuration", () => {
 		)).toThrow(/strong non-placeholder/);
 		expect(() => validateMongoUri(
 			`mongodb://retro:${password}@db.example.com:27017/retrozetro`,
+			true
+		)).toThrow(/use TLS/);
+		expect(() => validateMongoUri(
+			`mongodb://retro:${password}@localhost:27017,db.example.com:27017/retrozetro`,
 			true
 		)).toThrow(/use TLS/);
 		expect(() => validateMongoUri(
