@@ -8,9 +8,11 @@ import {
 	StorageUnavailableError,
 	UploadValidationError
 } from "../errors/appError.js";
+import { readNodeEnvironment } from "../config/environment.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const backendRoot = path.resolve(__dirname, "../..");
+const defaultUploadRoot = path.resolve(backendRoot, "uploads");
 const DEFAULT_KEY_PREFIX = "content";
 const DEFAULT_LOCAL_PUBLIC_BASE = "/uploads";
 const DEFAULT_S3_REGION = "us-east-1";
@@ -18,8 +20,48 @@ const LEADING_OR_TRAILING_SLASHES_REGEX = /^\/+|\/+$/g;
 const LEADING_SLASHES_REGEX = /^\/+/;
 const HTTP_PROTOCOL_REGEX = /^https?:\/\//;
 const TRAILING_SLASHES_REGEX = /\/+$/g;
+const ALLOWED_UPLOAD_TYPES = new Map([
+	["application/pdf", ".pdf"],
+	["image/gif", ".gif"],
+	["image/jpeg", ".jpg"],
+	["image/png", ".png"],
+	["image/webp", ".webp"]
+]);
 
-export const uploadRoot = path.resolve(backendRoot, "uploads");
+export function isAllowedUploadMimeType(mimeType: string) {
+	return ALLOWED_UPLOAD_TYPES.has(mimeType);
+}
+
+export function readUploadRoot(source: NodeJS.ProcessEnv = process.env) {
+	const configuredRoot = source.UPLOAD_ROOT?.trim();
+	if (configuredRoot && !path.isAbsolute(configuredRoot)) {
+		throw new TypeError("UPLOAD_ROOT must be an absolute path");
+	}
+
+	const resolvedRoot = configuredRoot
+		? path.resolve(configuredRoot)
+		: defaultUploadRoot;
+	if (resolvedRoot === path.parse(resolvedRoot).root) {
+		throw new TypeError("UPLOAD_ROOT cannot be a filesystem root");
+	}
+	if (readNodeEnvironment(source) === "production") {
+		if (!configuredRoot) {
+			throw new TypeError("UPLOAD_ROOT is required in production");
+		}
+
+		const relativeToRelease = path.relative(backendRoot, resolvedRoot);
+		if (
+			!relativeToRelease
+			|| (!relativeToRelease.startsWith(`..${path.sep}`) && relativeToRelease !== "..")
+		) {
+			throw new TypeError("Production UPLOAD_ROOT must be outside the application release directory");
+		}
+	}
+
+	return resolvedRoot;
+}
+
+export const uploadRoot = readUploadRoot();
 export type StorageDriver = "local" | "s3";
 
 export interface UploadedFile {
@@ -85,6 +127,13 @@ function normalizeStorageKeyPrefix(value?: string | null) {
 		LEADING_OR_TRAILING_SLASHES_REGEX,
 		""
 	);
+	if (
+		!cleaned
+		|| cleaned.length > 120
+		|| !/^[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*$/.test(cleaned)
+	) {
+		throw new TypeError("STORAGE_KEY_PREFIX must contain safe relative path segments only");
+	}
 	return cleaned || DEFAULT_KEY_PREFIX;
 }
 
@@ -137,8 +186,12 @@ function joinPublicUrl(base: string, storageKey: string) {
 	return `/${base.replace(LEADING_OR_TRAILING_SLASHES_REGEX, "")}/${normalizedKey}`;
 }
 
-function createStorageKey(originalName: string, now = new Date()) {
-	const extension = path.extname(originalName).toLowerCase();
+function createStorageKey(file: Pick<UploadedFile, "mimetype">, now = new Date()) {
+	const extension = ALLOWED_UPLOAD_TYPES.get(file.mimetype);
+	if (!extension) {
+		throw new UploadValidationError("Only JPEG, PNG, GIF, WebP, and PDF uploads are supported");
+	}
+
 	return path.posix.join(
 		getStorageKeyPrefix(),
 		now.toISOString().slice(0, 7),
@@ -148,7 +201,7 @@ function createStorageKey(originalName: string, now = new Date()) {
 
 function ensureGeneratedStorageKey(file: UploadedFile) {
 	if (!file.generatedStorageKey) {
-		file.generatedStorageKey = createStorageKey(file.originalname);
+		file.generatedStorageKey = createStorageKey(file);
 	}
 
 	return file.generatedStorageKey;
@@ -263,11 +316,13 @@ function fileFilter(
 	file: UploadedFile,
 	callback: (error: Error | null, acceptFile?: boolean) => void
 ) {
-	if (file.mimetype.startsWith("image/") || file.mimetype === "application/pdf") {
+	if (isAllowedUploadMimeType(file.mimetype)) {
 		return callback(null, true);
 	}
 
-	return callback(new UploadValidationError("Only images and PDF uploads are supported"));
+	return callback(
+		new UploadValidationError("Only JPEG, PNG, GIF, WebP, and PDF uploads are supported")
+	);
 }
 
 export const postUpload = multer({
@@ -285,7 +340,7 @@ export function normalizeUploadedFiles(files: UploadedFile[] = []) {
 		return {
 			kind: file.mimetype.startsWith("image/") ? "image" : "document",
 			mimeType: file.mimetype,
-			originalName: file.originalname,
+			originalName: path.basename(file.originalname).slice(0, 255),
 			provider: "local",
 			size: file.size,
 			storageKey,

@@ -3,6 +3,7 @@
 **/dist
 **/*.tsbuildinfo
 .run
+.retrozetro-release-prepared.json
 
 #package-lock.json
 #pnpm-lock.yaml

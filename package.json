@@ -1,7 +1,7 @@
 {
 	"name": "retrozetro-monorepo",
 	"type": "module",
-	"version": "2.2.0",
+	"version": "2.3.0",
 	"private": true,
 	"packageManager": "npm@12.0.2",
 	"engines": {
@@ -40,8 +40,11 @@
 		"typecheck": "npm run -w front-end typecheck && npm run -w back-end typecheck",
 		"up": "taze major -I && npm run -w front-end up && npm run -w back-end up",
 		"verify:dependency-graph": "node scripts/verify-dependency-graph.mjs",
+		"verify:deploy-assets": "node scripts/verify-deploy-assets.mjs",
+		"verify:direct-runtime": "node scripts/direct-runtime-smoke.mjs",
 		"verify:native-lock": "node scripts/verify-native-lock.mjs",
-		"verify:platform-install": "node scripts/verify-platform-install.mjs"
+		"verify:platform-install": "node scripts/verify-platform-install.mjs",
+		"verify:production-install": "node scripts/verify-production-install.mjs"
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^9.2.0",

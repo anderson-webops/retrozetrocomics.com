@@ -56,9 +56,9 @@
 
 ## Security & Configuration Tips
 
-- The API expects a 32+ character `SESSION_SECRET`, exact `PUBLIC_SITE_ORIGIN`/`ALLOWED_ORIGINS`, and Mongo credentials
-  (`MONGODB_URI` or fully configured Vault). `TRUST_PROXY_HOPS` must match the known reverse-proxy topology and defaults
-  to zero. Load secrets through `.env` files excluded from version control.
+- The API expects non-placeholder 32+ character secrets, HTTPS-only production origins, authenticated MongoDB with TLS
+  away from literal loopback, and either `MONGODB_URI` or fully configured Vault. Production trusts only exact loopback
+  values in `TRUSTED_PROXY_IPS`; numeric proxy-hop trust is unsupported. Load secrets through excluded environment files.
 - `npm run server` already loads `dotenv/config` and will attempt Vault retrieval via `src/vaultClient.ts`; validate
   both code paths when changing auth or persistence.
 - Never commit real credentials or production endpoints. Scrub logs before sharing, and verify rate limiting when

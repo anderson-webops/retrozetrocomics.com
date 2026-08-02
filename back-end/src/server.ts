@@ -1,9 +1,19 @@
 import process, { env, exit } from "node:process";
 import mongoose from "mongoose";
 
-import { createApp } from "./app.js";
-import { connectToMongo } from "./services/database.js";
-import "dotenv/config";
+if (env.NODE_ENV !== "production") {
+	await import("dotenv/config");
+}
+
+const [
+	{ createApp },
+	{ readServerConfig },
+	{ connectToMongo }
+] = await Promise.all([
+	import("./app.js"),
+	import("./config/server.js"),
+	import("./services/database.js")
+]);
 
 function logServerError(message: string, error: unknown) {
 	console.error(message, {
@@ -11,22 +21,13 @@ function logServerError(message: string, error: unknown) {
 	});
 }
 
-function readPort() {
-	const port = Number(env.PORT || 3006);
-	if (!Number.isInteger(port) || port < 1 || port > 65_535) {
-		throw new TypeError("PORT must be an integer from 1 through 65535");
-	}
-
-	return port;
-}
-
 async function main() {
+	const { host, port } = readServerConfig();
 	const app = createApp();
-	const PORT = readPort();
 	await connectToMongo();
 
-	const server = app.listen(PORT, () => {
-		console.log(`Server listening on port ${PORT}!`);
+	const server = app.listen(port, host, () => {
+		console.log(`Server listening on ${host}:${port}`);
 	});
 	server.requestTimeout = 30_000;
 	server.headersTimeout = 15_000;

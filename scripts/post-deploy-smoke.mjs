@@ -39,6 +39,16 @@ assert.equal(healthResponse.status, 200, "API liveness must be public.");
 const health = await healthResponse.json();
 assert.equal(health.version, expectedVersion, "API version differs from the static release.");
 assert.equal(health.revision, expectedRevision, "API revision differs from the static release.");
+assert.match(
+	health.deployedAt || "",
+	/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/,
+	"API deployment timestamp is missing or invalid."
+);
+
+const readinessResponse = await request("/api/readyz");
+assert.equal(readinessResponse.status, 200, "API readiness must pass after promotion.");
+const readiness = await readinessResponse.json();
+assert.equal(readiness.ready, true, "API database readiness is false.");
 
 const rootResponse = await request("/");
 assert.equal(rootResponse.status, 200, "Public homepage must be available.");
@@ -74,10 +84,10 @@ assert.equal(
 );
 
 const diagnosticsResponse = await request("/api/internal/dbinfo");
-assert.ok(
-	[403, 404].includes(diagnosticsResponse.status),
-	"Internal diagnostics must not be public."
-);
+assert.equal(diagnosticsResponse.status, 404, "Internal diagnostics must be blocked at the edge.");
+
+const adminResponse = await request("/api/admin/dashboard");
+assert.equal(adminResponse.status, 401, "Admin APIs must reject unauthenticated requests.");
 
 process.stdout.write(
 	`Verified ${origin} at ${expectedVersion} (${expectedRevision}).\n`

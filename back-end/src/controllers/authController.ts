@@ -12,7 +12,7 @@ import { Admin } from "../models/schemas/Admin.js";
 import { recordAuditLog } from "../services/auditLog.js";
 
 const loginSchema = z.object({
-	email: z.string().email(),
+	email: z.string().trim().email().max(254),
 	password: z.string().min(1).max(1024)
 });
 const dummyHashPromise = argon2.hash(

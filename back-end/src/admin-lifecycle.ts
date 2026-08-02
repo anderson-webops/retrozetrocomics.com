@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { Admin } from "./models/schemas/Admin.js";
 import { AuditLog } from "./models/schemas/AuditLog.js";
+import { withAdminLifecycleLock } from "./services/adminLifecycleLock.js";
 import { recordAuditLog } from "./services/auditLog.js";
 import { connectToMongo } from "./services/database.js";
 import "dotenv/config";
@@ -17,7 +18,7 @@ const commandSchema = z.enum([
 	"reset-password",
 	"sanitize-audit-logs"
 ]);
-const emailSchema = z.string().trim().email().transform(value => value.toLowerCase());
+const emailSchema = z.string().trim().email().max(254).transform(value => value.toLowerCase());
 const passwordSchema = z.string().min(14).max(256);
 
 function readOption(name: string) {
@@ -107,20 +108,26 @@ async function handleCreate(email: string, apply: boolean) {
 	}
 
 	const password = readPassword();
-	const admin = await Admin.create({
-		email,
-		name,
-		password,
-		role: "admin",
-		status: "active"
+	await withAdminLifecycleLock(async () => {
+		if (await Admin.exists({ email })) {
+			throw new Error(`An account already exists for ${maskEmail(email)}`);
+		}
+
+		const admin = await Admin.create({
+			email,
+			name,
+			password,
+			role: "admin",
+			status: "active"
+		});
+		await recordLifecycleAction(
+			"ADMIN_ACCOUNT_CREATED",
+			admin,
+			"Created an admin account",
+			null,
+			{ role: "admin", status: "active" }
+		);
 	});
-	await recordLifecycleAction(
-		"ADMIN_ACCOUNT_CREATED",
-		admin,
-		"Created an admin account",
-		null,
-		{ role: "admin", status: "active" }
-	);
 }
 
 async function handleStatusChange(
@@ -138,32 +145,51 @@ async function handleStatusChange(
 		return;
 	}
 
-	if (status === "disabled") {
-		const activeAdminCount = await Admin.countDocuments({
-			role: "admin",
-			status: "active"
-		});
-		if (activeAdminCount <= 1) {
-			throw new Error("Refusing to disable the final active admin account");
-		}
-	}
-
 	console.log(`${apply ? "Changing" : "Would change"} ${maskEmail(email)} to ${status}.`);
 	if (!apply) {
+		if (status === "disabled") {
+			const activeAdminCount = await Admin.countDocuments({
+				role: "admin",
+				status: "active"
+			});
+			if (activeAdminCount <= 1) {
+				throw new Error("Refusing to disable the final active admin account");
+			}
+		}
+
 		return;
 	}
 
-	const previousStatus = admin.status;
-	admin.status = status;
-	admin.sessionVersion += 1;
-	await admin.save();
-	await recordLifecycleAction(
-		status === "active" ? "ADMIN_ACCOUNT_ENABLED" : "ADMIN_ACCOUNT_DISABLED",
-		admin,
-		status === "active" ? "Enabled an admin account" : "Disabled an admin account",
-		{ status: previousStatus },
-		{ status }
-	);
+	await withAdminLifecycleLock(async () => {
+		const currentAdmin = await Admin.findOne({ email });
+		if (!currentAdmin) {
+			throw new Error(`No account exists for ${maskEmail(email)}`);
+		}
+		if (currentAdmin.status === status) {
+			throw new Error(`Admin ${maskEmail(email)} is already ${status}`);
+		}
+		if (status === "disabled") {
+			const activeAdminCount = await Admin.countDocuments({
+				role: "admin",
+				status: "active"
+			});
+			if (activeAdminCount <= 1) {
+				throw new Error("Refusing to disable the final active admin account");
+			}
+		}
+
+		const previousStatus = currentAdmin.status;
+		currentAdmin.status = status;
+		currentAdmin.sessionVersion += 1;
+		await currentAdmin.save();
+		await recordLifecycleAction(
+			status === "active" ? "ADMIN_ACCOUNT_ENABLED" : "ADMIN_ACCOUNT_DISABLED",
+			currentAdmin,
+			status === "active" ? "Enabled an admin account" : "Disabled an admin account",
+			{ status: previousStatus },
+			{ status }
+		);
+	});
 }
 
 async function handlePasswordReset(email: string, apply: boolean) {
@@ -177,15 +203,23 @@ async function handlePasswordReset(email: string, apply: boolean) {
 		return;
 	}
 
-	admin.password = readPassword();
-	await admin.save();
-	await recordLifecycleAction(
-		"ADMIN_PASSWORD_RESET",
-		admin,
-		"Reset an admin password and revoked existing sessions",
-		null,
-		{ sessionsRevoked: true }
-	);
+	const password = readPassword();
+	await withAdminLifecycleLock(async () => {
+		const currentAdmin = await Admin.findOne({ email });
+		if (!currentAdmin) {
+			throw new Error(`No account exists for ${maskEmail(email)}`);
+		}
+
+		currentAdmin.password = password;
+		await currentAdmin.save();
+		await recordLifecycleAction(
+			"ADMIN_PASSWORD_RESET",
+			currentAdmin,
+			"Reset an admin password and revoked existing sessions",
+			null,
+			{ sessionsRevoked: true }
+		);
+	});
 }
 
 async function handleAuditSanitization(apply: boolean) {

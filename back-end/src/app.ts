@@ -10,6 +10,11 @@ import helmet from "helmet";
 import mongoose from "mongoose";
 
 import {
+	readReleaseIdentity,
+	type ReleaseIdentity,
+	verifyStaticReleaseIdentity
+} from "./config/release.js";
+import {
 	readSecurityConfig,
 	SESSION_ABSOLUTE_LIFETIME_MS
 } from "./config/security.js";
@@ -44,14 +49,16 @@ function secretsMatch(expected: string | undefined, supplied: string | undefined
 
 function healthHandler(
 	_req: express.Request,
-	res: express.Response
+	res: express.Response,
+	identity: ReleaseIdentity
 ) {
 	return res
 		.set("Cache-Control", "no-store")
 		.json({
+			deployedAt: identity.deployedAt,
 			ok: true,
-			revision: env.SOURCE_REVISION || "development",
-			version: env.RETROZETRO_RELEASE_VERSION || "development"
+			revision: identity.revision,
+			version: identity.version
 		});
 }
 
@@ -91,15 +98,23 @@ async function readinessHandler(
 
 export function createApp() {
 	const config = readSecurityConfig();
+	const releaseIdentity = readReleaseIdentity(env, config.isProduction);
 	const app = express();
 	const apiRouter = express.Router();
 	const staticRoot = env.STATIC_SITE_DIR?.trim()
 		? path.resolve(env.STATIC_SITE_DIR)
 		: defaultStaticRoot;
 	const inlineScriptHashes = readInlineScriptHashes(staticRoot);
+	verifyStaticReleaseIdentity(staticRoot, releaseIdentity, config.isProduction);
 
 	app.disable("x-powered-by");
-	app.set("trust proxy", config.trustProxyHops || false);
+	if (config.trustedProxyIps.length > 0) {
+		const trustedProxyIps = new Set(config.trustedProxyIps);
+		app.set("trust proxy", (ip: string) => trustedProxyIps.has(ip));
+	}
+	else {
+		app.set("trust proxy", false);
+	}
 
 	app.use(
 		helmet({
@@ -166,7 +181,7 @@ export function createApp() {
 
 	ensureUploadDirectories();
 
-	apiRouter.get("/healthz", healthHandler);
+	apiRouter.get("/healthz", (req, res) => healthHandler(req, res, releaseIdentity));
 	apiRouter.get("/readyz", readinessHandler);
 	apiRouter.get("/internal/dbinfo", (req, res) => {
 		const suppliedKey = req.get("x-internal-diagnostics-key");
@@ -199,7 +214,7 @@ export function createApp() {
 	});
 
 	app.use("/api", apiRouter);
-	app.get("/healthz", healthHandler);
+	app.get("/healthz", (req, res) => healthHandler(req, res, releaseIdentity));
 	app.get("/readyz", readinessHandler);
 	app.use(
 		"/uploads",
@@ -207,7 +222,15 @@ export function createApp() {
 			dotfiles: "deny",
 			fallthrough: false,
 			index: false,
-			maxAge: "1h"
+			maxAge: "1h",
+			setHeaders(response, filePath) {
+				response.setHeader("Content-Security-Policy", "default-src 'none'; sandbox");
+				response.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+				response.setHeader("X-Content-Type-Options", "nosniff");
+				if (filePath.endsWith(".pdf")) {
+					response.setHeader("Content-Disposition", "attachment");
+				}
+			}
 		})
 	);
 

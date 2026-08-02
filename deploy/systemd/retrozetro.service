@@ -1,0 +1,45 @@
+[Unit]
+Description=RetroZetro Comics web application
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=retrozetro
+Group=retrozetro
+WorkingDirectory=/srv/retrozetro/current
+Environment=NODE_ENV=production
+EnvironmentFile=/etc/retrozetro/retrozetro.env
+EnvironmentFile=/etc/retrozetro/release.env
+ExecStart=/usr/bin/node back-end/dist/server.js
+Restart=on-failure
+RestartSec=5s
+TimeoutStartSec=30s
+TimeoutStopSec=15s
+UMask=0077
+
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectSystem=strict
+ProcSubset=pid
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+ReadWritePaths=/srv/retrozetro/shared/uploads
+
+[Install]
+WantedBy=multi-user.target
