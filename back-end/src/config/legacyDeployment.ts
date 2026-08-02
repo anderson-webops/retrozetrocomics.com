@@ -89,9 +89,11 @@ export function applyLegacyDeploymentDefaults(
 		return false;
 	}
 
+	// The exact legacy deployment serves static files from /var/www. Ignore a
+	// stale service-level STATIC_SITE_DIR that may still reference the removed
+	// /srv/retrozetrocomics.com/front-end tree.
 	const runtimeStaticRoot = path.resolve(
-		source.STATIC_SITE_DIR?.trim()
-		|| options.staticRoot
+		options.staticRoot
 		|| LEGACY_STATIC_ROOT
 	);
 	source.STATIC_SITE_DIR = runtimeStaticRoot;

@@ -136,6 +136,7 @@ describe("production runtime configuration", () => {
 			);
 			const source: NodeJS.ProcessEnv = {
 				NODE_ENV: "production",
+				STATIC_SITE_DIR: `${LEGACY_BACKEND_ROOT}/../front-end/dist`,
 				VAULT_ADDR: "http://127.0.0.1:8200"
 			};
 
