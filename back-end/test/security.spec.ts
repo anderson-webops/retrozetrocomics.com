@@ -10,6 +10,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { validateMongoUri } from "../src/config/mongodb.js";
 import {
+	applyLegacyDeploymentDefaults,
+	LEGACY_BACKEND_ROOT
+} from "../src/config/legacyDeployment.js";
+import {
 	declaredReleaseVersion,
 	readReleaseIdentity,
 	verifyStaticReleaseIdentity
@@ -119,6 +123,61 @@ describe("security configuration", () => {
 });
 
 describe("production runtime configuration", () => {
+	it("adapts only the exact legacy mutable deployment layout", () => {
+		const temporaryRoot = mkdtempSync(path.join(os.tmpdir(), "retro-legacy-static-"));
+		try {
+			writeFileSync(
+				path.join(temporaryRoot, "release.json"),
+				JSON.stringify({
+					releasedAt: null,
+					revision: "a".repeat(40),
+					version: declaredReleaseVersion
+				})
+			);
+			const source: NodeJS.ProcessEnv = {
+				NODE_ENV: "production",
+				VAULT_ADDR: "http://127.0.0.1:8200"
+			};
+
+			expect(applyLegacyDeploymentDefaults(source, {
+				backendRoot: LEGACY_BACKEND_ROOT,
+				staticRoot: temporaryRoot
+			})).toBe(true);
+			expect(source.STATIC_SITE_DIR).toBe(temporaryRoot);
+			expect(source.UPLOAD_ROOT).toBe(`${LEGACY_BACKEND_ROOT}/uploads`);
+			expect(source.TRUSTED_PROXY_IPS).toBe("127.0.0.1,::1");
+			expect(source.VAULT_ALLOW_HTTP).toBe("true");
+			expect(source.RETROZETRO_RELEASE_VERSION).toBe(declaredReleaseVersion);
+			expect(source.SOURCE_REVISION).toBe("a".repeat(40));
+			expect(source.DEPLOYED_AT).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+			expect(readUploadRoot(source, LEGACY_BACKEND_ROOT)).toBe(`${LEGACY_BACKEND_ROOT}/uploads`);
+			expect(() => readUploadRoot({
+				NODE_ENV: "production",
+				UPLOAD_ROOT: `${LEGACY_BACKEND_ROOT}/other`
+			}, LEGACY_BACKEND_ROOT)).toThrow(/outside/);
+			expect(readReleaseIdentity(source, true).revision).toBe("a".repeat(40));
+
+			const unrelated: NodeJS.ProcessEnv = { NODE_ENV: "production" };
+			expect(applyLegacyDeploymentDefaults(unrelated, {
+				backendRoot: "/srv/another-site/back-end",
+				staticRoot: temporaryRoot
+			})).toBe(false);
+			expect(unrelated.UPLOAD_ROOT).toBeUndefined();
+		}
+		finally {
+			rmSync(temporaryRoot, { force: true, recursive: true });
+		}
+	});
+
+	it("rejects partial legacy release identity instead of mixing sources", () => {
+		expect(() => applyLegacyDeploymentDefaults({
+			NODE_ENV: "production",
+			SOURCE_REVISION: "a".repeat(40)
+		}, {
+			backendRoot: LEGACY_BACKEND_ROOT
+		})).toThrow(/configured completely/);
+	});
+
 	it("binds production only to a literal loopback address", () => {
 		expect(readServerConfig({
 			HOST: "127.0.0.1",

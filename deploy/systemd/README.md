@@ -17,3 +17,9 @@ or routing outside the existing Nginx TLS server.
 
 Do not replace `/srv/retrozetro/current` with a directory, place secrets in a release checkout, or write uploads into a
 release. Do not promote while the historical Vault AppRole credential remains valid.
+
+The application retains a narrowly scoped transition adapter for the pre-existing
+`/srv/retrozetrocomics.com/back-end` plus `/var/www/retrozetrocomics.com` deployment. It supplies only non-secret,
+exact-path defaults and derives release identity from the installed `release.json`; all credential, MongoDB, origin,
+and runtime validation remains enforced. This compatibility path does not replace the credential rotation or the
+atomic direct-release migration above.

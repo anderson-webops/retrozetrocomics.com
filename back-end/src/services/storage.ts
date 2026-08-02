@@ -9,10 +9,10 @@ import {
 	UploadValidationError
 } from "../errors/appError.js";
 import { readNodeEnvironment } from "../config/environment.js";
+import { LEGACY_BACKEND_ROOT } from "../config/legacyDeployment.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const backendRoot = path.resolve(__dirname, "../..");
-const defaultUploadRoot = path.resolve(backendRoot, "uploads");
 const DEFAULT_KEY_PREFIX = "content";
 const DEFAULT_LOCAL_PUBLIC_BASE = "/uploads";
 const DEFAULT_S3_REGION = "us-east-1";
@@ -32,7 +32,11 @@ export function isAllowedUploadMimeType(mimeType: string) {
 	return ALLOWED_UPLOAD_TYPES.has(mimeType);
 }
 
-export function readUploadRoot(source: NodeJS.ProcessEnv = process.env) {
+export function readUploadRoot(
+	source: NodeJS.ProcessEnv = process.env,
+	applicationRoot = backendRoot
+) {
+	const resolvedApplicationRoot = path.resolve(applicationRoot);
 	const configuredRoot = source.UPLOAD_ROOT?.trim();
 	if (configuredRoot && !path.isAbsolute(configuredRoot)) {
 		throw new TypeError("UPLOAD_ROOT must be an absolute path");
@@ -40,7 +44,7 @@ export function readUploadRoot(source: NodeJS.ProcessEnv = process.env) {
 
 	const resolvedRoot = configuredRoot
 		? path.resolve(configuredRoot)
-		: defaultUploadRoot;
+		: path.resolve(resolvedApplicationRoot, "uploads");
 	if (resolvedRoot === path.parse(resolvedRoot).root) {
 		throw new TypeError("UPLOAD_ROOT cannot be a filesystem root");
 	}
@@ -49,10 +53,15 @@ export function readUploadRoot(source: NodeJS.ProcessEnv = process.env) {
 			throw new TypeError("UPLOAD_ROOT is required in production");
 		}
 
-		const relativeToRelease = path.relative(backendRoot, resolvedRoot);
+		const isPreservedLegacyUploadRoot = resolvedApplicationRoot === LEGACY_BACKEND_ROOT
+			&& resolvedRoot === path.join(LEGACY_BACKEND_ROOT, "uploads");
+		const relativeToRelease = path.relative(resolvedApplicationRoot, resolvedRoot);
 		if (
-			!relativeToRelease
-			|| (!relativeToRelease.startsWith(`..${path.sep}`) && relativeToRelease !== "..")
+			!isPreservedLegacyUploadRoot
+			&& (
+				!relativeToRelease
+				|| (!relativeToRelease.startsWith(`..${path.sep}`) && relativeToRelease !== "..")
+			)
 		) {
 			throw new TypeError("Production UPLOAD_ROOT must be outside the application release directory");
 		}

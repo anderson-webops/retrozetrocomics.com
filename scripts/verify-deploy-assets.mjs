@@ -10,11 +10,14 @@ const relativePaths = {
 	ci: ".github/workflows/ci.yml",
 	environment: "deploy/systemd/retrozetro.env.example",
 	install: "deploy/systemd/install-service.sh",
+	legacyRuntime: "back-end/src/config/legacyDeployment.ts",
 	nginx: "deploy/nginx/retrozetro.locations.conf",
 	prepare: "deploy/systemd/prepare-release.sh",
 	promote: "deploy/systemd/promote-release.sh",
 	releaseWorkflow: ".github/workflows/release-source.yml",
-	service: "deploy/systemd/retrozetro.service"
+	runtimeServer: "back-end/src/server.ts",
+	service: "deploy/systemd/retrozetro.service",
+	storage: "back-end/src/services/storage.ts"
 };
 
 async function exists(relativePath) {
@@ -44,19 +47,25 @@ for (const removedPath of [
 const [
 	ci,
 	environment,
+	legacyRuntime,
 	nginx,
 	prepare,
 	promote,
 	releaseWorkflow,
-	service
+	runtimeServer,
+	service,
+	storage
 ] = await Promise.all([
 	read(relativePaths.ci),
 	read(relativePaths.environment),
+	read(relativePaths.legacyRuntime),
 	read(relativePaths.nginx),
 	read(relativePaths.prepare),
 	read(relativePaths.promote),
 	read(relativePaths.releaseWorkflow),
-	read(relativePaths.service)
+	read(relativePaths.runtimeServer),
+	read(relativePaths.service),
+	read(relativePaths.storage)
 ]);
 
 assert.doesNotMatch(`${ci}\n${releaseWorkflow}`, /\bdocker\b|\bghcr\.io\b/i);
@@ -79,6 +88,23 @@ assert.match(environment, /^HOST=127\.0\.0\.1$/m);
 assert.match(environment, /^UPLOAD_ROOT=\/srv\/retrozetro\/shared\/uploads$/m);
 assert.match(environment, /^TRUSTED_PROXY_IPS=127\.0\.0\.1,::1$/m);
 assert.doesNotMatch(environment, /TRUST_PROXY_HOPS/);
+assert.match(legacyRuntime, /LEGACY_BACKEND_ROOT = "\/srv\/retrozetrocomics\.com\/back-end"/);
+assert.match(legacyRuntime, /LEGACY_STATIC_ROOT = "\/var\/www\/retrozetrocomics\.com"/);
+assert.match(legacyRuntime, /Legacy release identity must be configured completely/);
+assert.match(runtimeServer, /await import\("dotenv\/config"\)/);
+assert.match(runtimeServer, /applyLegacyDeploymentDefaults\(env\)/);
+assert.match(storage, /resolvedApplicationRoot === LEGACY_BACKEND_ROOT/);
+assert.match(storage, /resolvedRoot === path\.join\(LEGACY_BACKEND_ROOT, "uploads"\)/);
+
+const backEndPackage = JSON.parse(await read("back-end/package.json"));
+for (const installScript of [
+	"argon2@0.45.1",
+	"esbuild@0.28.1",
+	"fsevents@2.3.2",
+	"fsevents@2.3.3"
+]) {
+	assert.equal(backEndPackage.allowScripts?.[installScript], true);
+}
 
 assert.match(nginx, /location = \/api\/internal\/dbinfo[\s\S]*?return 404;/);
 assert.match(nginx, /proxy_pass http:\/\/127\.0\.0\.1:3006;/);

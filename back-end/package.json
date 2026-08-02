@@ -36,6 +36,12 @@
 		"js-yaml": "4.3.0",
 		"qs": "6.15.3"
 	},
+	"allowScripts": {
+		"argon2@0.45.1": true,
+		"esbuild@0.28.1": true,
+		"fsevents@2.3.2": true,
+		"fsevents@2.3.3": true
+	},
 	"dependencies": {
 		"argon2": "^0.45.1",
 		"cookie-session": "^2.1.1",

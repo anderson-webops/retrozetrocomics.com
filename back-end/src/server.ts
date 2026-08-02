@@ -1,9 +1,10 @@
 import process, { env, exit } from "node:process";
 import mongoose from "mongoose";
 
-if (env.NODE_ENV !== "production") {
-	await import("dotenv/config");
-}
+await import("dotenv/config");
+
+const { applyLegacyDeploymentDefaults } = await import("./config/legacyDeployment.js");
+applyLegacyDeploymentDefaults(env);
 
 const [
 	{ createApp },
