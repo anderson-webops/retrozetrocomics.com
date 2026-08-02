@@ -81,6 +81,7 @@ npm run lint
 npm run typecheck
 npm test
 npm run build
+npm run verify:startup-diagnostics
 npm run a11y
 npm run verify:production-install
 git diff --check

@@ -45,7 +45,8 @@
 		"verify:install-scripts": "node scripts/verify-install-script-policy.mjs",
 		"verify:native-lock": "node scripts/verify-native-lock.mjs",
 		"verify:platform-install": "node scripts/verify-platform-install.mjs",
-		"verify:production-install": "node scripts/verify-production-install.mjs"
+		"verify:production-install": "node scripts/verify-production-install.mjs",
+		"verify:startup-diagnostics": "node scripts/verify-startup-diagnostics.mjs"
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^9.2.0",

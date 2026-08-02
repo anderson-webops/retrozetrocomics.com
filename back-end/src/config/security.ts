@@ -1,5 +1,6 @@
 import net from "node:net";
 
+import { RuntimeConfigurationError } from "../errors/runtimeError.js";
 import { readNodeEnvironment } from "./environment.js";
 
 const DEFAULT_SITE_ORIGIN = "https://retrozetrocomics.com";
@@ -19,15 +20,19 @@ function parseOrigin(value: string, variableName: string, isProduction: boolean)
 		origin = new URL(trimmed);
 	}
 	catch {
-		throw new TypeError(`${variableName} must contain a valid HTTP(S) origin`);
+		throw new RuntimeConfigurationError(
+			`${variableName} must contain a valid HTTP(S) origin`
+		);
 	}
 
 	if (!(["http:", "https:"] as const).includes(origin.protocol as "http:" | "https:") || origin.origin !== trimmed) {
-		throw new TypeError(`${variableName} must contain an origin without a path, query, or fragment`);
+		throw new RuntimeConfigurationError(
+			`${variableName} must contain an origin without a path, query, or fragment`
+		);
 	}
 
 	if (isProduction && origin.protocol !== "https:") {
-		throw new TypeError(`${variableName} must use HTTPS in production`);
+		throw new RuntimeConfigurationError(`${variableName} must use HTTPS in production`);
 	}
 
 	return origin.origin;
@@ -42,11 +47,15 @@ function parseSecretList(value?: string) {
 
 function requireStrongSecret(secret: string, variableName: string) {
 	if (secret.length < MINIMUM_SECRET_LENGTH || secret.length > 512) {
-		throw new TypeError(`${variableName} must be between ${MINIMUM_SECRET_LENGTH} and 512 characters`);
+		throw new RuntimeConfigurationError(
+			`${variableName} must be between ${MINIMUM_SECRET_LENGTH} and 512 characters`
+		);
 	}
 
 	if (PLACEHOLDER_SECRET.test(secret) || /^(.)\1{31,}$/.test(secret)) {
-		throw new TypeError(`${variableName} must not use a placeholder or repeated-character value`);
+		throw new RuntimeConfigurationError(
+			`${variableName} must not use a placeholder or repeated-character value`
+		);
 	}
 
 	return secret;
@@ -66,12 +75,16 @@ function parseTrustedProxyIps(value: string | undefined, isProduction: boolean) 
 
 	for (const ip of ips) {
 		if (net.isIP(ip) === 0) {
-			throw new TypeError(`TRUSTED_PROXY_IPS accepts exact IP addresses only: ${ip}`);
+			throw new RuntimeConfigurationError(
+				"TRUSTED_PROXY_IPS accepts exact IP addresses only"
+			);
 		}
 	}
 
 	if (isProduction && (ips.length === 0 || ips.some(ip => !isLoopbackIp(ip)))) {
-		throw new TypeError("Production requires one or more exact loopback TRUSTED_PROXY_IPS values");
+		throw new RuntimeConfigurationError(
+			"Production requires one or more exact loopback TRUSTED_PROXY_IPS values"
+		);
 	}
 
 	return ips;
@@ -91,7 +104,9 @@ export function readSecurityConfig(source: NodeJS.ProcessEnv = process.env): Sec
 	const nodeEnvironment = readNodeEnvironment(source);
 	const isProduction = nodeEnvironment === "production";
 	if (source.TRUST_PROXY_HOPS?.trim()) {
-		throw new TypeError("TRUST_PROXY_HOPS is no longer supported; configure exact TRUSTED_PROXY_IPS values");
+		throw new RuntimeConfigurationError(
+			"TRUST_PROXY_HOPS is no longer supported; configure exact TRUSTED_PROXY_IPS values"
+		);
 	}
 
 	const primarySecret = requireStrongSecret(
@@ -102,7 +117,9 @@ export function readSecurityConfig(source: NodeJS.ProcessEnv = process.env): Sec
 		.map(secret => requireStrongSecret(secret, "SESSION_SECRET_PREVIOUS"));
 	const sessionKeys = [...new Set([primarySecret, ...previousSecrets])];
 	if (sessionKeys.length > MAXIMUM_SESSION_KEYS) {
-		throw new TypeError(`At most ${MAXIMUM_SESSION_KEYS} session signing keys may be configured`);
+		throw new RuntimeConfigurationError(
+			`At most ${MAXIMUM_SESSION_KEYS} session signing keys may be configured`
+		);
 	}
 
 	const siteOrigin = parseOrigin(

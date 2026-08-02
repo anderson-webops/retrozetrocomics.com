@@ -19,6 +19,7 @@ const relativePaths = {
 	releaseWorkflow: ".github/workflows/release-source.yml",
 	runtimeServer: "back-end/src/server.ts",
 	service: "deploy/systemd/retrozetro.service",
+	startupDiagnostics: "scripts/verify-startup-diagnostics.mjs",
 	storage: "back-end/src/services/storage.ts"
 };
 
@@ -58,6 +59,7 @@ const [
 	releaseWorkflow,
 	runtimeServer,
 	service,
+	startupDiagnostics,
 	storage
 ] = await Promise.all([
 	read(relativePaths.ci),
@@ -71,6 +73,7 @@ const [
 	read(relativePaths.releaseWorkflow),
 	read(relativePaths.runtimeServer),
 	read(relativePaths.service),
+	read(relativePaths.startupDiagnostics),
 	read(relativePaths.storage)
 ]);
 
@@ -102,9 +105,16 @@ assert.match(legacyRuntime, /const release = readStaticReleaseMetadata\(runtimeS
 assert.match(legacyRuntime, /source\.DEPLOYED_AT = release\.releasedAt/);
 assert.match(legacyRuntime, /source\.RETROZETRO_RELEASE_VERSION = release\.version/);
 assert.match(legacyRuntime, /source\.SOURCE_REVISION = release\.revision/);
+assert.match(legacyRuntime, /delete source\.TRUST_PROXY_HOPS/);
 assert.doesNotMatch(legacyRuntime, /configuredIdentityKeys/);
 assert.match(runtimeServer, /await import\("dotenv\/config"\)/);
 assert.match(runtimeServer, /applyLegacyDeploymentDefaults\(env\)/);
+assert.match(runtimeServer, /describeRuntimeError\(error\)/);
+assert.match(ci, /verify:startup-diagnostics/);
+assert.match(releaseWorkflow, /verify:startup-diagnostics/);
+assert.match(prepare, /verify:startup-diagnostics/);
+assert.match(startupDiagnostics, /RuntimeConfigurationError/);
+assert.match(startupDiagnostics, /assert\.doesNotMatch\(stderr, \/mongodb:/);
 assert.match(storage, /resolvedApplicationRoot === LEGACY_BACKEND_ROOT/);
 assert.match(storage, /resolvedRoot === path\.join\(LEGACY_BACKEND_ROOT, "uploads"\)/);
 

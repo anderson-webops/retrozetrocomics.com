@@ -1,5 +1,7 @@
 import net from "node:net";
 
+import { RuntimeConfigurationError } from "./errors/runtimeError.js";
+
 const DEFAULT_MONGODB_SECRET_PATH = "secret/data/retrozetro/mongodb";
 const MAXIMUM_VAULT_RESPONSE_BYTES = 64 * 1024;
 const PLACEHOLDER_SECRET = /^(?:replace(?:[-_ ]with)?|change[-_ ]?me|example)(?:[-_ ]|$)/i;
@@ -28,7 +30,7 @@ function parseBoolean(value: string | undefined, variableName: string) {
 		return true;
 	}
 
-	throw new TypeError(`${variableName} must be true or false`);
+	throw new RuntimeConfigurationError(`${variableName} must be true or false`);
 }
 
 function isPrivateLiteralIp(hostname: string) {
@@ -59,7 +61,9 @@ function requireVaultCredential(value: string, variableName: string) {
 		|| PLACEHOLDER_SECRET.test(value)
 		|| /^(.)\1{15,}$/.test(value)
 	) {
-		throw new TypeError(`${variableName} must contain a strong non-placeholder credential`);
+		throw new RuntimeConfigurationError(
+			`${variableName} must contain a strong non-placeholder credential`
+		);
 	}
 
 	return value;
@@ -74,7 +78,9 @@ function readSecretPath(value?: string) {
 		|| secretPath.endsWith("/")
 		|| secretPath.split("/").some(segment => !segment || segment === "." || segment === "..")
 	) {
-		throw new TypeError("VAULT_MONGODB_SECRET_PATH must be a bounded relative Vault API path");
+		throw new RuntimeConfigurationError(
+			"VAULT_MONGODB_SECRET_PATH must be a bounded relative Vault API path"
+		);
 	}
 
 	return secretPath;
@@ -90,7 +96,9 @@ export function readVaultConfig(source: NodeJS.ProcessEnv = process.env): VaultC
 		throw new VaultNotConfiguredError();
 	}
 	if (configuredCount !== 3) {
-		throw new TypeError("VAULT_ADDR, VAULT_ROLE_ID, and VAULT_SECRET_ID must be configured together");
+		throw new RuntimeConfigurationError(
+			"VAULT_ADDR, VAULT_ROLE_ID, and VAULT_SECRET_ID must be configured together"
+		);
 	}
 
 	let url: URL;
@@ -98,7 +106,7 @@ export function readVaultConfig(source: NodeJS.ProcessEnv = process.env): VaultC
 		url = new URL(address);
 	}
 	catch {
-		throw new TypeError("VAULT_ADDR must be a valid HTTPS origin");
+		throw new RuntimeConfigurationError("VAULT_ADDR must be a valid HTTPS origin");
 	}
 
 	if (
@@ -108,19 +116,21 @@ export function readVaultConfig(source: NodeJS.ProcessEnv = process.env): VaultC
 		|| url.search
 		|| url.hash
 	) {
-		throw new TypeError("VAULT_ADDR must be an origin without credentials, path, query, or fragment");
+		throw new RuntimeConfigurationError(
+			"VAULT_ADDR must be an origin without credentials, path, query, or fragment"
+		);
 	}
 
 	const allowHttp = parseBoolean(source.VAULT_ALLOW_HTTP, "VAULT_ALLOW_HTTP");
 	if (url.protocol === "http:") {
 		if (!allowHttp || !isPrivateLiteralIp(url.hostname)) {
-			throw new TypeError(
+			throw new RuntimeConfigurationError(
 				"HTTP Vault requires VAULT_ALLOW_HTTP=true and a private literal IP address"
 			);
 		}
 	}
 	else if (url.protocol !== "https:") {
-		throw new TypeError("VAULT_ADDR must use HTTPS");
+		throw new RuntimeConfigurationError("VAULT_ADDR must use HTTPS");
 	}
 
 	return {

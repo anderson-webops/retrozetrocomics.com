@@ -7,6 +7,8 @@ import {
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { RuntimeConfigurationError } from "../errors/runtimeError.js";
+
 const backendRoot = path.resolve(
 	path.dirname(fileURLToPath(import.meta.url)),
 	"../.."
@@ -44,7 +46,9 @@ function readStaticReleaseMetadata(staticRoot: string): StaticReleaseMetadata {
 	try {
 		metadata = fstatSync(descriptor);
 		if (!metadata.isFile() || metadata.size > 16 * 1024) {
-			throw new TypeError("Legacy static release metadata must be a bounded regular file");
+			throw new RuntimeConfigurationError(
+				"Legacy static release metadata must be a bounded regular file"
+			);
 		}
 		parsed = JSON.parse(readFileSync(descriptor, "utf8")) as Record<string, unknown>;
 	}
@@ -65,7 +69,7 @@ function readStaticReleaseMetadata(staticRoot: string): StaticReleaseMetadata {
 			)
 		)
 	) {
-		throw new TypeError("Legacy static release metadata is invalid");
+		throw new RuntimeConfigurationError("Legacy static release metadata is invalid");
 	}
 
 	return {
@@ -103,6 +107,7 @@ export function applyLegacyDeploymentDefaults(
 	if (isBlank(source.TRUSTED_PROXY_IPS)) {
 		source.TRUSTED_PROXY_IPS = "127.0.0.1,::1";
 	}
+	delete source.TRUST_PROXY_HOPS;
 
 	if (isBlank(source.VAULT_ALLOW_HTTP) && source.VAULT_ADDR?.trim()) {
 		try {

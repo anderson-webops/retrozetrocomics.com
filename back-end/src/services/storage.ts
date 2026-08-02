@@ -8,6 +8,7 @@ import {
 	StorageUnavailableError,
 	UploadValidationError
 } from "../errors/appError.js";
+import { RuntimeConfigurationError } from "../errors/runtimeError.js";
 import { readNodeEnvironment } from "../config/environment.js";
 import { LEGACY_BACKEND_ROOT } from "../config/legacyDeployment.js";
 
@@ -39,18 +40,18 @@ export function readUploadRoot(
 	const resolvedApplicationRoot = path.resolve(applicationRoot);
 	const configuredRoot = source.UPLOAD_ROOT?.trim();
 	if (configuredRoot && !path.isAbsolute(configuredRoot)) {
-		throw new TypeError("UPLOAD_ROOT must be an absolute path");
+		throw new RuntimeConfigurationError("UPLOAD_ROOT must be an absolute path");
 	}
 
 	const resolvedRoot = configuredRoot
 		? path.resolve(configuredRoot)
 		: path.resolve(resolvedApplicationRoot, "uploads");
 	if (resolvedRoot === path.parse(resolvedRoot).root) {
-		throw new TypeError("UPLOAD_ROOT cannot be a filesystem root");
+		throw new RuntimeConfigurationError("UPLOAD_ROOT cannot be a filesystem root");
 	}
 	if (readNodeEnvironment(source) === "production") {
 		if (!configuredRoot) {
-			throw new TypeError("UPLOAD_ROOT is required in production");
+			throw new RuntimeConfigurationError("UPLOAD_ROOT is required in production");
 		}
 
 		const isPreservedLegacyUploadRoot = resolvedApplicationRoot === LEGACY_BACKEND_ROOT
@@ -63,7 +64,9 @@ export function readUploadRoot(
 				|| (!relativeToRelease.startsWith(`..${path.sep}`) && relativeToRelease !== "..")
 			)
 		) {
-			throw new TypeError("Production UPLOAD_ROOT must be outside the application release directory");
+			throw new RuntimeConfigurationError(
+				"Production UPLOAD_ROOT must be outside the application release directory"
+			);
 		}
 	}
 
@@ -141,7 +144,9 @@ function normalizeStorageKeyPrefix(value?: string | null) {
 		|| cleaned.length > 120
 		|| !/^[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*$/.test(cleaned)
 	) {
-		throw new TypeError("STORAGE_KEY_PREFIX must contain safe relative path segments only");
+		throw new RuntimeConfigurationError(
+			"STORAGE_KEY_PREFIX must contain safe relative path segments only"
+		);
 	}
 	return cleaned || DEFAULT_KEY_PREFIX;
 }
