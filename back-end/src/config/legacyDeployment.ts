@@ -1,4 +1,9 @@
-import { readFileSync, statSync } from "node:fs";
+import {
+	closeSync,
+	fstatSync,
+	openSync,
+	readFileSync
+} from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -33,12 +38,19 @@ function isLoopbackHost(hostname: string) {
 
 function readStaticReleaseMetadata(staticRoot: string): StaticReleaseMetadata {
 	const releasePath = path.join(staticRoot, "release.json");
-	const metadata = statSync(releasePath);
-	if (!metadata.isFile() || metadata.size > 16 * 1024) {
-		throw new TypeError("Legacy static release metadata must be a bounded regular file");
+	const descriptor = openSync(releasePath, "r");
+	let metadata;
+	let parsed: Record<string, unknown>;
+	try {
+		metadata = fstatSync(descriptor);
+		if (!metadata.isFile() || metadata.size > 16 * 1024) {
+			throw new TypeError("Legacy static release metadata must be a bounded regular file");
+		}
+		parsed = JSON.parse(readFileSync(descriptor, "utf8")) as Record<string, unknown>;
 	}
-
-	const parsed = JSON.parse(readFileSync(releasePath, "utf8")) as Record<string, unknown>;
+	finally {
+		closeSync(descriptor);
+	}
 	if (
 		typeof parsed.version !== "string"
 		|| !/^\d+\.\d+\.\d+$/.test(parsed.version)
