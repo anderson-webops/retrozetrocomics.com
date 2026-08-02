@@ -88,6 +88,8 @@ npm run admin -- disable --email admin@example.com --apply
   a public hostname from being mislabeled as a private endpoint.
 - Production MongoDB requires non-placeholder credentials. A remote URI must use TLS, and options that weaken
   certificate or hostname verification are rejected. Only literal loopback hosts may omit TLS.
+- For compatibility with the historical local MongoDB URI, the exact single host `localhost` is canonicalized to
+  `127.0.0.1` before validation and connection; multi-host and all other hostname URIs still require verified TLS.
 - MongoDB connection, server-selection, socket, idle, and pool limits are bounded.
 
 ## Privacy, Contact, and Upload Storage

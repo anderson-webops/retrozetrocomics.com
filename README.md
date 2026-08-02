@@ -36,6 +36,8 @@ npm run audit:production
 - Use `deploy/systemd/retrozetro.env.example` for production. Session and diagnostics secrets must be non-placeholder
   random values, production origins must use HTTPS, and `TRUSTED_PROXY_IPS` must contain only the exact loopback proxy
   addresses. A configured Vault path fails closed and never silently falls back to `MONGODB_URI`.
+- A production `mongodb://` URI with the exact single host `localhost` is canonicalized to `127.0.0.1` before validation
+  and connection. Other hostnames remain remote and require verified TLS.
 - Admin creation, enablement, disablement, and password resets are dry-run-first:
 
 ```bash
