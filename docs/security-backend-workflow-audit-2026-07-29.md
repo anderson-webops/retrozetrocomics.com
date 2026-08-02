@@ -131,6 +131,9 @@ npm run admin -- disable --email admin@example.com --apply
   cross-site write rejection, protected admin access, and blocked public diagnostics.
 - Any failed gate restores the prior symlink and release environment and verifies the rollback with the same checks.
 - Existing DNS records, including all A and AAAA records, are preserved; deployment does not mutate DNS.
+- During migration, the exact historical `/srv/retrozetrocomics.com/back-end` layout receives non-secret runtime
+  defaults for its preserved upload directory, loopback proxy, static root, and installed release identity. The
+  adapter does not activate for any other path and does not relax Vault, MongoDB, secret, or origin validation.
 
 ## Production Promotion Checklist
 
