@@ -10,6 +10,7 @@ fi
 node_bin_dir_real="$(cd -- "$node_bin_dir" && pwd -P)"
 PATH="$node_bin_dir_real:$system_path"
 export PATH
+unset npm_config_global_ignore_file NPM_CONFIG_GLOBAL_IGNORE_FILE
 export CYPRESS_INSTALL_BINARY=0
 export PUPPETEER_SKIP_DOWNLOAD=true
 
@@ -73,6 +74,7 @@ npm run audit:production
 npm run audit:signatures
 npm run verify:dependency-graph
 npm run verify:deploy-assets
+npm run verify:install-scripts
 npm run verify:native-lock
 npm run verify:platform-install
 npm run lint

@@ -169,13 +169,42 @@ describe("production runtime configuration", () => {
 		}
 	});
 
-	it("rejects partial legacy release identity instead of mixing sources", () => {
-		expect(() => applyLegacyDeploymentDefaults({
-			NODE_ENV: "production",
-			SOURCE_REVISION: "a".repeat(40)
-		}, {
-			backendRoot: LEGACY_BACKEND_ROOT
-		})).toThrow(/configured completely/);
+	it("replaces stale legacy identity with the promoted static release", () => {
+		const temporaryRoot = mkdtempSync(path.join(os.tmpdir(), "retro-legacy-identity-"));
+		try {
+			writeFileSync(
+				path.join(temporaryRoot, "release.json"),
+				JSON.stringify({
+					releasedAt: "2026-08-02T16:30:00.000Z",
+					revision: "a".repeat(40),
+					version: declaredReleaseVersion
+				})
+			);
+
+			for (const source of [
+				{
+					NODE_ENV: "production",
+					SOURCE_REVISION: "b".repeat(40)
+				},
+				{
+					DEPLOYED_AT: "2025-01-01T00:00:00.000Z",
+					NODE_ENV: "production",
+					RETROZETRO_RELEASE_VERSION: "1.0.0",
+					SOURCE_REVISION: "b".repeat(40)
+				}
+			]) {
+				expect(applyLegacyDeploymentDefaults(source, {
+					backendRoot: LEGACY_BACKEND_ROOT,
+					staticRoot: temporaryRoot
+				})).toBe(true);
+				expect(source.DEPLOYED_AT).toBe("2026-08-02T16:30:00.000Z");
+				expect(source.RETROZETRO_RELEASE_VERSION).toBe(declaredReleaseVersion);
+				expect(source.SOURCE_REVISION).toBe("a".repeat(40));
+			}
+		}
+		finally {
+			rmSync(temporaryRoot, { force: true, recursive: true });
+		}
 	});
 
 	it("binds production only to a literal loopback address", () => {

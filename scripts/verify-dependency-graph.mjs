@@ -1,13 +1,17 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import path from "node:path";
 import process from "node:process";
 
-const npmCommand = process.platform === "win32"
-	? "npm.cmd"
-	: path.join(path.dirname(process.execPath), "npm");
-const result = spawnSync(npmCommand, ["ls", "--all", "--json"], {
+const npmExecPath = process.env.npm_execpath;
+assert.ok(npmExecPath, "Run dependency-graph verification through npm so the selected npm executable is known.");
+
+const env = { ...process.env };
+delete env.npm_config_global_ignore_file;
+delete env.NPM_CONFIG_GLOBAL_IGNORE_FILE;
+
+const result = spawnSync(process.execPath, [npmExecPath, "ls", "--all", "--json"], {
 	encoding: "utf8",
+	env,
 	maxBuffer: 128 * 1024 * 1024
 });
 

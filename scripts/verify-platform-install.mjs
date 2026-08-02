@@ -12,20 +12,26 @@ const repositoryRoot = path.resolve(
 const frontendManifest = JSON.parse(
 	await readFile(path.join(repositoryRoot, "front-end/package.json"), "utf8")
 );
-const npmCommand = process.platform === "win32"
-	? "npm.cmd"
-	: path.join(path.dirname(process.execPath), "npm");
+const npmExecPath = process.env.npm_execpath;
 
-function run(command, args, cwd, cacheDirectory) {
+if (!npmExecPath) {
+	throw new Error("Run platform-install verification through npm so the selected npm executable is known.");
+}
+
+function runNpm(args, cwd, cacheDirectory) {
 	return new Promise((resolveRun, reject) => {
-		const child = spawn(command, args, {
+		const env = {
+			...process.env,
+			CYPRESS_INSTALL_BINARY: "0",
+			PUPPETEER_SKIP_DOWNLOAD: "true",
+			npm_config_cache: cacheDirectory
+		};
+		delete env.npm_config_global_ignore_file;
+		delete env.NPM_CONFIG_GLOBAL_IGNORE_FILE;
+
+		const child = spawn(process.execPath, [npmExecPath, ...args], {
 			cwd,
-			env: {
-				...process.env,
-				CYPRESS_INSTALL_BINARY: "0",
-				PUPPETEER_SKIP_DOWNLOAD: "true",
-				npm_config_cache: cacheDirectory
-			},
+			env,
 			stdio: "inherit"
 		});
 		child.once("error", reject);
@@ -33,7 +39,7 @@ function run(command, args, cwd, cacheDirectory) {
 			"exit",
 			code => code === 0
 				? resolveRun()
-				: reject(new Error(`${command} exited with code ${code}.`))
+				: reject(new Error(`npm exited with code ${code}.`))
 		);
 	});
 }
@@ -79,8 +85,7 @@ async function verifyTarget(libc) {
 				path.join(temporaryRoot, "back-end/package.json")
 			)
 		]);
-		await run(
-			npmCommand,
+		await runNpm(
 			[
 				"ci",
 				"--ignore-scripts",
