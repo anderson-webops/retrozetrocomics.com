@@ -110,6 +110,7 @@ assert.match(storage, /resolvedRoot === path\.join\(LEGACY_BACKEND_ROOT, "upload
 
 const rootPackage = JSON.parse(await read("package.json"));
 const backEndPackage = JSON.parse(await read("back-end/package.json"));
+assert.equal(Object.hasOwn(rootPackage, "devEngines"), false);
 assert.equal(Object.hasOwn(backEndPackage, "allowScripts"), false);
 assert.equal(rootPackage.allowScripts?.["argon2@0.45.1"], true);
 assert.equal(rootPackage.allowScripts?.["express-rate-limit@8.6.1"], false);
