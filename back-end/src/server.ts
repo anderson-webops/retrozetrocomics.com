@@ -1,28 +1,28 @@
 import process, { env, exit } from "node:process";
-import mongoose from "mongoose";
 
-await import("dotenv/config");
-
-const { applyLegacyDeploymentDefaults } = await import("./config/legacyDeployment.js");
-applyLegacyDeploymentDefaults(env);
-
-const [
-	{ createApp },
-	{ readServerConfig },
-	{ connectToMongo }
-] = await Promise.all([
-	import("./app.js"),
-	import("./config/server.js"),
-	import("./services/database.js")
-]);
+import { describeRuntimeError } from "./errors/runtimeError.js";
 
 function logServerError(message: string, error: unknown) {
-	console.error(message, {
-		error: error instanceof Error ? error.name : "UnknownError"
-	});
+	console.error(message, describeRuntimeError(error));
 }
 
 async function main() {
+	await import("dotenv/config");
+	const { applyLegacyDeploymentDefaults } = await import("./config/legacyDeployment.js");
+	applyLegacyDeploymentDefaults(env);
+
+	const [
+		{ default: mongoose },
+		{ createApp },
+		{ readServerConfig },
+		{ connectToMongo }
+	] = await Promise.all([
+		import("mongoose"),
+		import("./app.js"),
+		import("./config/server.js"),
+		import("./services/database.js")
+	]);
+
 	const { host, port } = readServerConfig();
 	const app = createApp();
 	await connectToMongo();

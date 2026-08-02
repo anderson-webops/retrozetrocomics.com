@@ -136,7 +136,9 @@ describe("production runtime configuration", () => {
 			);
 			const source: NodeJS.ProcessEnv = {
 				NODE_ENV: "production",
+				SESSION_SECRET: strongSecret,
 				STATIC_SITE_DIR: `${LEGACY_BACKEND_ROOT}/../front-end/dist`,
+				TRUST_PROXY_HOPS: "1",
 				VAULT_ADDR: "http://127.0.0.1:8200"
 			};
 
@@ -147,10 +149,12 @@ describe("production runtime configuration", () => {
 			expect(source.STATIC_SITE_DIR).toBe(temporaryRoot);
 			expect(source.UPLOAD_ROOT).toBe(`${LEGACY_BACKEND_ROOT}/uploads`);
 			expect(source.TRUSTED_PROXY_IPS).toBe("127.0.0.1,::1");
+			expect(source.TRUST_PROXY_HOPS).toBeUndefined();
 			expect(source.VAULT_ALLOW_HTTP).toBe("true");
 			expect(source.RETROZETRO_RELEASE_VERSION).toBe(declaredReleaseVersion);
 			expect(source.SOURCE_REVISION).toBe("a".repeat(40));
 			expect(source.DEPLOYED_AT).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+			expect(readSecurityConfig(source).trustedProxyIps).toEqual(["127.0.0.1", "::1"]);
 			expect(readUploadRoot(source, LEGACY_BACKEND_ROOT)).toBe(`${LEGACY_BACKEND_ROOT}/uploads`);
 			expect(() => readUploadRoot({
 				NODE_ENV: "production",

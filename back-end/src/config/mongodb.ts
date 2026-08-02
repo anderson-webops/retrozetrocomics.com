@@ -1,5 +1,7 @@
 import net from "node:net";
 
+import { RuntimeConfigurationError } from "../errors/runtimeError.js";
+
 const PLACEHOLDER_SECRET = /^(?:replace(?:[-_ ]with)?|change[-_ ]?me|example)(?:[-_ ]|$)/i;
 
 function isLoopbackIp(value: string) {
@@ -94,7 +96,7 @@ function weakensTls(uri: string) {
 
 export function validateMongoUri(uri: string, isProduction: boolean) {
 	if (!/^mongodb(?:\+srv)?:\/\//.test(uri) || !mongoAuthority(uri)) {
-		throw new TypeError("MongoDB URI must use mongodb:// or mongodb+srv://");
+		throw new RuntimeConfigurationError("MongoDB URI must use mongodb:// or mongodb+srv://");
 	}
 
 	if (!isProduction) {
@@ -102,13 +104,19 @@ export function validateMongoUri(uri: string, isProduction: boolean) {
 	}
 
 	if (!hasStrongCredentials(uri)) {
-		throw new TypeError("Production MongoDB requires strong non-placeholder credentials");
+		throw new RuntimeConfigurationError(
+			"Production MongoDB requires strong non-placeholder credentials"
+		);
 	}
 	if (!hostsAreLoopback(uri) && !usesTls(uri)) {
-		throw new TypeError("Production MongoDB must use TLS unless every host is a literal loopback address");
+		throw new RuntimeConfigurationError(
+			"Production MongoDB must use TLS unless every host is a literal loopback address"
+		);
 	}
 	if (weakensTls(uri)) {
-		throw new TypeError("Production MongoDB TLS verification cannot be disabled");
+		throw new RuntimeConfigurationError(
+			"Production MongoDB TLS verification cannot be disabled"
+		);
 	}
 
 	return uri;

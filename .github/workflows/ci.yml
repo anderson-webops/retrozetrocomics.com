@@ -58,6 +58,7 @@ jobs:
           npm run typecheck
           npm test
           npm run build
+          npm run verify:startup-diagnostics
           git diff --check
 
   accessibility:
@@ -168,5 +169,6 @@ jobs:
           export SOURCE_REVISION=0000000000000000000000000000000000000000
           export SOURCE_DATE_EPOCH=1
           npm run build
+          npm run verify:startup-diagnostics
           npm run verify:production-install
           npm run verify:direct-runtime

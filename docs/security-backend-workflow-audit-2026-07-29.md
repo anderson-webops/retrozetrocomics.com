@@ -132,8 +132,11 @@ npm run admin -- disable --email admin@example.com --apply
 - Any failed gate restores the prior symlink and release environment and verifies the rollback with the same checks.
 - Existing DNS records, including all A and AAAA records, are preserved; deployment does not mutate DNS.
 - During migration, the exact historical `/srv/retrozetrocomics.com/back-end` layout receives non-secret runtime
-  defaults for its preserved upload directory, loopback proxy, static root, and installed release identity. The
-  adapter does not activate for any other path and does not relax Vault, MongoDB, secret, or origin validation.
+  defaults for its preserved upload directory, exact loopback proxies, static root, and installed release identity.
+  It removes the obsolete numeric proxy-hop variable so that the stricter exact-address boundary is authoritative.
+  The adapter does not activate for any other path and does not relax Vault, MongoDB, secret, or origin validation.
+- Startup logs expose approved configuration or dependency reasons, but never raw messages from unclassified errors.
+  This keeps failed promotions diagnosable without logging connection strings, credentials, or dependency internals.
 
 ## Production Promotion Checklist
 

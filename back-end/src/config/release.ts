@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { RuntimeConfigurationError } from "../errors/runtimeError.js";
 import { readNodeEnvironment } from "./environment.js";
 
 const backendRoot = path.resolve(
@@ -14,7 +15,7 @@ const packageManifest = JSON.parse(
 const packageVersion = packageManifest.version;
 
 if (typeof packageVersion !== "string" || !/^\d+\.\d+\.\d+$/.test(packageVersion)) {
-	throw new TypeError("The back-end package must declare a semantic version");
+	throw new RuntimeConfigurationError("The back-end package must declare a semantic version");
 }
 
 export const declaredReleaseVersion = packageVersion;
@@ -29,7 +30,7 @@ function parseDeploymentTime(value: string | undefined, isProduction: boolean) {
 	const trimmed = value?.trim();
 	if (!trimmed) {
 		if (isProduction) {
-			throw new TypeError("DEPLOYED_AT is required in production");
+			throw new RuntimeConfigurationError("DEPLOYED_AT is required in production");
 		}
 
 		return null;
@@ -37,7 +38,7 @@ function parseDeploymentTime(value: string | undefined, isProduction: boolean) {
 
 	const milliseconds = Date.parse(trimmed);
 	if (!Number.isFinite(milliseconds)) {
-		throw new TypeError("DEPLOYED_AT must be a valid ISO-8601 timestamp");
+		throw new RuntimeConfigurationError("DEPLOYED_AT must be a valid ISO-8601 timestamp");
 	}
 
 	return new Date(milliseconds).toISOString();
@@ -52,18 +53,24 @@ export function readReleaseIdentity(
 	const revision = source.SOURCE_REVISION?.trim() || "development";
 
 	if (version !== "development" && !/^\d+\.\d+\.\d+$/.test(version)) {
-		throw new TypeError("RETROZETRO_RELEASE_VERSION must be a semantic version");
+		throw new RuntimeConfigurationError(
+			"RETROZETRO_RELEASE_VERSION must be a semantic version"
+		);
 	}
 	if (revision !== "development" && !/^[0-9a-f]{40}$/.test(revision)) {
-		throw new TypeError("SOURCE_REVISION must be a full lowercase Git revision");
+		throw new RuntimeConfigurationError(
+			"SOURCE_REVISION must be a full lowercase Git revision"
+		);
 	}
 	if (version !== "development" && version !== packageVersion) {
-		throw new TypeError(
-			`Release version ${version} does not match back-end package version ${packageVersion}`
+		throw new RuntimeConfigurationError(
+			"Release version does not match back-end package version"
 		);
 	}
 	if (isProduction && (version === "development" || revision === "development")) {
-		throw new TypeError("Production requires exact release version and source revision identity");
+		throw new RuntimeConfigurationError(
+			"Production requires exact release version and source revision identity"
+		);
 	}
 
 	return {
@@ -89,7 +96,9 @@ export function verifyStaticReleaseIdentity(
 		);
 	}
 	catch {
-		throw new Error("Production static release metadata is missing or invalid");
+		throw new RuntimeConfigurationError(
+			"Production static release metadata is missing or invalid"
+		);
 	}
 
 	if (
@@ -98,6 +107,6 @@ export function verifyStaticReleaseIdentity(
 		|| (release as Record<string, unknown>).version !== identity.version
 		|| (release as Record<string, unknown>).revision !== identity.revision
 	) {
-		throw new Error("Static and API release identities do not match");
+		throw new RuntimeConfigurationError("Static and API release identities do not match");
 	}
 }

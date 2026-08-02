@@ -1,3 +1,5 @@
+import { RuntimeConfigurationError } from "../errors/runtimeError.js";
+
 export type NodeEnvironment = "development" | "production" | "test";
 
 export function readNodeEnvironment(
@@ -5,7 +7,9 @@ export function readNodeEnvironment(
 ): NodeEnvironment {
 	const value = source.NODE_ENV?.trim() || "development";
 	if (!["development", "production", "test"].includes(value)) {
-		throw new TypeError("NODE_ENV must be exactly development, production, or test");
+		throw new RuntimeConfigurationError(
+			"NODE_ENV must be exactly development, production, or test"
+		);
 	}
 
 	return value as NodeEnvironment;
