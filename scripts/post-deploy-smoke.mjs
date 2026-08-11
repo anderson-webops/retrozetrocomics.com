@@ -37,18 +37,18 @@ assert.equal(release.revision, expectedRevision, "Public source revision is stal
 const healthResponse = await request("/api/healthz");
 assert.equal(healthResponse.status, 200, "API liveness must be public.");
 const health = await healthResponse.json();
-assert.equal(health.version, expectedVersion, "API version differs from the static release.");
-assert.equal(health.revision, expectedRevision, "API revision differs from the static release.");
-assert.match(
-	health.deployedAt || "",
-	/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/,
-	"API deployment timestamp is missing or invalid."
-);
+assert.deepEqual(health, { ok: true }, "API liveness payload must remain minimal.");
+assert.equal(healthResponse.headers.get("cache-control"), "no-store");
+assert.equal(healthResponse.headers.get("set-cookie"), null);
+
+const healthHead = await request("/api/healthz", { method: "HEAD" });
+assert.equal(healthHead.status, 200, "API liveness HEAD must be public.");
+assert.equal(await healthHead.text(), "");
 
 const readinessResponse = await request("/api/readyz");
 assert.equal(readinessResponse.status, 200, "API readiness must pass after promotion.");
 const readiness = await readinessResponse.json();
-assert.equal(readiness.ready, true, "API database readiness is false.");
+assert.deepEqual(readiness, { ok: true }, "API readiness payload must remain minimal.");
 
 const rootResponse = await request("/");
 assert.equal(rootResponse.status, 200, "Public homepage must be available.");

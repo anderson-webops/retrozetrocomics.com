@@ -58,15 +58,17 @@ async function request(pathname, init) {
 try {
 	const healthResponse = await request("/api/healthz");
 	assert.equal(healthResponse.status, 200);
-	assert.deepEqual(await healthResponse.json(), {
-		deployedAt: "2026-08-02T00:00:00.000Z",
-		ok: true,
-		revision: release.revision,
-		version: release.version
-	});
+	assert.deepEqual(await healthResponse.json(), { ok: true });
+	assert.equal(healthResponse.headers.get("cache-control"), "no-store");
+	assert.equal(healthResponse.headers.get("set-cookie"), null);
+
+	const healthHead = await request("/api/healthz", { method: "HEAD" });
+	assert.equal(healthHead.status, 200);
+	assert.equal(await healthHead.text(), "");
 
 	const readinessResponse = await request("/api/readyz");
 	assert.equal(readinessResponse.status, 503);
+	assert.deepEqual(await readinessResponse.json(), { ok: false });
 
 	const rootResponse = await request("/");
 	assert.equal(rootResponse.status, 200);

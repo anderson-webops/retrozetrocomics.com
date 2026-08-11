@@ -11,7 +11,6 @@ import mongoose from "mongoose";
 
 import {
 	readReleaseIdentity,
-	type ReleaseIdentity,
 	verifyStaticReleaseIdentity
 } from "./config/release.js";
 import {
@@ -25,6 +24,7 @@ import { authRouter } from "./routes/auth.js";
 import { contactRouter } from "./routes/contact.js";
 import { siteContentRouter } from "./routes/siteContent.js";
 import { readInlineScriptHashes } from "./services/contentSecurityPolicy.js";
+import { createProbeRouter } from "./services/probes.js";
 import {
 	ensureUploadDirectories,
 	uploadRoot
@@ -45,55 +45,6 @@ function secretsMatch(expected: string | undefined, supplied: string | undefined
 	const suppliedBuffer = Buffer.from(supplied);
 	return expectedBuffer.length === suppliedBuffer.length
 		&& timingSafeEqual(expectedBuffer, suppliedBuffer);
-}
-
-function healthHandler(
-	_req: express.Request,
-	res: express.Response,
-	identity: ReleaseIdentity
-) {
-	return res
-		.set("Cache-Control", "no-store")
-		.json({
-			deployedAt: identity.deployedAt,
-			ok: true,
-			revision: identity.revision,
-			version: identity.version
-		});
-}
-
-async function readinessHandler(
-	_req: express.Request,
-	res: express.Response
-) {
-	const connection = mongoose.connection;
-	const state = connection.readyState;
-	if (state !== 1 || !connection.db) {
-		return res.status(503).set("Cache-Control", "no-store").json({
-			components: {
-				db: { ok: false, state }
-			},
-			ready: false
-		});
-	}
-
-	try {
-		await connection.db.admin().ping();
-		return res.set("Cache-Control", "no-store").json({
-			components: {
-				db: { ok: true, state }
-			},
-			ready: true
-		});
-	}
-	catch {
-		return res.status(503).set("Cache-Control", "no-store").json({
-			components: {
-				db: { ok: false, state }
-			},
-			ready: false
-		});
-	}
 }
 
 export function createApp() {
@@ -163,6 +114,16 @@ export function createApp() {
 			referrerPolicy: { policy: "strict-origin-when-cross-origin" }
 		})
 	);
+	app.use(
+		createProbeRouter(async () => {
+			const connection = mongoose.connection;
+			if (connection.readyState !== 1 || !connection.db) {
+				return false;
+			}
+			await connection.db.admin().ping();
+			return true;
+		})
+	);
 	app.use(createRequestSecurityMiddleware(config));
 	app.use(express.json({ limit: "1mb", strict: true }));
 	app.use(express.urlencoded({ extended: false, limit: "1mb" }));
@@ -181,8 +142,6 @@ export function createApp() {
 
 	ensureUploadDirectories();
 
-	apiRouter.get("/healthz", (req, res) => healthHandler(req, res, releaseIdentity));
-	apiRouter.get("/readyz", readinessHandler);
 	apiRouter.get("/internal/dbinfo", (req, res) => {
 		const suppliedKey = req.get("x-internal-diagnostics-key");
 		const isAllowed = config.isProduction
@@ -214,8 +173,6 @@ export function createApp() {
 	});
 
 	app.use("/api", apiRouter);
-	app.get("/healthz", (req, res) => healthHandler(req, res, releaseIdentity));
-	app.get("/readyz", readinessHandler);
 	app.use(
 		"/uploads",
 		express.static(uploadRoot, {
