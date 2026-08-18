@@ -65,7 +65,22 @@ assert.match(hsts, /max-age=63072000/i, "HSTS must retain the two-year preload l
 assert.match(hsts, /includeSubDomains/i, "HSTS must include subdomains.");
 assert.match(hsts, /preload/i, "HSTS must retain preload eligibility.");
 
-const ownerResponse = await request("/studio/admin");
+const ownerRedirectResponse = await request("/studio/admin");
+assert.equal(ownerRedirectResponse.status, 301, "The owner route must redirect to its canonical path.");
+assert.equal(
+	ownerRedirectResponse.headers.get("location"),
+	"/studio/admin/",
+	"The owner route must preserve the canonical trailing slash."
+);
+assert.match(ownerRedirectResponse.headers.get("cache-control") || "", /no-store/);
+assert.match(ownerRedirectResponse.headers.get("x-robots-tag") || "", /noindex/);
+assert.equal(
+	ownerRedirectResponse.headers.get("content-security-policy"),
+	"default-src 'none'",
+	"The redirect must not inherit the public application policy."
+);
+
+const ownerResponse = await request("/studio/admin/");
 assert.equal(ownerResponse.status, 200, "The owner sign-in page must remain available.");
 assert.match(ownerResponse.headers.get("cache-control") || "", /no-store/);
 assert.match(ownerResponse.headers.get("x-robots-tag") || "", /noindex/);

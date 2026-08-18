@@ -204,7 +204,7 @@ export function createApp() {
 			publicPageRateLimiter,
 			express.static(staticRoot, {
 				dotfiles: "deny",
-				index: false,
+				index: "index.html",
 				setHeaders(response, filePath) {
 					if (filePath.endsWith(".html") || filePath.endsWith("/release.json")) {
 						response.setHeader("Cache-Control", "no-store");
