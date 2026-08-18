@@ -10,9 +10,12 @@ release_env_dest="${RELEASE_ENV_DEST:-/etc/retrozetro/release.env}"
 service_name="${SERVICE_NAME:-retrozetro.service}"
 health_url="${HEALTH_URL:-http://127.0.0.1:3006/api/healthz}"
 ready_url="${READY_URL:-http://127.0.0.1:3006/api/readyz}"
+local_site_origin="${LOCAL_SITE_ORIGIN:-http://127.0.0.1:3006}"
 site_origin="${SITE_ORIGIN:-https://retrozetrocomics.com}"
 site_resolve_ipv4="${SITE_RESOLVE_IPV4:-retrozetrocomics.com:443:127.0.0.1}"
 site_resolve_ipv6="${SITE_RESOLVE_IPV6:-retrozetrocomics.com:443:[::1]}"
+github_repository="${GITHUB_REPOSITORY:-anderson-webops/retrozetrocomics.com}"
+github_token_file="${GITHUB_POST_DEPLOY_TOKEN_FILE:-/etc/retrozetro/github-post-deploy.token}"
 
 if [[ $# -ne 1 ]]; then
 	echo "Usage: promote-release.sh /srv/retrozetro/releases/<prepared-release>" >&2
@@ -72,6 +75,7 @@ headers_ipv4="$(mktemp)"
 headers_ipv6="$(mktemp)"
 release_env_temp="$(mktemp)"
 release_env_backup="$(mktemp)"
+github_curl_config="$(mktemp)"
 candidate_identity="$(mktemp)"
 previous_identity="$(mktemp)"
 had_release_env=false
@@ -84,7 +88,7 @@ cleanup() {
 	if [[ -e "$release_env_next" || -L "$release_env_next" ]]; then unlink -- "$release_env_next"; fi
 	rm -f -- "$response_local" "$response_ipv4" "$response_ipv6" "$response_misc" \
 		"$headers_ipv4" "$headers_ipv6" "$release_env_temp" "$release_env_backup" \
-		"$candidate_identity" "$previous_identity"
+		"$candidate_identity" "$previous_identity" "$github_curl_config"
 }
 trap cleanup EXIT
 
@@ -117,20 +121,6 @@ process.stdout.write(`RETROZETRO_RELEASE_VERSION=${release.release}\nSOURCE_REVI
 	install_release_environment "$release_env_temp"
 }
 
-identity_matches() {
-	local expected="$1"
-	local actual="$2"
-	/usr/bin/node -e '
-const expected = require(process.argv[1]);
-const actual = JSON.parse(require("node:fs").readFileSync(process.argv[2], "utf8"));
-if (
-	actual.version !== expected.release.replace(/^v/, "")
-	|| actual.revision !== expected.commitSha
-	|| actual.deployedAt !== expected.deployedAt
-) process.exit(1);
-' "$expected" "$actual"
-}
-
 static_identity_matches() {
 	local target="$1"
 	local actual="$2"
@@ -141,23 +131,39 @@ if (actual.version !== expected.version || actual.revision !== expected.revision
 ' "$target/front-end/dist/release.json" "$actual"
 }
 
+probe_is_minimal_and_healthy() {
+	local actual="$1"
+	/usr/bin/node -e '
+const value = JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8"));
+if (
+	!value
+	|| typeof value !== "object"
+	|| Array.isArray(value)
+	|| Object.keys(value).length !== 1
+	|| value.ok !== true
+) process.exit(1);
+' "$actual"
+}
+
 headers_are_strict() {
 	local headers="$1"
 	grep -Eiq '^Content-Security-Policy:.*frame-ancestors .none.' "$headers" \
 		&& grep -Eiq '^Content-Security-Policy:.*script-src[^;]*.self.' "$headers" \
 		&& ! grep -Eiq '^Content-Security-Policy:.*script-src[^;]*unsafe-(inline|eval)' "$headers" \
-		&& grep -Eiq '^Strict-Transport-Security:' "$headers" \
+		&& grep -Eiq '^Strict-Transport-Security:.*max-age=63072000.*includeSubDomains.*preload' "$headers" \
 		&& grep -Eiq '^X-Content-Type-Options:[[:space:]]*nosniff' "$headers" \
 		&& ! grep -Eiq '^X-Powered-By:' "$headers"
 }
 
 verify_target() {
 	local target="$1"
-	local identity="$2"
 	curl --noproxy '*' --fail --silent --show-error --max-time 5 "$health_url" --output "$response_local" \
-		&& identity_matches "$identity" "$response_local" \
+		&& probe_is_minimal_and_healthy "$response_local" \
 		&& curl --noproxy '*' --fail --silent --show-error --max-time 5 "$ready_url" --output "$response_local" \
-		&& grep -Eq '"ready"[[:space:]]*:[[:space:]]*true' "$response_local" \
+		&& probe_is_minimal_and_healthy "$response_local" \
+		&& curl --noproxy '*' --fail --silent --show-error --max-time 5 \
+			"$local_site_origin/release.json" --output "$response_local" \
+		&& static_identity_matches "$target" "$response_local" \
 		&& curl --noproxy '*' --ipv4 --fail --silent --show-error --max-time 5 --resolve "$site_resolve_ipv4" \
 			"$site_origin/release.json" --output "$response_ipv4" \
 		&& static_identity_matches "$target" "$response_ipv4" \
@@ -172,7 +178,7 @@ verify_target() {
 		&& headers_are_strict "$headers_ipv6" \
 		&& curl --noproxy '*' --ipv4 --fail --silent --show-error --max-time 5 --resolve "$site_resolve_ipv4" \
 			"$site_origin/api/healthz" --output "$response_local" \
-		&& identity_matches "$identity" "$response_local" \
+		&& probe_is_minimal_and_healthy "$response_local" \
 		&& [[ "$(curl --noproxy '*' --ipv4 --silent --show-error --max-time 5 --resolve "$site_resolve_ipv4" \
 			--request POST --header 'Content-Type: application/json' --header 'Origin: https://deployment-audit.invalid' \
 			--header 'Sec-Fetch-Site: cross-site' --data '{}' --output "$response_misc" --write-out '%{http_code}' \
@@ -185,15 +191,56 @@ verify_target() {
 
 wait_for_target() {
 	local target="$1"
-	local identity="$2"
 	local attempt
 	for attempt in {1..30}; do
-		if verify_target "$target" "$identity"; then
+		if verify_target "$target"; then
 			return 0
 		fi
 		sleep 1
 	done
 	return 1
+}
+
+dispatch_post_deploy_verification() {
+	local identity="$1"
+	local token token_mode status
+	if [[ ! -f "$github_token_file" || -L "$github_token_file" ]]; then
+		echo "Post-deploy GitHub token file is missing or unsafe: $github_token_file" >&2
+		return 1
+	fi
+	if [[ "$(stat -c '%u' -- "$github_token_file")" != "0" ]]; then
+		echo "Post-deploy GitHub token file must be owned by root." >&2
+		return 1
+	fi
+	token_mode="$(stat -c '%a' -- "$github_token_file")"
+	if [[ "$token_mode" != "400" && "$token_mode" != "600" ]]; then
+		echo "Post-deploy GitHub token file mode must be 0400 or 0600." >&2
+		return 1
+	fi
+	token="$(<"$github_token_file")"
+	if [[ ! "$token" =~ ^[A-Za-z0-9_]{20,512}$ ]]; then
+		echo "Post-deploy GitHub token file does not contain a bounded token." >&2
+		return 1
+	fi
+	printf 'header = "Authorization: Bearer %s"\n' "$token" > "$github_curl_config"
+	printf 'header = "Accept: application/vnd.github+json"\n' >> "$github_curl_config"
+	printf 'header = "X-GitHub-Api-Version: 2022-11-28"\n' >> "$github_curl_config"
+	chmod 600 "$github_curl_config"
+	/usr/bin/node -e '
+const identity = require(process.argv[1]);
+process.stdout.write(JSON.stringify({
+	ref: "main",
+	inputs: {
+		expected_revision: identity.commitSha,
+		expected_version: identity.release
+	}
+}));
+' "$identity" > "$response_misc"
+	status="$(curl --config "$github_curl_config" --silent --show-error --max-time 15 \
+		--request POST --header 'Content-Type: application/json' --data-binary "@$response_misc" \
+		--output /dev/null --write-out '%{http_code}' \
+		"https://api.github.com/repos/$github_repository/actions/workflows/post-deploy.yml/dispatches")"
+	[[ "$status" == "204" ]]
 }
 
 /usr/bin/node -e '
@@ -225,8 +272,11 @@ fi
 nginx -t
 write_release_environment "$candidate_identity"
 activate_target "$candidate"
-if systemctl restart "$service_name" && systemctl reload nginx && wait_for_target "$candidate" "$candidate_identity"; then
-	echo "Promoted $candidate and verified readiness, exact IPv4/IPv6 identity, security headers, origin rejection, and protected admin access."
+if systemctl restart "$service_name" \
+	&& systemctl reload nginx \
+	&& wait_for_target "$candidate" \
+	&& dispatch_post_deploy_verification "$candidate_identity"; then
+	echo "Promoted $candidate, verified the local and IPv4/IPv6 boundaries, and dispatched independent post-deploy verification."
 	exit 0
 fi
 
@@ -246,7 +296,7 @@ if [[ -n "$previous_target" ]]; then
 	nginx -t && systemctl reload nginx
 	if [[ ! -s "$previous_identity" ]]; then
 		echo "The previous release was restored without identity metadata for automated verification." >&2
-	elif ! wait_for_target "$previous_target" "$previous_identity"; then
+	elif ! wait_for_target "$previous_target"; then
 		echo "The previous release was restored but did not pass the same verification gates." >&2
 	fi
 else

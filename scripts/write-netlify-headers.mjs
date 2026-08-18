@@ -3,14 +3,13 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { parse } from "parse5";
 
 const repositoryRoot = path.resolve(
 	path.dirname(fileURLToPath(import.meta.url)),
 	".."
 );
 const outputDirectory = path.join(repositoryRoot, "front-end", "dist");
-const scriptPattern = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
-const sourceAttributePattern = /(?:^|\s)src\s*=/i;
 
 async function collectHtmlFiles(directory) {
 	const entries = await readdir(directory, { withFileTypes: true });
@@ -29,15 +28,26 @@ async function collectHtmlFiles(directory) {
 	return files;
 }
 
+function collectInlineScripts(node, scripts = []) {
+	if (
+		node.nodeName === "script"
+		&& !node.attrs?.some(attribute => attribute.name.toLowerCase() === "src")
+	) {
+		scripts.push(
+			(node.childNodes || [])
+				.filter(child => child.nodeName === "#text")
+				.map(child => child.value || "")
+				.join("")
+		);
+	}
+	for (const child of node.childNodes || []) collectInlineScripts(child, scripts);
+	return scripts;
+}
+
 const hashes = new Set();
 for (const htmlPath of await collectHtmlFiles(outputDirectory)) {
 	const html = await readFile(htmlPath, "utf8");
-	for (const match of html.matchAll(scriptPattern)) {
-		if (sourceAttributePattern.test(match[1] || "")) {
-			continue;
-		}
-
-		const script = match[2] || "";
+	for (const script of collectInlineScripts(parse(html))) {
 		if (script.trim()) {
 			hashes.add(
 				`'sha256-${createHash("sha256").update(script).digest("base64")}'`
@@ -45,6 +55,21 @@ for (const htmlPath of await collectHtmlFiles(outputDirectory)) {
 		}
 	}
 }
+
+const contentImageSources = (process.env.CONTENT_IMAGE_HOSTS || "")
+	.split(",")
+	.map(host => host.trim().toLowerCase())
+	.filter(Boolean)
+	.map((host) => {
+		if (
+			host.length > 253
+			|| !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*$/.test(host)
+		) {
+			throw new Error("CONTENT_IMAGE_HOSTS contains an invalid DNS hostname.");
+		}
+		return `https://${host}`;
+	});
+const contentImagePolicy = contentImageSources.length ? ` ${contentImageSources.join(" ")}` : "";
 
 function createContentSecurityPolicy(profile) {
 	const ownerOnly = profile === "owner";
@@ -73,8 +98,8 @@ function createContentSecurityPolicy(profile) {
 			? "frame-src 'none'"
 			: "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
 		ownerOnly
-			? "img-src 'self' data: blob:"
-			: "img-src 'self' data: blob: https://*.doubleclick.net https://*.googlesyndication.com https://*.googleusercontent.com",
+			? `img-src 'self' data: blob:${contentImagePolicy}`
+			: `img-src 'self' data: blob:${contentImagePolicy} https://*.doubleclick.net https://*.googlesyndication.com https://*.googleusercontent.com`,
 		"object-src 'none'",
 		`script-src ${scriptSources}`,
 		"script-src-attr 'none'",
@@ -94,6 +119,7 @@ await writeFile(
   Cross-Origin-Resource-Policy: cross-origin
   Permissions-Policy: camera=(), geolocation=(), microphone=(), payment=(), usb=()
   Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
 

@@ -1,4 +1,5 @@
 name: Post-deploy verification
+run-name: Verify ${{ inputs.expected_version }} at ${{ inputs.expected_revision }}
 
 on:
   workflow_dispatch:
@@ -14,6 +15,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: post-deploy-${{ inputs.expected_revision }}
+  cancel-in-progress: false
 
 jobs:
   verify:

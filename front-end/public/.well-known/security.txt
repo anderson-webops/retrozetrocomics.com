@@ -1,0 +1,5 @@
+Contact: mailto:contacts@jacobdanderson.net
+Contact: https://retrozetrocomics.com/contact
+Expires: 2027-08-17T23:59:59Z
+Canonical: https://retrozetrocomics.com/.well-known/security.txt
+Preferred-Languages: en

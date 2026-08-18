@@ -1,8 +1,13 @@
+import { createHash } from "node:crypto";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
 	buildContentSecurityPolicyDirectives,
-	isOwnerSecurityRoute
+	isOwnerSecurityRoute,
+	readInlineScriptHashes
 } from "../src/services/contentSecurityPolicy.js";
 
 describe("content security policy profiles", () => {
@@ -37,5 +42,34 @@ describe("content security policy profiles", () => {
 		expect(publicPolicy.scriptSrc).toContain("https://analytics.retrozetrocomics.com");
 		expect(publicPolicy.scriptSrc).toContain("https://analytics.jacobdanderson.net");
 		expect(publicPolicy.scriptSrc).not.toContain("'unsafe-inline'");
+	});
+
+	it("adds only configured image sources to both page profiles", () => {
+		for (const profile of ["owner", "public"] as const) {
+			const policy = buildContentSecurityPolicyDirectives(
+				profile,
+				[],
+				true,
+				["https://images.example.com"]
+			);
+			expect(policy.imgSrc).toContain("https://images.example.com");
+		}
+	});
+
+	it("hashes parsed inline scripts without treating external scripts as inline", () => {
+		const directory = mkdtempSync(path.join(os.tmpdir(), "retro-csp-"));
+		const inlineScript = "window.__RETRO_TEST__ = '</not-a-script>';";
+		try {
+			writeFileSync(
+				path.join(directory, "index.html"),
+				`<!doctype html><script src="/assets/app.js"></script><script>${inlineScript}</script>`
+			);
+			expect(readInlineScriptHashes(directory)).toEqual([
+				`'sha256-${createHash("sha256").update(inlineScript).digest("base64")}'`
+			]);
+		}
+		finally {
+			rmSync(directory, { force: true, recursive: true });
+		}
 	});
 });

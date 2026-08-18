@@ -4,6 +4,7 @@ import { getDashboard, listAuditLogs } from "../controllers/adminController.js";
 import {
 	createMediaAsset,
 	listMediaAssets,
+	permanentlyDeleteMediaAsset,
 	restoreMediaAsset,
 	trashMediaAsset
 } from "../controllers/mediaController.js";
@@ -19,7 +20,7 @@ import {
 	updateAboutPageContent,
 	updateCharactersPageContent
 } from "../controllers/siteContentController.js";
-import { requireAdmin } from "../middleware/auth.js";
+import { requireAdmin, requireRecentMfa } from "../middleware/auth.js";
 import {
 	adminMutationRateLimiter,
 	adminReadRateLimiter
@@ -30,28 +31,62 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 export const adminRouter = Router();
 
 adminRouter.use(asyncHandler(requireAdmin));
-adminRouter.use((req, res, next) => {
-	const limiter = req.method === "GET" || req.method === "HEAD"
-		? adminReadRateLimiter
-		: adminMutationRateLimiter;
-	limiter(req, res, next);
-});
-adminRouter.get("/dashboard", asyncHandler(getDashboard));
-adminRouter.get("/audit-logs", asyncHandler(listAuditLogs));
-adminRouter.get("/media", asyncHandler(listMediaAssets));
-adminRouter.post("/media", postUpload.single("file"), asyncHandler(createMediaAsset));
-adminRouter.delete("/media/:assetId", asyncHandler(trashMediaAsset));
-adminRouter.post("/media/:assetId/restore", asyncHandler(restoreMediaAsset));
-adminRouter.get("/site-content/trash", asyncHandler(listContentTrash));
-adminRouter.post("/site-content/trash/:trashId/restore", asyncHandler(restoreContentTrashItem));
-adminRouter.get("/site-content/:page", asyncHandler(getAdminSiteContent));
-adminRouter.put("/site-content/:page/draft", asyncHandler(saveSiteContentDraft));
-adminRouter.post("/site-content/:page/publish", asyncHandler(publishSiteContentDraft));
-adminRouter.get("/site-content/:page/revisions", asyncHandler(listSiteContentRevisions));
+adminRouter.get("/dashboard", adminReadRateLimiter, asyncHandler(getDashboard));
+adminRouter.get("/audit-logs", adminReadRateLimiter, asyncHandler(listAuditLogs));
+adminRouter.get("/media", adminReadRateLimiter, asyncHandler(listMediaAssets));
+adminRouter.post(
+	"/media",
+	adminMutationRateLimiter,
+	postUpload.single("file"),
+	asyncHandler(createMediaAsset)
+);
+adminRouter.delete("/media/:assetId", adminMutationRateLimiter, asyncHandler(trashMediaAsset));
+adminRouter.delete(
+	"/media/:assetId/permanent",
+	adminMutationRateLimiter,
+	asyncHandler(requireRecentMfa),
+	asyncHandler(permanentlyDeleteMediaAsset)
+);
+adminRouter.post("/media/:assetId/restore", adminMutationRateLimiter, asyncHandler(restoreMediaAsset));
+adminRouter.get("/site-content/trash", adminReadRateLimiter, asyncHandler(listContentTrash));
+adminRouter.post(
+	"/site-content/trash/:trashId/restore",
+	adminMutationRateLimiter,
+	asyncHandler(restoreContentTrashItem)
+);
+adminRouter.get("/site-content/:page", adminReadRateLimiter, asyncHandler(getAdminSiteContent));
+adminRouter.put(
+	"/site-content/:page/draft",
+	adminMutationRateLimiter,
+	asyncHandler(saveSiteContentDraft)
+);
+adminRouter.post(
+	"/site-content/:page/publish",
+	adminMutationRateLimiter,
+	asyncHandler(publishSiteContentDraft)
+);
+adminRouter.get(
+	"/site-content/:page/revisions",
+	adminReadRateLimiter,
+	asyncHandler(listSiteContentRevisions)
+);
 adminRouter.post(
 	"/site-content/:page/revisions/:revisionId/restore",
+	adminMutationRateLimiter,
 	asyncHandler(restoreSiteContentRevision)
 );
-adminRouter.post("/site-content/:page/trash", asyncHandler(trashSiteContentItem));
-adminRouter.patch("/site-content/about", asyncHandler(updateAboutPageContent));
-adminRouter.patch("/site-content/characters", asyncHandler(updateCharactersPageContent));
+adminRouter.post(
+	"/site-content/:page/trash",
+	adminMutationRateLimiter,
+	asyncHandler(trashSiteContentItem)
+);
+adminRouter.patch(
+	"/site-content/about",
+	adminMutationRateLimiter,
+	asyncHandler(updateAboutPageContent)
+);
+adminRouter.patch(
+	"/site-content/characters",
+	adminMutationRateLimiter,
+	asyncHandler(updateCharactersPageContent)
+);

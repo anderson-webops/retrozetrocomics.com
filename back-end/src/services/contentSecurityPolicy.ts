@@ -1,9 +1,14 @@
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { parse } from "parse5";
 
-const SCRIPT_PATTERN = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
-const SOURCE_ATTRIBUTE_PATTERN = /(?:^|\s)src\s*=/i;
+interface HtmlNode {
+	attrs?: Array<{ name: string; value: string }>;
+	childNodes?: HtmlNode[];
+	nodeName?: string;
+	value?: string;
+}
 
 export type ContentSecurityPolicyProfile = "owner" | "public";
 
@@ -15,7 +20,8 @@ export function isOwnerSecurityRoute(requestPath: string) {
 export function buildContentSecurityPolicyDirectives(
 	profile: ContentSecurityPolicyProfile,
 	inlineScriptHashes: readonly string[],
-	isProduction: boolean
+	isProduction: boolean,
+	contentImageSources: readonly string[] = []
 ) {
 	const ownerOnly = profile === "owner";
 
@@ -42,11 +48,12 @@ export function buildContentSecurityPolicyDirectives(
 					"https://tpc.googlesyndication.com"
 				],
 		imgSrc: ownerOnly
-			? ["'self'", "data:", "blob:"]
+			? ["'self'", "data:", "blob:", ...contentImageSources]
 			: [
 					"'self'",
 					"data:",
 					"blob:",
+					...contentImageSources,
 					"https://*.doubleclick.net",
 					"https://*.googlesyndication.com",
 					"https://*.googleusercontent.com"
@@ -82,17 +89,29 @@ function collectHtmlFiles(directory: string): string[] {
 	});
 }
 
+function collectInlineScripts(node: HtmlNode, scripts: string[] = []) {
+	if (
+		node.nodeName === "script"
+		&& !node.attrs?.some(attribute => attribute.name.toLowerCase() === "src")
+	) {
+		scripts.push(
+			(node.childNodes || [])
+				.filter(child => child.nodeName === "#text")
+				.map(child => child.value || "")
+				.join("")
+		);
+	}
+	for (const child of node.childNodes || []) collectInlineScripts(child, scripts);
+	return scripts;
+}
+
 export function readInlineScriptHashes(staticRoot: string) {
 	const hashes = new Set<string>();
 
 	for (const htmlPath of collectHtmlFiles(staticRoot)) {
 		const html = readFileSync(htmlPath, "utf8");
-		for (const match of html.matchAll(SCRIPT_PATTERN)) {
-			if (SOURCE_ATTRIBUTE_PATTERN.test(match[1] || "")) {
-				continue;
-			}
-
-			const script = match[2] || "";
+		const document = parse(html) as unknown as HtmlNode;
+		for (const script of collectInlineScripts(document)) {
 			if (!script.trim()) {
 				continue;
 			}

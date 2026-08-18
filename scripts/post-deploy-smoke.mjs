@@ -58,6 +58,36 @@ const scriptPolicy = csp.split(";")
 	.map(directive => directive.trim())
 	.find(directive => directive.startsWith("script-src")) || "";
 assert.doesNotMatch(scriptPolicy, /'unsafe-inline'|'unsafe-eval'/);
+const hsts = rootResponse.headers.get("strict-transport-security") || "";
+assert.match(hsts, /max-age=63072000/i, "HSTS must retain the two-year preload lifetime.");
+assert.match(hsts, /includeSubDomains/i, "HSTS must include subdomains.");
+assert.match(hsts, /preload/i, "HSTS must retain preload eligibility.");
+
+const ownerResponse = await request("/studio/admin");
+assert.equal(ownerResponse.status, 200, "The owner sign-in page must remain available.");
+assert.match(ownerResponse.headers.get("cache-control") || "", /no-store/);
+assert.match(ownerResponse.headers.get("x-robots-tag") || "", /noindex/);
+const ownerCsp = ownerResponse.headers.get("content-security-policy") || "";
+assert.doesNotMatch(ownerCsp, /googlesyndication|doubleclick|analytics\./i);
+
+const securityTextResponse = await request("/.well-known/security.txt");
+assert.equal(securityTextResponse.status, 200, "security.txt must be public.");
+assert.match(securityTextResponse.headers.get("content-type") || "", /text\/plain/);
+const securityText = await securityTextResponse.text();
+assert.match(securityText, /^Contact:/m);
+assert.match(securityText, /^Canonical: https:\/\/retrozetrocomics\.com\/\.well-known\/security\.txt$/m);
+
+const wwwResponse = await fetch(`https://www.${new URL(origin).hostname}/characters?audit=1`, {
+	headers: { "User-Agent": "retrozetro-post-deploy-smoke/1.0" },
+	redirect: "manual",
+	signal: AbortSignal.timeout(15_000)
+});
+assert.equal(wwwResponse.status, 308, "The www hostname must use a permanent method-preserving redirect.");
+assert.equal(
+	wwwResponse.headers.get("location"),
+	`${origin}/characters?audit=1`,
+	"The www hostname must redirect to the canonical origin."
+);
 
 const missingApiResponse = await request("/api/not-a-public-route");
 assert.equal(missingApiResponse.status, 404, "Unknown API routes must return 404.");

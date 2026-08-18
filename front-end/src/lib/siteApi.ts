@@ -146,3 +146,9 @@ export async function restoreMediaAsset(assetId: string) {
 	const { data } = await api.post<{ asset: MediaAsset }>(`/admin/media/${assetId}/restore`, {});
 	return data.asset;
 }
+
+export async function permanentlyDeleteMediaAsset(assetId: string) {
+	await api.delete(`/admin/media/${assetId}/permanent`, {
+		data: { confirmation: "PERMANENTLY DELETE" }
+	});
+}

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+	isAllowedContentImageUrl,
+	readContentImageHosts
+} from "../src/config/contentImages.js";
+import {
 	createDefaultSiteContent,
 	parseDraftSiteContent,
 	parsePublishedSiteContent,
@@ -73,5 +77,35 @@ describe("guided site content safety", () => {
 			message: "Keep at least one item in this section before publishing.",
 			success: false
 		});
+	});
+
+	it("allows local media and explicitly approved HTTPS image hosts only", () => {
+		expect(isAllowedContentImageUrl("/uploads/content/2026-08/picture.jpg", {})).toBe(true);
+		expect(isAllowedContentImageUrl("/brand/characters-zetro.svg", {})).toBe(true);
+		expect(isAllowedContentImageUrl("//attacker.invalid/picture.jpg", {})).toBe(false);
+		expect(isAllowedContentImageUrl("javascript:alert(1)", {})).toBe(false);
+		expect(isAllowedContentImageUrl("https://attacker.invalid/picture.jpg", {})).toBe(false);
+		expect(isAllowedContentImageUrl("https://images.example.com/picture.jpg", {
+			CONTENT_IMAGE_HOSTS: "images.example.com"
+		})).toBe(true);
+		expect(isAllowedContentImageUrl("https://images.example.com:444/picture.jpg", {
+			CONTENT_IMAGE_HOSTS: "images.example.com"
+		})).toBe(false);
+		expect(() => readContentImageHosts({ CONTENT_IMAGE_HOSTS: "https://images.example.com/path" }))
+			.toThrow(/DNS hostnames/);
+	});
+
+	it("rejects an unapproved image URL in otherwise publishable content", () => {
+		const content = createDefaultSiteContent("characters");
+		(content.characters as Array<Record<string, unknown>>)[0].image
+			= "https://attacker.invalid/tracker.gif";
+		const parsed = parsePublishedSiteContent("characters", content);
+		expect(parsed.success).toBe(false);
+		if (!parsed.success) {
+			expect(parsed.issues).toContainEqual(expect.objectContaining({
+				field: "characters.0.image",
+				message: expect.stringMatching(/media library|approved/)
+			}));
+		}
 	});
 });

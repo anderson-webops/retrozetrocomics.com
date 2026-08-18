@@ -107,18 +107,18 @@ NODE
 npm ci \
 	--include=prod \
 	--omit=dev \
-	--omit=optional \
+	--include=optional \
 	--workspace back-end \
 	--include-workspace-root=false \
 	--ignore-scripts \
 	--no-audit \
 	--no-fund
 npm rebuild argon2 --workspace back-end --foreground-scripts --no-audit --no-fund
-npm audit --include=prod --omit=dev --omit=optional --workspace back-end --audit-level=high
+npm audit --include=prod --omit=dev --include=optional --workspace back-end --audit-level=high
 npm prune \
 	--include=prod \
 	--omit=dev \
-	--omit=optional \
+	--include=optional \
 	--workspace back-end \
 	--include-workspace-root=false \
 	--no-audit \

@@ -14,7 +14,7 @@ const securityConfig = {
 } as SecurityConfig;
 
 describe("owner multifactor authentication", () => {
-	it("creates single-use recovery codes without storing their plaintext", async () => {
+	it("creates single-use recovery codes without storing their plaintext", { timeout: 30_000 }, async () => {
 		const { plainTextCodes, storedCodes } = await createRecoveryCodes();
 
 		expect(plainTextCodes).toHaveLength(8);

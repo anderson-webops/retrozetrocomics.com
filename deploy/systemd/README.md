@@ -9,6 +9,9 @@ or routing outside the existing Nginx TLS server.
    paths validated by the scripts.
 3. Run `install-service.sh --dry-run`, inspect every target, then run it as root. Replace every placeholder in
    `/etc/retrozetro/retrozetro.env`; the application intentionally refuses to start with the example values.
+   Create `/etc/retrozetro/github-post-deploy.token` as a root-owned `0400` file containing a fine-grained GitHub token
+   limited to Actions write access for this repository. Promotion fails closed if it cannot dispatch the independent
+   post-deploy verification workflow.
 4. Include `../nginx/retrozetro.locations.conf` inside the existing TLS server block and validate Nginx.
 5. Clone the exact release tag beneath `/srv/retrozetro/releases/<release>`, preserving a clean Git checkout.
 6. As `retrozetro`, run `prepare-release.sh` with that absolute checkout path.

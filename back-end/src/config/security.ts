@@ -1,6 +1,7 @@
 import net from "node:net";
 
 import { RuntimeConfigurationError } from "../errors/runtimeError.js";
+import { readContentImageSources } from "./contentImages.js";
 import { readNodeEnvironment } from "./environment.js";
 
 const DEFAULT_SITE_ORIGIN = "https://retrozetrocomics.com";
@@ -94,6 +95,7 @@ function parseTrustedProxyIps(value: string | undefined, isProduction: boolean) 
 
 export interface SecurityConfig {
 	allowedOrigins: ReadonlySet<string>;
+	contentImageSources: readonly string[];
 	diagnosticsKey?: string;
 	isProduction: boolean;
 	sessionCookieName: string;
@@ -166,6 +168,7 @@ export function readSecurityConfig(source: NodeJS.ProcessEnv = process.env): Sec
 
 	return {
 		allowedOrigins: new Set([siteOrigin, webAuthnOrigin, ...additionalOrigins]),
+		contentImageSources: readContentImageSources(source, siteOrigin),
 		diagnosticsKey,
 		isProduction,
 		sessionCookieName:

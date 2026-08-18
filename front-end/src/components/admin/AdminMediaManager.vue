@@ -3,7 +3,14 @@ import type { MediaAsset, MediaPurpose } from "@/types/site";
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 
 import { useLocalDraft } from "@/composables/useLocalDraft";
-import { fetchMediaAssets, restoreMediaAsset, trashMediaAsset, uploadMediaAsset } from "@/lib/siteApi";
+import {
+	fetchMediaAssets,
+	permanentlyDeleteMediaAsset,
+	restoreMediaAsset,
+	trashMediaAsset,
+	uploadMediaAsset
+} from "@/lib/siteApi";
+import { useSessionStore } from "@/stores/session";
 
 const props = withDefaults(defineProps<{ selectable?: boolean }>(), {
 	selectable: false
@@ -12,6 +19,7 @@ const props = withDefaults(defineProps<{ selectable?: boolean }>(), {
 const emit = defineEmits<{
 	select: [asset: MediaAsset];
 }>();
+const session = useSessionStore();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const selectedFile = ref<File | null>(null);
@@ -25,7 +33,9 @@ const error = ref("");
 const status = ref("");
 const showTrash = ref(false);
 const pendingRemoval = ref<MediaAsset | null>(null);
+const pendingPermanentRemoval = ref<MediaAsset | null>(null);
 const removing = ref(false);
+const permanentlyRemoving = ref(false);
 const missingRestoredFile = ref(false);
 
 const form = reactive({
@@ -176,6 +186,35 @@ async function restoreAsset(asset: MediaAsset) {
 		await loadAssets();
 	} catch (caught: any) {
 		error.value = messageFromError(caught, "That item could not be restored.");
+	}
+}
+
+function requiresPasskeyConfirmation(caught: any) {
+	return caught?.response?.data?.code === "MFA_STEP_UP_REQUIRED";
+}
+
+async function confirmPermanentRemoval() {
+	if (!pendingPermanentRemoval.value) return;
+	permanentlyRemoving.value = true;
+	error.value = "";
+	status.value = "";
+	try {
+		const asset = pendingPermanentRemoval.value;
+		try {
+			await permanentlyDeleteMediaAsset(asset.id);
+		} catch (caught: any) {
+			if (!requiresPasskeyConfirmation(caught)) throw caught;
+			status.value = "Confirm your passkey to finish deleting this file.";
+			await session.authenticatePasskey();
+			await permanentlyDeleteMediaAsset(asset.id);
+		}
+		status.value = `${asset.title} was permanently deleted.`;
+		pendingPermanentRemoval.value = null;
+		await loadAssets();
+	} catch (caught: any) {
+		error.value = messageFromError(caught, "That file could not be permanently deleted. It is still in trash.");
+	} finally {
+		permanentlyRemoving.value = false;
 	}
 }
 
@@ -338,6 +377,14 @@ onBeforeUnmount(releasePreview);
 						<button v-if="showTrash" type="button" @click="restoreAsset(asset)">
 							Restore {{ asset.title }}
 						</button>
+						<button
+							v-if="showTrash"
+							class="media-tile__permanent"
+							type="button"
+							@click="pendingPermanentRemoval = asset"
+						>
+							Delete {{ asset.title }} forever
+						</button>
 						<button v-else class="media-tile__remove" type="button" @click="pendingRemoval = asset">
 							Move {{ asset.title }} to trash
 						</button>
@@ -354,6 +401,15 @@ onBeforeUnmount(releasePreview);
 			:title="`Move ${pendingRemoval?.title || 'this file'} to trash?`"
 			@cancel="pendingRemoval = null"
 			@confirm="confirmRemoval"
+		/>
+		<AdminConfirmDialog
+			:busy="permanentlyRemoving"
+			confirm-label="Delete forever"
+			:description="`${pendingPermanentRemoval?.title || 'This file'} and its stored upload will be erased. This cannot be undone. Restore it instead if you might need it later.`"
+			:open="Boolean(pendingPermanentRemoval)"
+			:title="`Permanently delete ${pendingPermanentRemoval?.title || 'this file'}?`"
+			@cancel="pendingPermanentRemoval = null"
+			@confirm="confirmPermanentRemoval"
 		/>
 	</section>
 </template>
@@ -697,6 +753,12 @@ onBeforeUnmount(releasePreview);
 .media-tile__actions .media-tile__remove {
 	border-color: rgba(255, 143, 143, 0.28);
 	color: #ffdada;
+}
+
+.media-tile__actions .media-tile__permanent {
+	border-color: rgba(255, 112, 112, 0.45);
+	background: rgba(132, 20, 20, 0.28);
+	color: #ffd4d4;
 }
 
 @media (max-width: 680px) {

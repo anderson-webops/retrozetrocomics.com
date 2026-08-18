@@ -46,10 +46,26 @@ export const mfaRateLimiter = rateLimit({
 	windowMs: 10 * 60 * 1000
 });
 
+export const authReadRateLimiter = rateLimit({
+	legacyHeaders: false,
+	max: 120,
+	message: { message: "Too many account checks. Pause for a moment, then try again." },
+	standardHeaders: true,
+	windowMs: 60 * 1000
+});
+
 export const publicContentRateLimiter = rateLimit({
 	legacyHeaders: false,
 	max: 180,
 	message: { message: "Too many requests. Please try again shortly." },
+	standardHeaders: true,
+	windowMs: 60 * 1000
+});
+
+export const publicPageRateLimiter = rateLimit({
+	legacyHeaders: false,
+	max: 1_200,
+	message: { message: "Too many page requests. Please try again shortly." },
 	standardHeaders: true,
 	windowMs: 60 * 1000
 });

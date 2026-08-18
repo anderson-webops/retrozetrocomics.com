@@ -15,6 +15,7 @@ import {
 } from "../controllers/authController.js";
 import { requireAdmin, requireRecentMfa } from "../middleware/auth.js";
 import {
+	authReadRateLimiter,
 	loginAccountRateLimiter,
 	loginIpRateLimiter,
 	mfaRateLimiter
@@ -23,10 +24,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const authRouter = Router();
 
-authRouter.get("/me", asyncHandler(me));
+authRouter.get("/me", authReadRateLimiter, asyncHandler(me));
 authRouter.post("/login", loginIpRateLimiter, loginAccountRateLimiter, asyncHandler(login));
-authRouter.post("/logout", asyncHandler(logout));
-authRouter.post("/mfa/cancel", asyncHandler(cancelMfa));
+authRouter.post("/logout", mfaRateLimiter, asyncHandler(logout));
+authRouter.post("/mfa/cancel", mfaRateLimiter, asyncHandler(cancelMfa));
 authRouter.post("/mfa/passkey/registration/options", mfaRateLimiter, asyncHandler(passkeyRegistrationOptions));
 authRouter.post(
 	"/mfa/passkey/registration/verify",
@@ -40,9 +41,10 @@ authRouter.post(
 	asyncHandler(verifyPasskeyAuthenticationResponse)
 );
 authRouter.post("/mfa/recovery", mfaRateLimiter, asyncHandler(useRecoveryCode));
-authRouter.get("/mfa/status", asyncHandler(requireAdmin), asyncHandler(mfaStatus));
+authRouter.get("/mfa/status", authReadRateLimiter, asyncHandler(requireAdmin), asyncHandler(mfaStatus));
 authRouter.post(
 	"/mfa/recovery/regenerate",
+	mfaRateLimiter,
 	asyncHandler(requireRecentMfa),
 	asyncHandler(regenerateRecoveryCodes)
 );

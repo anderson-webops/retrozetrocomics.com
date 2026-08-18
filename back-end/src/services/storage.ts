@@ -140,6 +140,34 @@ function createRelativeStorageKey(absolutePath: string) {
 	return path.relative(uploadRoot, absolutePath).split(path.sep).join("/");
 }
 
+export function resolveUploadedFilePath(uploadPath: string) {
+	const resolvedPath = path.resolve(uploadPath);
+	const relativePath = path.relative(uploadRoot, resolvedPath);
+	if (!relativePath || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+		throw new StorageUnavailableError("Uploaded file path resolves outside upload storage");
+	}
+	return resolvedPath;
+}
+
+export function resolveLocalStoragePath(storageKey: string) {
+	if (
+		!storageKey
+		|| path.isAbsolute(storageKey)
+		|| storageKey.includes("\\")
+		|| storageKey.split("/").some(segment => !segment || segment === "." || segment === "..")
+	) {
+		throw new StorageUnavailableError("Media storage key is not a safe relative path");
+	}
+
+	const resolvedPath = path.resolve(uploadRoot, ...storageKey.split("/"));
+	const relativePath = path.relative(uploadRoot, resolvedPath);
+	if (!relativePath || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+		throw new StorageUnavailableError("Media storage key resolves outside upload storage");
+	}
+
+	return resolvedPath;
+}
+
 function normalizeStorageDriver(value?: string | null): StorageDriver {
 	return value === "s3" ? "s3" : "local";
 }
@@ -232,7 +260,7 @@ function ensureGeneratedStorageKey(file: UploadedFile) {
 }
 
 function resolveStorageKeyForFile(file: UploadedFile) {
-	return file.generatedStorageKey || createRelativeStorageKey(file.path);
+	return file.generatedStorageKey || createRelativeStorageKey(resolveUploadedFilePath(file.path));
 }
 
 export function ensureUploadDirectories() {

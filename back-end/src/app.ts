@@ -28,7 +28,9 @@ import {
 	isOwnerSecurityRoute,
 	readInlineScriptHashes
 } from "./services/contentSecurityPolicy.js";
+import { canonicalRedirectUrl } from "./services/domainRouting.js";
 import { createProbeRouter } from "./services/probes.js";
+import { publicPageRateLimiter } from "./services/rateLimits.js";
 import {
 	ensureUploadDirectories,
 	uploadRoot
@@ -65,12 +67,16 @@ export function createApp() {
 			directives: buildContentSecurityPolicyDirectives(
 				profile,
 				inlineScriptHashes,
-				config.isProduction
+				config.isProduction,
+				config.contentImageSources
 			)
 		},
 		crossOriginEmbedderPolicy: false,
 		crossOriginResourcePolicy: { policy: "cross-origin" },
 		referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+		strictTransportSecurity: config.isProduction
+			? { includeSubDomains: true, maxAge: 63_072_000, preload: true }
+			: false,
 		xFrameOptions: { action: "deny" }
 	});
 	const ownerSecurityHeaders = createSecurityHeaders("owner");
@@ -93,6 +99,11 @@ export function createApp() {
 			: publicSecurityHeaders;
 		securityHeaders(req, res, next);
 	});
+	app.use((req, res, next) => {
+		const redirectUrl = canonicalRedirectUrl(req.hostname, req.originalUrl, config.siteOrigin);
+		if (redirectUrl) return res.redirect(308, redirectUrl);
+		next();
+	});
 	app.use(
 		createProbeRouter(async () => {
 			const connection = mongoose.connection;
@@ -105,11 +116,12 @@ export function createApp() {
 	);
 	app.use(createRequestSecurityMiddleware(config));
 	app.use((req, res, next) => {
-		if (/^\/api\/(?:admin|auth)(?:\/|$)/.test(req.path)) {
+		if (isOwnerSecurityRoute(req.path)) {
 			res.set({
 				"Cache-Control": "no-store, max-age=0",
 				Expires: "0",
-				Pragma: "no-cache"
+				Pragma: "no-cache",
+				"X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet"
 			});
 		}
 		next();
@@ -164,6 +176,7 @@ export function createApp() {
 	app.use("/api", apiRouter);
 	app.use(
 		"/uploads",
+		publicPageRateLimiter,
 		express.static(uploadRoot, {
 			dotfiles: "deny",
 			fallthrough: false,
@@ -181,7 +194,14 @@ export function createApp() {
 	);
 
 	if (existsSync(staticRoot)) {
+		app.get("/.well-known/security.txt", publicPageRateLimiter, (_req, res, next) => {
+			res.type("text/plain").set("Cache-Control", "public, max-age=86400");
+			return res.sendFile(path.join(staticRoot, ".well-known/security.txt"), error => {
+				if (error) next(error);
+			});
+		});
 		app.use(
+			publicPageRateLimiter,
 			express.static(staticRoot, {
 				dotfiles: "deny",
 				index: false,
@@ -196,7 +216,7 @@ export function createApp() {
 			})
 		);
 
-		app.get("*path", (req, res, next) => {
+		app.get("*path", publicPageRateLimiter, (req, res, next) => {
 			if (!req.accepts("html")) {
 				return res.status(404).json({ message: "Not found" });
 			}

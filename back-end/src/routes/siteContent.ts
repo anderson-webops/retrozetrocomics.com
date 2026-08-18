@@ -6,6 +6,5 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const siteContentRouter = Router();
 
-siteContentRouter.use(publicContentRateLimiter);
-siteContentRouter.get("/about", asyncHandler(getAboutPageContent));
-siteContentRouter.get("/characters", asyncHandler(getCharactersPageContent));
+siteContentRouter.get("/about", publicContentRateLimiter, asyncHandler(getAboutPageContent));
+siteContentRouter.get("/characters", publicContentRateLimiter, asyncHandler(getCharactersPageContent));

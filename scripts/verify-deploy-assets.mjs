@@ -42,6 +42,7 @@ for (const removedPath of [
 	"Dockerfile",
 	"docker-compose.yml",
 	"compose.yaml",
+	".github/workflows/qodana_code_quality.yml",
 	".github/workflows/release-container.yml"
 ]) {
 	assert.equal(await exists(removedPath), false, `${removedPath} must remain absent`);
@@ -137,9 +138,12 @@ assert.match(prepare, /Node 24\.18\.1 and npm 12\.0\.2/);
 assert.match(prepare, /unset npm_config_global_ignore_file NPM_CONFIG_GLOBAL_IGNORE_FILE/);
 assert.match(prepare, /verify:install-scripts/);
 assert.match(prepare, /verify:production-install/);
-assert.match(prepare, /npm audit --include=prod --omit=dev --omit=optional/);
+assert.match(prepare, /npm audit --include=prod --omit=dev --include=optional/);
 assert.match(promote, /--ipv4/);
 assert.match(promote, /--ipv6/);
+assert.match(promote, /probe_is_minimal_and_healthy/);
+assert.match(promote, /dispatch_post_deploy_verification/);
+assert.doesNotMatch(promote, /^identity_matches\(\)/m);
 assert.match(promote, /Candidate verification failed; restoring the previous release/);
 assert.match(promote, /api\/admin\/dashboard/);
 assert.match(promote, /api\/internal\/dbinfo/);

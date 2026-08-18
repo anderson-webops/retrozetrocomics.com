@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { isAllowedContentImageUrl } from "../config/contentImages.js";
 import { createDefaultAboutPageContent } from "../content/defaultAboutPageContent.js";
 import { createDefaultCharactersPageContent } from "../content/defaultCharactersPageContent.js";
 
@@ -8,6 +9,20 @@ export type SiteContentPage = z.infer<typeof siteContentPageSchema>;
 export type SiteContentCollection = "characters" | "storyArcs" | "worldEntries";
 export type SiteContentData = Record<string, unknown>;
 
+const CONTENT_IMAGE_HELP = "Choose a picture from the media library or an approved site image.";
+
+const requiredContentImageSchema = z.string()
+	.trim()
+	.min(1)
+	.max(260)
+	.refine(value => isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP);
+const optionalContentImageSchema = z.string()
+	.trim()
+	.max(260)
+	.refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP)
+	.optional()
+	.default("");
+
 const characterFactSchema = z.object({
 	label: z.string().trim().min(1).max(80),
 	value: z.string().trim().min(1).max(220)
@@ -15,10 +30,10 @@ const characterFactSchema = z.object({
 
 const characterProfileSchema = z.object({
 	description: z.string().trim().min(12).max(420),
-	fallbackImage: z.string().trim().max(260).optional().default(""),
+	fallbackImage: optionalContentImageSchema,
 	frequency: z.string().trim().min(2).max(120),
 	id: z.string().trim().min(1).max(80),
-	image: z.string().trim().min(1).max(260),
+	image: requiredContentImageSchema,
 	imgAlt: z.string().trim().min(2).max(180),
 	name: z.string().trim().min(1).max(80),
 	role: z.string().trim().min(1).max(80),
@@ -56,9 +71,9 @@ const charactersPageSchema = z.object({
 	characters: z.array(characterProfileSchema).min(1).max(16),
 	description: z.string().trim().min(12).max(320),
 	eyebrow: z.string().trim().min(1).max(80),
-	heroImage: z.string().trim().min(1).max(260),
+	heroImage: requiredContentImageSchema,
 	heroImageAlt: z.string().trim().min(2).max(180),
-	heroImageFallback: z.string().trim().max(260).optional().default(""),
+	heroImageFallback: optionalContentImageSchema,
 	title: z.string().trim().min(1).max(120),
 	worldEntries: z.array(worldEntrySchema).min(1).max(16)
 });
@@ -70,10 +85,10 @@ const draftCharacterFactSchema = z.object({
 
 const draftCharacterProfileSchema = z.object({
 	description: z.string().max(420),
-	fallbackImage: z.string().max(260).optional().default(""),
+	fallbackImage: optionalContentImageSchema,
 	frequency: z.string().max(120),
 	id: z.string().trim().min(1).max(80),
-	image: z.string().max(260),
+	image: z.string().max(260).refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
 	imgAlt: z.string().max(180),
 	name: z.string().max(80),
 	role: z.string().max(80),
@@ -111,9 +126,9 @@ const draftCharactersPageSchema = z.object({
 	characters: z.array(draftCharacterProfileSchema).min(1).max(16),
 	description: z.string().max(320),
 	eyebrow: z.string().max(80),
-	heroImage: z.string().max(260),
+	heroImage: z.string().max(260).refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
 	heroImageAlt: z.string().max(180),
-	heroImageFallback: z.string().max(260).optional().default(""),
+	heroImageFallback: optionalContentImageSchema,
 	title: z.string().max(120),
 	worldEntries: z.array(draftWorldEntrySchema).min(1).max(16)
 });

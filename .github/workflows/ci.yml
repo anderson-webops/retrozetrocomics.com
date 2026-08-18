@@ -165,7 +165,8 @@ jobs:
       - name: Build exact direct-runtime candidate
         run: |
           npm ci --include=optional --strict-allow-scripts
-          export RETROZETRO_RELEASE_VERSION="v$(node -p "require('./package.json').version")"
+          RETROZETRO_RELEASE_VERSION="v$(node -p "require('./package.json').version")"
+          export RETROZETRO_RELEASE_VERSION
           export SOURCE_REVISION=0000000000000000000000000000000000000000
           export SOURCE_DATE_EPOCH=1
           npm run build

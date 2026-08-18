@@ -1,4 +1,4 @@
-import net from "node:net";
+import { createHash } from "node:crypto";
 
 import { RuntimeConfigurationError } from "./errors/runtimeError.js";
 
@@ -6,6 +6,9 @@ const DEFAULT_MONGODB_SECRET_PATH = "secret/data/retrozetro/mongodb";
 const MAXIMUM_VAULT_RESPONSE_BYTES = 64 * 1024;
 const PLACEHOLDER_SECRET = /^(?:replace(?:[-_ ]with)?|change[-_ ]?me|example)(?:[-_ ]|$)/i;
 const VAULT_TIMEOUT_MS = 5_000;
+const HISTORICALLY_EXPOSED_SECRET_ID_HASHES = new Set([
+	"36ebb850cae31eee45317ae2261becc728c35bc32881c5537157ac6b1ee10dc3"
+]);
 
 export class VaultNotConfiguredError extends Error {
 	constructor() {
@@ -33,25 +36,9 @@ function parseBoolean(value: string | undefined, variableName: string) {
 	throw new RuntimeConfigurationError(`${variableName} must be true or false`);
 }
 
-function isPrivateLiteralIp(hostname: string) {
+function isLiteralLoopback(hostname: string) {
 	const host = hostname.replace(/^\[|\]$/g, "").toLowerCase();
-	const family = net.isIP(host);
-	if (family === 4) {
-		const [first, second] = host.split(".").map(Number);
-		return first === 10
-			|| first === 127
-			|| (first === 169 && second === 254)
-			|| (first === 172 && second >= 16 && second <= 31)
-			|| (first === 192 && second === 168)
-			|| (first === 100 && second >= 64 && second <= 127);
-	}
-	if (family === 6) {
-		return host === "::1"
-			|| /^f[cd]/.test(host)
-			|| /^fe[89ab]/.test(host);
-	}
-
-	return false;
+	return host === "127.0.0.1" || host === "::1";
 }
 
 function requireVaultCredential(value: string, variableName: string) {
@@ -84,6 +71,26 @@ function readSecretPath(value?: string) {
 	}
 
 	return secretPath;
+}
+
+function requireUnrevokedVaultSecret(secretId: string, source: NodeJS.ProcessEnv) {
+	const configuredHashes = (source.REVOKED_VAULT_SECRET_ID_SHA256 || "")
+		.split(",")
+		.map(value => value.trim().toLowerCase())
+		.filter(Boolean);
+	if (configuredHashes.some(value => !/^[\da-f]{64}$/.test(value))) {
+		throw new RuntimeConfigurationError(
+			"REVOKED_VAULT_SECRET_ID_SHA256 accepts comma-separated SHA-256 values only"
+		);
+	}
+
+	const fingerprint = createHash("sha256").update(secretId).digest("hex");
+	if (HISTORICALLY_EXPOSED_SECRET_ID_HASHES.has(fingerprint) || configuredHashes.includes(fingerprint)) {
+		throw new RuntimeConfigurationError(
+			"VAULT_SECRET_ID matches a revoked or historically exposed credential and must be rotated"
+		);
+	}
+	return secretId;
 }
 
 export function readVaultConfig(source: NodeJS.ProcessEnv = process.env): VaultConfig {
@@ -123,9 +130,9 @@ export function readVaultConfig(source: NodeJS.ProcessEnv = process.env): VaultC
 
 	const allowHttp = parseBoolean(source.VAULT_ALLOW_HTTP, "VAULT_ALLOW_HTTP");
 	if (url.protocol === "http:") {
-		if (!allowHttp || !isPrivateLiteralIp(url.hostname)) {
+		if (!allowHttp || !isLiteralLoopback(url.hostname)) {
 			throw new RuntimeConfigurationError(
-				"HTTP Vault requires VAULT_ALLOW_HTTP=true and a private literal IP address"
+				"HTTP Vault requires VAULT_ALLOW_HTTP=true and the literal loopback address 127.0.0.1 or ::1"
 			);
 		}
 	}
@@ -137,7 +144,10 @@ export function readVaultConfig(source: NodeJS.ProcessEnv = process.env): VaultC
 		address: url.origin,
 		mongodbSecretPath: readSecretPath(source.VAULT_MONGODB_SECRET_PATH),
 		roleId: requireVaultCredential(roleId, "VAULT_ROLE_ID"),
-		secretId: requireVaultCredential(secretId, "VAULT_SECRET_ID")
+		secretId: requireUnrevokedVaultSecret(
+			requireVaultCredential(secretId, "VAULT_SECRET_ID"),
+			source
+		)
 	};
 }
 

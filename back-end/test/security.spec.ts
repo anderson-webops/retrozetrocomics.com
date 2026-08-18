@@ -1,6 +1,7 @@
 import type { AddressInfo } from "node:net";
 import type { Request } from "express";
 
+import { createHash } from "node:crypto";
 import { once } from "node:events";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
@@ -32,9 +33,13 @@ import { createRequestSecurityMiddleware } from "../src/middleware/requestSecuri
 import { Admin } from "../src/models/schemas/Admin.js";
 import { withAdminLifecycleLock } from "../src/services/adminLifecycleLock.js";
 import { buildContactMail } from "../src/services/contact.js";
+import { canonicalRedirectUrl } from "../src/services/domainRouting.js";
 import {
 	isAllowedUploadMimeType,
-	readUploadRoot
+	readUploadRoot,
+	resolveLocalStoragePath,
+	resolveUploadedFilePath,
+	uploadRoot
 } from "../src/services/storage.js";
 import {
 	isVaultConfigured,
@@ -53,6 +58,9 @@ async function startSecurityTestApp() {
 	);
 	app.use(express.json());
 	app.post("/api/change", (_req, res) => {
+		res.json({ ok: true });
+	});
+	app.post("/api/admin/media", (_req, res) => {
 		res.json({ ok: true });
 	});
 
@@ -102,6 +110,7 @@ describe("security configuration", () => {
 
 	it("deduplicates rotation keys and defaults to no trusted proxy", () => {
 		const config = readSecurityConfig({
+			CONTENT_IMAGE_HOSTS: "images.example.com,images.example.com",
 			SESSION_SECRET: strongSecret,
 			SESSION_SECRET_PREVIOUS: `${strongSecret},previous-session-secret-that-is-also-more-than-thirty-two`
 		});
@@ -109,6 +118,7 @@ describe("security configuration", () => {
 		expect(config.sessionKeys).toHaveLength(2);
 		expect(config.trustedProxyIps).toEqual([]);
 		expect(config.allowedOrigins.has("https://retrozetrocomics.com")).toBe(true);
+		expect(config.contentImageSources).toEqual(["https://images.example.com"]);
 		expect(config.webAuthnOrigin).toBe("https://retrozetrocomics.com");
 		expect(config.webAuthnRpId).toBe("retrozetrocomics.com");
 	});
@@ -287,7 +297,13 @@ describe("production runtime configuration", () => {
 			VAULT_ALLOW_HTTP: "true",
 			VAULT_ROLE_ID: "role-identifier-that-is-long-enough",
 			VAULT_SECRET_ID: "secret-identifier-that-is-long-enough"
-		})).toThrow(/private literal IP/);
+		})).toThrow(/literal loopback/);
+		expect(() => readVaultConfig({
+			VAULT_ADDR: "http://192.168.1.20:8200",
+			VAULT_ALLOW_HTTP: "true",
+			VAULT_ROLE_ID: "role-identifier-that-is-long-enough",
+			VAULT_SECRET_ID: "secret-identifier-that-is-long-enough"
+		})).toThrow(/literal loopback/);
 		expect(() => readVaultConfig({
 			VAULT_ADDR: "https://vault.example.com/secret",
 			VAULT_ROLE_ID: "role-identifier-that-is-long-enough",
@@ -301,6 +317,14 @@ describe("production runtime configuration", () => {
 			VAULT_SECRET_ID: "secret-identifier-that-is-long-enough"
 		});
 		expect(config.address).toBe("http://127.0.0.1:8200");
+
+		const revokedSecret = "revoked-secret-identifier-that-is-long-enough";
+		expect(() => readVaultConfig({
+			REVOKED_VAULT_SECRET_ID_SHA256: createHash("sha256").update(revokedSecret).digest("hex"),
+			VAULT_ADDR: "https://vault.example.com",
+			VAULT_ROLE_ID: "role-identifier-that-is-long-enough",
+			VAULT_SECRET_ID: revokedSecret
+		})).toThrow(/revoked or historically exposed/);
 	});
 
 	it("requires exact runtime and static release identity", () => {
@@ -343,6 +367,24 @@ describe("production runtime configuration", () => {
 		}
 	});
 
+	it("redirects only the exact www hostname to the canonical origin", () => {
+		expect(canonicalRedirectUrl(
+			"www.retrozetrocomics.com",
+			"/characters?view=all",
+			"https://retrozetrocomics.com"
+		)).toBe("https://retrozetrocomics.com/characters?view=all");
+		expect(canonicalRedirectUrl(
+			"retrozetrocomics.com.attacker.invalid",
+			"/",
+			"https://retrozetrocomics.com"
+		)).toBeNull();
+		expect(canonicalRedirectUrl(
+			"www.retrozetrocomics.com",
+			"//attacker.invalid/path",
+			"https://retrozetrocomics.com"
+		)).toBe("https://retrozetrocomics.com//attacker.invalid/path");
+	});
+
 	it("keeps production uploads outside releases and rejects active formats", () => {
 		expect(readUploadRoot({
 			NODE_ENV: "production",
@@ -359,6 +401,11 @@ describe("production runtime configuration", () => {
 		expect(isAllowedUploadMimeType("application/pdf")).toBe(true);
 		expect(isAllowedUploadMimeType("image/svg+xml")).toBe(false);
 		expect(isAllowedUploadMimeType("text/html")).toBe(false);
+		expect(resolveLocalStoragePath("content/2026-08/picture.jpg"))
+			.toBe(path.join(uploadRoot, "content/2026-08/picture.jpg"));
+		expect(() => resolveLocalStoragePath("../outside.jpg")).toThrow(/safe relative path/);
+		expect(() => resolveUploadedFilePath(path.resolve(uploadRoot, "../outside.jpg")))
+			.toThrow(/outside upload storage/);
 	});
 
 	it("serializes administrator lifecycle mutations", async () => {
@@ -467,6 +514,38 @@ describe("request security", () => {
 			});
 
 			expect(response.status).toBe(415);
+		}
+		finally {
+			server.close();
+			await once(server, "close");
+		}
+	});
+
+	it("permits multipart data only for the authenticated media upload route", async () => {
+		const { server, url } = await startSecurityTestApp();
+		const formData = new FormData();
+		formData.set("file", new Blob(["picture"], { type: "image/png" }), "picture.png");
+
+		try {
+			const allowed = await fetch(url.replace("/api/change", "/api/admin/media"), {
+				body: formData,
+				headers: {
+					Origin: "https://retrozetrocomics.com",
+					"Sec-Fetch-Site": "same-origin"
+				},
+				method: "POST"
+			});
+			expect(allowed.status).toBe(200);
+
+			const blocked = await fetch(url, {
+				body: formData,
+				headers: {
+					Origin: "https://retrozetrocomics.com",
+					"Sec-Fetch-Site": "same-origin"
+				},
+				method: "POST"
+			});
+			expect(blocked.status).toBe(415);
 		}
 		finally {
 			server.close();

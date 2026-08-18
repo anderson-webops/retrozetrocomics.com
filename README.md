@@ -31,11 +31,18 @@ npm run audit:production
 - If you override the public site hostname during builds, also set `VITE_PUBLIC_SITE_ORIGIN` so canonical URLs and SSG API resolution stay correct.
 - Use [`HEALTHCHECKS.md`](./HEALTHCHECKS.md) for deployment monitor targets instead of `/`.
 - Production uploads live outside immutable releases at `/srv/retrozetro/shared/uploads`. Only JPEG, PNG, GIF, WebP,
-  and PDF files are accepted; generated filenames use canonical extensions, and PDFs are served as attachments.
+  and PDF files are accepted. The backend verifies signatures, decodes and re-encodes images without metadata, rejects
+  active or encrypted PDFs, and serves PDFs as attachments. Permanent deletion is available only from trash after a
+  recent passkey confirmation and is blocked while current saved or published content still uses the file.
 - The public contact form now submits through the backend. Set `CONTACT_FROM_EMAIL` and either `CONTACT_USE_SENDMAIL=true` or the `CONTACT_SMTP_*` settings. If `CONTACT_TO_EMAIL` is unset, submissions default to `contacts@jacobdanderson.net`; `CONTACT_BCC_EMAIL` stays optional so future alias-plus-BCC routing is a simple env change.
 - Use `deploy/systemd/retrozetro.env.example` for production. Session and diagnostics secrets must be non-placeholder
   random values, production origins must use HTTPS, and `TRUSTED_PROXY_IPS` must contain only the exact loopback proxy
-  addresses. A configured Vault path fails closed and never silently falls back to `MONGODB_URI`.
+  addresses. A configured Vault path fails closed and never silently falls back to `MONGODB_URI`; plaintext Vault is
+  accepted only on literal loopback, and the historically exposed SecretID fingerprint is denied even if it remains
+  present in a local environment file.
+- Current site content accepts media-library paths and bundled `/brand/` or `/legacy-images/` files. Deliberate external
+  image hosting remains available by listing exact HTTPS DNS hostnames in `CONTENT_IMAGE_HOSTS`; those same hosts are
+  added narrowly to the browser image policy.
 - A production `mongodb://` URI with the exact single host `localhost` is canonicalized to `127.0.0.1` before validation
   and connection. Other hostnames remain remote and require verified TLS.
 - Admin creation, enablement, disablement, and password resets are dry-run-first:
@@ -74,7 +81,9 @@ The repository contains the complete non-container deployment contract:
 - `deploy/systemd/prepare-release.sh` validates a clean release checkout, performs all dependency and application gates,
   builds exact source metadata, and reduces the tree to audited backend runtime dependencies.
 - `deploy/systemd/promote-release.sh` atomically changes `/srv/retrozetro/current`, writes exact deployment identity,
-  verifies local readiness and both public address families, and restores the prior release if any gate fails.
+  verifies local readiness and both public address families, dispatches independent GitHub post-deploy verification,
+  and restores the prior release if any gate or dispatch fails. The required root-owned GitHub token file and minimum
+  permission are documented in `deploy/systemd/README.md`.
 
 Before the first direct promotion, back up MongoDB and uploads, rotate the Vault AppRole SecretID exposed in historical
 commit `8b8a2a4d431f1a2599a69ac0a56c0423285b9332`, and prove the old login is rejected. Production promotion remains blocked
