@@ -52,6 +52,8 @@ assert.deepEqual(readiness, { ok: true }, "API readiness payload must remain min
 
 const rootResponse = await request("/");
 assert.equal(rootResponse.status, 200, "Public homepage must be available.");
+const rootHtml = await rootResponse.text();
+assert.match(rootHtml, /http-equiv="Content-Security-Policy"/);
 const csp = rootResponse.headers.get("content-security-policy") || "";
 assert.match(csp, /script-src/, "Public homepage must send a script policy.");
 const scriptPolicy = csp.split(";")

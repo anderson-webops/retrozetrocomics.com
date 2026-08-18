@@ -1,13 +1,25 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { parse, parseFragment, serialize } from "parse5";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ownerHtmlPath = path.join(repositoryRoot, "front-end", "dist", "studio", "admin", "index.html");
+const outputDirectory = path.join(repositoryRoot, "front-end", "dist");
+const ownerHtmlRelativePath = "studio/admin/index.html";
+
+async function collectHtmlFiles(directory) {
+	const entries = await readdir(directory, { withFileTypes: true });
+	const files = [];
+	for (const entry of entries) {
+		const absolutePath = path.join(directory, entry.name);
+		if (entry.isDirectory()) files.push(...await collectHtmlFiles(absolutePath));
+		else if (entry.isFile() && entry.name.endsWith(".html")) files.push(absolutePath);
+	}
+	return files;
+}
 
 function walk(node, visitor) {
 	visitor(node);
@@ -63,52 +75,84 @@ function readContentImageSources() {
 		});
 }
 
-function createOwnerPolicy(hashes) {
+function createPolicy(hashes, ownerOnly) {
 	const imageSources = ["'self'", "data:", "blob:", ...readContentImageSources()].join(" ");
+	const connectSources = ownerOnly
+		? "'self'"
+		: "'self' https://analytics.retrozetrocomics.com https://analytics.jacobdanderson.net https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google.com";
+	const frameSources = ownerOnly
+		? "'none'"
+		: "https://googleads.g.doubleclick.net https://tpc.googlesyndication.com";
+	const finalImageSources = ownerOnly
+		? imageSources
+		: `${imageSources} https://*.doubleclick.net https://*.googlesyndication.com https://*.googleusercontent.com`;
+	const scriptSources = [
+		"'self'",
+		...hashes,
+		...(ownerOnly
+			? []
+			: [
+					"https://pagead2.googlesyndication.com",
+					"https://analytics.retrozetrocomics.com",
+					"https://analytics.jacobdanderson.net"
+				])
+	].join(" ");
 	return [
 		"default-src 'self'",
 		"base-uri 'self'",
-		"connect-src 'self'",
+		`connect-src ${connectSources}`,
 		"font-src 'self' data:",
 		"form-action 'self'",
-		"frame-src 'none'",
-		`img-src ${imageSources}`,
+		`frame-src ${frameSources}`,
+		`img-src ${finalImageSources}`,
 		"object-src 'none'",
-		`script-src 'self' ${hashes.join(" ")}`.trim(),
+		`script-src ${scriptSources}`,
 		"script-src-attr 'none'",
 		"style-src 'self' 'unsafe-inline'",
 		"upgrade-insecure-requests"
 	].join("; ");
 }
 
-const ownerHtml = await readFile(ownerHtmlPath, "utf8");
-const document = parse(ownerHtml);
-const head = findNode(document, node => node.nodeName === "head");
-assert.ok(head, "The generated owner page must contain a head element.");
+let ownerPages = 0;
+const htmlFiles = await collectHtmlFiles(outputDirectory);
+for (const htmlPath of htmlFiles) {
+	const relativePath = path.relative(outputDirectory, htmlPath).split(path.sep).join("/");
+	const ownerOnly = relativePath === ownerHtmlRelativePath;
+	const html = await readFile(htmlPath, "utf8");
+	const document = parse(html);
+	const head = findNode(document, node => node.nodeName === "head");
+	assert.ok(head, `The generated page ${relativePath} must contain a head element.`);
 
-const hashes = collectInlineScriptHashes(document);
-assert.ok(hashes.length > 0, "The generated owner page must record its inline script hashes.");
-
-walk(head, (node) => {
-	if (node.nodeName === "meta" && readAttribute(node, "name")?.toLowerCase() === "robots") {
-		writeAttribute(node, "content", "noindex,nofollow,noarchive,nosnippet");
+	const hashes = collectInlineScriptHashes(document);
+	if (ownerOnly) {
+		ownerPages += 1;
+		walk(head, (node) => {
+			if (node.nodeName === "meta" && readAttribute(node, "name")?.toLowerCase() === "robots") {
+				writeAttribute(node, "content", "noindex,nofollow,noarchive,nosnippet");
+			}
+		});
 	}
-});
 
-head.childNodes = (head.childNodes || []).filter(node => !(
-	node.nodeName === "meta"
-	&& readAttribute(node, "http-equiv")?.toLowerCase() === "content-security-policy"
-));
-const policy = createOwnerPolicy(hashes);
-const policyFragment = parseFragment(`<meta http-equiv="Content-Security-Policy" content="${policy}">`);
-const policyNode = policyFragment.childNodes[0];
-assert.ok(policyNode, "The owner content security policy meta element could not be created.");
-policyNode.parentNode = head;
-head.childNodes.unshift(policyNode);
+	head.childNodes = (head.childNodes || []).filter(node => !(
+		node.nodeName === "meta"
+		&& readAttribute(node, "http-equiv")?.toLowerCase() === "content-security-policy"
+	));
+	const policy = createPolicy(hashes, ownerOnly);
+	const policyFragment = parseFragment(`<meta http-equiv="Content-Security-Policy" content="${policy}">`);
+	const policyNode = policyFragment.childNodes[0];
+	assert.ok(policyNode, `The content security policy for ${relativePath} could not be created.`);
+	policyNode.parentNode = head;
+	head.childNodes.unshift(policyNode);
 
-const hardenedHtml = serialize(document);
-assert.doesNotMatch(policy, /googlesyndication|doubleclick|analytics\./i);
-assert.match(hardenedHtml, /content="noindex,nofollow,noarchive,nosnippet" name="robots"/);
-assert.match(hardenedHtml, /http-equiv="Content-Security-Policy"/);
-await writeFile(ownerHtmlPath, hardenedHtml, "utf8");
-process.stdout.write(`Hardened the static owner page with ${hashes.length} inline script hashes.\n`);
+	const hardenedHtml = serialize(document);
+	assert.match(hardenedHtml, /http-equiv="Content-Security-Policy"/);
+	if (ownerOnly) {
+		assert.ok(hashes.length > 0, "The generated owner page must record its inline script hashes.");
+		assert.doesNotMatch(policy, /googlesyndication|doubleclick|analytics\./i);
+		assert.match(hardenedHtml, /content="noindex,nofollow,noarchive,nosnippet" name="robots"/);
+	}
+	await writeFile(htmlPath, hardenedHtml, "utf8");
+}
+
+assert.equal(ownerPages, 1, "Exactly one generated owner page must receive the owner policy.");
+process.stdout.write(`Hardened ${htmlFiles.length} static pages, including the owner boundary.\n`);
