@@ -1,9 +1,10 @@
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMemoryHistory, createRouter } from "vue-router";
 
 import AdminOwnerWorkspace from "../src/components/admin/AdminOwnerWorkspace.vue";
+import DefaultLayout from "../src/layouts/default.vue";
 import { useSessionStore } from "../src/stores/session";
 
 describe("owner workspace", () => {
@@ -45,5 +46,38 @@ describe("owner workspace", () => {
 		expect(wrapper.text()).toContain("Edit something");
 		expect(wrapper.text()).toContain("Preview as a visitor");
 		expect(wrapper.text()).toContain("Advanced tools");
+	});
+
+	it("keeps the owner route focused when production adds a trailing slash", async () => {
+		const pinia = createPinia();
+		setActivePinia(pinia);
+		const session = useSessionStore();
+		vi.spyOn(session, "bootstrapSession").mockResolvedValue();
+		const router = createRouter({
+			history: createMemoryHistory(),
+			routes: [
+				{
+					component: { template: '<div data-testid="owner-route">Owner route</div>' },
+					path: "/studio/admin/"
+				}
+			]
+		});
+		await router.push("/studio/admin/");
+		await router.isReady();
+
+		const wrapper = mount(DefaultLayout, {
+			global: {
+				plugins: [pinia, router],
+				stubs: {
+					ResolvedImage: true,
+					SiteAdSlot: true,
+					TheFooter: true,
+					TheHeader: true
+				}
+			}
+		});
+
+		expect(wrapper.find('[data-testid="owner-route"]').exists()).toBe(true);
+		expect(wrapper.find(".site-shell").exists()).toBe(false);
 	});
 });

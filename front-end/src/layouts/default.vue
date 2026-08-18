@@ -7,7 +7,7 @@ import SiteAdSlot from "~/components/SiteAdSlot.vue";
 
 const session = useSessionStore();
 const route = useRoute();
-const isAdminRoute = computed(() => route.path === "/studio/admin");
+const isAdminRoute = computed(() => route.path.replace(/\/+$/, "") === "/studio/admin");
 const focusedOwnerEditing = computed(() => session.isAdmin && route.query.manage === "1" && !session.adminViewerMode);
 const showAdminViewerBanner = computed(() => session.isAdmin && session.adminViewerMode && !isAdminRoute.value);
 
