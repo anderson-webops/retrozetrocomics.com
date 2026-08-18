@@ -193,13 +193,17 @@ export function createApp() {
 		})
 	);
 
-	if (existsSync(staticRoot)) {
-		app.get("/.well-known/security.txt", publicPageRateLimiter, (_req, res, next) => {
-			res.type("text/plain").set("Cache-Control", "public, max-age=86400");
-			return res.sendFile(path.join(staticRoot, ".well-known/security.txt"), error => {
-				if (error) next(error);
+		if (existsSync(staticRoot)) {
+			app.get("/.well-known/security.txt", publicPageRateLimiter, (_req, res, next) => {
+				res.type("text/plain").set("Cache-Control", "public, max-age=86400");
+				return res.sendFile(
+					path.join(staticRoot, ".well-known/security.txt"),
+					{ dotfiles: "allow" },
+					error => {
+						if (error) next(error);
+					}
+				);
 			});
-		});
 		app.use(
 			publicPageRateLimiter,
 			express.static(staticRoot, {

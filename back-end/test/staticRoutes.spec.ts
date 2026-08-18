@@ -29,10 +29,15 @@ describe("generated static routes", () => {
 		const staticRoot = mkdtempSync(path.join(os.tmpdir(), "retro-static-routes-"));
 		staticRoots.push(staticRoot);
 		mkdirSync(path.join(staticRoot, "studio", "admin"), { recursive: true });
+		mkdirSync(path.join(staticRoot, ".well-known"), { recursive: true });
 		writeFileSync(path.join(staticRoot, "index.html"), "public-page-marker");
 		writeFileSync(
 			path.join(staticRoot, "studio", "admin", "index.html"),
 			"owner-page-marker"
+		);
+		writeFileSync(
+			path.join(staticRoot, ".well-known", "security.txt"),
+			"Contact: mailto:security@example.test\n"
 		);
 
 		vi.stubEnv("NODE_ENV", "test");
@@ -59,5 +64,10 @@ describe("generated static routes", () => {
 		expect(owner.headers.get("content-security-policy")).not.toMatch(
 			/googlesyndication|doubleclick|analytics\./i
 		);
+
+		const securityText = await fetch(`${origin}/.well-known/security.txt`);
+		expect(securityText.status).toBe(200);
+		expect(securityText.headers.get("content-type")).toContain("text/plain");
+		expect(await securityText.text()).toContain("Contact: mailto:security@example.test");
 	});
 });
