@@ -75,6 +75,7 @@ export function createApp() {
 	});
 	const ownerSecurityHeaders = createSecurityHeaders("owner");
 	const publicSecurityHeaders = createSecurityHeaders("public");
+	app.locals.securityConfig = config;
 	verifyStaticReleaseIdentity(staticRoot, releaseIdentity, config.isProduction);
 
 	app.disable("x-powered-by");
@@ -103,6 +104,16 @@ export function createApp() {
 		})
 	);
 	app.use(createRequestSecurityMiddleware(config));
+	app.use((req, res, next) => {
+		if (/^\/api\/(?:admin|auth)(?:\/|$)/.test(req.path)) {
+			res.set({
+				"Cache-Control": "no-store, max-age=0",
+				Expires: "0",
+				Pragma: "no-cache"
+			});
+		}
+		next();
+	});
 	app.use(express.json({ limit: "1mb", strict: true }));
 	app.use(express.urlencoded({ extended: false, limit: "1mb" }));
 	app.use(

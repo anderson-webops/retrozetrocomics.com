@@ -20,12 +20,22 @@ import {
 	updateCharactersPageContent
 } from "../controllers/siteContentController.js";
 import { requireAdmin } from "../middleware/auth.js";
+import {
+	adminMutationRateLimiter,
+	adminReadRateLimiter
+} from "../services/rateLimits.js";
 import { postUpload } from "../services/storage.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const adminRouter = Router();
 
 adminRouter.use(asyncHandler(requireAdmin));
+adminRouter.use((req, res, next) => {
+	const limiter = req.method === "GET" || req.method === "HEAD"
+		? adminReadRateLimiter
+		: adminMutationRateLimiter;
+	limiter(req, res, next);
+});
 adminRouter.get("/dashboard", asyncHandler(getDashboard));
 adminRouter.get("/audit-logs", asyncHandler(listAuditLogs));
 adminRouter.get("/media", asyncHandler(listMediaAssets));

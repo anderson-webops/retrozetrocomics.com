@@ -48,6 +48,21 @@ npm run admin -- disable --email admin@example.com --apply
 Passwords are prompted interactively and cannot be supplied as command-line arguments. Applied lifecycle changes use a
 database lease so simultaneous operators cannot race past the final-active-admin guard.
 
+Owner sign-in requires a passkey after the password is accepted. A first sign-in receives an enrollment-only session
+that cannot reach the editor until passkey setup succeeds. Recovery codes are displayed once and stored only as Argon2
+hashes. Operators can safely recover an account or replay preserved audit events with dry-run-first commands:
+
+```bash
+npm run admin -- reset-mfa --email admin@example.com
+npm run admin -- reset-mfa --email admin@example.com --apply
+npm run admin -- replay-audit-outbox
+npm run admin -- replay-audit-outbox --apply
+```
+
+Production defaults WebAuthn to `PUBLIC_SITE_ORIGIN`; the explicit `WEBAUTHN_ORIGIN` and `WEBAUTHN_RP_ID` values in the
+environment example document the required relying-party boundary. Development on another origin must set both values
+to the exact browser origin and its hostname.
+
 ## Direct production deployment
 
 The repository contains the complete non-container deployment contract:

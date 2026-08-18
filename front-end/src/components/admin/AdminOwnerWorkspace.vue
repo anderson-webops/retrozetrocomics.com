@@ -4,7 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import { useSessionStore } from "@/stores/session";
 
-type WorkspaceTask = "add-character" | "add-story" | "add-world" | "advanced" | "edit" | "home" | "media";
+type WorkspaceTask = "add-character" | "add-story" | "add-world" | "advanced" | "edit" | "home" | "media" | "security";
 
 const route = useRoute();
 const router = useRouter();
@@ -20,7 +20,8 @@ const allowedTasks = new Set<WorkspaceTask>([
 	"advanced",
 	"edit",
 	"home",
-	"media"
+	"media",
+	"security"
 ]);
 
 const activeTask = ref<WorkspaceTask>(readTask());
@@ -31,6 +32,11 @@ const taskCards: Array<{
 	task?: WorkspaceTask;
 	tone?: "advanced" | "preview";
 }> = [
+	{
+		description: "Add a passkey or replace the one-time recovery codes for owner access.",
+		label: "Account security",
+		task: "security"
+	},
 	{
 		description: "Upload a picture, comic page, storyboard, or PDF and check it before saving.",
 		label: "Add a picture or comic",
@@ -203,6 +209,13 @@ watch(
 						</div>
 					</div>
 					<AdminDashboard />
+				</div>
+
+				<div v-else-if="activeTask === 'security'" class="owner-task__panel">
+					<button class="owner-task__back" type="button" @click="chooseTask('home')">
+						Back to owner home
+					</button>
+					<AdminSecurityPanel />
 				</div>
 			</section>
 		</main>

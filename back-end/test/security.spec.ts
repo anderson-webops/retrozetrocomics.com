@@ -109,6 +109,22 @@ describe("security configuration", () => {
 		expect(config.sessionKeys).toHaveLength(2);
 		expect(config.trustedProxyIps).toEqual([]);
 		expect(config.allowedOrigins.has("https://retrozetrocomics.com")).toBe(true);
+		expect(config.webAuthnOrigin).toBe("https://retrozetrocomics.com");
+		expect(config.webAuthnRpId).toBe("retrozetrocomics.com");
+	});
+
+	it("binds production passkeys to the canonical public origin", () => {
+		expect(() => readSecurityConfig({
+			NODE_ENV: "production",
+			SESSION_SECRET: strongSecret,
+			TRUSTED_PROXY_IPS: "127.0.0.1",
+			WEBAUTHN_ORIGIN: "https://admin.example.com"
+		})).toThrow(/must match PUBLIC_SITE_ORIGIN/);
+		expect(() => readSecurityConfig({
+			SESSION_SECRET: strongSecret,
+			WEBAUTHN_ORIGIN: "http://localhost:3333",
+			WEBAUTHN_RP_ID: "example.com"
+		})).toThrow(/must contain/);
 	});
 
 	it("accepts exact loopback proxies in production", () => {
@@ -471,9 +487,10 @@ describe("admin sessions", () => {
 				accountId: "admin-1",
 				issuedAt: now - SESSION_IDLE_LIFETIME_MS - 1,
 				lastSeenAt: now - SESSION_IDLE_LIFETIME_MS - 1,
+				mfaVerifiedAt: now - SESSION_IDLE_LIFETIME_MS - 1,
 				role: "admin",
 				sessionVersion: 3,
-				version: 1
+				version: 2
 			} satisfies SessionState
 		} as unknown as Request;
 		const lookup = vi.spyOn(Admin, "findById");
@@ -485,9 +502,10 @@ describe("admin sessions", () => {
 			accountId: "admin-1",
 			issuedAt: now,
 			lastSeenAt: now,
+			mfaVerifiedAt: now,
 			role: "admin",
 			sessionVersion: 2,
-			version: 1
+			version: 2
 		} as any;
 		lookup.mockResolvedValue({
 			email: "admin@example.com",
@@ -509,9 +527,10 @@ describe("admin sessions", () => {
 				accountId: "admin-1",
 				issuedAt,
 				lastSeenAt: now - SESSION_TOUCH_INTERVAL_MS - 1,
+				mfaVerifiedAt: now - 30 * 60 * 1000,
 				role: "admin",
 				sessionVersion: 3,
-				version: 1
+				version: 2
 			} satisfies SessionState
 		} as unknown as Request;
 		vi.spyOn(Admin, "findById").mockResolvedValue({

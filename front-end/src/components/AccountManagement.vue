@@ -1,26 +1,49 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { nextTick, onBeforeUnmount, reactive, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from "vue";
 
 import { useSessionStore } from "@/stores/session";
 
 const session = useSessionStore();
-const { authModalOpen, authError, busy } = storeToRefs(session);
+const { authError, authModalOpen, authStep, busy, passkeysSupported, recoveryCodes } = storeToRefs(session);
 
 const loginForm = reactive({
 	email: "",
 	password: ""
 });
+const recoveryForm = reactive({ code: "" });
 
 const localError = ref("");
 const showPassword = ref(false);
 const dialog = ref<HTMLElement | null>(null);
 const emailInput = ref<HTMLInputElement | null>(null);
+const primaryAction = ref<HTMLButtonElement | null>(null);
 let returnFocus: HTMLElement | null = null;
+
+const heading = computed(
+	() =>
+		({
+			authenticate: "Confirm with your passkey",
+			enroll: "Protect owner access",
+			password: "Admin sign in",
+			"recovery-codes": "Save your recovery codes"
+		})[authStep.value]
+);
+const description = computed(
+	() =>
+		({
+			authenticate: "Use the fingerprint, face, screen lock, or security key already connected to this account.",
+			enroll: "Create a passkey so a stolen password cannot open the owner workspace.",
+			password: "Sign in only when you need to edit site content or review owner activity.",
+			"recovery-codes":
+				"These one-time codes are the backup if the passkey is unavailable. They will not be shown again."
+		})[authStep.value]
+);
 
 function resetForm() {
 	loginForm.email = "";
 	loginForm.password = "";
+	recoveryForm.code = "";
 	localError.value = "";
 	showPassword.value = false;
 }
@@ -29,7 +52,8 @@ watch(authModalOpen, async open => {
 	if (open) {
 		returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 		await nextTick();
-		emailInput.value?.focus();
+		if (authStep.value === "password") emailInput.value?.focus();
+		else primaryAction.value?.focus();
 		return;
 	}
 
@@ -42,7 +66,7 @@ watch(authModalOpen, async open => {
 function handleDialogKeydown(event: KeyboardEvent) {
 	if (event.key === "Escape") {
 		event.preventDefault();
-		session.closeAuth();
+		void session.cancelAuthentication();
 		return;
 	}
 	if (event.key !== "Tab" || !dialog.value) return;
@@ -62,6 +86,44 @@ function handleDialogKeydown(event: KeyboardEvent) {
 	} else if (!event.shiftKey && document.activeElement === last) {
 		event.preventDefault();
 		first.focus();
+	}
+}
+
+async function setUpPasskey() {
+	localError.value = "";
+	try {
+		await session.registerPasskey();
+	} catch {
+		localError.value = authError.value || "The passkey could not be set up.";
+	}
+}
+
+async function confirmPasskey() {
+	localError.value = "";
+	try {
+		await session.authenticatePasskey();
+	} catch {
+		localError.value = authError.value || "The passkey could not confirm this sign-in.";
+	}
+}
+
+async function submitRecoveryCode() {
+	localError.value = "";
+	try {
+		await session.useRecoveryCode(recoveryForm.code);
+		recoveryForm.code = "";
+	} catch {
+		localError.value = authError.value || "That recovery code could not be used.";
+	}
+}
+
+async function copyRecoveryCodes() {
+	localError.value = "";
+	try {
+		await navigator.clipboard.writeText(recoveryCodes.value.join("\n"));
+		localError.value = "Recovery codes copied. Save them somewhere private.";
+	} catch {
+		localError.value = "Copy was blocked. Select the codes below and save them somewhere private.";
 	}
 }
 
@@ -85,7 +147,7 @@ onBeforeUnmount(() => {
 
 <template>
 	<Teleport to="body">
-		<div v-if="authModalOpen" class="auth-overlay" role="presentation" @click.self="session.closeAuth()">
+		<div v-if="authModalOpen" class="auth-overlay" role="presentation" @click.self="session.cancelAuthentication()">
 			<div
 				ref="dialog"
 				aria-describedby="admin-login-description"
@@ -99,20 +161,18 @@ onBeforeUnmount(() => {
 					aria-label="Close admin sign-in dialog"
 					class="auth-modal__close"
 					type="button"
-					@click="session.closeAuth()"
+					@click="session.cancelAuthentication()"
 				>
 					&times;
 				</button>
 
 				<div class="auth-modal__hero">
 					<p class="auth-modal__eyebrow">Owner Access</p>
-					<h2 id="admin-login-heading">Admin sign in</h2>
-					<p id="admin-login-description">
-						Sign in only when you need to edit site content or review owner activity.
-					</p>
+					<h2 id="admin-login-heading">{{ heading }}</h2>
+					<p id="admin-login-description">{{ description }}</p>
 				</div>
 
-				<form class="auth-form" @submit.prevent="submitLogin">
+				<form v-if="authStep === 'password'" class="auth-form" @submit.prevent="submitLogin">
 					<label>
 						<span>Email</span>
 						<input
@@ -163,6 +223,86 @@ onBeforeUnmount(() => {
 						{{ busy ? "Signing in..." : "Sign in" }}
 					</button>
 				</form>
+
+				<div v-else-if="authStep === 'enroll'" class="auth-form auth-step">
+					<ol class="auth-step__list">
+						<li>Choose the button below.</li>
+						<li>Follow the device instructions for a fingerprint, face, screen lock, or security key.</li>
+						<li>Save the recovery codes shown afterward.</li>
+					</ol>
+					<p v-if="!passkeysSupported" class="auth-form__error" role="alert">
+						This browser cannot create a passkey. Open this page in a current browser or ask for owner
+						sign-in help.
+					</p>
+					<p v-if="localError || authError" id="admin-login-error" class="auth-form__error" role="alert">
+						{{ localError || authError }}
+					</p>
+					<button
+						ref="primaryAction"
+						class="auth-form__submit"
+						:disabled="busy || !passkeysSupported"
+						type="button"
+						@click="setUpPasskey"
+					>
+						{{ busy ? "Opening passkey setup..." : "Set up my passkey" }}
+					</button>
+					<p class="auth-form__help">
+						Need another person to help?
+						<a href="mailto:retrozetrocomics@gmail.com?subject=RetroZetro%20passkey%20setup%20help">
+							Ask for passkey setup help</a
+						>.
+					</p>
+				</div>
+
+				<div v-else-if="authStep === 'authenticate'" class="auth-form auth-step">
+					<button
+						ref="primaryAction"
+						class="auth-form__submit"
+						:disabled="busy || !passkeysSupported"
+						type="button"
+						@click="confirmPasskey"
+					>
+						{{ busy ? "Waiting for passkey..." : "Use my passkey" }}
+					</button>
+					<p v-if="localError || authError" id="admin-login-error" class="auth-form__error" role="alert">
+						{{ localError || authError }}
+					</p>
+					<details class="auth-recovery">
+						<summary>I cannot use my passkey</summary>
+						<form @submit.prevent="submitRecoveryCode">
+							<label>
+								<span>One-time recovery code</span>
+								<input
+									v-model="recoveryForm.code"
+									autocapitalize="characters"
+									autocomplete="one-time-code"
+									placeholder="RZ-1234-5678-90AB"
+									required
+									type="text"
+								/>
+							</label>
+							<button :disabled="busy" type="submit">Use this recovery code</button>
+						</form>
+					</details>
+				</div>
+
+				<div v-else class="auth-form auth-step">
+					<p class="auth-codes__warning">
+						Keep these private. Each code works once. Saving them now prevents an account lockout later.
+					</p>
+					<ul class="auth-codes" aria-label="One-time recovery codes">
+						<li v-for="code in recoveryCodes" :key="code">
+							<code>{{ code }}</code>
+						</li>
+					</ul>
+					<p v-if="localError" class="auth-form__help" role="status">{{ localError }}</p>
+					<div class="auth-step__actions">
+						<button ref="primaryAction" type="button" @click="copyRecoveryCodes">Copy all codes</button>
+						<button class="auth-form__submit" type="button" @click="session.closeAuth()">
+							I saved the codes — continue
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</Teleport>
@@ -326,5 +466,78 @@ onBeforeUnmount(() => {
 .auth-form__submit:disabled {
 	cursor: wait;
 	opacity: 0.68;
+}
+
+.auth-step__list,
+.auth-codes__warning {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.78);
+	line-height: 1.65;
+}
+
+.auth-step__list {
+	display: grid;
+	gap: 0.55rem;
+	padding-left: 1.4rem;
+}
+
+.auth-recovery {
+	border-top: 1px solid rgba(255, 255, 255, 0.12);
+	padding-top: 0.9rem;
+}
+
+.auth-recovery summary {
+	cursor: pointer;
+	color: #ffd27d;
+	font-weight: 800;
+}
+
+.auth-recovery form {
+	display: grid;
+	gap: 0.8rem;
+	padding-top: 0.9rem;
+}
+
+.auth-recovery button,
+.auth-step__actions > button:not(.auth-form__submit) {
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	border-radius: var(--radius-pill);
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff8ef;
+	cursor: pointer;
+	font: inherit;
+	font-weight: 800;
+	padding: 0.8rem 1rem;
+}
+
+.auth-codes {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.55rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.auth-codes code {
+	display: block;
+	border-radius: var(--radius-control);
+	background: rgba(0, 0, 0, 0.28);
+	color: #fff4e7;
+	font-size: 0.92rem;
+	padding: 0.65rem;
+	text-align: center;
+	user-select: all;
+}
+
+.auth-step__actions {
+	display: grid;
+	gap: 0.7rem;
+}
+
+@media (max-width: 480px) {
+	.auth-codes {
+		grid-template-columns: 1fr;
+	}
 }
 </style>

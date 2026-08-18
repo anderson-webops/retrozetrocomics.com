@@ -57,16 +57,12 @@ describe("session store", () => {
 		expect(session.showAdminTools).toBe(true);
 	});
 
-	it("signs in through the admin auth endpoint", async () => {
+	it("moves a password-verified owner into passkey confirmation", async () => {
 		(apiMod.api.post as any).mockResolvedValueOnce({
 			data: {
-				account: {
-					email: "owner@example.com",
-					id: "admin-1",
-					name: "Owner",
-					role: "admin",
-					status: "active"
-				}
+				account: null,
+				authenticated: false,
+				mfa: { mode: "authenticate", required: true }
 			}
 		});
 
@@ -81,8 +77,9 @@ describe("session store", () => {
 			email: "owner@example.com",
 			password: "password123"
 		});
-		expect(session.authModalOpen).toBe(false);
-		expect(session.account?.role).toBe("admin");
+		expect(session.authModalOpen).toBe(true);
+		expect(session.account).toBeNull();
+		expect(session.authStep).toBe("authenticate");
 	});
 
 	it("clears local account state on sign out", async () => {

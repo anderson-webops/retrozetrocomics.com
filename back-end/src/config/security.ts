@@ -11,6 +11,8 @@ const PLACEHOLDER_SECRET = /^(?:replace(?:[-_ ]with)?|change[-_ ]?me|example)(?:
 export const SESSION_ABSOLUTE_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
 export const SESSION_IDLE_LIFETIME_MS = 12 * 60 * 60 * 1000;
 export const SESSION_TOUCH_INTERVAL_MS = 5 * 60 * 1000;
+export const MFA_CHALLENGE_LIFETIME_MS = 5 * 60 * 1000;
+export const MFA_STEP_UP_LIFETIME_MS = 15 * 60 * 1000;
 
 function parseOrigin(value: string, variableName: string, isProduction: boolean) {
 	const trimmed = value.trim().replace(/\/+$/, "");
@@ -98,6 +100,8 @@ export interface SecurityConfig {
 	sessionKeys: readonly string[];
 	siteOrigin: string;
 	trustedProxyIps: readonly string[];
+	webAuthnOrigin: string;
+	webAuthnRpId: string;
 }
 
 export function readSecurityConfig(source: NodeJS.ProcessEnv = process.env): SecurityConfig {
@@ -133,13 +137,35 @@ export function readSecurityConfig(source: NodeJS.ProcessEnv = process.env): Sec
 		.filter(Boolean)
 		.map(value => parseOrigin(value, "ALLOWED_ORIGINS", isProduction));
 	const diagnosticsKey = source.INTERNAL_DIAGNOSTICS_KEY?.trim();
+	const webAuthnOrigin = parseOrigin(
+		source.WEBAUTHN_ORIGIN || siteOrigin,
+		"WEBAUTHN_ORIGIN",
+		isProduction
+	);
+	const webAuthnRpId = (source.WEBAUTHN_RP_ID || new URL(webAuthnOrigin).hostname)
+		.trim()
+		.toLowerCase();
+	const webAuthnHostname = new URL(webAuthnOrigin).hostname.toLowerCase();
+	if (
+		!webAuthnRpId
+		|| webAuthnRpId.length > 253
+		|| !/^(?:localhost|[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*)$/.test(webAuthnRpId)
+	) {
+		throw new RuntimeConfigurationError("WEBAUTHN_RP_ID must be a valid DNS hostname");
+	}
+	if (webAuthnHostname !== webAuthnRpId && !webAuthnHostname.endsWith(`.${webAuthnRpId}`)) {
+		throw new RuntimeConfigurationError("WEBAUTHN_RP_ID must contain the WebAuthn origin hostname");
+	}
+	if (isProduction && webAuthnOrigin !== siteOrigin) {
+		throw new RuntimeConfigurationError("Production WEBAUTHN_ORIGIN must match PUBLIC_SITE_ORIGIN");
+	}
 
 	if (diagnosticsKey) {
 		requireStrongSecret(diagnosticsKey, "INTERNAL_DIAGNOSTICS_KEY");
 	}
 
 	return {
-		allowedOrigins: new Set([siteOrigin, ...additionalOrigins]),
+		allowedOrigins: new Set([siteOrigin, webAuthnOrigin, ...additionalOrigins]),
 		diagnosticsKey,
 		isProduction,
 		sessionCookieName:
@@ -148,6 +174,8 @@ export function readSecurityConfig(source: NodeJS.ProcessEnv = process.env): Sec
 				: "retrozetro-session",
 		sessionKeys,
 		siteOrigin,
-		trustedProxyIps: parseTrustedProxyIps(source.TRUSTED_PROXY_IPS, isProduction)
+		trustedProxyIps: parseTrustedProxyIps(source.TRUSTED_PROXY_IPS, isProduction),
+		webAuthnOrigin,
+		webAuthnRpId
 	};
 }

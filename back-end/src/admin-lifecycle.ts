@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { Admin } from "./models/schemas/Admin.js";
 import { AuditLog } from "./models/schemas/AuditLog.js";
+import { AuditOutbox } from "./models/schemas/AuditOutbox.js";
 import { withAdminLifecycleLock } from "./services/adminLifecycleLock.js";
 import { recordAuditLog } from "./services/auditLog.js";
 import { connectToMongo } from "./services/database.js";
@@ -15,7 +16,9 @@ const commandSchema = z.enum([
 	"create",
 	"disable",
 	"enable",
+	"replay-audit-outbox",
 	"reset-password",
+	"reset-mfa",
 	"sanitize-audit-logs"
 ]);
 const emailSchema = z.string().trim().email().max(254).transform(value => value.toLowerCase());
@@ -61,11 +64,58 @@ function printUsage() {
   npm run admin -- create --email <email> --name <name> [--apply]
   npm run admin -- enable --email <email> [--apply]
   npm run admin -- disable --email <email> [--apply]
+  npm run admin -- reset-mfa --email <email> [--apply]
   npm run admin -- reset-password --email <email> [--apply]
+  npm run admin -- replay-audit-outbox [--apply]
   npm run admin -- sanitize-audit-logs [--apply]
 
 Commands are dry-run only unless --apply is present. Passwords are prompted
 interactively and are rejected if supplied as command-line arguments.`);
+}
+
+async function handleMfaReset(email: string, apply: boolean) {
+	const admin = await Admin.findOne({ email }).select("+recoveryCodes");
+	if (!admin) {
+		throw new Error(`No account exists for ${maskEmail(email)}`);
+	}
+
+	console.log(`${apply ? "Resetting" : "Would reset"} passkeys and recovery codes for ${maskEmail(email)}.`);
+	if (!apply) {
+		return;
+	}
+
+	await withAdminLifecycleLock(async () => {
+		const currentAdmin = await Admin.findOne({ email }).select("+recoveryCodes");
+		if (!currentAdmin) {
+			throw new Error(`No account exists for ${maskEmail(email)}`);
+		}
+		const passkeyCount = currentAdmin.passkeys.length;
+		currentAdmin.passkeys.splice(0);
+		currentAdmin.recoveryCodes.splice(0);
+		currentAdmin.mfaEnrolledAt = null;
+		currentAdmin.sessionVersion += 1;
+		await currentAdmin.save();
+		await recordLifecycleAction(
+			"ADMIN_MFA_RESET",
+			currentAdmin,
+			"Reset owner passkeys, recovery codes, and existing sessions",
+			{ passkeyCount },
+			{ passkeyCount: 0, sessionsRevoked: true }
+		);
+	});
+}
+
+async function handleAuditOutboxReplay(apply: boolean) {
+	const pendingCount = await AuditOutbox.countDocuments();
+	console.log(`${apply ? "Replaying" : "Would replay"} ${pendingCount} preserved audit event(s).`);
+	if (!apply || pendingCount === 0) {
+		return;
+	}
+
+	for await (const pending of AuditOutbox.find().sort({ createdAt: 1 }).cursor()) {
+		await AuditLog.create(pending.payload);
+		await AuditOutbox.deleteOne({ _id: pending.id });
+	}
 }
 
 async function recordLifecycleAction(
@@ -270,6 +320,10 @@ async function main() {
 		await handleAuditSanitization(apply);
 		return;
 	}
+	if (command === "replay-audit-outbox") {
+		await handleAuditOutboxReplay(apply);
+		return;
+	}
 
 	const email = emailSchema.parse(readOption("email"));
 	if (command === "create") {
@@ -280,6 +334,9 @@ async function main() {
 	}
 	else if (command === "disable") {
 		await handleStatusChange(email, "disabled", apply);
+	}
+	else if (command === "reset-mfa") {
+		await handleMfaReset(email, apply);
 	}
 	else {
 		await handlePasswordReset(email, apply);

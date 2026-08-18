@@ -26,7 +26,7 @@ const auditLogSchema = new Schema(
 		},
 		actorRole: {
 			type: String,
-			enum: ["admin", "user"],
+			enum: ["admin", "anonymous", "system", "user"],
 			required: true,
 			index: true
 		},

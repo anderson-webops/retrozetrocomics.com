@@ -191,7 +191,7 @@ async function publishContent(
 export async function getCharactersPageContent(_req: Request, res: Response) {
 	const config = getSiteContentConfig("characters");
 	const document = await SiteContent.findOne({ key: config.key });
-	return res.json({
+	return res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300").json({
 		content: normalizePublishedSiteContent("characters", document?.data)
 	});
 }
@@ -199,7 +199,7 @@ export async function getCharactersPageContent(_req: Request, res: Response) {
 export async function getAboutPageContent(_req: Request, res: Response) {
 	const config = getSiteContentConfig("about");
 	const document = await SiteContent.findOne({ key: config.key });
-	return res.json({
+	return res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300").json({
 		content: normalizePublishedSiteContent("about", document?.data)
 	});
 }

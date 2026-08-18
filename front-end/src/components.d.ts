@@ -18,6 +18,7 @@ declare module 'vue' {
     AdminInlineTools: typeof import('./components/admin/AdminInlineTools.vue')['default']
     AdminMediaManager: typeof import('./components/admin/AdminMediaManager.vue')['default']
     AdminOwnerWorkspace: typeof import('./components/admin/AdminOwnerWorkspace.vue')['default']
+    AdminSecurityPanel: typeof import('./components/admin/AdminSecurityPanel.vue')['default']
     ResolvedImage: typeof import('./components/ResolvedImage.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

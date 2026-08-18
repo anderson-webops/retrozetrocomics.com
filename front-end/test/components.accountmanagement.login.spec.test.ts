@@ -25,19 +25,15 @@ describe("accountManagement.vue login (happy path)", () => {
 		vi.clearAllMocks();
 	});
 
-	it("logs in an administrator, updates the session store, and closes the modal", async () => {
+	it("accepts the owner password and moves to passkey enrollment", async () => {
 		const session = useSessionStore();
 		session.openAuth();
 
 		(apiMod.api.post as any).mockResolvedValueOnce({
 			data: {
-				account: {
-					email: "user@example.com",
-					id: "u123",
-					name: "User",
-					role: "admin",
-					status: "active"
-				}
+				account: null,
+				authenticated: false,
+				mfa: { mode: "enroll", required: true }
 			}
 		});
 
@@ -58,7 +54,9 @@ describe("accountManagement.vue login (happy path)", () => {
 			password: "secret123"
 		});
 
-		expect(session.account?.email).toBe("user@example.com");
-		expect(session.authModalOpen).toBe(false);
+		expect(session.account).toBeNull();
+		expect(session.authModalOpen).toBe(true);
+		expect(session.authStep).toBe("enroll");
+		expect(wrapper.text()).toContain("Set up my passkey");
 	});
 });

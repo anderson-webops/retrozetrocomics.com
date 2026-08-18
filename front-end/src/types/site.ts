@@ -1,4 +1,5 @@
 export type AccountRole = "admin";
+export type AuditActorRole = AccountRole | "anonymous" | "system";
 export type AuditLogCategory = "auth" | "media" | "site-content";
 export type AuditLogOutcome = "failure" | "success";
 
@@ -7,7 +8,7 @@ export interface AuditLogRecord {
 	after: Record<string, unknown> | null;
 	actorId: string;
 	actorName: string;
-	actorRole: AccountRole;
+	actorRole: AuditActorRole;
 	before: Record<string, unknown> | null;
 	category: AuditLogCategory;
 	createdAt: string;
