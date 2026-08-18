@@ -69,6 +69,9 @@ assert.match(ownerResponse.headers.get("cache-control") || "", /no-store/);
 assert.match(ownerResponse.headers.get("x-robots-tag") || "", /noindex/);
 const ownerCsp = ownerResponse.headers.get("content-security-policy") || "";
 assert.doesNotMatch(ownerCsp, /googlesyndication|doubleclick|analytics\./i);
+const ownerHtml = await ownerResponse.text();
+assert.match(ownerHtml, /content="noindex,nofollow,noarchive,nosnippet" name="robots"/);
+assert.match(ownerHtml, /http-equiv="Content-Security-Policy"/);
 
 const securityTextResponse = await request("/.well-known/security.txt");
 assert.equal(securityTextResponse.status, 200, "security.txt must be public.");
