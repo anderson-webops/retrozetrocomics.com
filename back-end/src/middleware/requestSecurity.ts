@@ -13,29 +13,38 @@ function isAdminMediaUpload(req: Parameters<RequestHandler>[0]) {
 }
 
 function setCorsHeaders(
-	requestOrigin: string,
+	allowedOrigin: string,
 	response: Parameters<RequestHandler>[1]
 ) {
 	response.set({
 		"Access-Control-Allow-Credentials": "true",
 		"Access-Control-Allow-Headers": ALLOWED_HEADERS,
 		"Access-Control-Allow-Methods": ALLOWED_METHODS,
-		"Access-Control-Allow-Origin": requestOrigin,
+		"Access-Control-Allow-Origin": allowedOrigin,
 		Vary: "Origin"
 	});
+}
+
+function findAllowedOrigin(requestOrigin: string, allowedOrigins: readonly string[]) {
+	for (const allowedOrigin of allowedOrigins) {
+		if (requestOrigin === allowedOrigin) return allowedOrigin;
+	}
+	return null;
 }
 
 export function createRequestSecurityMiddleware(
 	config: Pick<SecurityConfig, "allowedOrigins">
 ): RequestHandler {
+	const allowedOrigins = [...config.allowedOrigins];
 	return (req, res, next) => {
 		const origin = req.get("origin");
 		const fetchSite = req.get("sec-fetch-site");
 		const isSafeMethod = SAFE_METHODS.has(req.method);
-		const originAllowed = !origin || config.allowedOrigins.has(origin);
+		const allowedOrigin = origin ? findAllowedOrigin(origin, allowedOrigins) : null;
+		const originAllowed = !origin || Boolean(allowedOrigin);
 
-		if (origin && originAllowed) {
-			setCorsHeaders(origin, res);
+		if (allowedOrigin) {
+			setCorsHeaders(allowedOrigin, res);
 		}
 		else if (origin) {
 			res.vary("Origin");
