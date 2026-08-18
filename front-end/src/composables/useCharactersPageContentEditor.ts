@@ -45,7 +45,7 @@ function createCharacterDraft(): CharacterBoardProfile {
 function createWorldEntryDraft(): CharacterBoardWorldEntry {
 	return {
 		body: "",
-		facts: [{ label: "", value: "" }],
+		facts: [],
 		id: nextDraftId("world"),
 		label: "",
 		title: ""
@@ -114,7 +114,7 @@ export function useCharactersPageContentEditor() {
 	function removeCharacter(characterId: string) {
 		if (content.value.characters.length <= 1) {
 			error.value = "At least one character card must remain.";
-			return Promise.resolve(content.value);
+			return Promise.reject(new Error(error.value));
 		}
 
 		return persist(nextContent => {
@@ -160,7 +160,7 @@ export function useCharactersPageContentEditor() {
 	function removeWorldEntry(entryId: string) {
 		if (content.value.worldEntries.length <= 1) {
 			error.value = "At least one world note must remain.";
-			return Promise.resolve(content.value);
+			return Promise.reject(new Error(error.value));
 		}
 
 		return persist(nextContent => {

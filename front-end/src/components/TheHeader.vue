@@ -86,20 +86,21 @@ watch(
 
 						<div class="nav__utility">
 							<RouterLink class="nav__action nav__action--ghost nav__action--utility" to="/studio/admin">
-								Admin
+								Owner Home
 							</RouterLink>
 							<button
+								:aria-pressed="session.adminViewerMode"
 								class="nav__action nav__action--ghost nav__action--utility"
 								type="button"
 								@click="session.toggleAdminViewerMode()"
 							>
-								{{ session.adminViewerMode ? "Edit Tools" : "Viewer Mode" }}
+								{{ session.adminViewerMode ? "Return to owner tools" : "Preview as a visitor" }}
 							</button>
 						</div>
 					</div>
 
 					<button class="nav__action nav__action--primary" type="button" @click="session.logout()">
-						Logout
+						Sign out
 					</button>
 				</template>
 				<button v-else class="nav__action nav__action--ghost" type="button" @click="session.openAuth()">

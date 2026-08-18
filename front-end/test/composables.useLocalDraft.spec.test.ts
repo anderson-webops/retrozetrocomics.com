@@ -287,4 +287,42 @@ describe("useLocalDraft()", () => {
 
 		scope.stop();
 	});
+
+	it("keeps the editor usable when browser storage methods are blocked", () => {
+		const blockedStorage = {
+			...createStorageMock(),
+			getItem() {
+				throw new DOMException("Storage blocked", "SecurityError");
+			},
+			removeItem() {
+				throw new DOMException("Storage blocked", "SecurityError");
+			},
+			setItem() {
+				throw new DOMException("Storage blocked", "SecurityError");
+			}
+		} as Storage;
+		Object.defineProperty(window, "localStorage", {
+			configurable: true,
+			value: blockedStorage
+		});
+
+		const scope = effectScope();
+		let draft!: ReturnType<typeof useLocalDraft<{ content: string; hasFiles: boolean }>>;
+
+		expect(() => {
+			scope.run(() => {
+				draft = useLocalDraft<{ content: string; hasFiles: boolean }>({
+					isEmpty: snapshot => !snapshot.content,
+					source: () => ({ content: "Unfinished work", hasFiles: false }),
+					storageKey: "retrozetro:test:drafts:blocked"
+				});
+			});
+			draft.saveNow();
+			draft.clearDraft();
+			draft.restoreDraft();
+		}).not.toThrow();
+		expect(draft.restorePromptVisible.value).toBe(false);
+
+		scope.stop();
+	});
 });

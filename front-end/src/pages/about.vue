@@ -34,6 +34,9 @@ const openStoryArcEditorId = ref("");
 const savingStoryArcId = ref("");
 const openWorldEditorId = ref("");
 const savingWorldEditorId = ref("");
+const lastRemovedStory = ref<AboutStoryArc | null>(null);
+const lastRemovedWorldEntry = ref<CharacterBoardWorldEntry | null>(null);
+const pageStatus = ref("");
 
 const highlights = computed(() =>
 	store.about.values.map(value => ({
@@ -88,10 +91,12 @@ onBeforeUnmount(() => {
 });
 
 function addStoryArcInline() {
+	if (openStoryArcEditorId.value) return;
 	openStoryArcEditorId.value = addStoryArcDraft();
 }
 
 function addWorldEntryInline() {
+	if (openWorldEditorId.value) return;
 	openWorldEditorId.value = addWorldEntryDraft();
 }
 
@@ -100,14 +105,24 @@ async function handleStoryArcSave(arc: AboutStoryArc) {
 	try {
 		await saveStoryArc(arc);
 		openStoryArcEditorId.value = "";
+		pageStatus.value = `${arc.title} was saved and published.`;
+	} catch {
+		// The editor stays open and shows the plain-language error.
 	} finally {
 		savingStoryArcId.value = "";
 	}
 }
 
 async function handleStoryArcRemove(arcId: string) {
-	await removeStoryArc(arcId);
-	openStoryArcEditorId.value = "";
+	const arc = aboutPageContent.value.storyArcs.find(item => item.id === arcId);
+	try {
+		await removeStoryArc(arcId);
+		lastRemovedStory.value = arc ? JSON.parse(JSON.stringify(arc)) : null;
+		openStoryArcEditorId.value = "";
+		pageStatus.value = `${arc?.title || "The story"} was removed. You can undo this now or restore an earlier version from Owner Workspace.`;
+	} catch {
+		// The page-level error remains visible and the editor stays available.
+	}
 }
 
 function handleStoryArcDiscard(arcId: string) {
@@ -122,14 +137,24 @@ async function handleWorldEntrySave(entry: CharacterBoardWorldEntry) {
 	try {
 		await saveWorldEntry(entry);
 		openWorldEditorId.value = "";
+		pageStatus.value = `${entry.title} was saved and published.`;
+	} catch {
+		// The editor stays open and shows the plain-language error.
 	} finally {
 		savingWorldEditorId.value = "";
 	}
 }
 
 async function handleWorldEntryRemove(entryId: string) {
-	await removeWorldEntry(entryId);
-	openWorldEditorId.value = "";
+	const entry = charactersPageContent.value.worldEntries.find(item => item.id === entryId);
+	try {
+		await removeWorldEntry(entryId);
+		lastRemovedWorldEntry.value = entry ? JSON.parse(JSON.stringify(entry)) : null;
+		openWorldEditorId.value = "";
+		pageStatus.value = `${entry?.title || "The world note"} was removed. You can undo this now or restore an earlier version from Owner Workspace.`;
+	} catch {
+		// The page-level error remains visible and the editor stays available.
+	}
 }
 
 function handleWorldEntryDiscard(entryId: string) {
@@ -138,16 +163,49 @@ function handleWorldEntryDiscard(entryId: string) {
 		openWorldEditorId.value = "";
 	}
 }
+
+async function undoStoryRemoval() {
+	if (!lastRemovedStory.value) return;
+	const arc = lastRemovedStory.value;
+	try {
+		await saveStoryArc(arc);
+		lastRemovedStory.value = null;
+		pageStatus.value = `${arc.title} was restored.`;
+	} catch {
+		// The page-level error explains the retry path.
+	}
+}
+
+async function undoWorldEntryRemoval() {
+	if (!lastRemovedWorldEntry.value) return;
+	const entry = lastRemovedWorldEntry.value;
+	try {
+		await saveWorldEntry(entry);
+		lastRemovedWorldEntry.value = null;
+		pageStatus.value = `${entry.title} was restored.`;
+	} catch {
+		// The page-level error explains the retry path.
+	}
+}
 </script>
 
 <template>
 	<div class="page about-page">
-		<p v-if="aboutError || boardError" class="about-page__status about-page__status--error">
+		<p v-if="aboutError || boardError" class="about-page__status about-page__status--error" role="alert">
 			{{ aboutError || boardError }}
 		</p>
-		<p v-else-if="aboutSaving || boardSaving" class="about-page__status">
+		<p v-else-if="aboutSaving || boardSaving" class="about-page__status" role="status">
 			{{ aboutSaving ? "Saving story page changes..." : "Saving world note changes..." }}
 		</p>
+		<div v-else-if="pageStatus" class="about-page__status about-page__status--success" role="status">
+			<span>{{ pageStatus }}</span>
+			<button v-if="lastRemovedStory" type="button" @click="undoStoryRemoval">
+				Undo removing {{ lastRemovedStory.title }}
+			</button>
+			<button v-if="lastRemovedWorldEntry" type="button" @click="undoWorldEntryRemoval">
+				Undo removing {{ lastRemovedWorldEntry.title }}
+			</button>
+		</div>
 
 		<WelcomeSection
 			:actions="[
@@ -187,6 +245,7 @@ function handleWorldEntryDiscard(entryId: string) {
 					:inline-editing="session.showAdminTools"
 					:items="aboutPageContent.storyArcs"
 					:open-editor-id="openStoryArcEditorId"
+					:save-error="aboutError"
 					:saving-id="savingStoryArcId"
 					@discard="handleStoryArcDiscard"
 					@remove="handleStoryArcRemove"
@@ -194,7 +253,7 @@ function handleWorldEntryDiscard(entryId: string) {
 				/>
 			</div>
 			<div v-if="session.showAdminTools" class="about-page__section-actions">
-				<button type="button" @click="addStoryArcInline">Add</button>
+				<button type="button" @click="addStoryArcInline">Add a story</button>
 			</div>
 		</section>
 
@@ -210,6 +269,7 @@ function handleWorldEntryDiscard(entryId: string) {
 					:inline-editing="session.showAdminTools"
 					:items="charactersPageContent.worldEntries"
 					:open-editor-id="openWorldEditorId"
+					:save-error="boardError"
 					:saving-id="savingWorldEditorId"
 					@discard="handleWorldEntryDiscard"
 					@remove="handleWorldEntryRemove"
@@ -217,7 +277,7 @@ function handleWorldEntryDiscard(entryId: string) {
 				/>
 			</div>
 			<div v-if="session.showAdminTools" class="about-page__section-actions">
-				<button type="button" @click="addWorldEntryInline">Add</button>
+				<button type="button" @click="addWorldEntryInline">Add a world note</button>
 			</div>
 		</section>
 	</div>
@@ -236,6 +296,28 @@ function handleWorldEntryDiscard(entryId: string) {
 
 .about-page__status--error {
 	color: #ffd0d0;
+}
+
+.about-page__status--success {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.7rem;
+	border: 1px solid rgba(124, 225, 246, 0.25);
+	border-radius: var(--radius-control);
+	background: rgba(124, 225, 246, 0.09);
+	color: #eaffff;
+	padding: 0.8rem;
+}
+
+.about-page__status--success button {
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	border-radius: var(--radius-pill);
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff8ef;
+	font-weight: 800;
+	padding: 0.6rem 0.85rem;
 }
 
 .about-page__story-grid,

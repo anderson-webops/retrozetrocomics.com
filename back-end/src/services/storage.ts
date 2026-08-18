@@ -84,6 +84,16 @@ export interface UploadedFile {
 	size: number;
 }
 
+export interface NormalizedUploadedFile {
+	kind: "document" | "image";
+	mimeType: string;
+	originalName: string;
+	provider: "local";
+	size: number;
+	storageKey: string;
+	url: string;
+}
+
 interface MediaAssetLike {
 	kind: "document" | "image";
 	mimeType: string;
@@ -348,7 +358,7 @@ export const postUpload = multer({
 	}
 });
 
-export function normalizeUploadedFiles(files: UploadedFile[] = []) {
+export function normalizeUploadedFiles(files: UploadedFile[] = []): NormalizedUploadedFile[] {
 	return files.map((file) => {
 		const storageKey = resolveStorageKeyForFile(file);
 		return {

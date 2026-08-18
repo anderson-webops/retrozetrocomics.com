@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { CharacterBoardProfile } from "@/types/site";
-import { computed } from "vue";
+import { computed, nextTick } from "vue";
+import { useLocalDraft } from "@/composables/useLocalDraft";
 import { createDefaultCharactersPageContent } from "@/content/defaultCharactersPageContent";
 import { useSessionStore } from "@/stores/session";
 
@@ -9,11 +10,13 @@ const props = withDefaults(
 		inlineEditing?: boolean;
 		items?: CharacterBoardProfile[];
 		openEditorId?: string;
+		saveError?: string;
 		savingId?: string;
 	}>(),
 	{
 		inlineEditing: false,
 		openEditorId: "",
+		saveError: "",
 		savingId: ""
 	}
 );
@@ -28,8 +31,18 @@ const fallbackCharacters = createDefaultCharactersPageContent().characters;
 const characters = computed(() => props.items ?? fallbackCharacters);
 const session = useSessionStore();
 const editingId = ref("");
-const removalArmedId = ref("");
 const draftCharacter = ref<CharacterBoardProfile | null>(null);
+const pendingRemoval = ref<CharacterBoardProfile | null>(null);
+
+const localDraft = useLocalDraft({
+	enabled: () => Boolean(editingId.value && draftCharacter.value),
+	isEmpty: snapshot => !snapshot.character,
+	source: () => ({
+		character: draftCharacter.value ? cloneCharacter(draftCharacter.value) : null,
+		hasFiles: false
+	}),
+	storageKey: () => `retrozetro:inline-character:${editingId.value || "none"}`
+});
 
 function isDefinedImageCandidate(candidate: string | undefined): candidate is string {
 	return Boolean(candidate);
@@ -43,10 +56,18 @@ function cloneCharacter(character: CharacterBoardProfile) {
 	return JSON.parse(JSON.stringify(character)) as CharacterBoardProfile;
 }
 
+async function focusEditor(characterId: string) {
+	await nextTick();
+	const editor = document.querySelector<HTMLElement>(`[data-character-editor="${characterId}"]`);
+	editor?.scrollIntoView({ behavior: "smooth", block: "center" });
+	editor?.querySelector<HTMLElement>("input, textarea")?.focus({ preventScroll: true });
+}
+
 function startEditing(character: CharacterBoardProfile) {
+	if (editingId.value && editingId.value !== character.id) return;
 	editingId.value = character.id;
-	removalArmedId.value = "";
 	draftCharacter.value = cloneCharacter(character);
+	void focusEditor(character.id);
 }
 
 function closeEditor() {
@@ -55,16 +76,24 @@ function closeEditor() {
 	}
 
 	editingId.value = "";
-	removalArmedId.value = "";
 	draftCharacter.value = null;
+	localDraft.clearDraft();
+}
+
+function finishEditor() {
+	editingId.value = "";
+	draftCharacter.value = null;
+	localDraft.clearDraft();
 }
 
 function submitCharacter() {
 	if (!draftCharacter.value) return;
 	emit("save", cloneCharacter(draftCharacter.value));
-	editingId.value = "";
-	removalArmedId.value = "";
-	draftCharacter.value = null;
+}
+
+function restoreSavedDraft() {
+	const restored = localDraft.restoreDraft();
+	if (restored?.character) draftCharacter.value = cloneCharacter(restored.character);
 }
 
 watch(
@@ -77,6 +106,13 @@ watch(
 		}
 	},
 	{ immediate: true }
+);
+
+watch(
+	() => props.savingId,
+	(nextId, previousId) => {
+		if (!nextId && previousId === editingId.value && !props.saveError) finishEditor();
+	}
 );
 
 watch(
@@ -104,17 +140,47 @@ watch(
 			>
 				<button
 					v-if="session.showAdminTools && props.inlineEditing"
+					v-show="editingId !== item.id"
+					:aria-label="`Edit ${item.name}`"
 					type="button"
 					class="characters-grid__edit"
+					:disabled="Boolean(editingId)"
 					@click="startEditing(item)"
 				>
-					{{ editingId === item.id ? "Editing" : "Edit" }}
+					Edit {{ item.name }}
 				</button>
+				<span v-if="editingId === item.id" class="characters-grid__editing-status"
+					>Editing {{ item.name }}</span
+				>
 
 				<template
 					v-if="session.showAdminTools && props.inlineEditing && editingId === item.id && draftCharacter"
 				>
-					<form class="characters-grid__editor" @submit.prevent="submitCharacter">
+					<form
+						class="characters-grid__editor"
+						:data-character-editor="item.id"
+						:aria-describedby="props.saveError ? `character-save-error-${item.id}` : undefined"
+						@submit.prevent="submitCharacter"
+					>
+						<div
+							v-if="localDraft.restorePromptVisible.value"
+							class="characters-grid__draft-notice"
+							role="status"
+						>
+							<strong>Continue unfinished edits?</strong>
+							<div>
+								<button type="button" @click="restoreSavedDraft">Continue</button>
+								<button type="button" @click="localDraft.discardStoredDraft">Use saved copy</button>
+							</div>
+						</div>
+						<p
+							v-if="props.saveError"
+							:id="`character-save-error-${item.id}`"
+							class="characters-grid__save-error"
+							role="alert"
+						>
+							{{ props.saveError }} Your edits are still here. Fix the named field or try saving again.
+						</p>
 						<div class="characters-grid__editor-grid">
 							<label>
 								<span>Name</span>
@@ -126,11 +192,23 @@ watch(
 							</label>
 							<label>
 								<span>Specialty</span>
-								<input v-model="draftCharacter.specialty" maxlength="120" required type="text" />
+								<input
+									v-model="draftCharacter.specialty"
+									maxlength="120"
+									minlength="2"
+									required
+									type="text"
+								/>
 							</label>
 							<label>
 								<span>Secondary line</span>
-								<input v-model="draftCharacter.frequency" maxlength="120" required type="text" />
+								<input
+									v-model="draftCharacter.frequency"
+									maxlength="120"
+									minlength="2"
+									required
+									type="text"
+								/>
 							</label>
 							<label>
 								<span>Image URL</span>
@@ -142,13 +220,25 @@ watch(
 							</label>
 							<label class="characters-grid__editor-span">
 								<span>Image alt text</span>
-								<input v-model="draftCharacter.imgAlt" maxlength="180" required type="text" />
+								<input
+									v-model="draftCharacter.imgAlt"
+									maxlength="180"
+									minlength="2"
+									required
+									type="text"
+								/>
 							</label>
 						</div>
 
 						<label>
 							<span>Description</span>
-							<textarea v-model="draftCharacter.description" required rows="6" />
+							<textarea
+								v-model="draftCharacter.description"
+								maxlength="420"
+								minlength="12"
+								required
+								rows="6"
+							/>
 						</label>
 
 						<div class="characters-grid__actions">
@@ -156,14 +246,8 @@ watch(
 								{{ props.savingId === item.id ? "Saving..." : "Save" }}
 							</button>
 							<button type="button" @click="closeEditor">Cancel</button>
-							<button
-								type="button"
-								class="characters-grid__danger"
-								@click="
-									removalArmedId === item.id ? emit('remove', item.id) : (removalArmedId = item.id)
-								"
-							>
-								{{ removalArmedId === item.id ? "Confirm remove" : "Remove" }}
+							<button type="button" class="characters-grid__danger" @click="pendingRemoval = item">
+								Remove {{ item.name }} from the public page
 							</button>
 						</div>
 					</form>
@@ -187,6 +271,15 @@ watch(
 				</template>
 			</div>
 		</div>
+
+		<AdminConfirmDialog
+			confirm-label="Remove from public page"
+			:description="`${pendingRemoval?.name || 'This character'} will disappear from the public page immediately. An earlier published version will remain available in Owner Workspace recovery.`"
+			:open="Boolean(pendingRemoval)"
+			:title="`Remove ${pendingRemoval?.name || 'this character'}?`"
+			@cancel="pendingRemoval = null"
+			@confirm="pendingRemoval && (emit('remove', pendingRemoval.id), (pendingRemoval = null))"
+		/>
 	</section>
 </template>
 
@@ -238,6 +331,63 @@ watch(
 	text-decoration: none;
 	border: none;
 	cursor: pointer;
+}
+
+.characters-grid__edit:disabled {
+	cursor: not-allowed;
+	opacity: 0.45;
+}
+
+.characters-grid__editing-status {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	border: 1px solid rgba(124, 225, 246, 0.22);
+	border-radius: var(--radius-pill);
+	background: rgba(124, 225, 246, 0.12);
+	color: #dff9ff;
+	font-size: 0.82rem;
+	font-weight: 800;
+	padding: 0.55rem 0.8rem;
+}
+
+.characters-grid__draft-notice,
+.characters-grid__save-error {
+	border: 1px solid rgba(124, 225, 246, 0.25);
+	border-radius: var(--radius-control);
+	background: rgba(124, 225, 246, 0.09);
+	color: #eaffff;
+	padding: 0.8rem;
+}
+
+.characters-grid__draft-notice {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.7rem;
+}
+
+.characters-grid__draft-notice > div {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.characters-grid__draft-notice button {
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	border-radius: var(--radius-pill);
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff8ef;
+	font-weight: 800;
+	padding: 0.55rem 0.75rem;
+}
+
+.characters-grid__save-error {
+	margin: 0;
+	border-color: rgba(255, 143, 143, 0.32);
+	background: rgba(255, 143, 143, 0.11);
+	color: #ffdada;
 }
 
 .characters-grid__media {

@@ -26,6 +26,7 @@ const filters = reactive({
 const categoryOptions: Array<{ label: string; value: CategoryFilter }> = [
 	{ label: "All activity", value: "all" },
 	{ label: "Auth", value: "auth" },
+	{ label: "Media", value: "media" },
 	{ label: "Site content", value: "site-content" }
 ];
 
@@ -41,6 +42,14 @@ const metricCards = computed(() => [
 	{
 		label: "Story Files",
 		value: dashboard.value?.metrics.storyArcCount ?? 0
+	},
+	{
+		label: "Uploaded Files",
+		value: dashboard.value?.metrics.mediaCount ?? 0
+	},
+	{
+		label: "Private Drafts",
+		value: dashboard.value?.metrics.pendingDraftCount ?? 0
 	}
 ]);
 
@@ -115,7 +124,9 @@ function formatDate(value: string) {
 }
 
 function formatCategory(category: AuditLogCategory) {
-	return category === "site-content" ? "Site content" : "Auth";
+	if (category === "site-content") return "Site content";
+	if (category === "media") return "Media";
+	return "Auth";
 }
 
 onMounted(() => {
@@ -153,7 +164,7 @@ onMounted(() => {
 			</div>
 		</header>
 
-		<p v-if="dashboardError" class="admin-dashboard__status admin-dashboard__status--error">
+		<p v-if="dashboardError" class="admin-dashboard__status admin-dashboard__status--error" role="alert">
 			{{ dashboardError }}
 		</p>
 
@@ -269,11 +280,11 @@ onMounted(() => {
 				</button>
 			</form>
 
-			<p v-if="auditError" class="admin-dashboard__status admin-dashboard__status--error">
+			<p v-if="auditError" class="admin-dashboard__status admin-dashboard__status--error" role="alert">
 				{{ auditError }}
 			</p>
 
-			<div v-if="auditLoading" class="audit-empty">Loading activity...</div>
+			<div v-if="auditLoading" class="audit-empty" role="status">Loading activity...</div>
 			<div v-else-if="!auditLogs.length" class="audit-empty">No matching activity yet.</div>
 			<ol v-else class="audit-list">
 				<li v-for="log in auditLogs" :key="log.id" class="audit-item">

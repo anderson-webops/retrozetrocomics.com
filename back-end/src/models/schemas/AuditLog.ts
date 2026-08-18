@@ -32,7 +32,7 @@ const auditLogSchema = new Schema(
 		},
 		category: {
 			type: String,
-			enum: ["auth", "comment", "member", "post", "site-content"],
+			enum: ["auth", "comment", "media", "member", "post", "site-content"],
 			required: true,
 			index: true
 		},

@@ -103,7 +103,7 @@ export function useAboutPageContentEditor() {
 	function removeStoryArc(arcId: string) {
 		if (content.value.storyArcs.length <= 1) {
 			error.value = "At least one story arc must remain.";
-			return Promise.resolve(content.value);
+			return Promise.reject(new Error(error.value));
 		}
 
 		return persist(nextContent => {

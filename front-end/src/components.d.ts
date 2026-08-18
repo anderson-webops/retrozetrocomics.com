@@ -12,8 +12,12 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AccountManagement: typeof import('./components/AccountManagement.vue')['default']
+    AdminConfirmDialog: typeof import('./components/admin/AdminConfirmDialog.vue')['default']
     AdminDashboard: typeof import('./components/admin/AdminDashboard.vue')['default']
+    AdminGuidedContentEditor: typeof import('./components/admin/AdminGuidedContentEditor.vue')['default']
     AdminInlineTools: typeof import('./components/admin/AdminInlineTools.vue')['default']
+    AdminMediaManager: typeof import('./components/admin/AdminMediaManager.vue')['default']
+    AdminOwnerWorkspace: typeof import('./components/admin/AdminOwnerWorkspace.vue')['default']
     ResolvedImage: typeof import('./components/ResolvedImage.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

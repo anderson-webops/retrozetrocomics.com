@@ -30,7 +30,11 @@ export const useSessionStore = defineStore("session", {
 			}
 
 			if (typeof window !== "undefined") {
-				this.adminViewerMode = window.localStorage.getItem(ADMIN_VIEWER_MODE_KEY) === "1";
+				try {
+					this.adminViewerMode = window.localStorage.getItem(ADMIN_VIEWER_MODE_KEY) === "1";
+				} catch {
+					this.adminViewerMode = false;
+				}
 			}
 
 			this.adminViewerModeReady = true;
@@ -40,7 +44,11 @@ export const useSessionStore = defineStore("session", {
 			this.adminViewerMode = nextValue;
 
 			if (typeof window !== "undefined") {
-				window.localStorage.setItem(ADMIN_VIEWER_MODE_KEY, nextValue ? "1" : "0");
+				try {
+					window.localStorage.setItem(ADMIN_VIEWER_MODE_KEY, nextValue ? "1" : "0");
+				} catch {
+					// The active view still changes even when private browsing blocks storage.
+				}
 			}
 		},
 

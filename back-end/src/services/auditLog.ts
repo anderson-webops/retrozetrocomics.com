@@ -5,6 +5,7 @@ import { AuditLog } from "../models/schemas/AuditLog.js";
 
 export type AuditLogCategory
 	= "auth"
+		| "media"
 		| "site-content";
 
 interface AuditLogPayload {

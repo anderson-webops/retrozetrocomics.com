@@ -32,10 +32,25 @@ export function useLocalDraft<T>({
 	const isAutosaveEnabled = computed(() => (typeof enabled === "function" ? enabled() : enabled));
 	const resolvedStorageKey = computed(() => (typeof storageKey === "function" ? storageKey() : storageKey));
 
-	function readDraft(targetStorageKey = resolvedStorageKey.value) {
+	function getLocalStorage() {
 		if (!isClient) return null;
+		try {
+			return window.localStorage || null;
+		} catch {
+			return null;
+		}
+	}
 
-		const raw = window.localStorage.getItem(targetStorageKey);
+	function readDraft(targetStorageKey = resolvedStorageKey.value) {
+		const storage = getLocalStorage();
+		if (!storage) return null;
+
+		let raw: string | null;
+		try {
+			raw = storage.getItem(targetStorageKey);
+		} catch {
+			return null;
+		}
 		if (!raw) return null;
 
 		try {
@@ -49,13 +64,21 @@ export function useLocalDraft<T>({
 				typeof parsed.hasFiles !== "boolean" ||
 				!parsed.value
 			) {
-				window.localStorage.removeItem(targetStorageKey);
+				try {
+					storage.removeItem(targetStorageKey);
+				} catch {
+					// Draft recovery remains optional when browser storage is blocked.
+				}
 				return null;
 			}
 
 			return parsed;
 		} catch {
-			window.localStorage.removeItem(targetStorageKey);
+			try {
+				storage.removeItem(targetStorageKey);
+			} catch {
+				// Draft recovery remains optional when browser storage is blocked.
+			}
 			return null;
 		}
 	}
@@ -69,7 +92,11 @@ export function useLocalDraft<T>({
 	}
 
 	function clearDraft(targetStorageKey = resolvedStorageKey.value) {
-		if (isClient) window.localStorage.removeItem(targetStorageKey);
+		try {
+			getLocalStorage()?.removeItem(targetStorageKey);
+		} catch {
+			// Keep the editor usable when browser storage is blocked.
+		}
 
 		available.value = false;
 		hasStoredFiles.value = false;
@@ -78,7 +105,8 @@ export function useLocalDraft<T>({
 	}
 
 	function saveNow(snapshot = source(), targetStorageKey = resolvedStorageKey.value) {
-		if (!isClient) return;
+		const storage = getLocalStorage();
+		if (!storage) return;
 
 		if (isEmpty(snapshot)) {
 			clearDraft(targetStorageKey);
@@ -94,7 +122,11 @@ export function useLocalDraft<T>({
 			version: 1
 		};
 
-		window.localStorage.setItem(targetStorageKey, JSON.stringify(record));
+		try {
+			storage.setItem(targetStorageKey, JSON.stringify(record));
+		} catch {
+			return;
+		}
 		available.value = true;
 		hasStoredFiles.value = record.hasFiles;
 		restorePromptVisible.value = false;

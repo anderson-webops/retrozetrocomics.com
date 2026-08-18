@@ -114,11 +114,10 @@ button {
 	border: none;
 }
 
-a:hover,
-a:focus-visible,
-button:hover,
-button:focus-visible {
-	outline: none;
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+	outline: 3px solid #7ce1f6;
+	outline-offset: 3px;
+	box-shadow: 0 0 0 2px #07111f;
 }
 
 img {

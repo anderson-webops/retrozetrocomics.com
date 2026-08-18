@@ -1,9 +1,16 @@
 import type {
 	AboutPageContent,
+	AdminSiteContentState,
 	AuditLogCategory,
 	AuditLogRecord,
 	CharactersPageContent,
-	DashboardData
+	ContentTrashItem,
+	DashboardData,
+	EditableSiteContent,
+	MediaAsset,
+	SiteContentCollection,
+	SiteContentPage,
+	SiteContentRevision
 } from "@/types/site";
 
 import { api } from "@/api";
@@ -56,4 +63,86 @@ export async function updateCharactersPageContent(payload: CharactersPageContent
 export async function updateAboutPageContent(payload: AboutPageContent) {
 	const { data } = await api.patch<{ content: AboutPageContent }>("/admin/site-content/about", payload);
 	return data.content;
+}
+
+export async function fetchAdminSiteContent<T extends EditableSiteContent>(page: SiteContentPage) {
+	const { data } = await api.get<AdminSiteContentState<T>>(`/admin/site-content/${page}`);
+	return data;
+}
+
+export async function saveAdminSiteContentDraft<T extends EditableSiteContent>(page: SiteContentPage, content: T) {
+	const { data } = await api.put<AdminSiteContentState<T>>(`/admin/site-content/${page}/draft`, { content });
+	return data;
+}
+
+export async function publishAdminSiteContentDraft<T extends EditableSiteContent>(page: SiteContentPage) {
+	const { data } = await api.post<AdminSiteContentState<T>>(`/admin/site-content/${page}/publish`, {});
+	return data;
+}
+
+export async function fetchSiteContentRevisions(page: SiteContentPage) {
+	const { data } = await api.get<{ revisions: SiteContentRevision[] }>(`/admin/site-content/${page}/revisions`);
+	return data.revisions;
+}
+
+export async function restoreSiteContentRevision<T extends EditableSiteContent>(
+	page: SiteContentPage,
+	revisionId: string
+) {
+	const { data } = await api.post<AdminSiteContentState<T>>(
+		`/admin/site-content/${page}/revisions/${revisionId}/restore`,
+		{}
+	);
+	return data;
+}
+
+export async function fetchContentTrash(page?: SiteContentPage) {
+	const { data } = await api.get<{ items: ContentTrashItem[] }>("/admin/site-content/trash", {
+		params: { page }
+	});
+	return data.items;
+}
+
+export async function trashSiteContentItem<T extends EditableSiteContent>(
+	page: SiteContentPage,
+	collection: SiteContentCollection,
+	itemId: string
+) {
+	const { data } = await api.post<AdminSiteContentState<T> & { trashItem: ContentTrashItem }>(
+		`/admin/site-content/${page}/trash`,
+		{ collection, itemId }
+	);
+	return data;
+}
+
+export async function restoreContentTrashItem<T extends EditableSiteContent>(trashId: string) {
+	const { data } = await api.post<AdminSiteContentState<T>>(`/admin/site-content/trash/${trashId}/restore`, {});
+	return data;
+}
+
+export async function fetchMediaAssets(trash = false) {
+	const { data } = await api.get<{ assets: MediaAsset[] }>("/admin/media", {
+		params: { trash: trash ? "1" : undefined }
+	});
+	return data.assets;
+}
+
+export async function uploadMediaAsset(formData: FormData, onProgress?: (percent: number) => void) {
+	const { data } = await api.post<{ asset: MediaAsset }>("/admin/media", formData, {
+		onUploadProgress(event) {
+			if (!event.total || !onProgress) return;
+			onProgress(Math.min(100, Math.round((event.loaded / event.total) * 100)));
+		}
+	});
+	return data.asset;
+}
+
+export async function trashMediaAsset(assetId: string) {
+	const { data } = await api.delete<{ asset: MediaAsset }>(`/admin/media/${assetId}`);
+	return data.asset;
+}
+
+export async function restoreMediaAsset(assetId: string) {
+	const { data } = await api.post<{ asset: MediaAsset }>(`/admin/media/${assetId}/restore`, {});
+	return data.asset;
 }

@@ -1,5 +1,5 @@
 export type AccountRole = "admin";
-export type AuditLogCategory = "auth" | "site-content";
+export type AuditLogCategory = "auth" | "media" | "site-content";
 export type AuditLogOutcome = "failure" | "success";
 
 export interface AuditLogRecord {
@@ -92,6 +92,8 @@ export interface SiteAccount {
 
 export interface DashboardMetrics {
 	characterCount: number;
+	mediaCount: number;
+	pendingDraftCount: number;
 	storyArcCount: number;
 	worldEntryCount: number;
 }
@@ -113,4 +115,61 @@ export interface DashboardStorage {
 export interface DashboardData {
 	metrics: DashboardMetrics;
 	storage: DashboardStorage;
+}
+
+export type SiteContentPage = "about" | "characters";
+export type SiteContentCollection = "characters" | "storyArcs" | "worldEntries";
+export type EditableSiteContent = AboutPageContent | CharactersPageContent;
+
+export interface AdminSiteContentState<T extends EditableSiteContent = EditableSiteContent> {
+	draft: T;
+	draftUpdatedAt: string | null;
+	hasDraft: boolean;
+	lastPublishedAt: string | null;
+	page: SiteContentPage;
+	published: T;
+	publishedVersion: number;
+}
+
+export interface SiteContentRevision {
+	actorName?: string;
+	createdAt: string | null;
+	id: string;
+	isCurrent: boolean;
+	reason: string;
+	version: number;
+}
+
+export interface ContentTrashItem {
+	collection: SiteContentCollection;
+	createdAt: string;
+	id: string;
+	itemId: string;
+	itemLabel: string;
+	page: SiteContentPage;
+}
+
+export type MediaPurpose = "character" | "comic" | "other" | "picture" | "storyboard";
+
+export interface MediaAsset {
+	altText: string;
+	createdAt: string;
+	deletedAt: string | null;
+	id: string;
+	kind: "document" | "image";
+	mimeType: string;
+	originalName: string;
+	provider: "local" | "s3";
+	purpose: MediaPurpose;
+	restoredAt: string | null;
+	size: number;
+	storageKey: string;
+	title: string;
+	updatedAt: string;
+	url: string;
+}
+
+export interface SiteContentValidationIssue {
+	field: string;
+	message: string;
 }

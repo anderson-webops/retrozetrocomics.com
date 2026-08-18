@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import type { CharacterBoardWorldEntry } from "@/types/site";
+import { nextTick } from "vue";
+import { useLocalDraft } from "@/composables/useLocalDraft";
 import { useSessionStore } from "@/stores/session";
 
 const props = withDefaults(
@@ -7,11 +9,13 @@ const props = withDefaults(
 		inlineEditing?: boolean;
 		items: CharacterBoardWorldEntry[];
 		openEditorId?: string;
+		saveError?: string;
 		savingId?: string;
 	}>(),
 	{
 		inlineEditing: false,
 		openEditorId: "",
+		saveError: "",
 		savingId: ""
 	}
 );
@@ -23,19 +27,37 @@ const emit = defineEmits<{
 }>();
 
 const editingId = ref("");
-const removalArmedId = ref("");
 const draftEntry = ref<CharacterBoardWorldEntry | null>(null);
+const pendingRemoval = ref<CharacterBoardWorldEntry | null>(null);
 const session = useSessionStore();
 const canEdit = computed(() => props.inlineEditing && session.showAdminTools);
+
+const localDraft = useLocalDraft({
+	enabled: () => Boolean(editingId.value && draftEntry.value),
+	isEmpty: snapshot => !snapshot.entry,
+	source: () => ({
+		entry: draftEntry.value ? cloneWorldEntry(draftEntry.value) : null,
+		hasFiles: false
+	}),
+	storageKey: () => `retrozetro:inline-world-entry:${editingId.value || "none"}`
+});
 
 function cloneWorldEntry(entry: CharacterBoardWorldEntry): CharacterBoardWorldEntry {
 	return JSON.parse(JSON.stringify(entry)) as CharacterBoardWorldEntry;
 }
 
 function startEditing(entry: CharacterBoardWorldEntry) {
+	if (editingId.value && editingId.value !== entry.id) return;
 	editingId.value = entry.id;
-	removalArmedId.value = "";
 	draftEntry.value = cloneWorldEntry(entry);
+	void focusEditor(entry.id);
+}
+
+async function focusEditor(entryId: string) {
+	await nextTick();
+	const editor = document.querySelector<HTMLElement>(`[data-world-editor="${entryId}"]`);
+	editor?.scrollIntoView({ behavior: "smooth", block: "center" });
+	editor?.querySelector<HTMLElement>("input, textarea")?.focus({ preventScroll: true });
 }
 
 function closeEditor() {
@@ -44,8 +66,14 @@ function closeEditor() {
 	}
 
 	editingId.value = "";
-	removalArmedId.value = "";
 	draftEntry.value = null;
+	localDraft.clearDraft();
+}
+
+function finishEditor() {
+	editingId.value = "";
+	draftEntry.value = null;
+	localDraft.clearDraft();
 }
 
 function addFact() {
@@ -57,17 +85,17 @@ function addFact() {
 
 function removeFact(index: number) {
 	if (!draftEntry.value?.facts) return;
-	if (draftEntry.value.facts.length <= 1) return;
-
 	draftEntry.value.facts.splice(index, 1);
 }
 
 function submitEntry() {
 	if (!draftEntry.value) return;
 	emit("save", cloneWorldEntry(draftEntry.value));
-	editingId.value = "";
-	removalArmedId.value = "";
-	draftEntry.value = null;
+}
+
+function restoreSavedDraft() {
+	const restored = localDraft.restoreDraft();
+	if (restored?.entry) draftEntry.value = cloneWorldEntry(restored.entry);
 }
 
 watch(
@@ -80,6 +108,13 @@ watch(
 		}
 	},
 	{ immediate: true }
+);
+
+watch(
+	() => props.savingId,
+	(nextId, previousId) => {
+		if (!nextId && previousId === editingId.value && !props.saveError) finishEditor();
+	}
 );
 
 watch(
@@ -110,12 +145,46 @@ watch(
 				'world-entry-card--editing': editingId === entry.id
 			}"
 		>
-			<button v-if="canEdit" type="button" class="world-entry-card__edit" @click="startEditing(entry)">
-				{{ editingId === entry.id ? "Editing" : "Edit" }}
+			<button
+				v-if="canEdit && editingId !== entry.id"
+				:aria-label="`Edit ${entry.title}`"
+				class="world-entry-card__edit"
+				:disabled="Boolean(editingId)"
+				type="button"
+				@click="startEditing(entry)"
+			>
+				Edit {{ entry.title }}
 			</button>
+			<span v-if="editingId === entry.id" class="world-entry-card__editing-status"
+				>Editing {{ entry.title }}</span
+			>
 
 			<template v-if="canEdit && editingId === entry.id && draftEntry">
-				<form class="world-entry-card__editor" @submit.prevent="submitEntry">
+				<form
+					class="world-entry-card__editor"
+					:data-world-editor="entry.id"
+					:aria-describedby="props.saveError ? `world-save-error-${entry.id}` : undefined"
+					@submit.prevent="submitEntry"
+				>
+					<div
+						v-if="localDraft.restorePromptVisible.value"
+						class="world-entry-card__draft-notice"
+						role="status"
+					>
+						<strong>Continue unfinished edits?</strong>
+						<div>
+							<button type="button" @click="restoreSavedDraft">Continue</button>
+							<button type="button" @click="localDraft.discardStoredDraft">Use saved copy</button>
+						</div>
+					</div>
+					<p
+						v-if="props.saveError"
+						:id="`world-save-error-${entry.id}`"
+						class="world-entry-card__save-error"
+						role="alert"
+					>
+						{{ props.saveError }} Your edits are still here. Fix the named field or try saving again.
+					</p>
 					<div class="world-entry-card__editor-grid">
 						<label>
 							<span>Label</span>
@@ -129,7 +198,7 @@ watch(
 
 					<label>
 						<span>Body</span>
-						<textarea v-model="draftEntry.body" required rows="5" />
+						<textarea v-model="draftEntry.body" maxlength="520" minlength="12" required rows="5" />
 					</label>
 
 					<div class="world-entry-card__facts">
@@ -151,12 +220,7 @@ watch(
 								<span>Value</span>
 								<input v-model="fact.value" maxlength="220" type="text" />
 							</label>
-							<button
-								type="button"
-								:disabled="(draftEntry.facts?.length || 0) <= 1"
-								class="world-entry-card__fact-remove"
-								@click="removeFact(index)"
-							>
+							<button type="button" class="world-entry-card__fact-remove" @click="removeFact(index)">
 								Remove
 							</button>
 						</div>
@@ -170,14 +234,8 @@ watch(
 							<button type="button" @click="closeEditor">Cancel edits</button>
 						</div>
 						<div class="world-entry-card__danger-zone">
-							<button
-								type="button"
-								class="world-entry-card__danger"
-								@click="
-									removalArmedId === entry.id ? emit('remove', entry.id) : (removalArmedId = entry.id)
-								"
-							>
-								{{ removalArmedId === entry.id ? "Confirm remove entry" : "Remove entry" }}
+							<button type="button" class="world-entry-card__danger" @click="pendingRemoval = entry">
+								Remove {{ entry.title }} from the public page
 							</button>
 						</div>
 					</div>
@@ -197,6 +255,15 @@ watch(
 				</dl>
 			</template>
 		</article>
+
+		<AdminConfirmDialog
+			confirm-label="Remove from public page"
+			:description="`${pendingRemoval?.title || 'This world note'} will disappear from the public page immediately. An earlier published version will remain available in Owner Workspace recovery.`"
+			:open="Boolean(pendingRemoval)"
+			:title="`Remove ${pendingRemoval?.title || 'this world note'}?`"
+			@cancel="pendingRemoval = null"
+			@confirm="pendingRemoval && (emit('remove', pendingRemoval.id), (pendingRemoval = null))"
+		/>
 	</section>
 </template>
 
@@ -244,6 +311,63 @@ watch(
 	font-weight: 800;
 	font-size: 0.84rem;
 	cursor: pointer;
+}
+
+.world-entry-card__edit:disabled {
+	cursor: not-allowed;
+	opacity: 0.45;
+}
+
+.world-entry-card__editing-status {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	border: 1px solid rgba(124, 225, 246, 0.22);
+	border-radius: var(--radius-pill);
+	background: rgba(124, 225, 246, 0.12);
+	color: #dff9ff;
+	font-size: 0.82rem;
+	font-weight: 800;
+	padding: 0.55rem 0.8rem;
+}
+
+.world-entry-card__draft-notice,
+.world-entry-card__save-error {
+	border: 1px solid rgba(124, 225, 246, 0.25);
+	border-radius: var(--radius-control);
+	background: rgba(124, 225, 246, 0.09);
+	color: #eaffff;
+	padding: 0.8rem;
+}
+
+.world-entry-card__draft-notice {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.7rem;
+}
+
+.world-entry-card__draft-notice > div {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.world-entry-card__draft-notice button {
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	border-radius: var(--radius-pill);
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff8ef;
+	font-weight: 800;
+	padding: 0.55rem 0.75rem;
+}
+
+.world-entry-card__save-error {
+	margin: 0;
+	border-color: rgba(255, 143, 143, 0.32);
+	background: rgba(255, 143, 143, 0.11);
+	color: #ffdada;
 }
 
 .world-entry-card__eyebrow {

@@ -5,12 +5,13 @@ import { z } from "zod";
 import { createDefaultAboutPageContent } from "../content/defaultAboutPageContent.js";
 import { createDefaultCharactersPageContent } from "../content/defaultCharactersPageContent.js";
 import { AuditLog } from "../models/schemas/AuditLog.js";
+import { MediaAsset } from "../models/schemas/MediaAsset.js";
 import { SiteContent } from "../models/schemas/SiteContent.js";
 import { getStorageStatus } from "../services/storage.js";
 
 const ABOUT_PAGE_KEY = "about-page";
 const CHARACTERS_PAGE_KEY = "characters-page";
-const ACTIVITY_CATEGORIES = ["auth", "site-content"] as const;
+const ACTIVITY_CATEGORIES = ["auth", "media", "site-content"] as const;
 
 const auditLogQuerySchema = z.object({
 	action: z.string().trim().max(80).optional().default(""),
@@ -55,9 +56,10 @@ function readArrayCount(value: unknown, key: string, fallback: number) {
 }
 
 export async function getDashboard(_req: Request, res: Response) {
-	const [charactersDocument, aboutDocument] = await Promise.all([
+	const [charactersDocument, aboutDocument, mediaCount] = await Promise.all([
 		SiteContent.findOne({ key: CHARACTERS_PAGE_KEY }),
-		SiteContent.findOne({ key: ABOUT_PAGE_KEY })
+		SiteContent.findOne({ key: ABOUT_PAGE_KEY }),
+		MediaAsset.countDocuments({ deletedAt: null })
 	]);
 	const defaultCharacters = createDefaultCharactersPageContent();
 	const defaultAbout = createDefaultAboutPageContent();
@@ -74,6 +76,8 @@ export async function getDashboard(_req: Request, res: Response) {
 				"storyArcs",
 				defaultAbout.storyArcs.length
 			),
+			mediaCount,
+			pendingDraftCount: [charactersDocument, aboutDocument].filter(document => document?.draftData != null).length,
 			worldEntryCount: readArrayCount(
 				charactersDocument?.data,
 				"worldEntries",

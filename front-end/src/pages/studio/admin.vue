@@ -19,7 +19,7 @@ onMounted(() => {
 
 <template>
 	<div v-if="session.isAdmin" class="admin-page">
-		<AdminDashboard />
+		<AdminOwnerWorkspace />
 	</div>
 	<section v-else class="admin-gate">
 		<p class="admin-gate__eyebrow">Restricted</p>

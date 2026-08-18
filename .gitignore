@@ -4,6 +4,8 @@
 **/*.tsbuildinfo
 .run
 .retrozetro-release-prepared.json
+.playwright-cli/
+output/playwright/
 
 #package-lock.json
 #pnpm-lock.yaml

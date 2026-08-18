@@ -8,6 +8,7 @@ import SiteAdSlot from "~/components/SiteAdSlot.vue";
 const session = useSessionStore();
 const route = useRoute();
 const isAdminRoute = computed(() => route.path === "/studio/admin");
+const focusedOwnerEditing = computed(() => session.isAdmin && route.query.manage === "1" && !session.adminViewerMode);
 const showAdminViewerBanner = computed(() => session.isAdmin && session.adminViewerMode && !isAdminRoute.value);
 
 onMounted(() => {
@@ -16,7 +17,8 @@ onMounted(() => {
 </script>
 
 <template>
-	<main class="site-shell">
+	<RouterView v-if="isAdminRoute" />
+	<main v-else class="site-shell">
 		<div class="site-frame">
 			<header class="site-masthead">
 				<RouterLink aria-label="RetroZetro Comics home" class="site-masthead__brand" to="/">
@@ -24,25 +26,40 @@ onMounted(() => {
 					<span>RetroZetro Comics</span>
 				</RouterLink>
 
-				<SiteAdSlot class="site-masthead__ad" label="Advertisement" placement="top" />
+				<SiteAdSlot
+					v-if="!focusedOwnerEditing"
+					class="site-masthead__ad"
+					label="Advertisement"
+					placement="top"
+				/>
 			</header>
 
 			<TheHeader class="site-frame__nav" />
 
 			<div v-if="showAdminViewerBanner" class="admin-viewer-banner">
 				<div>
-					<p class="admin-viewer-banner__eyebrow">Viewer Mode</p>
-					<p>Public edit tools are hidden so you can browse the site more like a regular visitor.</p>
+					<p class="admin-viewer-banner__eyebrow">Preview as a visitor</p>
+					<p>Editing tools are hidden so you can check the site the way a visitor sees it.</p>
 				</div>
-				<button type="button" @click="session.toggleAdminViewerMode()">Turn edit tools back on</button>
+				<button type="button" @click="session.toggleAdminViewerMode()">Return to owner tools</button>
 			</div>
 
-			<div class="content-grid">
-				<SiteAdSlot class="content-grid__ad content-grid__ad--left" label="Advertisement" placement="side" />
+			<div class="content-grid" :class="{ 'content-grid--focused': focusedOwnerEditing }">
+				<SiteAdSlot
+					v-if="!focusedOwnerEditing"
+					class="content-grid__ad content-grid__ad--left"
+					label="Advertisement"
+					placement="side"
+				/>
 				<div id="center-plate" class="center-plate">
 					<RouterView class="page-slot" />
 				</div>
-				<SiteAdSlot class="content-grid__ad content-grid__ad--right" label="Advertisement" placement="side" />
+				<SiteAdSlot
+					v-if="!focusedOwnerEditing"
+					class="content-grid__ad content-grid__ad--right"
+					label="Advertisement"
+					placement="side"
+				/>
 			</div>
 
 			<TheFooter class="site-shell__footer" />
@@ -166,6 +183,14 @@ onMounted(() => {
 
 .content-grid__ad--right {
 	grid-column: 3;
+}
+
+.content-grid--focused {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+.content-grid--focused .center-plate {
+	grid-column: 1;
 }
 
 .site-shell__footer {
