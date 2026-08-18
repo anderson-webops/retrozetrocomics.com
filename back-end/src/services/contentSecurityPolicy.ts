@@ -5,6 +5,68 @@ import path from "node:path";
 const SCRIPT_PATTERN = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
 const SOURCE_ATTRIBUTE_PATTERN = /(?:^|\s)src\s*=/i;
 
+export type ContentSecurityPolicyProfile = "owner" | "public";
+
+export function isOwnerSecurityRoute(requestPath: string) {
+	return /^\/studio\/admin(?:\/|$)/.test(requestPath)
+		|| /^\/api\/(?:admin|auth)(?:\/|$)/.test(requestPath);
+}
+
+export function buildContentSecurityPolicyDirectives(
+	profile: ContentSecurityPolicyProfile,
+	inlineScriptHashes: readonly string[],
+	isProduction: boolean
+) {
+	const ownerOnly = profile === "owner";
+
+	return {
+		baseUri: ["'self'"],
+		connectSrc: ownerOnly
+			? ["'self'"]
+			: [
+					"'self'",
+					"https://analytics.retrozetrocomics.com",
+					"https://analytics.jacobdanderson.net",
+					"https://pagead2.googlesyndication.com",
+					"https://googleads.g.doubleclick.net",
+					"https://www.google.com"
+				],
+		defaultSrc: ["'self'"],
+		fontSrc: ["'self'", "data:"],
+		formAction: ["'self'"],
+		frameAncestors: ["'none'"],
+		frameSrc: ownerOnly
+			? ["'none'"]
+			: [
+					"https://googleads.g.doubleclick.net",
+					"https://tpc.googlesyndication.com"
+				],
+		imgSrc: ownerOnly
+			? ["'self'", "data:", "blob:"]
+			: [
+					"'self'",
+					"data:",
+					"blob:",
+					"https://*.doubleclick.net",
+					"https://*.googlesyndication.com",
+					"https://*.googleusercontent.com"
+				],
+		objectSrc: ["'none'"],
+		scriptSrc: ownerOnly
+			? ["'self'", ...inlineScriptHashes]
+			: [
+					"'self'",
+					...inlineScriptHashes,
+					"https://pagead2.googlesyndication.com",
+					"https://analytics.retrozetrocomics.com",
+					"https://analytics.jacobdanderson.net"
+				],
+		scriptSrcAttr: ["'none'"],
+		styleSrc: ["'self'", "'unsafe-inline'"],
+		upgradeInsecureRequests: isProduction ? [] : null
+	};
+}
+
 function collectHtmlFiles(directory: string): string[] {
 	if (!existsSync(directory)) {
 		return [];

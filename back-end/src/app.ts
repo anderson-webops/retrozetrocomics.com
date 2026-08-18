@@ -23,7 +23,11 @@ import { adminRouter } from "./routes/admin.js";
 import { authRouter } from "./routes/auth.js";
 import { contactRouter } from "./routes/contact.js";
 import { siteContentRouter } from "./routes/siteContent.js";
-import { readInlineScriptHashes } from "./services/contentSecurityPolicy.js";
+import {
+	buildContentSecurityPolicyDirectives,
+	isOwnerSecurityRoute,
+	readInlineScriptHashes
+} from "./services/contentSecurityPolicy.js";
 import { createProbeRouter } from "./services/probes.js";
 import {
 	ensureUploadDirectories,
@@ -56,6 +60,21 @@ export function createApp() {
 		? path.resolve(env.STATIC_SITE_DIR)
 		: defaultStaticRoot;
 	const inlineScriptHashes = readInlineScriptHashes(staticRoot);
+	const createSecurityHeaders = (profile: "owner" | "public") => helmet({
+		contentSecurityPolicy: {
+			directives: buildContentSecurityPolicyDirectives(
+				profile,
+				inlineScriptHashes,
+				config.isProduction
+			)
+		},
+		crossOriginEmbedderPolicy: false,
+		crossOriginResourcePolicy: { policy: "cross-origin" },
+		referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+		xFrameOptions: { action: "deny" }
+	});
+	const ownerSecurityHeaders = createSecurityHeaders("owner");
+	const publicSecurityHeaders = createSecurityHeaders("public");
 	verifyStaticReleaseIdentity(staticRoot, releaseIdentity, config.isProduction);
 
 	app.disable("x-powered-by");
@@ -67,53 +86,12 @@ export function createApp() {
 		app.set("trust proxy", false);
 	}
 
-	app.use(
-		helmet({
-			contentSecurityPolicy: {
-				directives: {
-					baseUri: ["'self'"],
-					connectSrc: [
-						"'self'",
-						"https://analytics.retrozetrocomics.com",
-						"https://analytics.jacobdanderson.net",
-						"https://pagead2.googlesyndication.com",
-						"https://googleads.g.doubleclick.net",
-						"https://www.google.com"
-					],
-					defaultSrc: ["'self'"],
-					fontSrc: ["'self'", "data:"],
-					formAction: ["'self'"],
-					frameAncestors: ["'none'"],
-					frameSrc: [
-						"https://googleads.g.doubleclick.net",
-						"https://tpc.googlesyndication.com"
-					],
-					imgSrc: [
-						"'self'",
-						"data:",
-						"blob:",
-						"https://*.doubleclick.net",
-						"https://*.googlesyndication.com",
-						"https://*.googleusercontent.com"
-					],
-					objectSrc: ["'none'"],
-					scriptSrc: [
-						"'self'",
-						...inlineScriptHashes,
-						"https://pagead2.googlesyndication.com",
-						"https://analytics.retrozetrocomics.com",
-						"https://analytics.jacobdanderson.net"
-					],
-					scriptSrcAttr: ["'none'"],
-					styleSrc: ["'self'", "'unsafe-inline'"],
-					upgradeInsecureRequests: config.isProduction ? [] : null
-				}
-			},
-			crossOriginEmbedderPolicy: false,
-			crossOriginResourcePolicy: { policy: "cross-origin" },
-			referrerPolicy: { policy: "strict-origin-when-cross-origin" }
-		})
-	);
+	app.use((req, res, next) => {
+		const securityHeaders = isOwnerSecurityRoute(req.path)
+			? ownerSecurityHeaders
+			: publicSecurityHeaders;
+		securityHeaders(req, res, next);
+	});
 	app.use(
 		createProbeRouter(async () => {
 			const connection = mongoose.connection;

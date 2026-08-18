@@ -15,8 +15,9 @@ const socialPreviewPath = ref<string>(siteAssetCandidates.socialPreview[0]);
 
 const defaultSocialImageUrl = computed(() => toAbsoluteSiteUrl(socialPreviewPath.value));
 const canonicalUrl = computed(() => new URL(route.path || "/", `${siteUrl}/`).toString());
+const isOwnerRoute = computed(() => /^\/studio\/admin(?:\/|$)/.test(route.path));
 const robotsContent = computed(() =>
-	/^\/studio\/admin(?:\/|$)|^\/api(?:\/|$)/.test(route.path)
+	isOwnerRoute.value || /^\/api(?:\/|$)/.test(route.path)
 		? "noindex,nofollow"
 		: "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
 );
@@ -51,6 +52,14 @@ useHead(
 		({
 			title: "RetroZetro Comics",
 			meta: [
+				...(!isOwnerRoute.value
+					? [
+							{
+								name: "google-adsense-account",
+								content: "ca-pub-4342594327430874"
+							}
+						]
+					: []),
 				{
 					name: "description",
 					content:
@@ -142,8 +151,13 @@ useHead(
 				}
 			],
 			script: [
-				...(import.meta.env.PROD
+				...(import.meta.env.PROD && !isOwnerRoute.value
 					? [
+							{
+								async: true,
+								crossorigin: "anonymous",
+								src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4342594327430874"
+							},
 							{
 								defer: true,
 								src: "https://analytics.retrozetrocomics.com/script.js",
@@ -156,7 +170,7 @@ useHead(
 							}
 						]
 					: []),
-				...structuredData.value.map((entry, index) => ({
+				...(!isOwnerRoute.value ? structuredData.value : []).map((entry, index) => ({
 					innerHTML: JSON.stringify(entry),
 					key: `ld-json-${index}`,
 					type: "application/ld+json"

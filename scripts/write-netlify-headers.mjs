@@ -46,28 +46,45 @@ for (const htmlPath of await collectHtmlFiles(outputDirectory)) {
 	}
 }
 
-const scriptSources = [
-	"'self'",
-	...[...hashes].sort(),
-	"https://pagead2.googlesyndication.com",
-	"https://analytics.retrozetrocomics.com",
-	"https://analytics.jacobdanderson.net"
-].join(" ");
-const contentSecurityPolicy = [
-	"default-src 'self'",
-	"base-uri 'self'",
-	"connect-src 'self' https://analytics.retrozetrocomics.com https://analytics.jacobdanderson.net https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google.com",
-	"font-src 'self' data:",
-	"form-action 'self'",
-	"frame-ancestors 'none'",
-	"frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
-	"img-src 'self' data: blob: https://*.doubleclick.net https://*.googlesyndication.com https://*.googleusercontent.com",
-	"object-src 'none'",
-	`script-src ${scriptSources}`,
-	"script-src-attr 'none'",
-	"style-src 'self' 'unsafe-inline'",
-	"upgrade-insecure-requests"
-].join("; ");
+function createContentSecurityPolicy(profile) {
+	const ownerOnly = profile === "owner";
+	const scriptSources = [
+		"'self'",
+		...[...hashes].sort(),
+		...(ownerOnly
+			? []
+			: [
+					"https://pagead2.googlesyndication.com",
+					"https://analytics.retrozetrocomics.com",
+					"https://analytics.jacobdanderson.net"
+				])
+	].join(" ");
+
+	return [
+		"default-src 'self'",
+		"base-uri 'self'",
+		ownerOnly
+			? "connect-src 'self'"
+			: "connect-src 'self' https://analytics.retrozetrocomics.com https://analytics.jacobdanderson.net https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google.com",
+		"font-src 'self' data:",
+		"form-action 'self'",
+		"frame-ancestors 'none'",
+		ownerOnly
+			? "frame-src 'none'"
+			: "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
+		ownerOnly
+			? "img-src 'self' data: blob:"
+			: "img-src 'self' data: blob: https://*.doubleclick.net https://*.googlesyndication.com https://*.googleusercontent.com",
+		"object-src 'none'",
+		`script-src ${scriptSources}`,
+		"script-src-attr 'none'",
+		"style-src 'self' 'unsafe-inline'",
+		"upgrade-insecure-requests"
+	].join("; ");
+}
+
+const contentSecurityPolicy = createContentSecurityPolicy("public");
+const ownerContentSecurityPolicy = createContentSecurityPolicy("owner");
 
 await writeFile(
 	path.join(outputDirectory, "_headers"),
@@ -85,6 +102,16 @@ await writeFile(
 
 /release.json
   Cache-Control: no-store
+
+/studio/admin
+  Cache-Control: no-store
+  Content-Security-Policy: ${ownerContentSecurityPolicy}
+  X-Robots-Tag: noindex, nofollow
+
+/studio/admin/*
+  Cache-Control: no-store
+  Content-Security-Policy: ${ownerContentSecurityPolicy}
+  X-Robots-Tag: noindex, nofollow
 `,
 	"utf8"
 );
