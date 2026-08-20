@@ -13,6 +13,7 @@ const relativePaths = {
 	legacyRuntime: "back-end/src/config/legacyDeployment.ts",
 	nginx: "deploy/nginx/retrozetro.locations.conf",
 	npmHelper: "scripts/run-pinned-npm.mjs",
+	ownerStaticSecurity: "scripts/write-owner-static-security.mjs",
 	installPolicy: "scripts/verify-install-script-policy.mjs",
 	prepare: "deploy/systemd/prepare-release.sh",
 	promote: "deploy/systemd/promote-release.sh",
@@ -55,6 +56,7 @@ const [
 	legacyRuntime,
 	nginx,
 	npmHelper,
+	ownerStaticSecurity,
 	prepare,
 	promote,
 	releaseWorkflow,
@@ -69,6 +71,7 @@ const [
 	read(relativePaths.legacyRuntime),
 	read(relativePaths.nginx),
 	read(relativePaths.npmHelper),
+	read(relativePaths.ownerStaticSecurity),
 	read(relativePaths.prepare),
 	read(relativePaths.promote),
 	read(relativePaths.releaseWorkflow),
@@ -121,10 +124,15 @@ assert.match(storage, /resolvedRoot === path\.join\(LEGACY_BACKEND_ROOT, "upload
 
 const rootPackage = JSON.parse(await read("package.json"));
 const backEndPackage = JSON.parse(await read("back-end/package.json"));
+const frontEndPackage = JSON.parse(await read("front-end/package.json"));
 assert.equal(Object.hasOwn(rootPackage, "devEngines"), false);
 assert.equal(Object.hasOwn(backEndPackage, "allowScripts"), false);
 assert.equal(rootPackage.allowScripts?.["argon2@0.45.1"], true);
 assert.equal(rootPackage.allowScripts?.["express-rate-limit@8.6.1"], false);
+assert.match(frontEndPackage.scripts.build, /write-owner-static-security\.mjs/);
+assert.match(ownerStaticSecurity, /Content-Security-Policy/);
+assert.match(ownerStaticSecurity, /noindex,nofollow,noarchive,nosnippet/);
+assert.match(ownerStaticSecurity, /assert\.doesNotMatch\(policy/);
 assert.match(installPolicy, /npm ci|"ci"/);
 assert.match(installPolicy, /--workspace/);
 assert.match(npmHelper, /delete env\.npm_config_global_ignore_file/);

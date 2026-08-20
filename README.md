@@ -43,6 +43,9 @@ npm run audit:production
 - Current site content accepts media-library paths and bundled `/brand/` or `/legacy-images/` files. Deliberate external
   image hosting remains available by listing exact HTTPS DNS hostnames in `CONTENT_IMAGE_HOSTS`; those same hosts are
   added narrowly to the browser image policy.
+- Every generated page carries a restrictive hash-based static script policy, and the owner page also carries no-index
+  metadata. This preserves the intended browser boundary if a legacy edge configuration temporarily lags the application
+  release. The Nginx route policy remains the authoritative production header and is checked independently after promotion.
 - A production `mongodb://` URI with the exact single host `localhost` is canonicalized to `127.0.0.1` before validation
   and connection. Other hostnames remain remote and require verified TLS.
 - Admin creation, enablement, disablement, and password resets are dry-run-first:

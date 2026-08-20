@@ -52,6 +52,8 @@ assert.deepEqual(readiness, { ok: true }, "API readiness payload must remain min
 
 const rootResponse = await request("/");
 assert.equal(rootResponse.status, 200, "Public homepage must be available.");
+const rootHtml = await rootResponse.text();
+assert.match(rootHtml, /http-equiv="Content-Security-Policy"/);
 const csp = rootResponse.headers.get("content-security-policy") || "";
 assert.match(csp, /script-src/, "Public homepage must send a script policy.");
 const scriptPolicy = csp.split(";")
@@ -63,12 +65,30 @@ assert.match(hsts, /max-age=63072000/i, "HSTS must retain the two-year preload l
 assert.match(hsts, /includeSubDomains/i, "HSTS must include subdomains.");
 assert.match(hsts, /preload/i, "HSTS must retain preload eligibility.");
 
-const ownerResponse = await request("/studio/admin");
+const ownerRedirectResponse = await request("/studio/admin");
+assert.equal(ownerRedirectResponse.status, 301, "The owner route must redirect to its canonical path.");
+assert.equal(
+	ownerRedirectResponse.headers.get("location"),
+	"/studio/admin/",
+	"The owner route must preserve the canonical trailing slash."
+);
+assert.match(ownerRedirectResponse.headers.get("cache-control") || "", /no-store/);
+assert.match(ownerRedirectResponse.headers.get("x-robots-tag") || "", /noindex/);
+assert.equal(
+	ownerRedirectResponse.headers.get("content-security-policy"),
+	"default-src 'none'",
+	"The redirect must not inherit the public application policy."
+);
+
+const ownerResponse = await request("/studio/admin/");
 assert.equal(ownerResponse.status, 200, "The owner sign-in page must remain available.");
 assert.match(ownerResponse.headers.get("cache-control") || "", /no-store/);
 assert.match(ownerResponse.headers.get("x-robots-tag") || "", /noindex/);
 const ownerCsp = ownerResponse.headers.get("content-security-policy") || "";
 assert.doesNotMatch(ownerCsp, /googlesyndication|doubleclick|analytics\./i);
+const ownerHtml = await ownerResponse.text();
+assert.match(ownerHtml, /content="noindex,nofollow,noarchive,nosnippet" name="robots"/);
+assert.match(ownerHtml, /http-equiv="Content-Security-Policy"/);
 
 const securityTextResponse = await request("/.well-known/security.txt");
 assert.equal(securityTextResponse.status, 200, "security.txt must be public.");
