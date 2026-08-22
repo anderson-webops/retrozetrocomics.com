@@ -1,0 +1,87 @@
+{
+	"schemaVersion": 1,
+	"contentId": "tyler-source-backed-site-content-v1",
+	"activationPolicy": "Use checked-in defaults only when the matching SiteContent record is absent or invalid. Never overwrite an owner-created record automatically.",
+	"expectedImportedMedia": {
+		"activeCount": 85,
+		"provider": "local",
+		"storagePrefix": "content/tyler-handdrawn-v1/"
+	},
+	"referencedMedia": [
+		{
+			"manifestSequence": 63,
+			"sourceSha256": "ba7430851cc355383f307aa79f9cb717499226081223360dad199614b4cc7153",
+			"storageKey": "content/tyler-handdrawn-v1/063-ba7430851cc35538.jpg",
+			"title": "Tyler original 063: Exo and Shaman",
+			"placements": ["home:hero", "site:social preview"],
+			"evidence": ["Adjacent single-image visual confirmation: Exo and Shaman"]
+		},
+		{
+			"manifestSequence": 84,
+			"sourceSha256": "fb97b37cd5c66f0ed0f27f628da5ab758c7bbd8b57bc994030f09b4c32ad139f",
+			"storageKey": "content/tyler-handdrawn-v1/084-fb97b37cd5c66f0e.jpg",
+			"title": "Tyler original 084: Exo",
+			"placements": ["home:The List", "about:hero", "characters:hero"],
+			"evidence": ["Direct same-message label: Exo"]
+		},
+		{
+			"manifestSequence": 10,
+			"sourceSha256": "171f13ce370c971610d7d0576995cd59660417e8bfe1ccc3353f5a13fca6a64a",
+			"storageKey": "content/tyler-handdrawn-v1/010-171f13ce370c9716.jpg",
+			"title": "Tyler original 010: Apex Army character",
+			"placements": ["home:The Fall of a Dream"],
+			"evidence": ["Direct same-message label: Apex Army"]
+		},
+		{
+			"manifestSequence": 12,
+			"sourceSha256": "198b5c15c9c93a505cdcbb0eb3c7f498c6bc0f0cfd411dac9a0d1b404c63c5e4",
+			"storageKey": "content/tyler-handdrawn-v1/012-198b5c15c9c93a50.jpg",
+			"title": "Tyler original 012: Exo, first new design",
+			"placements": ["home:Exo Dexus", "characters:Exo Dexus"],
+			"evidence": ["Direct same-message label: first new design of Exo"]
+		},
+		{
+			"manifestSequence": 5,
+			"sourceSha256": "0905d798b55c8bb8cc9ac0565e72aa732d91357e158de51bd56be267051bfdbd",
+			"storageKey": "content/tyler-handdrawn-v1/005-0905d798b55c8bb8.jpg",
+			"title": "Tyler original 005: Fazo",
+			"placements": ["home:Bitgam", "characters:Fazo"],
+			"evidence": ["Direct same-message label: Fazo"]
+		}
+	],
+	"siteContent": {
+		"home-page": {
+			"sourceDefault": "front-end/src/content/defaultHomePageContent.ts",
+			"serverDefault": "back-end/src/content/defaultHomePageContent.ts",
+			"showcaseItems": 4
+		},
+		"about-page": {
+			"sourceDefault": "front-end/src/content/defaultAboutPageContent.ts",
+			"serverDefault": "back-end/src/content/defaultAboutPageContent.ts",
+			"storyFiles": 2
+		},
+		"characters-page": {
+			"sourceDefault": "front-end/src/content/defaultCharactersPageContent.ts",
+			"serverDefault": "back-end/src/content/defaultCharactersPageContent.ts",
+			"characters": 2,
+			"worldEntries": 5
+		}
+	},
+	"sourceEvidenceIds": [
+		"SM-0025",
+		"SM-0041",
+		"SM-0048",
+		"SM-0049",
+		"SM-0089",
+		"SM-0096",
+		"SM-0191",
+		"SM-0199"
+	],
+	"publicationBoundaries": [
+		"The List and The Fall of a Dream are labeled working story files; their sequence and continuity relationship are not stated as final canon.",
+		"Zorix is not assigned another character's drawing. No confidently matched imported hand-drawn Zorix image was available.",
+		"Zetro, Retro, Exo Dexus, Fazo, AU material, and Zlugnoid material are not merged into one continuity without Tyler's confirmation.",
+		"Raw messages, private storyline documents, source message identifiers, and archive paths are not exposed through public APIs or pages.",
+		"No S3 migration, media re-upload, or image transformation is part of this content release."
+	]
+}

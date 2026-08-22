@@ -2,98 +2,102 @@ import type { CharactersPageContent } from "@/types/site";
 
 import { siteAssetCandidates } from "@/lib/siteAssets";
 
+const tylerHandDrawnBase = "/uploads/content/tyler-handdrawn-v1";
+
 export function createDefaultCharactersPageContent(): CharactersPageContent {
 	return {
-		description: "Meet the characters, factions, and worlds driving The List and The Fall of a Dream.",
-		eyebrow: "Characters and Factions",
-		heroImage: siteAssetCandidates.zetroPortrait[0],
-		heroImageAlt: "Zetro portrait",
-		heroImageFallback: siteAssetCandidates.zetroPortrait[1],
-		title: "Meet the Characters",
 		characters: [
 			{
-				description: "Zetro is brave, stubborn, and quick to step into danger.",
-				fallbackImage: siteAssetCandidates.zetroPortrait[1],
-				frequency: "Hope under pressure",
-				id: "zetro",
-				image: siteAssetCandidates.zetroPortrait[0],
-				imgAlt: "Poster portrait of Zetro in orange and cyan tones",
-				name: "Zetro",
-				role: "Lead hero",
-				specialty: "Frontline improvisation"
-			},
-			{
-				description: "Kazay handles missions built on timing and misdirection.",
-				fallbackImage: siteAssetCandidates.kazayPortrait[1],
-				frequency: "Speed and misdirection",
-				id: "kazay",
-				image: siteAssetCandidates.kazayPortrait[0],
-				imgAlt: "Poster portrait of Kazay in cyan and amber tones",
-				name: "Kazay",
-				role: "Signal runner",
-				specialty: "Covert entry and extraction"
-			},
-			{
-				description: "Exo leads Team Rimlaw through searches that keep pulling him back to the Apex Army.",
+				description:
+					"Exo Dexus leads Team Rimlaw, infiltrates an Apex moon base, searches for his mother and a missing friend, and confronts Zego in the developing crisis.",
 				fallbackImage: siteAssetCandidates.exoPortrait[1],
-				frequency: "Search and rescue",
-				id: "exo",
-				image: siteAssetCandidates.exoPortrait[0],
-				imgAlt: "Poster portrait of Exo in pale blue and gold tones",
-				name: "Exo",
-				role: "Rescue bruiser",
-				specialty: "Orbital pursuit and lift"
+				frequency: "Searching for his mother and a missing friend",
+				id: "exo-dexus",
+				image: `${tylerHandDrawnBase}/012-198b5c15c9c93a50.jpg`,
+				imgAlt: "Tyler's hand-drawn first new design for Exo Dexus.",
+				name: "Exo Dexus",
+				role: "Team Rimlaw leader",
+				specialty: "Apex moon-base infiltration and investigation"
 			},
 			{
-				description: "Shaman brings memory, healing, and spiritual judgment.",
-				fallbackImage: siteAssetCandidates.shamanPortrait[1],
-				frequency: "Memory and repair",
-				id: "shaman",
-				image: siteAssetCandidates.shamanPortrait[0],
-				imgAlt: "Poster portrait of Shaman in violet and gold tones",
-				name: "Shaman",
-				role: "Mystic anchor",
-				specialty: "Healing and spiritual cartography"
-			},
-			{
-				description: "Zorix uses fear and command to force each conflict toward his next move.",
-				fallbackImage: "",
-				frequency: "Control and intimidation",
-				id: "zorix",
-				image: siteAssetCandidates.zorixPortrait[0],
-				imgAlt: "Poster portrait of Zorix in crimson and obsidian tones",
-				name: "Zorix",
-				role: "Antagonist",
-				specialty: "Direct pressure and command"
+				description:
+					"Fazo is a recurring character who was born and raised on Bitgam. Tyler notes that some later sketches give him white eyes.",
+				fallbackImage: "/brand/world-bitgam.svg",
+				frequency: "Born and raised on Bitgam",
+				id: "fazo",
+				image: `${tylerHandDrawnBase}/005-0905d798b55c8bb8.jpg`,
+				imgAlt: "Tyler's hand-drawn colored portrait of Fazo, a character from Bitgam.",
+				name: "Fazo",
+				role: "Recurring Bitgam character",
+				specialty: "Further story details are still in development"
 			}
 		],
+		description:
+			"Meet the characters Tyler has directly named and described, followed by the factions, places, and terms connected to their stories.",
+		eyebrow: "Tyler's Characters and Worlds",
+		heroImage: `${tylerHandDrawnBase}/084-fb97b37cd5c66f0e.jpg`,
+		heroImageAlt: "Tyler's hand-drawn colored portrait of Exo Dexus.",
+		heroImageFallback: siteAssetCandidates.exoPortrait[1],
+		title: "Meet Tyler's Characters",
 		worldEntries: [
 			{
-				body: "Star Hunters are outlaw crews who operate outside official systems. They are mobile, dangerous, and willing to chase threats that institutions avoid.",
+				body: "Team Rimlaw is Exo's outlaw group. In this story continuity, organized outlaw teams are known as Star Hunters and pursue Apex members responsible for crimes on other planets.",
 				facts: [
 					{
-						label: "Use",
-						value: "Outlaw crews operating beyond official systems"
+						label: "Leader",
+						value: "Exo Dexus"
+					},
+					{
+						label: "Status",
+						value: "Outlaw team operating outside the Apex Army"
 					}
 				],
-				id: "star-hunters",
-				label: "Term Note",
-				title: "Star Hunters"
+				id: "team-rimlaw-star-hunters",
+				label: "Faction and Term Note",
+				title: "Team Rimlaw and the Star Hunters"
 			},
 			{
-				body: "Bitgam is Fazo's homeworld in Gamborus. Its recorded history reaches back to the Great Manifested, making it one of the setting's older known worlds.",
+				body: "The Apex Army operates moon bases and has influence across planets. The Zego Order overtakes or infiltrates it, while loyal Apex members rebel and later work with the Star Hunters.",
 				facts: [
 					{
-						label: "Residents",
-						value: "Gambit Pointe races with red skin, yellow-white eyes, and exoskeletons"
+						label: "Central conflict",
+						value: "Hidden takeover, altered symbols, and loss of public trust"
+					}
+				],
+				id: "apex-army",
+				label: "Faction Note",
+				title: "Apex Army"
+			},
+			{
+				body: "The Zego Order is the force behind the Apex takeover in Tyler's central plot notes. Tyler has not yet confirmed Zego's exact title or relationship to the order.",
+				facts: [
+					{
+						label: "Named opponent",
+						value: "Zego"
+					},
+					{
+						label: "Known methods",
+						value: "Infiltration, impersonation, altered symbols, and robot forces"
+					}
+				],
+				id: "zego-order",
+				label: "Faction Note",
+				title: "Zego Order"
+			},
+			{
+				body: "Bitgam is Fazo's homeworld in Gamborus. Its Gambit Pointe residents have red skin, yellow and white eyes, and exoskeletons. Its history reaches back to the unexplained Great Manifested.",
+				facts: [
+					{
+						label: "Known resident",
+						value: "Fazo"
 					},
 					{
 						label: "Region",
 						value: "Gamborus"
 					},
 					{
-						label: "Recorded history",
-						value: "Present in Gambit archives since the Great Manifested"
+						label: "Open question",
+						value: "What happened during the Great Manifested?"
 					}
 				],
 				id: "bitgam",
@@ -101,16 +105,20 @@ export function createDefaultCharactersPageContent(): CharactersPageContent {
 				title: "Bitgam"
 			},
 			{
-				body: "The Apex Army is powerful, visible, and deeply compromised by hidden manipulation. Its credibility becomes part of the conflict.",
+				body: "The Council of Orpex asks Team Rimlaw for help during the crisis. Orpex is the Orpenoid homeworld, but Tyler has not yet defined the council's membership or full authority.",
 				facts: [
 					{
-						label: "Primary pressure",
-						value: "Internal corruption and loss of trust"
+						label: "Homeworld",
+						value: "Orpex"
+					},
+					{
+						label: "People",
+						value: "Orpenoids"
 					}
 				],
-				id: "apex-army",
-				label: "Faction Note",
-				title: "Apex Army"
+				id: "council-of-orpex",
+				label: "World and Faction Note",
+				title: "Council of Orpex"
 			}
 		]
 	};

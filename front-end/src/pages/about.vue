@@ -223,7 +223,7 @@ async function undoWorldEntryRemoval() {
 			eyebrow="Project"
 			:highlights="highlights"
 			:image-candidates="siteAssetCandidates.aboutHero"
-			image-alt="RetroZetro flagship portrait"
+			image-alt="Tyler's hand-drawn colored portrait of Exo Dexus."
 			:message="store.about.description"
 			:title="store.about.title"
 			actions-placement="poster"

@@ -13,6 +13,43 @@ import {
 } from "../src/services/siteContent.js";
 
 describe("guided site content safety", () => {
+	it("ships a publishable home page backed by the reviewed Tyler media paths", () => {
+		const content = createDefaultSiteContent("home");
+		const parsed = parsePublishedSiteContent("home", content);
+
+		expect(parsed.success).toBe(true);
+		expect(content.showcaseItems).toHaveLength(4);
+		expect(content.showcaseItems).toEqual(expect.arrayContaining([
+			expect.objectContaining({
+				image: "/uploads/content/tyler-handdrawn-v1/084-fb97b37cd5c66f0e.jpg",
+				title: "The List"
+			}),
+			expect.objectContaining({
+				image: "/uploads/content/tyler-handdrawn-v1/005-0905d798b55c8bb8.jpg",
+				title: "Bitgam"
+			})
+		]));
+		expect(String(content.developmentNote)).toMatch(/exact order and final canon/i);
+	});
+
+	it("allows an unfinished home highlight only in a private draft", () => {
+		const content = createDefaultSiteContent("home");
+		(content.showcaseItems as Array<Record<string, unknown>>).push({
+			destination: "/characters",
+			fallbackImage: "",
+			format: "",
+			id: "unfinished-home-highlight",
+			image: "",
+			imageAlt: "",
+			status: "",
+			summary: "",
+			title: ""
+		});
+
+		expect(parseDraftSiteContent("home", content).success).toBe(true);
+		expect(parsePublishedSiteContent("home", content).success).toBe(false);
+	});
+
 	it("allows an incomplete private draft but blocks it from publication", () => {
 		const content = createDefaultSiteContent("characters");
 		const characters = content.characters as Array<Record<string, unknown>>;
@@ -52,7 +89,7 @@ describe("guided site content safety", () => {
 
 	it("restores a trashed item to the unpublished draft", () => {
 		const content = createDefaultSiteContent("characters");
-		const removed = removeSiteContentItem("characters", content, "characters", "zetro");
+		const removed = removeSiteContentItem("characters", content, "characters", "exo-dexus");
 		expect(removed.success).toBe(true);
 		if (!removed.success) return;
 
@@ -64,7 +101,7 @@ describe("guided site content safety", () => {
 		);
 		expect(restored.success).toBe(true);
 		if (restored.success) {
-			expect((restored.content.characters as Array<{ id: string }>)[0]?.id).toBe("zetro");
+			expect((restored.content.characters as Array<{ id: string }>)[0]?.id).toBe("exo-dexus");
 		}
 	});
 

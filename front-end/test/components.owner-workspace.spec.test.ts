@@ -34,6 +34,7 @@ describe("owner workspace", () => {
 				stubs: {
 					AdminDashboard: true,
 					AdminGuidedContentEditor: true,
+					AdminHomeContentEditor: true,
 					AdminMediaManager: true
 				}
 			}
@@ -41,6 +42,7 @@ describe("owner workspace", () => {
 
 		expect(wrapper.get("h1").text()).toBe("What would you like to do?");
 		expect(wrapper.text()).toContain("Add a picture or comic");
+		expect(wrapper.text()).toContain("Edit the home page");
 		expect(wrapper.text()).toContain("Add a character");
 		expect(wrapper.text()).toContain("Add a story idea");
 		expect(wrapper.text()).toContain("Edit something");

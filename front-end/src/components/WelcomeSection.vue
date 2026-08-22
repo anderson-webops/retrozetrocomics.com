@@ -28,16 +28,16 @@ const props = defineProps({
 		type: Array as PropType<readonly string[]>
 	},
 	imageAlt: {
-		default: "RetroZetro lead portrait",
+		default: "Tyler's hand-drawn Exo and Shaman character artwork.",
 		type: String
 	},
 	imageSrc: {
-		default: "/legacy-images/Zetro2.jpg",
+		default: "/uploads/content/tyler-handdrawn-v1/063-ba7430851cc35538.jpg",
 		type: String
 	},
 	message: {
 		default:
-			"Exo, Zetro, and the Star Hunters are caught between personal searches, broken alliances, and the Apex Army's hidden corruption.",
+			"Exo Dexus and Team Rimlaw uncover a hidden takeover inside the Apex Army as Tyler's wider cast and worlds continue to develop.",
 		type: String
 	},
 	title: {
@@ -73,8 +73,8 @@ const defaultHighlights: HeroHighlight[] = [
 		term: "The Fall of a Dream"
 	},
 	{
-		description: "Heroes, rivals, factions, and worlds.",
-		term: "Retroverse"
+		description: "Characters, factions, places, and open questions from Tyler's notes.",
+		term: "Tyler's Worlds"
 	}
 ];
 

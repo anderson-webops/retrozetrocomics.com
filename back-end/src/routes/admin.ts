@@ -18,7 +18,8 @@ import {
 	saveSiteContentDraft,
 	trashSiteContentItem,
 	updateAboutPageContent,
-	updateCharactersPageContent
+	updateCharactersPageContent,
+	updateHomePageContent
 } from "../controllers/siteContentController.js";
 import { requireAdmin, requireRecentMfa } from "../middleware/auth.js";
 import {
@@ -89,4 +90,9 @@ adminRouter.patch(
 	"/site-content/characters",
 	adminMutationRateLimiter,
 	asyncHandler(updateCharactersPageContent)
+);
+adminRouter.patch(
+	"/site-content/home",
+	adminMutationRateLimiter,
+	asyncHandler(updateHomePageContent)
 );

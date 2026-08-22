@@ -4,7 +4,8 @@ import { useRoute, useRouter } from "vue-router";
 
 import { useSessionStore } from "@/stores/session";
 
-type WorkspaceTask = "add-character" | "add-story" | "add-world" | "advanced" | "edit" | "home" | "media" | "security";
+type WorkspaceTask =
+	"add-character" | "add-story" | "add-world" | "advanced" | "edit" | "edit-home" | "home" | "media" | "security";
 
 const route = useRoute();
 const router = useRouter();
@@ -19,6 +20,7 @@ const allowedTasks = new Set<WorkspaceTask>([
 	"add-world",
 	"advanced",
 	"edit",
+	"edit-home",
 	"home",
 	"media",
 	"security"
@@ -41,6 +43,11 @@ const taskCards: Array<{
 		description: "Upload a picture, comic page, storyboard, or PDF and check it before saving.",
 		label: "Add a picture or comic",
 		task: "media"
+	},
+	{
+		description: "Choose the pictures and short descriptions visitors see first, then preview before publishing.",
+		label: "Edit the home page",
+		task: "edit-home"
 	},
 	{
 		description: "Add a character with a name, picture, and short description first.",
@@ -181,6 +188,12 @@ watch(
 					@dirty-change="guidedDirty = $event"
 				/>
 
+				<AdminHomeContentEditor
+					v-else-if="activeTask === 'edit-home'"
+					@back="chooseTask('home')"
+					@dirty-change="guidedDirty = $event"
+				/>
+
 				<div v-else-if="activeTask === 'media'" class="owner-task__panel">
 					<button class="owner-task__back" type="button" @click="chooseTask('home')">
 						Back to owner home
@@ -200,6 +213,9 @@ watch(
 							guided tools when you want drafts, preview, trash, and recovery.
 						</p>
 						<div>
+							<RouterLink :to="{ path: '/studio/admin', query: { task: 'edit-home' } }">
+								Edit home page highlights
+							</RouterLink>
 							<RouterLink :to="{ path: '/characters', query: { manage: '1' } }">
 								Edit characters on the public page
 							</RouterLink>

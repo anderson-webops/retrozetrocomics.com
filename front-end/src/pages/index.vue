@@ -1,8 +1,16 @@
 <script lang="ts" setup>
+import { useHomePageContent } from "@/composables/useHomePageContent";
 import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
-import { useMainStore } from "~/stores";
 
-const store = useMainStore();
+const { content, load } = useHomePageContent();
+
+function definedImageCandidates(candidates: Array<string | undefined>) {
+	return candidates.filter((candidate): candidate is string => Boolean(candidate));
+}
+
+onMounted(() => {
+	void load();
+});
 
 useHead({
 	title: "RetroZetro Comics | Stories and Characters",
@@ -47,25 +55,35 @@ useHead({
 
 		<section class="home-showcase">
 			<header class="home-showcase__header">
-				<p class="home-showcase__eyebrow">Current Conflicts</p>
-				<h2>Two storylines drive the Retroverse</h2>
-				<p>
-					Exo's search in The List exposes a hidden enemy. The Fall of a Dream follows the damage when that
-					influence reaches the Apex Army itself.
-				</p>
+				<p class="home-showcase__eyebrow">{{ content.eyebrow }}</p>
+				<h2>{{ content.title }}</h2>
+				<p>{{ content.description }}</p>
 			</header>
 
 			<div class="home-showcase__grid">
-				<article v-for="story in store.home.storylines" :key="story.title" class="home-showcase__card">
-					<img :alt="story.title" :src="story.image" />
-					<div class="home-showcase__copy">
-						<p>{{ story.format }}</p>
-						<h3>{{ story.title }}</h3>
-						<span>{{ story.status }}</span>
-						<p>{{ story.summary }}</p>
-					</div>
-				</article>
+				<RouterLink
+					v-for="item in content.showcaseItems"
+					:key="item.id"
+					class="home-showcase__link"
+					:to="item.destination"
+				>
+					<article class="home-showcase__card">
+						<ResolvedImage
+							:alt="item.imageAlt"
+							:candidates="definedImageCandidates([item.image, item.fallbackImage])"
+						/>
+						<div class="home-showcase__copy">
+							<p class="home-showcase__format">{{ item.format }}</p>
+							<h3>{{ item.title }}</h3>
+							<span>{{ item.status }}</span>
+							<p class="home-showcase__summary">{{ item.summary }}</p>
+							<strong>Read more</strong>
+						</div>
+					</article>
+				</RouterLink>
 			</div>
+
+			<p class="home-showcase__development-note">{{ content.developmentNote }}</p>
 		</section>
 	</div>
 </template>
@@ -134,17 +152,43 @@ useHead({
 .home-showcase__card {
 	display: grid;
 	gap: 1rem;
+	height: 100%;
 	padding: 1rem;
 	border-radius: var(--radius-card);
 	background: var(--surface-panel);
 	border: 1px solid rgba(11, 19, 35, 0.08);
+	transition:
+		border-color 160ms ease,
+		box-shadow 160ms ease,
+		transform 160ms ease;
+}
+
+.home-showcase__link {
+	color: inherit;
+	text-decoration: none;
+}
+
+.home-showcase__link:hover .home-showcase__card,
+.home-showcase__link:focus-visible .home-showcase__card {
+	border-color: rgba(157, 54, 13, 0.42);
+	box-shadow: 0 0.8rem 1.8rem rgba(11, 19, 35, 0.12);
+	transform: translateY(-0.15rem);
+}
+
+.home-showcase__link:focus-visible {
+	border-radius: var(--radius-card);
+	outline: 0.2rem solid #9d360d;
+	outline-offset: 0.2rem;
 }
 
 .home-showcase__card img {
 	width: 100%;
+	aspect-ratio: 4 / 3;
 	display: block;
+	object-fit: contain;
+	padding: 0.5rem;
 	border-radius: var(--radius-card);
-	background: #0b1323;
+	background: #f5ede3;
 }
 
 .home-showcase__copy {
@@ -152,7 +196,7 @@ useHead({
 	gap: 0.55rem;
 }
 
-.home-showcase__copy p:first-child,
+.home-showcase__format,
 .home-showcase__copy span {
 	text-transform: uppercase;
 	letter-spacing: var(--tracking-ui);
@@ -160,7 +204,7 @@ useHead({
 	font-weight: 700;
 }
 
-.home-showcase__copy p:first-child {
+.home-showcase__format {
 	color: #4d5f79;
 }
 
@@ -175,9 +219,26 @@ useHead({
 	color: #9d360d;
 }
 
-.home-showcase__copy p:last-child {
+.home-showcase__summary {
 	line-height: 1.7;
 	color: #31405a;
+}
+
+.home-showcase__copy strong {
+	color: #9d360d;
+	font-size: 0.84rem;
+	letter-spacing: var(--tracking-ui);
+	text-transform: uppercase;
+}
+
+.home-showcase__development-note {
+	max-width: 76ch;
+	margin: 0;
+	border-left: 0.25rem solid #9d360d;
+	color: #31405a;
+	font-size: 0.95rem;
+	line-height: 1.7;
+	padding-left: 1rem;
 }
 </style>
 

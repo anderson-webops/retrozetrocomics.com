@@ -7,6 +7,7 @@ import type {
 	ContentTrashItem,
 	DashboardData,
 	EditableSiteContent,
+	HomePageContent,
 	MediaAsset,
 	SiteContentCollection,
 	SiteContentPage,
@@ -55,6 +56,11 @@ export async function fetchAboutPageContent() {
 	return data.content;
 }
 
+export async function fetchHomePageContent() {
+	const { data } = await api.get<{ content: HomePageContent }>("/site-content/home");
+	return data.content;
+}
+
 export async function updateCharactersPageContent(payload: CharactersPageContent) {
 	const { data } = await api.patch<{ content: CharactersPageContent }>("/admin/site-content/characters", payload);
 	return data.content;
@@ -62,6 +68,11 @@ export async function updateCharactersPageContent(payload: CharactersPageContent
 
 export async function updateAboutPageContent(payload: AboutPageContent) {
 	const { data } = await api.patch<{ content: AboutPageContent }>("/admin/site-content/about", payload);
+	return data.content;
+}
+
+export async function updateHomePageContent(payload: HomePageContent) {
+	const { data } = await api.patch<{ content: HomePageContent }>("/admin/site-content/home", payload);
 	return data.content;
 }
 

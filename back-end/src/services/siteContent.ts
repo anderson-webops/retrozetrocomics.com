@@ -3,10 +3,11 @@ import { z } from "zod";
 import { isAllowedContentImageUrl } from "../config/contentImages.js";
 import { createDefaultAboutPageContent } from "../content/defaultAboutPageContent.js";
 import { createDefaultCharactersPageContent } from "../content/defaultCharactersPageContent.js";
+import { createDefaultHomePageContent } from "../content/defaultHomePageContent.js";
 
-export const siteContentPageSchema = z.enum(["about", "characters"]);
+export const siteContentPageSchema = z.enum(["about", "characters", "home"]);
 export type SiteContentPage = z.infer<typeof siteContentPageSchema>;
-export type SiteContentCollection = "characters" | "storyArcs" | "worldEntries";
+export type SiteContentCollection = "characters" | "showcaseItems" | "storyArcs" | "worldEntries";
 export type SiteContentData = Record<string, unknown>;
 
 const CONTENT_IMAGE_HELP = "Choose a picture from the media library or an approved site image.";
@@ -22,6 +23,28 @@ const optionalContentImageSchema = z.string()
 	.refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP)
 	.optional()
 	.default("");
+
+const homeDestinationSchema = z.enum(["/about", "/characters"]);
+
+const homeShowcaseItemSchema = z.object({
+	destination: homeDestinationSchema,
+	fallbackImage: optionalContentImageSchema,
+	format: z.string().trim().min(1).max(80),
+	id: z.string().trim().min(1).max(80),
+	image: requiredContentImageSchema,
+	imageAlt: z.string().trim().min(2).max(180),
+	status: z.string().trim().min(2).max(160),
+	summary: z.string().trim().min(12).max(520),
+	title: z.string().trim().min(1).max(120)
+});
+
+const homePageSchema = z.object({
+	description: z.string().trim().min(12).max(520),
+	developmentNote: z.string().trim().min(12).max(420),
+	eyebrow: z.string().trim().min(1).max(80),
+	showcaseItems: z.array(homeShowcaseItemSchema).min(1).max(16),
+	title: z.string().trim().min(1).max(120)
+});
 
 const characterFactSchema = z.object({
 	label: z.string().trim().min(1).max(80),
@@ -81,6 +104,26 @@ const charactersPageSchema = z.object({
 const draftCharacterFactSchema = z.object({
 	label: z.string().max(80),
 	value: z.string().max(220)
+});
+
+const draftHomeShowcaseItemSchema = z.object({
+	destination: homeDestinationSchema,
+	fallbackImage: optionalContentImageSchema,
+	format: z.string().max(80),
+	id: z.string().trim().min(1).max(80),
+	image: z.string().max(260).refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
+	imageAlt: z.string().max(180),
+	status: z.string().max(160),
+	summary: z.string().max(520),
+	title: z.string().max(120)
+});
+
+const draftHomePageSchema = z.object({
+	description: z.string().max(520),
+	developmentNote: z.string().max(420),
+	eyebrow: z.string().max(80),
+	showcaseItems: z.array(draftHomeShowcaseItemSchema).min(1).max(16),
+	title: z.string().max(120)
 });
 
 const draftCharacterProfileSchema = z.object({
@@ -158,6 +201,11 @@ const configs: Record<SiteContentPage, SiteContentConfig> = {
 		collections: ["characters", "worldEntries"],
 		key: "characters-page",
 		label: "Characters and Factions"
+	},
+	home: {
+		collections: ["showcaseItems"],
+		key: "home-page",
+		label: "Home Page Showcase"
 	}
 };
 
@@ -167,8 +215,10 @@ function cloneContent<T>(value: T): T {
 
 function toParseResult(result: ReturnType<typeof aboutPageSchema.safeParse>): SiteContentParseResult;
 function toParseResult(result: ReturnType<typeof charactersPageSchema.safeParse>): SiteContentParseResult;
+function toParseResult(result: ReturnType<typeof homePageSchema.safeParse>): SiteContentParseResult;
 function toParseResult(result: ReturnType<typeof draftAboutPageSchema.safeParse>): SiteContentParseResult;
 function toParseResult(result: ReturnType<typeof draftCharactersPageSchema.safeParse>): SiteContentParseResult;
+function toParseResult(result: ReturnType<typeof draftHomePageSchema.safeParse>): SiteContentParseResult;
 function toParseResult(result: { data?: unknown; error?: z.ZodError; success: boolean }): SiteContentParseResult {
 	if (result.success) {
 		return {
@@ -194,23 +244,21 @@ export function getSiteContentConfig(page: SiteContentPage) {
 }
 
 export function createDefaultSiteContent(page: SiteContentPage): SiteContentData {
-	return cloneContent(
-		page === "about"
-			? createDefaultAboutPageContent()
-			: createDefaultCharactersPageContent()
-	) as SiteContentData;
+	if (page === "about") return cloneContent(createDefaultAboutPageContent()) as SiteContentData;
+	if (page === "characters") return cloneContent(createDefaultCharactersPageContent()) as SiteContentData;
+	return cloneContent(createDefaultHomePageContent()) as SiteContentData;
 }
 
 export function parsePublishedSiteContent(page: SiteContentPage, value: unknown): SiteContentParseResult {
-	return page === "about"
-		? toParseResult(aboutPageSchema.safeParse(value))
-		: toParseResult(charactersPageSchema.safeParse(value));
+	if (page === "about") return toParseResult(aboutPageSchema.safeParse(value));
+	if (page === "characters") return toParseResult(charactersPageSchema.safeParse(value));
+	return toParseResult(homePageSchema.safeParse(value));
 }
 
 export function parseDraftSiteContent(page: SiteContentPage, value: unknown): SiteContentParseResult {
-	return page === "about"
-		? toParseResult(draftAboutPageSchema.safeParse(value))
-		: toParseResult(draftCharactersPageSchema.safeParse(value));
+	if (page === "about") return toParseResult(draftAboutPageSchema.safeParse(value));
+	if (page === "characters") return toParseResult(draftCharactersPageSchema.safeParse(value));
+	return toParseResult(draftHomePageSchema.safeParse(value));
 }
 
 export function normalizePublishedSiteContent(page: SiteContentPage, value: unknown): SiteContentData {
@@ -231,6 +279,11 @@ export function summarizeSiteContent(page: SiteContentPage, content: SiteContent
 	if (page === "about") {
 		return {
 			storyArcCount: Array.isArray(content.storyArcs) ? content.storyArcs.length : 0
+		};
+	}
+	if (page === "home") {
+		return {
+			showcaseItemCount: Array.isArray(content.showcaseItems) ? content.showcaseItems.length : 0
 		};
 	}
 

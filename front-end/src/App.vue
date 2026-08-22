@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { resolvePreferredLocalAsset, siteAssetCandidates, toAbsoluteSiteUrl } from "@/lib/siteAssets";
 
-const defaultHeroImageAlt = "RetroZetro lead portrait";
+const defaultHeroImageAlt = "Tyler's hand-drawn Exo and Shaman character artwork.";
 const siteUrl = "https://retrozetrocomics.com";
 const siteDescription =
-	"RetroZetro Comics collects the stories, characters, and worlds behind Exo, Zetro, and the wider Retroverse.";
+	"RetroZetro Comics presents Tyler Morgan's developing stories, hand-drawn characters, factions, and worlds.";
 const route = useRoute();
 const appleTouchIconHref = ref<string>(siteAssetCandidates.favicons.appleTouch[0]);
 const favicon16Href = ref<string>(siteAssetCandidates.favicons.favicon16[0]);
@@ -62,8 +62,7 @@ useHead(
 					: []),
 				{
 					name: "description",
-					content:
-						"Explore RetroZetro Comics, the characters, and the worlds behind Exo, Zetro, and the Star Hunters."
+					content: "Explore Tyler Morgan's developing stories, hand-drawn characters, factions, and worlds."
 				},
 				{
 					name: "theme-color",

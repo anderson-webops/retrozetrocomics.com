@@ -46,6 +46,26 @@ export interface CharacterBoardWorldEntry {
 	title: string;
 }
 
+export interface HomeShowcaseItem {
+	destination: "/about" | "/characters";
+	fallbackImage?: string;
+	format: string;
+	id: string;
+	image: string;
+	imageAlt: string;
+	status: string;
+	summary: string;
+	title: string;
+}
+
+export interface HomePageContent {
+	description: string;
+	developmentNote: string;
+	eyebrow: string;
+	showcaseItems: HomeShowcaseItem[];
+	title: string;
+}
+
 export interface AboutStoryArc {
 	climax: string;
 	description: string;
@@ -93,6 +113,7 @@ export interface SiteAccount {
 
 export interface DashboardMetrics {
 	characterCount: number;
+	homeShowcaseCount: number;
 	mediaCount: number;
 	pendingDraftCount: number;
 	storyArcCount: number;
@@ -118,9 +139,9 @@ export interface DashboardData {
 	storage: DashboardStorage;
 }
 
-export type SiteContentPage = "about" | "characters";
-export type SiteContentCollection = "characters" | "storyArcs" | "worldEntries";
-export type EditableSiteContent = AboutPageContent | CharactersPageContent;
+export type SiteContentPage = "about" | "characters" | "home";
+export type SiteContentCollection = "characters" | "showcaseItems" | "storyArcs" | "worldEntries";
+export type EditableSiteContent = AboutPageContent | CharactersPageContent | HomePageContent;
 
 export interface AdminSiteContentState<T extends EditableSiteContent = EditableSiteContent> {
 	draft: T;

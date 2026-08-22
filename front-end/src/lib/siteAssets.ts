@@ -43,7 +43,7 @@ function uniqueCandidates(candidates: readonly string[]) {
 }
 
 export const siteAssetCandidates = {
-	aboutHero: ["/legacy-images/Zetro2.jpg", "/brand/poster-retrozetro.svg"],
+	aboutHero: ["/uploads/content/tyler-handdrawn-v1/084-fb97b37cd5c66f0e.jpg", "/brand/characters-exo.svg"],
 	contactLogo: ["/legacy-images/Original_Icon.png", "/brand/logo-mark.svg"],
 	favicons: {
 		android192: ["/legacy-favicons/android-chrome-192x192.png", "/Favicons/android-chrome-192x192.png"],
@@ -54,11 +54,11 @@ export const siteAssetCandidates = {
 		faviconIco: ["/legacy-favicons/favicon.ico", "/Favicons/favicon.ico"],
 		manifest: ["/legacy-favicons/site.webmanifest"]
 	},
-	hero: ["/legacy-images/Zetro2.jpg", "/brand/hero-collage.svg"],
+	hero: ["/uploads/content/tyler-handdrawn-v1/063-ba7430851cc35538.jpg", "/brand/hero-collage.svg"],
 	kazayPortrait: ["/legacy-images/Kazay.jpg", "/brand/characters-kazay.svg"],
 	logo: ["/legacy-images/Original_Icon.png", "/brand/logo-mark.svg"],
 	shamanPortrait: ["/legacy-images/Shaman.jpg", "/brand/characters-shaman.svg"],
-	socialPreview: ["/legacy-images/Zetro2.jpg", "/brand/hero-collage.svg"],
+	socialPreview: ["/uploads/content/tyler-handdrawn-v1/063-ba7430851cc35538.jpg", "/brand/hero-collage.svg"],
 	zetroPortrait: ["/legacy-images/Zetro2.jpg", "/brand/characters-zetro.svg"],
 	exoPortrait: ["/legacy-images/Exo.jpg", "/brand/characters-exo.svg"],
 	zorixPortrait: ["/brand/characters-zorix.svg"]

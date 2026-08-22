@@ -32,6 +32,10 @@ const categoryOptions: Array<{ label: string; value: CategoryFilter }> = [
 
 const metricCards = computed(() => [
 	{
+		label: "Home Highlights",
+		value: dashboard.value?.metrics.homeShowcaseCount ?? 0
+	},
+	{
 		label: "Characters",
 		value: dashboard.value?.metrics.characterCount ?? 0
 	},
@@ -146,8 +150,11 @@ onMounted(() => {
 			<div class="admin-dashboard__actions">
 				<RouterLink
 					class="admin-dashboard__button admin-dashboard__button--primary"
-					:to="{ path: '/characters', query: { manage: '1' } }"
+					:to="{ path: '/studio/admin', query: { task: 'edit-home' } }"
 				>
+					Edit Home Page
+				</RouterLink>
+				<RouterLink class="admin-dashboard__button" :to="{ path: '/characters', query: { manage: '1' } }">
 					Edit Characters
 				</RouterLink>
 				<RouterLink class="admin-dashboard__button" :to="{ path: '/about', query: { manage: '1' } }">
@@ -183,6 +190,14 @@ onMounted(() => {
 				</div>
 
 				<div class="content-links">
+					<RouterLink class="content-link" :to="{ path: '/studio/admin', query: { task: 'edit-home' } }">
+						<span>
+							<strong>Home page highlights</strong>
+							<small>Featured pictures, story files, characters, and world notes.</small>
+						</span>
+						<span aria-hidden="true">Open</span>
+					</RouterLink>
+
 					<RouterLink class="content-link" :to="{ path: '/characters', query: { manage: '1' } }">
 						<span>
 							<strong>Characters and factions</strong>

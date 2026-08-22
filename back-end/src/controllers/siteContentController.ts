@@ -25,7 +25,7 @@ import {
 } from "../services/siteContent.js";
 
 const trashItemSchema = z.object({
-	collection: z.enum(["characters", "storyArcs", "worldEntries"]),
+	collection: z.enum(["characters", "showcaseItems", "storyArcs", "worldEntries"]),
 	itemId: z.string().trim().min(1).max(80)
 });
 
@@ -42,6 +42,7 @@ function parsePage(req: Request, res: Response): SiteContentPage | null {
 function pageFromKey(key: string): SiteContentPage | null {
 	if (key === getSiteContentConfig("about").key) return "about";
 	if (key === getSiteContentConfig("characters").key) return "characters";
+	if (key === getSiteContentConfig("home").key) return "home";
 	return null;
 }
 
@@ -204,6 +205,14 @@ export async function getAboutPageContent(_req: Request, res: Response) {
 	});
 }
 
+export async function getHomePageContent(_req: Request, res: Response) {
+	const config = getSiteContentConfig("home");
+	const document = await SiteContent.findOne({ key: config.key });
+	return res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300").json({
+		content: normalizePublishedSiteContent("home", document?.data)
+	});
+}
+
 export async function getAdminSiteContent(req: Request, res: Response) {
 	const page = parsePage(req, res);
 	if (!page) return;
@@ -276,6 +285,10 @@ export async function updateCharactersPageContent(req: Request, res: Response) {
 
 export async function updateAboutPageContent(req: Request, res: Response) {
 	return updatePublishedPage(req, res, "about");
+}
+
+export async function updateHomePageContent(req: Request, res: Response) {
+	return updatePublishedPage(req, res, "home");
 }
 
 export async function listSiteContentRevisions(req: Request, res: Response) {

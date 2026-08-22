@@ -15,6 +15,7 @@ declare module 'vue' {
     AdminConfirmDialog: typeof import('./components/admin/AdminConfirmDialog.vue')['default']
     AdminDashboard: typeof import('./components/admin/AdminDashboard.vue')['default']
     AdminGuidedContentEditor: typeof import('./components/admin/AdminGuidedContentEditor.vue')['default']
+    AdminHomeContentEditor: typeof import('./components/admin/AdminHomeContentEditor.vue')['default']
     AdminInlineTools: typeof import('./components/admin/AdminInlineTools.vue')['default']
     AdminMediaManager: typeof import('./components/admin/AdminMediaManager.vue')['default']
     AdminOwnerWorkspace: typeof import('./components/admin/AdminOwnerWorkspace.vue')['default']

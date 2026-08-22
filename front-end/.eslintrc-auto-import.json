@@ -204,6 +204,7 @@
     "useGeolocation": true,
     "useHead": true,
     "useHeadSafe": true,
+    "useHomePageContent": true,
     "useI18n": true,
     "useId": true,
     "useIdle": true,

@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { createDefaultAboutPageContent } from "../content/defaultAboutPageContent.js";
 import { createDefaultCharactersPageContent } from "../content/defaultCharactersPageContent.js";
+import { createDefaultHomePageContent } from "../content/defaultHomePageContent.js";
 import { AuditLog } from "../models/schemas/AuditLog.js";
 import { MediaAsset } from "../models/schemas/MediaAsset.js";
 import { SiteContent } from "../models/schemas/SiteContent.js";
@@ -11,6 +12,7 @@ import { getStorageStatus } from "../services/storage.js";
 
 const ABOUT_PAGE_KEY = "about-page";
 const CHARACTERS_PAGE_KEY = "characters-page";
+const HOME_PAGE_KEY = "home-page";
 const ACTIVITY_CATEGORIES = ["auth", "media", "site-content"] as const;
 
 const auditLogQuerySchema = z.object({
@@ -56,13 +58,15 @@ function readArrayCount(value: unknown, key: string, fallback: number) {
 }
 
 export async function getDashboard(_req: Request, res: Response) {
-	const [charactersDocument, aboutDocument, mediaCount] = await Promise.all([
+	const [charactersDocument, aboutDocument, homeDocument, mediaCount] = await Promise.all([
 		SiteContent.findOne({ key: CHARACTERS_PAGE_KEY }),
 		SiteContent.findOne({ key: ABOUT_PAGE_KEY }),
+		SiteContent.findOne({ key: HOME_PAGE_KEY }),
 		MediaAsset.countDocuments({ deletedAt: null })
 	]);
 	const defaultCharacters = createDefaultCharactersPageContent();
 	const defaultAbout = createDefaultAboutPageContent();
+	const defaultHome = createDefaultHomePageContent();
 
 	return res.json({
 		metrics: {
@@ -71,13 +75,19 @@ export async function getDashboard(_req: Request, res: Response) {
 				"characters",
 				defaultCharacters.characters.length
 			),
+			homeShowcaseCount: readArrayCount(
+				homeDocument?.data,
+				"showcaseItems",
+				defaultHome.showcaseItems.length
+			),
 			storyArcCount: readArrayCount(
 				aboutDocument?.data,
 				"storyArcs",
 				defaultAbout.storyArcs.length
 			),
 			mediaCount,
-			pendingDraftCount: [charactersDocument, aboutDocument].filter(document => document?.draftData != null).length,
+			pendingDraftCount: [charactersDocument, aboutDocument, homeDocument]
+				.filter(document => document?.draftData != null).length,
 			worldEntryCount: readArrayCount(
 				charactersDocument?.data,
 				"worldEntries",
