@@ -12,6 +12,8 @@ activation. Do not infer additional canon or publish any source archive document
   publication confirmation, and revision recovery.
 - Existing owner-authored `SiteContent` records remain authoritative and are never overwritten automatically.
 - The existing 85 media records and files remain in place. This release uploads, moves, deletes, or transforms no media.
+- This handoff authorizes no S3 access or migration, no media write or reimport, no automatic `SiteContent` seed, and
+  no publication action or state change.
 
 ## Actual deployment profile
 
@@ -19,7 +21,8 @@ This handoff explicitly supports the audited compatibility deployment unless the
 separately reviewed migration to the canonical direct-release service:
 
 - service: `tyler-backend.service`
-- account: `tyler:tyler`
+- service account: `tyler:tyler`
+- imported-media ownership: `tyler:site_retrozetro`, mode `0600`
 - backend: `/srv/retrozetrocomics.com/back-end`
 - static site: `/var/www/retrozetrocomics.com`
 - executable: `/opt/node-24.19.0/bin/node`
@@ -37,9 +40,12 @@ authorizes and reviews it.
    built `release.json` to agree exactly. Require a clean checkout of the tag.
 2. Run the repository's pinned Node 24/npm 12 path and all release gates: `npm ci`, audit, lint, typecheck, tests,
    build, deployment-asset verification, and direct-runtime smoke tests.
-3. Read `deploy/content/tyler-site-content-v1.json`. Verify its five files beneath the upload root by exact SHA-256,
-   regular-file type, owner `tyler:tyler`, mode `0600`, and path containment. Do not repair, rename, or replace a
-   mismatch during this deployment.
+3. Read `deploy/content/tyler-site-content-v1.json`. For each of its five files beneath the upload root, verify the
+   stored importer-sanitized bytes against `storedSanitizedSha256`, plus regular-file type, path containment, owner
+   `tyler`, group `site_retrozetro`, mode `0600`, and ACL state. Retain `sourceSha256` only as the raw creative-source
+   provenance hash. Do not compare a stored sanitized file or public response directly with `sourceSha256`, and do not
+   treat the expected difference between those hashes as damage. Do not repair, rename, or replace a mismatch during
+   this deployment.
 4. Through a confined read-only process that loads the protected environment through systemd PID 1, verify:
    - exactly 85 active `MediaAsset` records remain under `content/tyler-handdrawn-v1/`;
    - all five referenced storage keys have active image records with provider `local`;
@@ -49,55 +55,74 @@ authorizes and reviews it.
 5. Expect those three `SiteContent` records to be absent based on the last verified state. If any record now exists,
    preserve it. Report which checked-in defaults it overrides, and do not seed, replace, merge, or publish it.
 6. Record pre-deploy release identity, service status, `/healthz`, `/readyz`, media counts, relevant content-record
-   metadata, and hashes for the five referenced files. Do not create an upload backup because this release has no
-   upload write path. Use the established database backup procedure only if an unexpected database write becomes
-   necessary, and stop for explicit approval before that write.
+   metadata, and `storedSanitizedSha256` results for the five referenced files. Record a pre-deploy upload inventory
+   whose invariants are content, path, hash, ownership, mode, ACLs, and file count. Do not require upload `ctime` to
+   remain unchanged because the server's `site-perms` process may legitimately refresh it. Do not create an upload
+   backup because this release has no upload write path. Use the established database backup procedure only if an
+   unexpected database write becomes necessary, and stop for explicit approval before that write.
 
 ## Deployment
 
 1. Build and stage the exact tagged artifact away from the live backend and static roots.
-2. Preserve the protected environment files, upload tree, ownership model, service confinement, and Nginx rules.
-3. Install the backend and static artifact using the server's established atomic compatibility-release procedure.
-   Keep a complete immediately previous artifact for rollback. Never place secrets or uploads inside the release.
-4. Write exact version, full commit revision, and deployment timestamp into the compatibility release metadata used by
-   both the static site and backend. Restart only `tyler-backend.service`, then validate and reload Nginx if the static
-   artifact procedure requires it.
-5. Do not write `SiteContent` records. When a record is absent, the application deliberately serves the reviewed
-   checked-in default. Tyler's first private save or publish through the owner workspace will create the managed record.
+2. Before any live mutation, create and verify a complete local pre-mutation artifact snapshot of the installed
+   backend, static site, and compatibility release metadata. Record its identifier, inventory, checksums, and restore
+   command. This snapshot protects application deployment rollback only and does not replace an off-server backup.
+3. Preserve the protected environment files, upload tree, ownership model, service confinement, and Nginx rules.
+4. Perform a verified transactional compatibility deployment: install the staged backend and static artifacts, restart
+   only `tyler-backend.service`, run every acceptance check, and automatically restore the pre-mutation artifact
+   snapshot if installation or acceptance fails. This legacy deployment is not a symlink-based atomic release. Do not
+   require `/srv/retrozetro/current`, `retrozetro.service`, or a service-layout migration.
+5. Set `SOURCE_DATE_EPOCH` to the tagged commit timestamp before building. Require `release.json.releasedAt` to be that
+   timestamp in ISO 8601 UTC format with milliseconds, as produced from `SOURCE_DATE_EPOCH`. Record deployment
+   wall-clock time separately; it is not `releasedAt`. Require the exact version and full commit revision in the
+   compatibility release metadata used by both the static site and backend.
+6. Validate and reload Nginx only if the compatibility static-artifact procedure requires it.
+7. Do not write `SiteContent` records. When a record is absent, the application deliberately serves the reviewed
+   checked-in default. Tyler's first separately authorized private save or publish through the owner workspace will
+   create the managed record.
 
 ## Acceptance checks
 
 1. Require `/healthz` and `/readyz` to return HTTP 200 with exactly `{ "ok": true }`.
-2. Require public and backend release identity to match the exact tag and commit.
+2. Require public and backend release identity to match the exact tag and commit. Require `releasedAt` to equal the
+   tagged commit timestamp derived from `SOURCE_DATE_EPOCH`, including milliseconds, and report deployment wall-clock
+   time separately.
 3. Require `GET /api/site-content/home` to return four showcase items in this order: The List, The Fall of a Dream,
    Exo Dexus, Bitgam. Require each primary image path to match the manifest.
 4. Require `GET /api/site-content/about` to return two items labeled **Working story file** and to state that their
    exact relationship remains for Tyler to confirm.
 5. Require `GET /api/site-content/characters` to return Exo Dexus and Fazo plus five source-backed world or faction
    entries. Do not accept the former invented role text for Zetro, Kazay, Exo, Shaman, or Zorix as fallback output.
-6. From an authenticated owner session, verify **Edit the home page** loads, selects an existing image, saves a private
-   draft without changing the public API, previews without cropping, and presents a separate publication confirmation.
-   Discard the test draft or restore the exact pre-test state. Do not publish a test change.
-7. Verify the five public image URLs return HTTP 200 with image content types. Verify fallback SVGs remain available,
-   but confirm the public cards display the imported drawings.
-8. Recheck the 85 imported media records and five file hashes. Require zero media, upload-tree, audit-import, or
-   unrelated-content changes from deployment.
+6. From an authenticated owner session, verify **Edit the home page** loads and displays its preview and media-library
+   controls without cropping. Do not save a live private draft, especially when `SiteContent` is absent and writes are
+   prohibited. Require the isolated automated editor and backend draft tests to pass instead. Any live draft save
+   requires separate explicit authorization plus documented database rollback instructions. Do not publish a test
+   change.
+7. Verify the five public image URLs return HTTP 200 with image content types and bytes matching each entry's
+   `storedSanitizedSha256`. Verify fallback SVGs remain available, but confirm the public cards display the imported
+   drawings. Do not compare the public bytes with `sourceSha256`.
+8. Recheck the 85 imported media records and the pre-deploy upload invariants: content, path, stored sanitized hash,
+   ownership, mode, ACLs, and file count. Require zero media-record, audit-import, or unrelated-content changes from
+   deployment. A `ctime` refresh alone is permitted and is not evidence of a content change.
 9. Recheck security headers, owner-route noindex behavior, unauthorized admin response, IPv4 and IPv6 public health,
    and the intended `www` redirect.
 
 ## Rollback and report
 
-On any failed required check, atomically restore the previous backend and static artifact, restart the compatibility
-service, and rerun the same health and identity checks. Do not roll back or alter the already imported media library.
+On any failed required check, automatically restore the backend, static site, and compatibility metadata from the
+verified local pre-mutation artifact snapshot, restart the compatibility service, and rerun the same health and identity
+checks. Do not roll back or alter the already imported media library.
 
 Report:
 
-- tag, full commit, package version, and deployed timestamp;
-- previous and current artifact identifiers;
+- tag, full commit, package version, tagged-commit `releasedAt`, and separate deployment wall-clock time;
+- pre-mutation snapshot identifier, checksums, restore result, and current artifact identifier;
 - all build and test gate results;
-- five storage keys, SHA-256 results, record status, owner, mode, and HTTP result;
+- five storage keys, raw creative-source `sourceSha256`, live `storedSanitizedSha256` results, record status, owner,
+  group, mode, ACL state, and HTTP result;
 - imported-media active count and remaining capacity;
 - `SiteContent` metadata before and after, with explicit confirmation of whether defaults or owner records are active;
 - homepage, about, characters, owner-editor, security-header, redirect, health, and readiness results;
-- service restart count, rollback status, and confirmation that uploads, source archives, publication state, and
-  unrelated content were unchanged.
+- service restart count, rollback status, and confirmation that upload content, paths, hashes, ownership, modes, ACLs,
+  file count, source archives, publication state, and unrelated content were unchanged. Report any permitted `ctime`
+  refresh separately.

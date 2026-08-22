@@ -2,15 +2,25 @@
 	"schemaVersion": 1,
 	"contentId": "tyler-source-backed-site-content-v1",
 	"activationPolicy": "Use checked-in defaults only when the matching SiteContent record is absent or invalid. Never overwrite an owner-created record automatically.",
+	"hashSemantics": {
+		"sourceSha256": "SHA-256 of the raw creative-source file retained for provenance.",
+		"storedSanitizedSha256": "SHA-256 of the importer-sanitized bytes stored on the server and returned by the public media URL."
+	},
 	"expectedImportedMedia": {
 		"activeCount": 85,
 		"provider": "local",
-		"storagePrefix": "content/tyler-handdrawn-v1/"
+		"storagePrefix": "content/tyler-handdrawn-v1/",
+		"liveOwnership": {
+			"user": "tyler",
+			"group": "site_retrozetro",
+			"mode": "0600"
+		}
 	},
 	"referencedMedia": [
 		{
 			"manifestSequence": 63,
 			"sourceSha256": "ba7430851cc355383f307aa79f9cb717499226081223360dad199614b4cc7153",
+			"storedSanitizedSha256": "67759447b4ee9270852543c702c988bc49f32dc02d9530e63940ce78df2e876f",
 			"storageKey": "content/tyler-handdrawn-v1/063-ba7430851cc35538.jpg",
 			"title": "Tyler original 063: Exo and Shaman",
 			"placements": ["home:hero", "site:social preview"],
@@ -19,6 +29,7 @@
 		{
 			"manifestSequence": 84,
 			"sourceSha256": "fb97b37cd5c66f0ed0f27f628da5ab758c7bbd8b57bc994030f09b4c32ad139f",
+			"storedSanitizedSha256": "2e21081198704842a205cbd0b17e287506ff30103b94ae0fb8ef40195b1df2f4",
 			"storageKey": "content/tyler-handdrawn-v1/084-fb97b37cd5c66f0e.jpg",
 			"title": "Tyler original 084: Exo",
 			"placements": ["home:The List", "about:hero", "characters:hero"],
@@ -27,6 +38,7 @@
 		{
 			"manifestSequence": 10,
 			"sourceSha256": "171f13ce370c971610d7d0576995cd59660417e8bfe1ccc3353f5a13fca6a64a",
+			"storedSanitizedSha256": "e01d1da026f3d7fb033ee9cb1d1e76cb4a29f312c9df6d3017645ab3d590c506",
 			"storageKey": "content/tyler-handdrawn-v1/010-171f13ce370c9716.jpg",
 			"title": "Tyler original 010: Apex Army character",
 			"placements": ["home:The Fall of a Dream"],
@@ -35,6 +47,7 @@
 		{
 			"manifestSequence": 12,
 			"sourceSha256": "198b5c15c9c93a505cdcbb0eb3c7f498c6bc0f0cfd411dac9a0d1b404c63c5e4",
+			"storedSanitizedSha256": "2f32733e9b0a8909f6e40e4ffb876a44169978aa38f6dd9a7ef31d38d496438f",
 			"storageKey": "content/tyler-handdrawn-v1/012-198b5c15c9c93a50.jpg",
 			"title": "Tyler original 012: Exo, first new design",
 			"placements": ["home:Exo Dexus", "characters:Exo Dexus"],
@@ -43,6 +56,7 @@
 		{
 			"manifestSequence": 5,
 			"sourceSha256": "0905d798b55c8bb8cc9ac0565e72aa732d91357e158de51bd56be267051bfdbd",
+			"storedSanitizedSha256": "b355da95d13779719502775ede3d6a8cf875037f3b9b41817f9f9ca9439c4a8a",
 			"storageKey": "content/tyler-handdrawn-v1/005-0905d798b55c8bb8.jpg",
 			"title": "Tyler original 005: Fazo",
 			"placements": ["home:Bitgam", "characters:Fazo"],

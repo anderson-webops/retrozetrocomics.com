@@ -8,6 +8,8 @@ import process from "node:process";
 const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
 const relativePaths = {
 	ci: ".github/workflows/ci.yml",
+	contentHandoff: "deploy/content/SERVER_AI_HANDOFF.md",
+	contentManifest: "deploy/content/tyler-site-content-v1.json",
 	environment: "deploy/systemd/retrozetro.env.example",
 	install: "deploy/systemd/install-service.sh",
 	legacyRuntime: "back-end/src/config/legacyDeployment.ts",
@@ -17,6 +19,7 @@ const relativePaths = {
 	installPolicy: "scripts/verify-install-script-policy.mjs",
 	prepare: "deploy/systemd/prepare-release.sh",
 	promote: "deploy/systemd/promote-release.sh",
+	releaseMetadata: "scripts/write-release-metadata.mjs",
 	releaseWorkflow: ".github/workflows/release-source.yml",
 	runtimeServer: "back-end/src/server.ts",
 	service: "deploy/systemd/retrozetro.service",
@@ -51,6 +54,8 @@ for (const removedPath of [
 
 const [
 	ci,
+	contentHandoff,
+	contentManifestText,
 	environment,
 	installPolicy,
 	legacyRuntime,
@@ -59,6 +64,7 @@ const [
 	ownerStaticSecurity,
 	prepare,
 	promote,
+	releaseMetadata,
 	releaseWorkflow,
 	runtimeServer,
 	service,
@@ -66,6 +72,8 @@ const [
 	storage
 ] = await Promise.all([
 	read(relativePaths.ci),
+	read(relativePaths.contentHandoff),
+	read(relativePaths.contentManifest),
 	read(relativePaths.environment),
 	read(relativePaths.installPolicy),
 	read(relativePaths.legacyRuntime),
@@ -74,12 +82,76 @@ const [
 	read(relativePaths.ownerStaticSecurity),
 	read(relativePaths.prepare),
 	read(relativePaths.promote),
+	read(relativePaths.releaseMetadata),
 	read(relativePaths.releaseWorkflow),
 	read(relativePaths.runtimeServer),
 	read(relativePaths.service),
 	read(relativePaths.startupDiagnostics),
 	read(relativePaths.storage)
 ]);
+
+const contentManifest = JSON.parse(contentManifestText);
+const expectedSanitizedHashes = new Map([
+	[
+		"content/tyler-handdrawn-v1/063-ba7430851cc35538.jpg",
+		"67759447b4ee9270852543c702c988bc49f32dc02d9530e63940ce78df2e876f"
+	],
+	[
+		"content/tyler-handdrawn-v1/084-fb97b37cd5c66f0e.jpg",
+		"2e21081198704842a205cbd0b17e287506ff30103b94ae0fb8ef40195b1df2f4"
+	],
+	[
+		"content/tyler-handdrawn-v1/010-171f13ce370c9716.jpg",
+		"e01d1da026f3d7fb033ee9cb1d1e76cb4a29f312c9df6d3017645ab3d590c506"
+	],
+	[
+		"content/tyler-handdrawn-v1/012-198b5c15c9c93a50.jpg",
+		"2f32733e9b0a8909f6e40e4ffb876a44169978aa38f6dd9a7ef31d38d496438f"
+	],
+	[
+		"content/tyler-handdrawn-v1/005-0905d798b55c8bb8.jpg",
+		"b355da95d13779719502775ede3d6a8cf875037f3b9b41817f9f9ca9439c4a8a"
+	]
+]);
+
+assert.match(contentManifest.hashSemantics.sourceSha256, /raw creative-source file/);
+assert.match(contentManifest.hashSemantics.storedSanitizedSha256, /importer-sanitized bytes/);
+assert.equal(contentManifest.expectedImportedMedia.liveOwnership.user, "tyler");
+assert.equal(contentManifest.expectedImportedMedia.liveOwnership.group, "site_retrozetro");
+assert.equal(contentManifest.expectedImportedMedia.liveOwnership.mode, "0600");
+assert.equal(contentManifest.referencedMedia.length, expectedSanitizedHashes.size);
+for (const media of contentManifest.referencedMedia) {
+	assert.equal(expectedSanitizedHashes.has(media.storageKey), true, `Unexpected storage key: ${media.storageKey}`);
+	assert.match(media.sourceSha256, /^[a-f0-9]{64}$/);
+	assert.equal(media.storedSanitizedSha256, expectedSanitizedHashes.get(media.storageKey));
+	assert.notEqual(media.sourceSha256, media.storedSanitizedSha256);
+}
+
+for (const requiredHandoffLanguage of [
+	"verified transactional compatibility deployment",
+	"pre-mutation artifact snapshot",
+	"automatically restore",
+	"storedSanitizedSha256",
+	"service account: `tyler:tyler`",
+	"tyler:site_retrozetro",
+	"no S3 access or migration",
+	"no media write or reimport",
+	"no automatic `SiteContent` seed",
+	"no publication action or state change",
+	"SOURCE_DATE_EPOCH",
+	"isolated automated editor and backend draft tests",
+	"separate explicit authorization"
+]) {
+	assert.match(contentHandoff, new RegExp(requiredHandoffLanguage));
+}
+assert.match(contentHandoff, /Do not compare[\s\S]*sourceSha256/);
+assert.match(contentHandoff, /ctime[\s\S]*site-perms[\s\S]*legitimately refresh/);
+assert.match(contentHandoff, /deployment\s+wall-clock time separately/);
+assert.match(contentHandoff, /not a symlink-based atomic release/);
+assert.doesNotMatch(contentHandoff, /established atomic compatibility-release procedure/);
+assert.doesNotMatch(contentHandoff, /saves a private\s+draft without changing the public API/);
+assert.match(releaseWorkflow, /SOURCE_DATE_EPOCH/);
+assert.match(releaseMetadata, /new Date\(sourceEpoch \* 1000\)\.toISOString\(\)/);
 
 assert.doesNotMatch(`${ci}\n${releaseWorkflow}`, /\bdocker\b|\bghcr\.io\b/i);
 assert.match(releaseWorkflow, /atomic host systemd and Nginx promotion/);

@@ -44,10 +44,11 @@ npm run audit:production
   image hosting remains available by listing exact HTTPS DNS hostnames in `CONTENT_IMAGE_HOSTS`; those same hosts are
   added narrowly to the browser image policy.
 - The home page, story files, characters, and world notes all use the managed `SiteContent` API. When a page has no
-  database record, reviewed source defaults remain available. The initial Tyler content references four existing local
+  database record, reviewed source defaults remain available. The initial Tyler content references five existing local
   media-library files without copying or re-uploading them. See
-  [`deploy/content/tyler-site-content-v1.json`](./deploy/content/tyler-site-content-v1.json) for exact image provenance
-  and [`deploy/content/SERVER_AI_HANDOFF.md`](./deploy/content/SERVER_AI_HANDOFF.md) for bounded activation checks.
+  [`deploy/content/tyler-site-content-v1.json`](./deploy/content/tyler-site-content-v1.json) for distinct raw
+  creative-source and live importer-sanitized image hashes, and
+  [`deploy/content/SERVER_AI_HANDOFF.md`](./deploy/content/SERVER_AI_HANDOFF.md) for bounded activation checks.
 - Every generated page carries a restrictive hash-based static script policy, and the owner page also carries no-index
   metadata. This preserves the intended browser boundary if a legacy edge configuration temporarily lags the application
   release. The Nginx route policy remains the authoritative production header and is checked independently after promotion.
