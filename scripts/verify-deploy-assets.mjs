@@ -7,6 +7,8 @@ import process from "node:process";
 
 const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
 const relativePaths = {
+	artworkIndex: "front-end/src/content/tylerArtwork.ts",
+	artworkPage: "front-end/src/pages/artwork.vue",
 	ci: ".github/workflows/ci.yml",
 	contentHandoff: "deploy/content/SERVER_AI_HANDOFF.md",
 	contentManifest: "deploy/content/tyler-site-content-v1.json",
@@ -25,7 +27,9 @@ const relativePaths = {
 	runtimeServer: "back-end/src/server.ts",
 	service: "deploy/systemd/retrozetro.service",
 	startupDiagnostics: "scripts/verify-startup-diagnostics.mjs",
-	storage: "back-end/src/services/storage.ts"
+	storage: "back-end/src/services/storage.ts",
+	worldsData: "front-end/src/content/retroverseWorlds.ts",
+	worldsPage: "front-end/src/pages/worlds.vue"
 };
 
 async function exists(relativePath) {
@@ -54,6 +58,8 @@ for (const removedPath of [
 }
 
 const [
+	artworkIndex,
+	artworkPage,
 	ci,
 	contentHandoff,
 	contentManifestText,
@@ -71,8 +77,12 @@ const [
 	runtimeServer,
 	service,
 	startupDiagnostics,
-	storage
+	storage,
+	worldsData,
+	worldsPage
 ] = await Promise.all([
+	read(relativePaths.artworkIndex),
+	read(relativePaths.artworkPage),
 	read(relativePaths.ci),
 	read(relativePaths.contentHandoff),
 	read(relativePaths.contentManifest),
@@ -90,7 +100,9 @@ const [
 	read(relativePaths.runtimeServer),
 	read(relativePaths.service),
 	read(relativePaths.startupDiagnostics),
-	read(relativePaths.storage)
+	read(relativePaths.storage),
+	read(relativePaths.worldsData),
+	read(relativePaths.worldsPage)
 ]);
 
 const contentManifest = JSON.parse(contentManifestText);
@@ -124,8 +136,33 @@ assert.equal(contentManifest.expectedImportedMedia.liveOwnership.user, "tyler");
 assert.equal(contentManifest.expectedImportedMedia.liveOwnership.group, "site_retrozetro");
 assert.equal(contentManifest.expectedImportedMedia.liveOwnership.mode, "0600");
 assert.equal(contentManifest.referencedMedia.length, expectedSanitizedHashes.size);
+const artworkStorageKeys = [
+	...artworkIndex.matchAll(/image: "\/uploads\/(content\/tyler-handdrawn-v1\/\d{3}-[a-f0-9]{16}\.jpg)"/g)
+].map(match => match[1]);
+const uniqueArtworkStorageKeys = new Set(artworkStorageKeys);
+assert.equal(artworkStorageKeys.length, 85);
+assert.equal(uniqueArtworkStorageKeys.size, 85);
+assert.equal(contentManifest.artworkGallery.publicRoute, "/artwork");
+assert.equal(contentManifest.artworkGallery.sourceIndex, relativePaths.artworkIndex);
+assert.equal(contentManifest.artworkGallery.reviewedImageCount, 85);
+assert.equal(contentManifest.artworkGallery.storageKeys.length, 85);
+assert.deepEqual(contentManifest.artworkGallery.storageKeys, artworkStorageKeys);
+for (const [index, storageKey] of artworkStorageKeys.entries()) {
+	const expectedSequence = String(index + 1).padStart(3, "0");
+	assert.match(storageKey, new RegExp(`/\\b${expectedSequence}-[a-f0-9]{16}\\.jpg$`));
+}
+assert.equal(contentManifest.siteContent["home-page"].showcaseItems, 7);
+assert.equal(contentManifest.siteContent["about-page"].storyArcs, 2);
+assert.equal(contentManifest.siteContent["characters-page"].characters, 6);
+assert.equal(contentManifest.siteContent["characters-page"].worldEntries, 9);
+assert.equal(contentManifest.siteContent["worlds-page"].worlds, 4);
+assert.equal(contentManifest.siteContent["worlds-page"].conflicts, 3);
+assert.equal(contentManifest.siteContent["worlds-page"].technologyEntries, 4);
+assert.equal(contentManifest.siteContent["artwork-page"].reviewedImages, 85);
 const publicationBoundaries = contentManifest.publicationBoundaries.join("\n");
 assert.match(publicationBoundaries, /remain distinct story arcs/);
+assert.match(publicationBoundaries, /85 reviewed hand-drawn images/);
+assert.match(publicationBoundaries, /seven excluded images/);
 assert.doesNotMatch(publicationBoundaries, /labeled working story files/i);
 assert.equal(locale.site.description, "Stories, characters, and worlds from the Retroverse.");
 for (const media of contentManifest.referencedMedia) {
@@ -133,7 +170,20 @@ for (const media of contentManifest.referencedMedia) {
 	assert.match(media.sourceSha256, /^[a-f0-9]{64}$/);
 	assert.equal(media.storedSanitizedSha256, expectedSanitizedHashes.get(media.storageKey));
 	assert.notEqual(media.sourceSha256, media.storedSanitizedSha256);
+	assert.equal(uniqueArtworkStorageKeys.has(media.storageKey), true);
 }
+
+for (const publicContentSource of [artworkPage, worldsData, worldsPage]) {
+	assert.doesNotMatch(
+		publicContentSource,
+		/working story|source notes|story files|world notes|final canon|open questions|still being developed/i
+	);
+}
+assert.match(artworkPage, /85 hand-drawn/);
+assert.match(artworkPage, /Show more artwork/);
+assert.match(worldsPage, /Planets and peoples/);
+assert.match(worldsPage, /Wars and adventures/);
+assert.match(worldsPage, /Machines and armor/);
 
 for (const requiredHandoffLanguage of [
 	"verified transactional compatibility deployment",
@@ -146,9 +196,12 @@ for (const requiredHandoffLanguage of [
 	"no media write or reimport",
 	"no automatic `SiteContent` seed",
 	"no publication action or state change",
+	"exactly 85 unique storage",
+	"The other 80 files have no checked-in sanitized-byte baseline",
+	"all 85 public image URLs",
 	"Investigation arc",
 	"Rebellion arc",
-	"Public copy must present the story directly",
+	"Public defaults must",
 	"SOURCE_DATE_EPOCH",
 	"isolated automated editor and backend draft tests",
 	"separate explicit authorization"
@@ -156,7 +209,8 @@ for (const requiredHandoffLanguage of [
 	assert.match(contentHandoff, new RegExp(requiredHandoffLanguage));
 }
 assert.match(contentHandoff, /Do not compare[\s\S]*sourceSha256/);
-assert.match(contentHandoff, /ctime[\s\S]*site-perms[\s\S]*legitimately refresh/);
+assert.match(contentHandoff, /Public defaults must\s+present the story directly/);
+assert.match(contentHandoff, /ctime[\s\S]*site-perms[\s\S]*legitimately\s+refresh/);
 assert.match(contentHandoff, /deployment\s+wall-clock time separately/);
 assert.match(contentHandoff, /not a symlink-based atomic release/);
 assert.doesNotMatch(contentHandoff, /established atomic compatibility-release procedure/);

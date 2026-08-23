@@ -23,9 +23,11 @@ const apiUrl = `http://127.0.0.1:${apiPort}/api`;
 const routes = [
 	"/",
 	"/about",
+	"/artwork",
 	"/characters",
 	"/contact",
-	"/studio/admin"
+	"/studio/admin",
+	"/worlds"
 ];
 const colorSchemes = (process.env.A11Y_COLOR_SCHEMES || "light,dark")
 	.split(",")

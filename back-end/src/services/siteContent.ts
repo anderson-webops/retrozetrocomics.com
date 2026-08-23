@@ -24,7 +24,7 @@ const optionalContentImageSchema = z.string()
 	.optional()
 	.default("");
 
-const homeDestinationSchema = z.enum(["/about", "/characters"]);
+const homeDestinationSchema = z.enum(["/about", "/artwork", "/characters", "/worlds"]);
 
 const homeShowcaseItemSchema = z.object({
 	destination: homeDestinationSchema,
@@ -195,7 +195,7 @@ const configs: Record<SiteContentPage, SiteContentConfig> = {
 	about: {
 		collections: ["storyArcs"],
 		key: "about-page",
-		label: "About Page Story Files"
+		label: "Story Arcs"
 	},
 	characters: {
 		collections: ["characters", "worldEntries"],

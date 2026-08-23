@@ -47,7 +47,7 @@ export interface CharacterBoardWorldEntry {
 }
 
 export interface HomeShowcaseItem {
-	destination: "/about" | "/characters";
+	destination: "/about" | "/artwork" | "/characters" | "/worlds";
 	fallbackImage?: string;
 	format: string;
 	id: string;

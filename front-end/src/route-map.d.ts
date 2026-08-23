@@ -52,6 +52,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/artwork': RouteRecordInfo<
+      '/artwork',
+      '/artwork',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/characters': RouteRecordInfo<
       '/characters',
       '/characters',
@@ -69,6 +76,13 @@ declare module 'vue-router/auto-routes' {
     '/studio/admin': RouteRecordInfo<
       '/studio/admin',
       '/studio/admin',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/worlds': RouteRecordInfo<
+      '/worlds',
+      '/worlds',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -110,6 +124,14 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
+    'src/pages/artwork.vue': {
+      routes:
+        | '/artwork'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
     'src/pages/characters.vue': {
       routes:
         | '/characters'
@@ -129,6 +151,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/studio/admin.vue': {
       routes:
         | '/studio/admin'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/worlds.vue': {
+      routes:
+        | '/worlds'
       views:
         | never
       pathParamNames:

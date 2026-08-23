@@ -197,7 +197,7 @@ watch(
 					</div>
 
 					<label>
-						<span>Additional note</span>
+						<span>Closing beat</span>
 						<textarea v-model="draftArc.note" maxlength="320" minlength="4" required rows="3" />
 					</label>
 

@@ -16,6 +16,98 @@
 			"mode": "0600"
 		}
 	},
+	"artworkGallery": {
+		"publicRoute": "/artwork",
+		"sourceIndex": "front-end/src/content/tylerArtwork.ts",
+		"reviewedImageCount": 85,
+		"storageKeys": [
+			"content/tyler-handdrawn-v1/001-02cf7aaa9fea53fa.jpg",
+			"content/tyler-handdrawn-v1/002-06cbffe80cbb3e49.jpg",
+			"content/tyler-handdrawn-v1/003-0706dc85fc02f7fe.jpg",
+			"content/tyler-handdrawn-v1/004-08f0479a7eac426f.jpg",
+			"content/tyler-handdrawn-v1/005-0905d798b55c8bb8.jpg",
+			"content/tyler-handdrawn-v1/006-0a64f079ad8ecbb2.jpg",
+			"content/tyler-handdrawn-v1/007-0d173c8b5957aded.jpg",
+			"content/tyler-handdrawn-v1/008-166e8f25330929cc.jpg",
+			"content/tyler-handdrawn-v1/009-16e8209ca408461e.jpg",
+			"content/tyler-handdrawn-v1/010-171f13ce370c9716.jpg",
+			"content/tyler-handdrawn-v1/011-18208a4722f52548.jpg",
+			"content/tyler-handdrawn-v1/012-198b5c15c9c93a50.jpg",
+			"content/tyler-handdrawn-v1/013-21e90d8edaac4060.jpg",
+			"content/tyler-handdrawn-v1/014-281a9fcd9f42f82f.jpg",
+			"content/tyler-handdrawn-v1/015-2a3c519736fae9f3.jpg",
+			"content/tyler-handdrawn-v1/016-2bd40d7cc06cff51.jpg",
+			"content/tyler-handdrawn-v1/017-2e80002f4baf1a3f.jpg",
+			"content/tyler-handdrawn-v1/018-31e45ecbc3970635.jpg",
+			"content/tyler-handdrawn-v1/019-34da3f59cef7fda5.jpg",
+			"content/tyler-handdrawn-v1/020-393e34a88928d499.jpg",
+			"content/tyler-handdrawn-v1/021-4095c22cce0633ce.jpg",
+			"content/tyler-handdrawn-v1/022-420ab79fbee0da8d.jpg",
+			"content/tyler-handdrawn-v1/023-435d91eb0f645351.jpg",
+			"content/tyler-handdrawn-v1/024-48d4aa8df224ae9e.jpg",
+			"content/tyler-handdrawn-v1/025-4c0bcb8eae7d1218.jpg",
+			"content/tyler-handdrawn-v1/026-4f690b61ad18edf6.jpg",
+			"content/tyler-handdrawn-v1/027-51e5613c74b0cde2.jpg",
+			"content/tyler-handdrawn-v1/028-525ef5706cbda1d0.jpg",
+			"content/tyler-handdrawn-v1/029-526d5fcdff23f407.jpg",
+			"content/tyler-handdrawn-v1/030-52a14054e11566b4.jpg",
+			"content/tyler-handdrawn-v1/031-58e3885f9fae7f71.jpg",
+			"content/tyler-handdrawn-v1/032-5cfd097464dd8a2c.jpg",
+			"content/tyler-handdrawn-v1/033-5e8f233a4bf0a1c9.jpg",
+			"content/tyler-handdrawn-v1/034-60274e89938ae041.jpg",
+			"content/tyler-handdrawn-v1/035-6142ad22797171ad.jpg",
+			"content/tyler-handdrawn-v1/036-647a4dd5b8291742.jpg",
+			"content/tyler-handdrawn-v1/037-6507a63e54a92b72.jpg",
+			"content/tyler-handdrawn-v1/038-67bd009caa6330b9.jpg",
+			"content/tyler-handdrawn-v1/039-6bafe90d0cd3de73.jpg",
+			"content/tyler-handdrawn-v1/040-708bf489a383d470.jpg",
+			"content/tyler-handdrawn-v1/041-723ea0b131c7a966.jpg",
+			"content/tyler-handdrawn-v1/042-744a000813905590.jpg",
+			"content/tyler-handdrawn-v1/043-7585f80b9949bb46.jpg",
+			"content/tyler-handdrawn-v1/044-77480a47db01a6d5.jpg",
+			"content/tyler-handdrawn-v1/045-7896e301de44957c.jpg",
+			"content/tyler-handdrawn-v1/046-78c3665d45ffc314.jpg",
+			"content/tyler-handdrawn-v1/047-87f8962d2be53207.jpg",
+			"content/tyler-handdrawn-v1/048-8c510ff99effb213.jpg",
+			"content/tyler-handdrawn-v1/049-966de6804791f9e4.jpg",
+			"content/tyler-handdrawn-v1/050-96c62e470588dc7c.jpg",
+			"content/tyler-handdrawn-v1/051-991ad008829da851.jpg",
+			"content/tyler-handdrawn-v1/052-9fc3ba9e9b3d36b4.jpg",
+			"content/tyler-handdrawn-v1/053-a2b08c61ab5ec2d5.jpg",
+			"content/tyler-handdrawn-v1/054-a7b0b897c9ddd176.jpg",
+			"content/tyler-handdrawn-v1/055-a911abc544e6a251.jpg",
+			"content/tyler-handdrawn-v1/056-ab2248cfc8f9b38c.jpg",
+			"content/tyler-handdrawn-v1/057-aefb56b0eb552b82.jpg",
+			"content/tyler-handdrawn-v1/058-af46b45c88f28730.jpg",
+			"content/tyler-handdrawn-v1/059-b030539c7c5b4384.jpg",
+			"content/tyler-handdrawn-v1/060-b11d64571cdf3611.jpg",
+			"content/tyler-handdrawn-v1/061-b5d9363f5d4319c9.jpg",
+			"content/tyler-handdrawn-v1/062-b8752d6902074c44.jpg",
+			"content/tyler-handdrawn-v1/063-ba7430851cc35538.jpg",
+			"content/tyler-handdrawn-v1/064-bbc17d82b5e42a5e.jpg",
+			"content/tyler-handdrawn-v1/065-c0425144279bd57b.jpg",
+			"content/tyler-handdrawn-v1/066-c08c30b578f7869a.jpg",
+			"content/tyler-handdrawn-v1/067-c0cafe542529caaf.jpg",
+			"content/tyler-handdrawn-v1/068-c9dcc317d7bb38b5.jpg",
+			"content/tyler-handdrawn-v1/069-cbcefeafc67b25c0.jpg",
+			"content/tyler-handdrawn-v1/070-ce90e46d86ab2f06.jpg",
+			"content/tyler-handdrawn-v1/071-d4d5852593bd2360.jpg",
+			"content/tyler-handdrawn-v1/072-d7b539082ccd9be4.jpg",
+			"content/tyler-handdrawn-v1/073-dd7131c8138f04e0.jpg",
+			"content/tyler-handdrawn-v1/074-e28d48c3df228e14.jpg",
+			"content/tyler-handdrawn-v1/075-e548be6b6094a637.jpg",
+			"content/tyler-handdrawn-v1/076-e56a3cb34a2733fc.jpg",
+			"content/tyler-handdrawn-v1/077-e8044ed72c34cccc.jpg",
+			"content/tyler-handdrawn-v1/078-e8423d69cc3bb488.jpg",
+			"content/tyler-handdrawn-v1/079-f4faba920637e979.jpg",
+			"content/tyler-handdrawn-v1/080-f51d03ff6ba97bb2.jpg",
+			"content/tyler-handdrawn-v1/081-f85a962eb01b15bc.jpg",
+			"content/tyler-handdrawn-v1/082-f8ccfccd2a18b75f.jpg",
+			"content/tyler-handdrawn-v1/083-fb44afd743b7453d.jpg",
+			"content/tyler-handdrawn-v1/084-fb97b37cd5c66f0e.jpg",
+			"content/tyler-handdrawn-v1/085-fd6ad777ef780a86.jpg"
+		]
+	},
 	"referencedMedia": [
 		{
 			"manifestSequence": 63,
@@ -67,18 +159,30 @@
 		"home-page": {
 			"sourceDefault": "front-end/src/content/defaultHomePageContent.ts",
 			"serverDefault": "back-end/src/content/defaultHomePageContent.ts",
-			"showcaseItems": 4
+			"showcaseItems": 7
 		},
 		"about-page": {
 			"sourceDefault": "front-end/src/content/defaultAboutPageContent.ts",
 			"serverDefault": "back-end/src/content/defaultAboutPageContent.ts",
-			"storyFiles": 2
+			"storyArcs": 2
 		},
 		"characters-page": {
 			"sourceDefault": "front-end/src/content/defaultCharactersPageContent.ts",
 			"serverDefault": "back-end/src/content/defaultCharactersPageContent.ts",
-			"characters": 2,
-			"worldEntries": 5
+			"characters": 6,
+			"worldEntries": 9
+		},
+		"worlds-page": {
+			"sourcePage": "front-end/src/pages/worlds.vue",
+			"sourceData": "front-end/src/content/retroverseWorlds.ts",
+			"worlds": 4,
+			"conflicts": 3,
+			"technologyEntries": 4
+		},
+		"artwork-page": {
+			"sourcePage": "front-end/src/pages/artwork.vue",
+			"sourceData": "front-end/src/content/tylerArtwork.ts",
+			"reviewedImages": 85
 		}
 	},
 	"sourceEvidenceIds": [
@@ -96,6 +200,7 @@
 		"Zorix is not assigned another character's drawing. No confidently matched imported hand-drawn Zorix image was available.",
 		"Zetro, Retro, Exo Dexus, Fazo, AU material, and Zlugnoid material are not merged into one continuity without Tyler's confirmation.",
 		"Raw messages, private storyline documents, source message identifiers, and archive paths are not exposed through public APIs or pages.",
-		"No S3 migration, media re-upload, or image transformation is part of this content release."
+		"The public artwork gallery is limited to the 85 reviewed hand-drawn images already imported under content/tyler-handdrawn-v1/. The seven excluded images and all other archive categories remain unpublished.",
+		"No S3 migration, media re-upload, media-record write, or image transformation is part of this content release."
 	]
 }

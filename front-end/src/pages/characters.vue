@@ -133,7 +133,7 @@ async function handleWorldEntryRemove(entryId: string) {
 		await removeWorldEntry(entryId);
 		lastRemovedWorldEntry.value = entry ? JSON.parse(JSON.stringify(entry)) : null;
 		openWorldEditorId.value = "";
-		pageStatus.value = `${entry?.title || "The world note"} was removed. You can undo this now or restore an earlier version from Owner Workspace.`;
+		pageStatus.value = `${entry?.title || "The world entry"} was removed. You can undo this now or restore an earlier version from Owner Workspace.`;
 	} catch {
 		// The page-level error remains visible and the editor stays available.
 	}
@@ -180,7 +180,7 @@ async function undoWorldEntryRemoval() {
 					onClick: addCharacterInline
 				},
 				{
-					label: 'Add world note',
+					label: 'Add world entry',
 					onClick: addWorldEntryInline,
 					tone: 'ghost'
 				},
@@ -218,9 +218,9 @@ async function undoWorldEntryRemoval() {
 					to: '/about'
 				},
 				{
-					label: 'Contact RetroZetro',
+					label: 'View the Artwork',
 					style: 'secondary',
-					to: '/contact'
+					to: '/artwork'
 				}
 			]"
 			actions-placement="poster"

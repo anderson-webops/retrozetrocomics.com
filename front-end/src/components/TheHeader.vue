@@ -10,8 +10,10 @@ const session = useSessionStore();
 
 const links = [
 	{ name: "Home", path: "/" },
-	{ name: "Characters", path: "/characters" },
 	{ name: "Story", path: "/about" },
+	{ name: "Characters", path: "/characters" },
+	{ name: "Worlds", path: "/worlds" },
+	{ name: "Artwork", path: "/artwork" },
 	{ name: "Contact", path: "/contact" }
 ];
 

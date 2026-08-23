@@ -258,9 +258,9 @@ watch(
 
 		<AdminConfirmDialog
 			confirm-label="Remove from public page"
-			:description="`${pendingRemoval?.title || 'This world note'} will disappear from the public page immediately. An earlier published version will remain available in Owner Workspace recovery.`"
+			:description="`${pendingRemoval?.title || 'This world entry'} will disappear from the public page immediately. An earlier published version will remain available in Owner Workspace recovery.`"
 			:open="Boolean(pendingRemoval)"
-			:title="`Remove ${pendingRemoval?.title || 'this world note'}?`"
+			:title="`Remove ${pendingRemoval?.title || 'this world entry'}?`"
 			@cancel="pendingRemoval = null"
 			@confirm="pendingRemoval && (emit('remove', pendingRemoval.id), (pendingRemoval = null))"
 		/>

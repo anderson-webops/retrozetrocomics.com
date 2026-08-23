@@ -13,8 +13,10 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 		<nav aria-label="Footer navigation" class="footer__links">
 			<h3>Explore</h3>
 			<div class="footer__link-list">
-				<RouterLink to="/characters">Characters</RouterLink>
 				<RouterLink to="/about">The story</RouterLink>
+				<RouterLink to="/characters">Characters</RouterLink>
+				<RouterLink to="/worlds">Worlds</RouterLink>
+				<RouterLink to="/artwork">Artwork</RouterLink>
 				<RouterLink to="/contact">Contact</RouterLink>
 			</div>
 		</nav>

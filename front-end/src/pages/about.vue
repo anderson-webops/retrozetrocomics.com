@@ -151,7 +151,7 @@ async function handleWorldEntryRemove(entryId: string) {
 		await removeWorldEntry(entryId);
 		lastRemovedWorldEntry.value = entry ? JSON.parse(JSON.stringify(entry)) : null;
 		openWorldEditorId.value = "";
-		pageStatus.value = `${entry?.title || "The world note"} was removed. You can undo this now or restore an earlier version from Owner Workspace.`;
+		pageStatus.value = `${entry?.title || "The world entry"} was removed. You can undo this now or restore an earlier version from Owner Workspace.`;
 	} catch {
 		// The page-level error remains visible and the editor stays available.
 	}
@@ -195,7 +195,7 @@ async function undoWorldEntryRemoval() {
 			{{ aboutError || boardError }}
 		</p>
 		<p v-else-if="aboutSaving || boardSaving" class="about-page__status" role="status">
-			{{ aboutSaving ? "Saving story page changes..." : "Saving world note changes..." }}
+			{{ aboutSaving ? "Saving story page changes..." : "Saving world entry changes..." }}
 		</p>
 		<div v-else-if="pageStatus" class="about-page__status about-page__status--success" role="status">
 			<span>{{ pageStatus }}</span>
@@ -215,9 +215,9 @@ async function undoWorldEntryRemoval() {
 					to: '/characters'
 				},
 				{
-					label: 'Contact RetroZetro',
+					label: 'Explore the Worlds',
 					style: 'secondary',
-					to: '/contact'
+					to: '/worlds'
 				}
 			]"
 			eyebrow="The conflict"
@@ -280,7 +280,7 @@ async function undoWorldEntryRemoval() {
 				/>
 			</div>
 			<div v-if="session.showAdminTools" class="about-page__section-actions">
-				<button type="button" @click="addWorldEntryInline">Add a world note</button>
+				<button type="button" @click="addWorldEntryInline">Add a world entry</button>
 			</div>
 		</section>
 	</div>

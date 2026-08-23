@@ -5,7 +5,7 @@ export function createDefaultHomePageContent() {
 		description:
 			"Exo's search for his missing mother leads Team Rimlaw into an Apex Army moon base, where altered symbols and vanished allies reveal a hidden takeover.",
 		developmentNote:
-			"The Zego Order has turned the Apex Army against itself. Loyal soldiers, Star Hunters, and outlaw crews must decide whether they can fight together.",
+			"Beyond the Apex takeover, the Zlugnoid Hive Wars, Zetro's adventures, distant worlds, and alien machines open new fronts across the Retroverse.",
 		eyebrow: "The Retroverse",
 		showcaseItems: [
 			{
@@ -55,8 +55,41 @@ export function createDefaultHomePageContent() {
 				summary:
 					"Bitgam is home to Gambit Pointe residents with red skin, yellow and white eyes, and exoskeletons. Its history reaches back to the unexplained Great Manifested.",
 				title: "Bitgam"
+			},
+			{
+				destination: "/worlds",
+				format: "Hive war",
+				id: "home-zlugnoid-hive-wars",
+				image: `${tylerHandDrawnBase}/006-0a64f079ad8ecbb2.jpg`,
+				imageAlt: "Hand-drawn Zlug character design.",
+				status: "Zucnoids and Zlugnoids collide",
+				summary:
+					"A Zlug doctor creates hybrid Wormoids as the Zlugnoid Hive Wars spread through commanders, armor squads, and mecha forces.",
+				title: "The Zlugnoid Hive Wars"
+			},
+			{
+				destination: "/worlds",
+				format: "Retro Zetro",
+				id: "home-zetro-and-retro",
+				image: `${tylerHandDrawnBase}/045-7896e301de44957c.jpg`,
+				imageAlt: "Hand-drawn original resketch of Zetro.",
+				status: "Zetro and Retro stand together",
+				summary:
+					"Zetro and Retro are paired heroes, while Zatral, Zat, and Zetro form an adventure trio surrounded by allies and alternate designs.",
+				title: "Zetro and Retro"
+			},
+			{
+				destination: "/artwork",
+				format: "85 hand-drawn designs",
+				id: "home-artwork-gallery",
+				image: `${tylerHandDrawnBase}/011-18208a4722f52548.jpg`,
+				imageAlt: "Hand-drawn character designs for Exo, Shaman, and Fazo.",
+				status: "Characters, peoples, machines, and armor",
+				summary:
+					"Browse Exo, Zetro, Opex, Zub units, alien peoples, character studies, robots, and biosuits across the full artwork gallery.",
+				title: "Explore the Artwork"
 			}
 		],
-		title: "The war inside the Apex Army"
+		title: "Wars, worlds, and heroes"
 	};
 }

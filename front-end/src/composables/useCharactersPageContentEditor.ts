@@ -159,7 +159,7 @@ export function useCharactersPageContentEditor() {
 
 	function removeWorldEntry(entryId: string) {
 		if (content.value.worldEntries.length <= 1) {
-			error.value = "At least one world note must remain.";
+			error.value = "At least one world entry must remain.";
 			return Promise.reject(new Error(error.value));
 		}
 

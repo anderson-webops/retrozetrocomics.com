@@ -30,10 +30,50 @@ export function createDefaultCharactersPageContent(): CharactersPageContent {
 				name: "Fazo",
 				role: "Bitgam native",
 				specialty: "Homeworld: Bitgam"
+			},
+			{
+				description: "Shaman is a Lightnoid who appears alongside Exo. Cosmos is Shaman's girlfriend.",
+				frequency: "Linked to Exo and Cosmos",
+				id: "shaman",
+				image: `${tylerHandDrawnBase}/063-ba7430851cc35538.jpg`,
+				imgAlt: "Hand-drawn character designs for Exo and Shaman.",
+				name: "Shaman",
+				role: "Lightnoid",
+				specialty: "Connected to Cosmos"
+			},
+			{
+				description: "Zetro is repeatedly paired with Retro and joins Zatral and Zat in an adventure trio.",
+				frequency: "Paired with Retro",
+				id: "zetro",
+				image: `${tylerHandDrawnBase}/045-7896e301de44957c.jpg`,
+				imgAlt: "Hand-drawn original resketch of Zetro.",
+				name: "Zetro",
+				role: "Retro Zetro adventurer",
+				specialty: "Adventure trio: Zatral, Zat, and Zetro"
+			},
+			{
+				description: "Fuzo is an alternate-universe version of Fazo with a separate character design.",
+				frequency: "Alternate version of Fazo",
+				id: "fuzo",
+				image: `${tylerHandDrawnBase}/028-525ef5706cbda1d0.jpg`,
+				imgAlt: "Hand-drawn character design for Fuzo, an alternate Fazo.",
+				name: "Fuzo",
+				role: "Alternate Fazo",
+				specialty: "Alternate-universe character"
+			},
+			{
+				description: "Mozo and Zoha are a character pair from FZ.",
+				frequency: "From FZ",
+				id: "mozo-and-zoha",
+				image: `${tylerHandDrawnBase}/069-cbcefeafc67b25c0.jpg`,
+				imgAlt: "Hand-drawn character designs for Mozo and Zoha.",
+				name: "Mozo and Zoha",
+				role: "FZ duo",
+				specialty: "Characters from FZ"
 			}
 		],
 		description:
-			"Meet Exo Dexus and Fazo, then explore the armies, outlaw crews, councils, and worlds caught in the Zego Order's expanding war.",
+			"Meet Exo Dexus, Fazo, Shaman, Zetro, Fuzo, Mozo, and Zoha, then explore the armies, outlaw crews, councils, and worlds surrounding them.",
 		eyebrow: "The Retroverse",
 		heroImage: `${tylerHandDrawnBase}/084-fb97b37cd5c66f0e.jpg`,
 		heroImageAlt: "Hand-drawn colored portrait of Exo Dexus.",
@@ -119,6 +159,70 @@ export function createDefaultCharactersPageContent(): CharactersPageContent {
 				id: "council-of-orpex",
 				label: "Council",
 				title: "Council of Orpex"
+			},
+			{
+				body: "Galgri is home to the Galgrey Galnoids and a Council of Twelve overseers. Giza, Gelth, Geth, Gel, Grorix, Velrix, and Vozith are connected to Galnoid history.",
+				facts: [
+					{
+						label: "People",
+						value: "Galgrey Galnoids"
+					},
+					{
+						label: "Government",
+						value: "Council of Twelve"
+					}
+				],
+				id: "galgri-and-galnoids",
+				label: "World and people",
+				title: "Galgri and the Galnoids"
+			},
+			{
+				body: "A Linkpod places an Orpenoid consciousness inside a CBot shell. One CBot model travels on the ground while another transforms into a small oval spacecraft.",
+				facts: [
+					{
+						label: "Creators",
+						value: "Orpenoids"
+					},
+					{
+						label: "CBot forms",
+						value: "Ground unit and transforming craft"
+					}
+				],
+				id: "linkpods-and-cbots",
+				label: "Technology",
+				title: "Linkpods and CBots"
+			},
+			{
+				body: "The Zlugnoid Hive Wars pit Zucnoids against Zlugnoids. A Zlug doctor creates hybrid Wormoids as the conflict spreads through commanders, armor squads, and mecha forces.",
+				facts: [
+					{
+						label: "Opposing peoples",
+						value: "Zucnoids and Zlugnoids"
+					},
+					{
+						label: "Created in the war",
+						value: "Hybrid Wormoids"
+					}
+				],
+				id: "zlugnoid-hive-wars",
+				label: "Conflict",
+				title: "The Zlugnoid Hive Wars"
+			},
+			{
+				body: "Mozo and Zoha come from FZ. The Piadom race began as part of Oddverse, opening another world of heroes and peoples.",
+				facts: [
+					{
+						label: "FZ characters",
+						value: "Mozo and Zoha"
+					},
+					{
+						label: "Oddverse people",
+						value: "Piadom"
+					}
+				],
+				id: "fz-and-oddverse",
+				label: "Worlds and heroes",
+				title: "FZ and Oddverse"
 			}
 		]
 	};

@@ -61,11 +61,11 @@ const taskCards: Array<{
 	},
 	{
 		description: "Explain a place, group, term, or faction for readers.",
-		label: "Add a world note",
+		label: "Add a world entry",
 		task: "add-world"
 	},
 	{
-		description: "Choose an existing character, story, or world note by name.",
+		description: "Choose an existing character, story, or world entry by name.",
 		label: "Edit something",
 		task: "edit"
 	},

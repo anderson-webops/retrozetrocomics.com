@@ -40,11 +40,11 @@ const metricCards = computed(() => [
 		value: dashboard.value?.metrics.characterCount ?? 0
 	},
 	{
-		label: "World Notes",
+		label: "World Entries",
 		value: dashboard.value?.metrics.worldEntryCount ?? 0
 	},
 	{
-		label: "Story Files",
+		label: "Story Arcs",
 		value: dashboard.value?.metrics.storyArcCount ?? 0
 	},
 	{
@@ -158,7 +158,7 @@ onMounted(() => {
 					Edit Characters
 				</RouterLink>
 				<RouterLink class="admin-dashboard__button" :to="{ path: '/about', query: { manage: '1' } }">
-					Edit Story Files
+					Edit Story Arcs
 				</RouterLink>
 				<button
 					class="admin-dashboard__button admin-dashboard__button--ghost"
@@ -193,7 +193,7 @@ onMounted(() => {
 					<RouterLink class="content-link" :to="{ path: '/studio/admin', query: { task: 'edit-home' } }">
 						<span>
 							<strong>Home page highlights</strong>
-							<small>Featured pictures, story files, characters, and world notes.</small>
+							<small>Featured pictures, stories, characters, and worlds.</small>
 						</span>
 						<span aria-hidden="true">Open</span>
 					</RouterLink>
@@ -201,14 +201,14 @@ onMounted(() => {
 					<RouterLink class="content-link" :to="{ path: '/characters', query: { manage: '1' } }">
 						<span>
 							<strong>Characters and factions</strong>
-							<small>Character cards, hero copy, and world notes.</small>
+							<small>Character cards, hero copy, and world entries.</small>
 						</span>
 						<span aria-hidden="true">Open</span>
 					</RouterLink>
 
 					<RouterLink class="content-link" :to="{ path: '/about', query: { manage: '1' } }">
 						<span>
-							<strong>About story files</strong>
+							<strong>Story arcs</strong>
 							<small>Story arc summaries and plot beats.</small>
 						</span>
 						<span aria-hidden="true">Open</span>

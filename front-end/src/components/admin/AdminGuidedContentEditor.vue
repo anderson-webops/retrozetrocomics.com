@@ -604,7 +604,7 @@ onBeforeRouteUpdate(() => {
 							: props.task === "add-story"
 								? "Add a story idea"
 								: props.task === "add-world"
-									? "Add a world note"
+									? "Add a world entry"
 									: "Edit something"
 					}}
 				</h2>
@@ -639,7 +639,7 @@ onBeforeRouteUpdate(() => {
 			<div>
 				<button type="button" @click="selectKind('character')">A character</button>
 				<button type="button" @click="selectKind('story')">A story</button>
-				<button type="button" @click="selectKind('world')">A world note</button>
+				<button type="button" @click="selectKind('world')">A world entry</button>
 			</div>
 		</div>
 
@@ -650,7 +650,7 @@ onBeforeRouteUpdate(() => {
 					<p>Select the exact item you want to change.</p>
 				</div>
 				<button type="button" @click="beginNew(editorKind)">
-					Add a new {{ editorKind === "world" ? "world note" : editorKind }}
+					Add a new {{ editorKind === "world" ? "world entry" : editorKind }}
 				</button>
 			</header>
 			<div class="item-chooser__list">
@@ -830,7 +830,7 @@ onBeforeRouteUpdate(() => {
 			</fieldset>
 
 			<fieldset v-if="editorKind === 'world' && currentWorld && step === 1">
-				<legend>World note basics</legend>
+				<legend>World entry basics</legend>
 				<p>Name the place, group, or idea and explain what readers should know.</p>
 				<div class="editor-card__grid">
 					<label>

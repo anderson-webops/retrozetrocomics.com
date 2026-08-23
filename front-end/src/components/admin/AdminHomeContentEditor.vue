@@ -301,9 +301,9 @@ onMounted(() => {
 						<textarea v-model="form.description" maxlength="520" rows="4" />
 					</label>
 					<label class="home-editor__wide">
-						<span>Note about ideas still being developed</span>
+						<span>Wider Retroverse</span>
 						<textarea v-model="form.developmentNote" maxlength="420" rows="3" />
-						<small>This helps readers understand that open story questions are not final canon.</small>
+						<small>Add a short line about other worlds, conflicts, or adventures.</small>
 					</label>
 				</div>
 			</section>
@@ -352,8 +352,10 @@ onMounted(() => {
 					<label>
 						<span>Where “Read more” goes</span>
 						<select v-model="currentItem.destination">
-							<option value="/about">Story files and world notes</option>
+							<option value="/about">Story</option>
 							<option value="/characters">Characters and factions</option>
+							<option value="/worlds">Worlds, peoples, and technology</option>
+							<option value="/artwork">Artwork gallery</option>
 						</select>
 					</label>
 					<label class="home-editor__wide">

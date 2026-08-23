@@ -18,18 +18,41 @@ describe("guided site content safety", () => {
 		const parsed = parsePublishedSiteContent("home", content);
 
 		expect(parsed.success).toBe(true);
-		expect(content.showcaseItems).toHaveLength(4);
+		expect(content.showcaseItems).toHaveLength(7);
 		expect(content.showcaseItems).toEqual(expect.arrayContaining([
 			expect.objectContaining({
 				image: "/uploads/content/tyler-handdrawn-v1/084-fb97b37cd5c66f0e.jpg",
 				title: "The List"
 			}),
-			expect.objectContaining({
-				image: "/uploads/content/tyler-handdrawn-v1/005-0905d798b55c8bb8.jpg",
-				title: "Bitgam"
-			})
+				expect.objectContaining({
+					image: "/uploads/content/tyler-handdrawn-v1/005-0905d798b55c8bb8.jpg",
+					title: "Bitgam"
+				}),
+				expect.objectContaining({
+					destination: "/worlds",
+					title: "The Zlugnoid Hive Wars"
+				}),
+				expect.objectContaining({
+					destination: "/artwork",
+					title: "Explore the Artwork"
+				})
+			]));
+		expect(String(content.developmentNote)).toMatch(/Zlugnoid Hive Wars/i);
+	});
+
+	it("ships a broader publishable character and world board", () => {
+		const content = createDefaultSiteContent("characters");
+		const parsed = parsePublishedSiteContent("characters", content);
+
+		expect(parsed.success).toBe(true);
+		expect(content.characters).toHaveLength(6);
+		expect(content.worldEntries).toHaveLength(9);
+		expect(content.characters).toEqual(expect.arrayContaining([
+			expect.objectContaining({ name: "Shaman" }),
+			expect.objectContaining({ name: "Zetro" }),
+			expect.objectContaining({ name: "Fuzo" }),
+			expect.objectContaining({ name: "Mozo and Zoha" })
 		]));
-		expect(String(content.developmentNote)).toMatch(/Zego Order has turned the Apex Army against itself/i);
 	});
 
 	it("keeps editorial scaffolding out of every public default", () => {
