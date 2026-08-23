@@ -6,6 +6,7 @@ import { useSessionStore } from "@/stores/session";
 
 const props = withDefaults(
 	defineProps<{
+		featuredIds?: readonly string[];
 		inlineEditing?: boolean;
 		items: CharacterBoardWorldEntry[];
 		openEditorId?: string;
@@ -13,6 +14,7 @@ const props = withDefaults(
 		savingId?: string;
 	}>(),
 	{
+		featuredIds: () => [],
 		inlineEditing: false,
 		openEditorId: "",
 		saveError: "",
@@ -142,6 +144,7 @@ watch(
 			:key="entry.id"
 			class="world-entry-card"
 			:class="{
+				'world-entry-card--featured': props.featuredIds.includes(entry.id),
 				'world-entry-card--editing': editingId === entry.id
 			}"
 		>
@@ -243,9 +246,11 @@ watch(
 			</template>
 
 			<template v-else>
-				<p class="world-entry-card__eyebrow">{{ entry.label }}</p>
-				<h2>{{ entry.title }}</h2>
-				<p>{{ entry.body }}</p>
+				<div class="world-entry-card__copy">
+					<p class="world-entry-card__eyebrow">{{ entry.label }}</p>
+					<h3>{{ entry.title }}</h3>
+					<p>{{ entry.body }}</p>
+				</div>
 
 				<dl v-if="entry.facts?.length" class="world-entry-card__facts-list">
 					<div v-for="fact in entry.facts" :key="fact.label">
@@ -271,7 +276,8 @@ watch(
 .world-entry-grid {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: start;
 }
 
 .world-entry-grid--editing {
@@ -288,6 +294,23 @@ watch(
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	min-width: 0;
 	align-content: start;
+}
+
+.world-entry-card--featured:not(.world-entry-card--editing) {
+	grid-column: 1 / -1;
+	grid-template-columns: minmax(0, 1.25fr) minmax(15rem, 0.75fr);
+	column-gap: clamp(1.4rem, 4vw, 2.4rem);
+	padding: clamp(1.5rem, 4vw, 2.2rem);
+	border-color: rgba(255, 210, 125, 0.2);
+	background: linear-gradient(125deg, rgba(124, 225, 246, 0.09), transparent 48%), rgba(255, 255, 255, 0.055);
+	box-shadow:
+		inset 4px 0 0 rgba(255, 210, 125, 0.42),
+		inset 0 1px 0 rgba(255, 255, 255, 0.04),
+		var(--shadow-soft);
+}
+
+.world-entry-card--featured:not(:first-child) {
+	margin-top: 0.55rem;
 }
 
 .world-entry-card--editing {
@@ -379,12 +402,18 @@ watch(
 	margin: 0;
 }
 
-.world-entry-card h2,
+.world-entry-card__copy {
+	display: grid;
+	gap: 0.7rem;
+	align-content: start;
+}
+
+.world-entry-card h3,
 .world-entry-card p {
 	margin: 0;
 }
 
-.world-entry-card h2 {
+.world-entry-card h3 {
 	font-family: var(--font-display);
 	font-size: clamp(1.45rem, 2.8vw, 1.9rem);
 	line-height: 1.06;
@@ -410,6 +439,10 @@ watch(
 
 .world-entry-card__facts-list {
 	margin: 0;
+}
+
+.world-entry-card--featured .world-entry-card__facts-list {
+	align-content: start;
 }
 
 .world-entry-card__facts-list div {
@@ -530,6 +563,16 @@ watch(
 }
 
 @media (max-width: 720px) {
+	.world-entry-grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.world-entry-card--featured:not(.world-entry-card--editing) {
+		grid-column: auto;
+		grid-template-columns: minmax(0, 1fr);
+		padding: 1.25rem;
+	}
+
 	.world-entry-card__editor-grid {
 		grid-template-columns: 1fr;
 	}

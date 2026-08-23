@@ -2,6 +2,7 @@
 import type { CharacterBoardProfile, CharacterBoardWorldEntry } from "@/types/site";
 import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import { useCharactersPageContentEditor } from "@/composables/useCharactersPageContentEditor";
+import { featuredWorldEntryIds, orderWorldEntriesForDisplay } from "@/content/worldEntryPresentation";
 import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
 import Characters from "~/components/TheCharacters.vue";
 import WorldEntryCards from "~/components/WorldEntryCards.vue";
@@ -26,6 +27,7 @@ const savingWorldEntryId = ref("");
 const lastRemovedCharacter = ref<CharacterBoardProfile | null>(null);
 const lastRemovedWorldEntry = ref<CharacterBoardWorldEntry | null>(null);
 const pageStatus = ref("");
+const displayedWorldEntries = computed(() => orderWorldEntriesForDisplay(content.value.worldEntries));
 
 useHead({
 	title: "Characters and Factions | RetroZetro Comics",
@@ -242,16 +244,28 @@ async function undoWorldEntryRemoval() {
 			@save="handleCharacterSave"
 		/>
 
-		<WorldEntryCards
-			:inline-editing="true"
-			:items="content.worldEntries"
-			:open-editor-id="openWorldEditorId"
-			:save-error="boardError"
-			:saving-id="savingWorldEntryId"
-			@discard="handleWorldEntryDiscard"
-			@remove="handleWorldEntryRemove"
-			@save="handleWorldEntrySave"
-		/>
+		<section class="characters-page__lore" aria-labelledby="retroverse-lore-title">
+			<header class="characters-page__lore-header">
+				<p>The Wider Retroverse</p>
+				<h2 id="retroverse-lore-title">Armies, planets, and other wars</h2>
+				<p>
+					The battle for the Apex Army draws in Team Rimlaw and the Zego Order before the story reaches
+					Bitgam, Orpex, Galgri, and the distant Zlugnoid Hive Wars.
+				</p>
+			</header>
+
+			<WorldEntryCards
+				:featured-ids="featuredWorldEntryIds"
+				:inline-editing="true"
+				:items="displayedWorldEntries"
+				:open-editor-id="openWorldEditorId"
+				:save-error="boardError"
+				:saving-id="savingWorldEntryId"
+				@discard="handleWorldEntryDiscard"
+				@remove="handleWorldEntryRemove"
+				@save="handleWorldEntrySave"
+			/>
+		</section>
 	</div>
 </template>
 
@@ -290,6 +304,42 @@ async function undoWorldEntryRemoval() {
 	color: #fff8ef;
 	font-weight: 800;
 	padding: 0.6rem 0.85rem;
+}
+
+.characters-page__lore {
+	display: grid;
+	gap: 1.2rem;
+}
+
+.characters-page__lore-header {
+	display: grid;
+	gap: 0.55rem;
+	max-width: 46rem;
+}
+
+.characters-page__lore-header p,
+.characters-page__lore-header h2 {
+	margin: 0;
+}
+
+.characters-page__lore-header > p:first-child {
+	color: #ffd27d;
+	font-size: 0.78rem;
+	font-weight: 800;
+	letter-spacing: var(--tracking-eyebrow);
+	text-transform: uppercase;
+}
+
+.characters-page__lore-header h2 {
+	color: #fff4e7;
+	font-family: var(--font-display);
+	font-size: clamp(1.8rem, 4vw, 2.65rem);
+	line-height: 1.04;
+}
+
+.characters-page__lore-header > p:last-child {
+	color: rgba(239, 244, 255, 0.76);
+	line-height: 1.75;
 }
 </style>
 

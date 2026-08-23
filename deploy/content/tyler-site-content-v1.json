@@ -170,7 +170,21 @@
 			"sourceDefault": "front-end/src/content/defaultCharactersPageContent.ts",
 			"serverDefault": "back-end/src/content/defaultCharactersPageContent.ts",
 			"characters": 6,
-			"worldEntries": 9
+			"worldEntries": 9,
+			"worldEntryPresentation": {
+				"displayOrder": [
+					"apex-army",
+					"team-rimlaw-star-hunters",
+					"zego-order",
+					"bitgam",
+					"galgri-and-galnoids",
+					"council-of-orpex",
+					"zlugnoid-hive-wars",
+					"linkpods-and-cbots",
+					"fz-and-oddverse"
+				],
+				"featuredEntries": ["apex-army", "bitgam", "zlugnoid-hive-wars"]
+			}
 		},
 		"worlds-page": {
 			"sourcePage": "front-end/src/pages/worlds.vue",

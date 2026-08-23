@@ -28,6 +28,8 @@ const relativePaths = {
 	service: "deploy/systemd/retrozetro.service",
 	startupDiagnostics: "scripts/verify-startup-diagnostics.mjs",
 	storage: "back-end/src/services/storage.ts",
+	worldEntryCards: "front-end/src/components/WorldEntryCards.vue",
+	worldEntryPresentation: "front-end/src/content/worldEntryPresentation.ts",
 	worldsData: "front-end/src/content/retroverseWorlds.ts",
 	worldsPage: "front-end/src/pages/worlds.vue"
 };
@@ -78,6 +80,8 @@ const [
 	service,
 	startupDiagnostics,
 	storage,
+	worldEntryCards,
+	worldEntryPresentation,
 	worldsData,
 	worldsPage
 ] = await Promise.all([
@@ -101,6 +105,8 @@ const [
 	read(relativePaths.service),
 	read(relativePaths.startupDiagnostics),
 	read(relativePaths.storage),
+	read(relativePaths.worldEntryCards),
+	read(relativePaths.worldEntryPresentation),
 	read(relativePaths.worldsData),
 	read(relativePaths.worldsPage)
 ]);
@@ -155,6 +161,41 @@ assert.equal(contentManifest.siteContent["home-page"].showcaseItems, 7);
 assert.equal(contentManifest.siteContent["about-page"].storyArcs, 2);
 assert.equal(contentManifest.siteContent["characters-page"].characters, 6);
 assert.equal(contentManifest.siteContent["characters-page"].worldEntries, 9);
+const expectedWorldEntryDisplayOrder = [
+	"apex-army",
+	"team-rimlaw-star-hunters",
+	"zego-order",
+	"bitgam",
+	"galgri-and-galnoids",
+	"council-of-orpex",
+	"zlugnoid-hive-wars",
+	"linkpods-and-cbots",
+	"fz-and-oddverse"
+];
+const expectedFeaturedWorldEntries = ["apex-army", "bitgam", "zlugnoid-hive-wars"];
+assert.deepEqual(
+	contentManifest.siteContent["characters-page"].worldEntryPresentation.displayOrder,
+	expectedWorldEntryDisplayOrder
+);
+assert.deepEqual(
+	contentManifest.siteContent["characters-page"].worldEntryPresentation.featuredEntries,
+	expectedFeaturedWorldEntries
+);
+const displayOrderSource = worldEntryPresentation.slice(
+	worldEntryPresentation.indexOf("const worldEntryDisplayOrder")
+);
+let previousDisplayOrderIndex = -1;
+for (const entryId of expectedWorldEntryDisplayOrder) {
+	const currentDisplayOrderIndex = displayOrderSource.indexOf(`"${entryId}"`, previousDisplayOrderIndex + 1);
+	assert.ok(currentDisplayOrderIndex > previousDisplayOrderIndex, `${entryId} is out of display order`);
+	previousDisplayOrderIndex = currentDisplayOrderIndex;
+}
+for (const entryId of expectedFeaturedWorldEntries) {
+	assert.match(worldEntryPresentation, new RegExp(`featuredWorldEntryIds = \\[.*"${entryId}"`));
+}
+assert.match(worldEntryCards, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+assert.match(worldEntryCards, /grid-column: 1 \/ -1/);
+assert.match(worldEntryCards, /@media \(max-width: 720px\)/);
 assert.equal(contentManifest.siteContent["worlds-page"].worlds, 4);
 assert.equal(contentManifest.siteContent["worlds-page"].conflicts, 3);
 assert.equal(contentManifest.siteContent["worlds-page"].technologyEntries, 4);
@@ -173,7 +214,7 @@ for (const media of contentManifest.referencedMedia) {
 	assert.equal(uniqueArtworkStorageKeys.has(media.storageKey), true);
 }
 
-for (const publicContentSource of [artworkPage, worldsData, worldsPage]) {
+for (const publicContentSource of [artworkPage, worldEntryPresentation, worldsData, worldsPage]) {
 	assert.doesNotMatch(
 		publicContentSource,
 		/working story|source notes|story files|world notes|final canon|open questions|still being developed/i

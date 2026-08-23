@@ -4,6 +4,7 @@ import { useAboutPageContent } from "@/composables/useAboutPageContent";
 import { useAboutPageContentEditor } from "@/composables/useAboutPageContentEditor";
 import { useCharactersPageContent } from "@/composables/useCharactersPageContent";
 import { useCharactersPageContentEditor } from "@/composables/useCharactersPageContentEditor";
+import { featuredWorldEntryIds, orderWorldEntriesForDisplay } from "@/content/worldEntryPresentation";
 import { siteAssetCandidates, toAbsoluteSiteUrl } from "@/lib/siteAssets";
 import { useSessionStore } from "@/stores/session";
 import StoryArcCards from "~/components/StoryArcCards.vue";
@@ -37,6 +38,7 @@ const savingWorldEditorId = ref("");
 const lastRemovedStory = ref<AboutStoryArc | null>(null);
 const lastRemovedWorldEntry = ref<CharacterBoardWorldEntry | null>(null);
 const pageStatus = ref("");
+const displayedWorldEntries = computed(() => orderWorldEntriesForDisplay(charactersPageContent.value.worldEntries));
 
 const highlights = computed(() =>
 	store.about.values.map(value => ({
@@ -269,8 +271,9 @@ async function undoWorldEntryRemoval() {
 
 			<div class="about-page__world-grid">
 				<WorldEntryCards
+					:featured-ids="featuredWorldEntryIds"
 					:inline-editing="session.showAdminTools"
-					:items="charactersPageContent.worldEntries"
+					:items="displayedWorldEntries"
 					:open-editor-id="openWorldEditorId"
 					:save-error="boardError"
 					:saving-id="savingWorldEditorId"

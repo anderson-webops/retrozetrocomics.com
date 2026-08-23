@@ -9,6 +9,8 @@ activation. Do not infer additional canon or publish any source archive document
   hand-drawn images.
 - The public Story and Characters pages carry expanded direct descriptions, while the new Worlds page presents four
   worlds, three conflicts or adventures, and four technology entries.
+- The Characters and Story pages present the nine wider-Retroverse entries as three readable story clusters: the Apex
+  conflict, connected worlds and peoples, and the wider wars and technology.
 - The new Artwork page presents the exact 85 reviewed hand-drawn images listed in
   `deploy/content/tyler-site-content-v1.json`, with filters and full-size views.
 - Public copy presents the stories and worlds directly without publishing archive notes, source-message history, or
@@ -113,7 +115,11 @@ authorizes and reviews it.
    for Exo Dexus, Fazo, Shaman, Zetro, Fuzo, and Mozo and Zoha, plus nine world, faction, conflict, or technology
    entries. If an owner record exists, preserve its public response and verify these checked-in defaults through
    isolated automated tests instead. Do not accept the former invented role text for Zetro, Kazay, Exo, Shaman, or
-   Zorix as fallback output.
+   Zorix as fallback output. On both Characters and Story, require the recognized entries to begin with Apex Army,
+   Team Rimlaw and the Star Hunters, and Zego Order; then Bitgam, Galgri and the Galnoids, and the Council of Orpex;
+   then the Zlugnoid Hive Wars, Linkpods and CBots, and FZ and Oddverse. Require Apex Army, Bitgam, and the Zlugnoid
+   Hive Wars to be full-width lead cards above their paired related cards on desktop and require a single readable
+   column with no horizontal overflow on mobile. Preserve any owner-created entries after these recognized entries.
 6. Require `/worlds` to return the direct public Worlds page with four worlds, three conflicts or adventures, and four
    technology entries. Require `/artwork` to expose all 85 manifest-listed reviewed images, six category filters plus
    **All artwork**, a search control, the progressive **Show more artwork** control, and full-size image links. Confirm

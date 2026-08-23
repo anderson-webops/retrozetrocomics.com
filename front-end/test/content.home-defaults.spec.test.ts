@@ -5,6 +5,7 @@ import { createDefaultCharactersPageContent } from "../src/content/defaultCharac
 import { createDefaultHomePageContent } from "../src/content/defaultHomePageContent";
 import { retroverseConflicts, retroverseTechnology, retroverseWorlds } from "../src/content/retroverseWorlds";
 import { artworkCollectionLabels, tylerArtworkItems } from "../src/content/tylerArtwork";
+import { featuredWorldEntryIds, orderWorldEntriesForDisplay } from "../src/content/worldEntryPresentation";
 
 describe("reader-facing content defaults", () => {
 	it("features seven source-backed entries across the public home page", () => {
@@ -58,6 +59,29 @@ describe("reader-facing content defaults", () => {
 			"Mozo and Zoha"
 		]);
 		expect(characters.worldEntries).toHaveLength(9);
+		expect(orderWorldEntriesForDisplay(characters.worldEntries).map(entry => entry.id)).toEqual([
+			"apex-army",
+			"team-rimlaw-star-hunters",
+			"zego-order",
+			"bitgam",
+			"galgri-and-galnoids",
+			"council-of-orpex",
+			"zlugnoid-hive-wars",
+			"linkpods-and-cbots",
+			"fz-and-oddverse"
+		]);
+		expect(featuredWorldEntryIds).toEqual(["apex-army", "bitgam", "zlugnoid-hive-wars"]);
+
+		const customEntries = [
+			{ ...characters.worldEntries[0], id: "owner-entry-one", title: "Owner entry one" },
+			{ ...characters.worldEntries[0], id: "owner-entry-two", title: "Owner entry two" }
+		];
+		const sourceEntries = [customEntries[0], ...characters.worldEntries, customEntries[1]];
+		const sourceOrder = sourceEntries.map(entry => entry.id);
+		const displayedEntries = orderWorldEntriesForDisplay(sourceEntries);
+
+		expect(displayedEntries.slice(-2).map(entry => entry.id)).toEqual(["owner-entry-one", "owner-entry-two"]);
+		expect(sourceEntries.map(entry => entry.id)).toEqual(sourceOrder);
 		expect(retroverseWorlds).toHaveLength(4);
 		expect(retroverseConflicts.map(feature => feature.title)).toEqual([
 			"The Zlugnoid Hive Wars",
