@@ -263,6 +263,8 @@ useHead({
 	border: 0.35rem solid #fff7ec;
 	border-radius: 0.45rem;
 	background: #f4eadc;
+	color: #31405a;
+	font-size: 0.86rem;
 	box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.28);
 }
 
@@ -274,8 +276,12 @@ useHead({
 	display: grid;
 	gap: 1.2rem;
 	padding: clamp(1.25rem, 3vw, 2rem);
-	background: rgba(249, 234, 219, 0.98);
-	color: #0b1323;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background:
+		radial-gradient(circle at 8% 94%, rgba(255, 148, 89, 0.1), transparent 28%),
+		linear-gradient(145deg, rgba(9, 24, 42, 0.98), rgba(15, 7, 22, 0.98));
+	background-color: #09182a;
+	color: var(--ink-on-deep);
 }
 
 .artwork-browser__header {
@@ -292,7 +298,7 @@ useHead({
 }
 
 .artwork-browser .artwork-page__eyebrow {
-	color: #9d360d;
+	color: var(--accent-gold);
 }
 
 .artwork-browser h2 {
@@ -313,16 +319,20 @@ useHead({
 
 .artwork-browser__search input {
 	width: 100%;
-	border: 1px solid rgba(11, 19, 35, 0.18);
+	border: 1px solid rgba(255, 255, 255, 0.12);
 	border-radius: var(--radius-control);
-	background: #fffaf3;
-	color: #0b1323;
+	background: rgba(5, 13, 25, 0.78);
+	color: var(--ink-on-deep);
 	font: inherit;
 	font-size: 1rem;
 	font-weight: 500;
 	letter-spacing: normal;
 	padding: 0.78rem 0.9rem;
 	text-transform: none;
+}
+
+.artwork-browser__search input::placeholder {
+	color: rgba(239, 244, 255, 0.5);
 }
 
 .artwork-filters {
@@ -335,19 +345,19 @@ useHead({
 	display: inline-flex;
 	align-items: center;
 	gap: 0.5rem;
-	border: 1px solid rgba(11, 19, 35, 0.14);
+	border: 1px solid rgba(255, 255, 255, 0.11);
 	border-radius: var(--radius-pill);
-	background: rgba(255, 255, 255, 0.62);
-	color: #263650;
+	background: rgba(255, 255, 255, 0.065);
+	color: #eef4ff;
 	cursor: pointer;
 	font-weight: 800;
 	padding: 0.62rem 0.85rem;
 }
 
 .artwork-filters button[aria-pressed="true"] {
-	border-color: #9d360d;
-	background: #9d360d;
-	color: #fff8ef;
+	border-color: var(--accent-sun);
+	background: var(--accent-sun);
+	color: #180124;
 }
 
 .artwork-filters span {
@@ -356,17 +366,17 @@ useHead({
 	min-width: 1.7rem;
 	padding: 0.14rem 0.35rem;
 	border-radius: var(--radius-pill);
-	background: rgba(11, 19, 35, 0.1);
+	background: rgba(255, 255, 255, 0.1);
 	font-size: 0.76rem;
 }
 
 .artwork-filters button[aria-pressed="true"] span {
-	background: rgba(255, 255, 255, 0.18);
+	background: rgba(24, 1, 36, 0.14);
 }
 
 .artwork-browser__status,
 .artwork-browser__empty {
-	color: #4d5f79;
+	color: var(--ink-on-deep-muted);
 	font-weight: 700;
 }
 
@@ -382,10 +392,10 @@ useHead({
 	min-width: 0;
 	margin: 0;
 	padding: 0.65rem;
-	border: 1px solid rgba(11, 19, 35, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.09);
 	border-radius: var(--radius-card);
-	background: #fffaf3;
-	box-shadow: 0 0.55rem 1.2rem rgba(11, 19, 35, 0.08);
+	background: var(--surface-deep-raised);
+	box-shadow: 0 0.55rem 1.2rem rgba(0, 0, 0, 0.16);
 }
 
 .artwork-card a {
@@ -396,8 +406,9 @@ useHead({
 	border-radius: calc(var(--radius-card) - 0.3rem);
 	background:
 		linear-gradient(rgba(11, 19, 35, 0.035) 1px, transparent 1px),
-		linear-gradient(90deg, rgba(11, 19, 35, 0.035) 1px, transparent 1px), #f2eadf;
+		linear-gradient(90deg, rgba(11, 19, 35, 0.035) 1px, transparent 1px), #dfd3c3;
 	background-size: 1rem 1rem;
+	color: #31405a;
 }
 
 .artwork-card a:focus-visible {
@@ -427,13 +438,13 @@ useHead({
 }
 
 .artwork-card strong {
-	color: #0f1e35;
+	color: var(--ink-on-deep);
 	line-height: 1.2;
 	overflow-wrap: anywhere;
 }
 
 .artwork-card span {
-	color: #9d360d;
+	color: #ffb071;
 	font-size: 0.74rem;
 	font-weight: 800;
 	letter-spacing: var(--tracking-ui);

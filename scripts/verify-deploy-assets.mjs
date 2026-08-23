@@ -13,9 +13,11 @@ const relativePaths = {
 	contentHandoff: "deploy/content/SERVER_AI_HANDOFF.md",
 	contentManifest: "deploy/content/tyler-site-content-v1.json",
 	environment: "deploy/systemd/retrozetro.env.example",
+	homePage: "front-end/src/pages/index.vue",
 	locale: "front-end/locales/en.json",
 	install: "deploy/systemd/install-service.sh",
 	legacyRuntime: "back-end/src/config/legacyDeployment.ts",
+	mainStyles: "front-end/src/styles/main.css",
 	nginx: "deploy/nginx/retrozetro.locations.conf",
 	npmHelper: "scripts/run-pinned-npm.mjs",
 	ownerStaticSecurity: "scripts/write-owner-static-security.mjs",
@@ -26,6 +28,7 @@ const relativePaths = {
 	releaseWorkflow: ".github/workflows/release-source.yml",
 	runtimeServer: "back-end/src/server.ts",
 	service: "deploy/systemd/retrozetro.service",
+	siteAdSlot: "front-end/src/components/SiteAdSlot.vue",
 	startupDiagnostics: "scripts/verify-startup-diagnostics.mjs",
 	storage: "back-end/src/services/storage.ts",
 	worldEntryCards: "front-end/src/components/WorldEntryCards.vue",
@@ -66,9 +69,11 @@ const [
 	contentHandoff,
 	contentManifestText,
 	environment,
+	homePage,
 	installPolicy,
 	legacyRuntime,
 	localeText,
+	mainStyles,
 	nginx,
 	npmHelper,
 	ownerStaticSecurity,
@@ -78,6 +83,7 @@ const [
 	releaseWorkflow,
 	runtimeServer,
 	service,
+	siteAdSlot,
 	startupDiagnostics,
 	storage,
 	worldEntryCards,
@@ -91,9 +97,11 @@ const [
 	read(relativePaths.contentHandoff),
 	read(relativePaths.contentManifest),
 	read(relativePaths.environment),
+	read(relativePaths.homePage),
 	read(relativePaths.installPolicy),
 	read(relativePaths.legacyRuntime),
 	read(relativePaths.locale),
+	read(relativePaths.mainStyles),
 	read(relativePaths.nginx),
 	read(relativePaths.npmHelper),
 	read(relativePaths.ownerStaticSecurity),
@@ -103,6 +111,7 @@ const [
 	read(relativePaths.releaseWorkflow),
 	read(relativePaths.runtimeServer),
 	read(relativePaths.service),
+	read(relativePaths.siteAdSlot),
 	read(relativePaths.startupDiagnostics),
 	read(relativePaths.storage),
 	read(relativePaths.worldEntryCards),
@@ -158,6 +167,9 @@ for (const [index, storageKey] of artworkStorageKeys.entries()) {
 	assert.match(storageKey, new RegExp(`/\\b${expectedSequence}-[a-f0-9]{16}\\.jpg$`));
 }
 assert.equal(contentManifest.siteContent["home-page"].showcaseItems, 7);
+assert.equal(contentManifest.siteContent["home-page"].visualPresentation.surface, "dark-retroverse");
+assert.equal(contentManifest.siteContent["home-page"].visualPresentation.oddFinalCard, "full-width-desktop");
+assert.equal(contentManifest.siteContent["home-page"].visualPresentation.mobileColumns, 1);
 assert.equal(contentManifest.siteContent["about-page"].storyArcs, 2);
 assert.equal(contentManifest.siteContent["characters-page"].characters, 6);
 assert.equal(contentManifest.siteContent["characters-page"].worldEntries, 9);
@@ -199,7 +211,14 @@ assert.match(worldEntryCards, /@media \(max-width: 720px\)/);
 assert.equal(contentManifest.siteContent["worlds-page"].worlds, 4);
 assert.equal(contentManifest.siteContent["worlds-page"].conflicts, 3);
 assert.equal(contentManifest.siteContent["worlds-page"].technologyEntries, 4);
+assert.equal(contentManifest.siteContent["worlds-page"].visualPresentation.collectionSurface, "dark-retroverse");
+assert.equal(contentManifest.siteContent["worlds-page"].visualPresentation.sideAdDesktopColumns, 1);
+assert.equal(contentManifest.siteContent["worlds-page"].visualPresentation.mobileColumns, 1);
 assert.equal(contentManifest.siteContent["artwork-page"].reviewedImages, 85);
+assert.equal(contentManifest.siteContent["artwork-page"].visualPresentation.gallerySurface, "dark-retroverse");
+assert.equal(contentManifest.siteContent["artwork-page"].visualPresentation.paperToneUse, "artwork-frames-only");
+assert.equal(contentManifest.visualPresentation.adPlaceholders, "muted-dark");
+assert.equal(contentManifest.visualPresentation.controlRadius, "8px");
 const publicationBoundaries = contentManifest.publicationBoundaries.join("\n");
 assert.match(publicationBoundaries, /remain distinct story arcs/);
 assert.match(publicationBoundaries, /85 reviewed hand-drawn images/);
@@ -222,9 +241,19 @@ for (const publicContentSource of [artworkPage, worldEntryPresentation, worldsDa
 }
 assert.match(artworkPage, /85 hand-drawn/);
 assert.match(artworkPage, /Show more artwork/);
+assert.match(artworkPage, /background-color: #09182a/);
+assert.doesNotMatch(artworkPage, /background: rgba\(249, 234, 219/);
+assert.match(homePage, /background-color: #0a1627/);
+assert.match(homePage, /last-child:nth-child\(odd\)/);
+assert.doesNotMatch(homePage, /background: rgba\(249, 234, 219/);
+assert.match(mainStyles, /--radius-control: var\(--radius-field\)/);
+assert.match(siteAdSlot, /rgba\(18, 11, 27, 0\.88\)/);
 assert.match(worldsPage, /Planets and peoples/);
 assert.match(worldsPage, /Wars and adventures/);
 assert.match(worldsPage, /Machines and armor/);
+assert.match(worldsPage, /worlds-section--atlas/);
+assert.match(worldsPage, /background-color: #09182a/);
+assert.doesNotMatch(worldsPage, /worlds-section--light/);
 
 for (const requiredHandoffLanguage of [
 	"verified transactional compatibility deployment",
@@ -245,7 +274,9 @@ for (const requiredHandoffLanguage of [
 	"Public defaults must",
 	"SOURCE_DATE_EPOCH",
 	"isolated automated editor and backend draft tests",
-	"separate explicit authorization"
+	"separate explicit authorization",
+	"muted dark palette",
+	"bright full-section paper background"
 ]) {
 	assert.match(contentHandoff, new RegExp(requiredHandoffLanguage));
 }

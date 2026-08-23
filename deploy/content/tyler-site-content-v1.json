@@ -159,7 +159,12 @@
 		"home-page": {
 			"sourceDefault": "front-end/src/content/defaultHomePageContent.ts",
 			"serverDefault": "back-end/src/content/defaultHomePageContent.ts",
-			"showcaseItems": 7
+			"showcaseItems": 7,
+			"visualPresentation": {
+				"surface": "dark-retroverse",
+				"oddFinalCard": "full-width-desktop",
+				"mobileColumns": 1
+			}
 		},
 		"about-page": {
 			"sourceDefault": "front-end/src/content/defaultAboutPageContent.ts",
@@ -191,13 +196,26 @@
 			"sourceData": "front-end/src/content/retroverseWorlds.ts",
 			"worlds": 4,
 			"conflicts": 3,
-			"technologyEntries": 4
+			"technologyEntries": 4,
+			"visualPresentation": {
+				"collectionSurface": "dark-retroverse",
+				"sideAdDesktopColumns": 1,
+				"mobileColumns": 1
+			}
 		},
 		"artwork-page": {
 			"sourcePage": "front-end/src/pages/artwork.vue",
 			"sourceData": "front-end/src/content/tylerArtwork.ts",
-			"reviewedImages": 85
+			"reviewedImages": 85,
+			"visualPresentation": {
+				"gallerySurface": "dark-retroverse",
+				"paperToneUse": "artwork-frames-only"
+			}
 		}
+	},
+	"visualPresentation": {
+		"adPlaceholders": "muted-dark",
+		"controlRadius": "8px"
 	},
 	"sourceEvidenceIds": [
 		"SM-0025",

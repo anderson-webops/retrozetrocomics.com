@@ -13,6 +13,8 @@ activation. Do not infer additional canon or publish any source archive document
   conflict, connected worlds and peoples, and the wider wars and technology.
 - The new Artwork page presents the exact 85 reviewed hand-drawn images listed in
   `deploy/content/tyler-site-content-v1.json`, with filters and full-size views.
+- The Home showcase, Worlds collections, Artwork gallery, and empty advertisement placements use the continuous muted
+  dark Retroverse palette. Paper tones remain limited to bounded artwork frames.
 - Public copy presents the stories and worlds directly without publishing archive notes, source-message history, or
   editorial commentary.
 - The owner workspace includes **Edit the home page**, with private drafts, preview, media-library selection,
@@ -124,19 +126,25 @@ authorizes and reviews it.
    technology entries. Require `/artwork` to expose all 85 manifest-listed reviewed images, six category filters plus
    **All artwork**, a search control, the progressive **Show more artwork** control, and full-size image links. Confirm
    the seven excluded images and every other archive category remain absent.
-7. From an authenticated owner session, verify **Edit the home page** loads and displays its preview and media-library
+7. At desktop and phone widths, require the home showcase, both Worlds collection sections, Artwork gallery, and empty
+   advertisement placements to use the muted dark palette. Reject the former bright full-section paper background.
+   Require the seventh home showcase card to span the final desktop row and return to one column on phones. When side
+   ads are visible, require Worlds collection cards to use one readable column instead of paired narrow cards. Confirm
+   missing-image text remains readable, controls retain rounded corners, and no public route develops horizontal
+   overflow. Do not require loaded hand-drawn images themselves to be darkened or transformed.
+8. From an authenticated owner session, verify **Edit the home page** loads and displays its preview and media-library
    controls without cropping. Do not save a live private draft, especially when `SiteContent` is absent and writes are
    prohibited. Require the isolated automated editor and backend draft tests to pass instead. Any live draft save
    requires separate explicit authorization plus documented database rollback instructions. Do not publish a test
    change.
-8. Verify all 85 public image URLs return HTTP 200 with image content types. Require the five baseline URLs to match
+9. Verify all 85 public image URLs return HTTP 200 with image content types. Require the five baseline URLs to match
    each entry's `storedSanitizedSha256`, and require every URL's bytes to match its own pre-deploy stored-byte hash.
    Verify fallback SVGs remain available, but confirm the public cards display the imported drawings. Do not compare
    the public bytes with `sourceSha256`.
-9. Recheck the 85 imported media records and the pre-deploy upload invariants: content, path, stored sanitized hash,
+10. Recheck the 85 imported media records and the pre-deploy upload invariants: content, path, stored sanitized hash,
    ownership, mode, ACLs, and file count. Require zero media-record, audit-import, or unrelated-content changes from
    deployment. A `ctime` refresh alone is permitted and is not evidence of a content change.
-10. Recheck security headers, owner-route noindex behavior, unauthorized admin response, IPv4 and IPv6 public health,
+11. Recheck security headers, owner-route noindex behavior, unauthorized admin response, IPv4 and IPv6 public health,
    and the intended `www` redirect.
 
 ## Rollback and report

@@ -56,7 +56,7 @@ useHead({
 			</div>
 		</section>
 
-		<section class="worlds-section worlds-section--light" aria-labelledby="worlds-title">
+		<section class="worlds-section worlds-section--atlas" aria-labelledby="worlds-title">
 			<header class="worlds-section__header">
 				<p class="worlds-page__eyebrow">Planets and peoples</p>
 				<h2 id="worlds-title">Four corners of the Retroverse</h2>
@@ -137,7 +137,7 @@ useHead({
 			</div>
 		</section>
 
-		<section class="worlds-section worlds-section--light" aria-labelledby="technology-title">
+		<section class="worlds-section worlds-section--atlas" aria-labelledby="technology-title">
 			<header class="worlds-section__header">
 				<p class="worlds-page__eyebrow">Machines and armor</p>
 				<h2 id="technology-title">Built for alien battlefields</h2>
@@ -279,6 +279,8 @@ useHead({
 	border: 0.35rem solid rgba(255, 248, 239, 0.95);
 	border-radius: 50% 50% 44% 56% / 52% 42% 58% 48%;
 	background: #f2eadf;
+	color: #31405a;
+	font-size: 0.9rem;
 	box-shadow: 0 1.3rem 2.8rem rgba(0, 0, 0, 0.32);
 }
 
@@ -302,9 +304,13 @@ useHead({
 	padding: clamp(1.4rem, 4vw, 2.4rem);
 }
 
-.worlds-section--light {
-	background: rgba(249, 234, 219, 0.98);
-	color: #0b1323;
+.worlds-section--atlas {
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background:
+		radial-gradient(circle at 92% 8%, rgba(124, 225, 246, 0.09), transparent 30%),
+		linear-gradient(145deg, rgba(9, 24, 42, 0.98), rgba(8, 13, 24, 0.98));
+	background-color: #09182a;
+	color: var(--ink-on-deep);
 }
 
 .worlds-section--dark {
@@ -318,8 +324,8 @@ useHead({
 	max-width: 64ch;
 }
 
-.worlds-section--light .worlds-page__eyebrow {
-	color: #9d360d;
+.worlds-section--atlas .worlds-page__eyebrow {
+	color: var(--accent-gold);
 }
 
 .worlds-section h2 {
@@ -329,7 +335,7 @@ useHead({
 }
 
 .worlds-section__header > p:last-child {
-	color: #4d5f79;
+	color: var(--ink-on-deep-muted);
 	line-height: 1.7;
 }
 
@@ -350,9 +356,9 @@ useHead({
 	grid-template-columns: minmax(8.5rem, 0.78fr) minmax(0, 1.22fr);
 	min-width: 0;
 	overflow: hidden;
-	border: 1px solid rgba(11, 19, 35, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.09);
 	border-radius: var(--radius-card);
-	background: #fffaf3;
+	background: var(--surface-deep-raised);
 }
 
 .world-card--text-only {
@@ -364,7 +370,7 @@ useHead({
 	display: grid;
 	place-items: stretch;
 	min-height: 15rem;
-	background: #ece1d5;
+	background: rgba(4, 12, 23, 0.7);
 }
 
 .world-card__media--pair,
@@ -380,6 +386,8 @@ useHead({
 	min-height: 0;
 	object-fit: contain;
 	padding: 0.45rem;
+	color: var(--ink-on-deep-muted);
+	font-size: 0.86rem;
 }
 
 .world-card__sigil {
@@ -410,7 +418,7 @@ useHead({
 .world-card__copy > p,
 .technology-card__copy > p,
 .conflict-card__copy > p {
-	color: #9d360d;
+	color: #ffb071;
 	font-size: 0.74rem;
 	font-weight: 800;
 	letter-spacing: var(--tracking-eyebrow);
@@ -428,7 +436,7 @@ useHead({
 .world-card__body,
 .technology-card__copy > div,
 .conflict-card__body {
-	color: #31405a;
+	color: var(--ink-on-deep-muted);
 	line-height: 1.65;
 }
 
@@ -444,7 +452,7 @@ useHead({
 }
 
 .world-card dt {
-	color: #4d5f79;
+	color: #a8dce7;
 	font-size: 0.7rem;
 	font-weight: 800;
 	letter-spacing: var(--tracking-ui);
@@ -452,6 +460,7 @@ useHead({
 }
 
 .world-card dd {
+	color: var(--ink-on-deep);
 	font-weight: 800;
 }
 
@@ -538,6 +547,13 @@ useHead({
 
 	.worlds-hero__art {
 		min-height: 18rem;
+	}
+}
+
+@media (min-width: 1101px) {
+	.world-card-grid,
+	.technology-grid {
+		grid-template-columns: 1fr;
 	}
 }
 

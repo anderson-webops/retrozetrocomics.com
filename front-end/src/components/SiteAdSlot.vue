@@ -25,18 +25,19 @@ const props = withDefaults(
 	justify-content: center;
 	min-width: 0;
 	overflow: hidden;
-	border: 1px solid rgba(255, 255, 255, 0.18);
+	border: 1px solid rgba(255, 210, 125, 0.13);
 	background:
-		linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent 24%),
+		linear-gradient(135deg, rgba(255, 148, 89, 0.09), transparent 30%),
 		repeating-linear-gradient(
 			45deg,
-			rgba(255, 255, 255, 0.08) 0,
-			rgba(255, 255, 255, 0.08) 1px,
+			rgba(255, 255, 255, 0.025) 0,
+			rgba(255, 255, 255, 0.025) 1px,
 			transparent 1px,
 			transparent 10px
 		),
-		rgba(205, 205, 205, 0.92);
-	color: rgba(24, 10, 22, 0.62);
+		rgba(18, 11, 27, 0.88);
+	color: rgba(255, 244, 231, 0.5);
+	box-shadow: inset 0 0 1.8rem rgba(0, 0, 0, 0.18);
 	text-transform: uppercase;
 	letter-spacing: var(--tracking-eyebrow);
 	font-size: 0.68rem;
@@ -48,7 +49,7 @@ const props = withDefaults(
 	content: "";
 	position: absolute;
 	inset: 0.45rem;
-	border: 1px solid rgba(24, 10, 22, 0.12);
+	border: 1px solid rgba(255, 255, 255, 0.055);
 	pointer-events: none;
 }
 
