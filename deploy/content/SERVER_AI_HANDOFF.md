@@ -89,8 +89,10 @@ authorizes and reviews it.
    time separately.
 3. Require `GET /api/site-content/home` to return four showcase items in this order: The List, The Fall of a Dream,
    Exo Dexus, Bitgam. Require each primary image path to match the manifest.
-4. Require `GET /api/site-content/about` to return two items labeled **Working story file** and to state that their
-   exact relationship remains for Tyler to confirm.
+4. Require `GET /api/site-content/about` to return **The List** labeled **Investigation arc** and **The Fall of a
+   Dream** labeled **Rebellion arc**. Public copy must present the story directly, without mentioning source notes,
+   working files, draft status, final canon, or a relationship awaiting confirmation. Preserve source uncertainty by
+   making no unsupported claim about the two arcs' sequence or continuity relationship.
 5. Require `GET /api/site-content/characters` to return Exo Dexus and Fazo plus five source-backed world or faction
    entries. Do not accept the former invented role text for Zetro, Kazay, Exo, Shaman, or Zorix as fallback output.
 6. From an authenticated owner session, verify **Edit the home page** loads and displays its preview and media-library

@@ -5,39 +5,39 @@ export function createDefaultCharactersPageContent() {
 		characters: [
 			{
 				description:
-					"Exo Dexus leads Team Rimlaw, infiltrates an Apex moon base, searches for his mother and a missing friend, and confronts Zego in the developing crisis.",
+					"Exo Dexus leads Team Rimlaw, infiltrates an Apex moon base, searches for his mother and a missing friend, and confronts Zego in the war for the Apex Army.",
 				fallbackImage: "/brand/characters-exo.svg",
 				frequency: "Searching for his mother and a missing friend",
 				id: "exo-dexus",
 				image: `${tylerHandDrawnBase}/012-198b5c15c9c93a50.jpg`,
-				imgAlt: "Tyler's hand-drawn first new design for Exo Dexus.",
+				imgAlt: "Hand-drawn character design for Exo Dexus.",
 				name: "Exo Dexus",
 				role: "Team Rimlaw leader",
 				specialty: "Apex moon-base infiltration and investigation"
 			},
 			{
 				description:
-					"Fazo is a recurring character who was born and raised on Bitgam. Tyler notes that some later sketches give him white eyes.",
+					"Fazo was born and raised on Bitgam, home to the red-skinned, exoskeleton-bearing people of Gambit Pointe.",
 				fallbackImage: "/brand/world-bitgam.svg",
 				frequency: "Born and raised on Bitgam",
 				id: "fazo",
 				image: `${tylerHandDrawnBase}/005-0905d798b55c8bb8.jpg`,
-				imgAlt: "Tyler's hand-drawn colored portrait of Fazo, a character from Bitgam.",
+				imgAlt: "Hand-drawn colored portrait of Fazo, a character from Bitgam.",
 				name: "Fazo",
-				role: "Recurring Bitgam character",
-				specialty: "Further story details are still in development"
+				role: "Bitgam native",
+				specialty: "Homeworld: Bitgam"
 			}
 		],
 		description:
-			"Meet the characters Tyler has directly named and described, followed by the factions, places, and terms connected to their stories.",
-		eyebrow: "Tyler's Characters and Worlds",
+			"Meet Exo Dexus and Fazo, then explore the armies, outlaw crews, councils, and worlds caught in the Zego Order's expanding war.",
+		eyebrow: "The Retroverse",
 		heroImage: `${tylerHandDrawnBase}/084-fb97b37cd5c66f0e.jpg`,
-		heroImageAlt: "Tyler's hand-drawn colored portrait of Exo Dexus.",
+		heroImageAlt: "Hand-drawn colored portrait of Exo Dexus.",
 		heroImageFallback: "/brand/characters-exo.svg",
-		title: "Meet Tyler's Characters",
+		title: "Heroes, outlaws, and armies",
 		worldEntries: [
 			{
-				body: "Team Rimlaw is Exo's outlaw group. In this story continuity, organized outlaw teams are known as Star Hunters and pursue Apex members responsible for crimes on other planets.",
+				body: "Team Rimlaw is Exo's outlaw group. Star Hunters are organized outlaw teams that pursue Apex members responsible for crimes on other planets.",
 				facts: [
 					{
 						label: "Leader",
@@ -49,7 +49,7 @@ export function createDefaultCharactersPageContent() {
 					}
 				],
 				id: "team-rimlaw-star-hunters",
-				label: "Faction and Term Note",
+				label: "Outlaw faction",
 				title: "Team Rimlaw and the Star Hunters"
 			},
 			{
@@ -61,11 +61,11 @@ export function createDefaultCharactersPageContent() {
 					}
 				],
 				id: "apex-army",
-				label: "Faction Note",
+				label: "Military power",
 				title: "Apex Army"
 			},
 			{
-				body: "The Zego Order is the force behind the Apex takeover in Tyler's central plot notes. Tyler has not yet confirmed Zego's exact title or relationship to the order.",
+				body: "The Zego Order stands behind the Apex takeover. Its methods include infiltration, impersonation, altered symbols, and robot forces.",
 				facts: [
 					{
 						label: "Named opponent",
@@ -77,7 +77,7 @@ export function createDefaultCharactersPageContent() {
 					}
 				],
 				id: "zego-order",
-				label: "Faction Note",
+				label: "Enemy faction",
 				title: "Zego Order"
 			},
 			{
@@ -92,16 +92,16 @@ export function createDefaultCharactersPageContent() {
 						value: "Gamborus"
 					},
 					{
-						label: "Open question",
-						value: "What happened during the Great Manifested?"
+						label: "Ancient mystery",
+						value: "The Great Manifested"
 					}
 				],
 				id: "bitgam",
-				label: "World Note",
+				label: "Planet",
 				title: "Bitgam"
 			},
 			{
-				body: "The Council of Orpex asks Team Rimlaw for help during the crisis. Orpex is the Orpenoid homeworld, but Tyler has not yet defined the council's membership or full authority.",
+				body: "The Council of Orpex calls on Team Rimlaw for help during the Apex crisis. Orpex is the homeworld of the Orpenoids.",
 				facts: [
 					{
 						label: "Homeworld",
@@ -113,7 +113,7 @@ export function createDefaultCharactersPageContent() {
 					}
 				],
 				id: "council-of-orpex",
-				label: "World and Faction Note",
+				label: "Council",
 				title: "Council of Orpex"
 			}
 		]

@@ -10,7 +10,7 @@ import { siteAssetCandidates } from "@/lib/siteAssets";
 			</RouterLink>
 			<div class="title-plate__text">
 				<span>RetroZetro Comics</span>
-				<p>Stories, characters, and world notes from the Retroverse.</p>
+				<p>Stories, characters, and worlds from the Retroverse.</p>
 			</div>
 		</div>
 	</header>

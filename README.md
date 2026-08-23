@@ -43,7 +43,7 @@ npm run audit:production
 - Current site content accepts media-library paths and bundled `/brand/` or `/legacy-images/` files. Deliberate external
   image hosting remains available by listing exact HTTPS DNS hostnames in `CONTENT_IMAGE_HOSTS`; those same hosts are
   added narrowly to the browser image policy.
-- The home page, story files, characters, and world notes all use the managed `SiteContent` API. When a page has no
+- The home page, story arcs, characters, and world entries all use the managed `SiteContent` API. When a page has no
   database record, reviewed source defaults remain available. The initial Tyler content references five existing local
   media-library files without copying or re-uploading them. See
   [`deploy/content/tyler-site-content-v1.json`](./deploy/content/tyler-site-content-v1.json) for distinct raw

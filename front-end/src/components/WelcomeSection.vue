@@ -37,7 +37,7 @@ const props = defineProps({
 	},
 	message: {
 		default:
-			"Exo Dexus and Team Rimlaw uncover a hidden takeover inside the Apex Army as Tyler's wider cast and worlds continue to develop.",
+			"Exo Dexus and Team Rimlaw uncover a hidden takeover inside the Apex Army, where altered symbols and vanished soldiers point to the Zego Order.",
 		type: String
 	},
 	title: {
@@ -60,21 +60,21 @@ interface HeroHighlight {
 
 const defaultActions: HeroAction[] = [
 	{ label: "Meet the Characters", style: "primary", to: "/characters" },
-	{ label: "About the Project", style: "secondary", to: "/about" }
+	{ label: "Enter the Story", style: "secondary", to: "/about" }
 ];
 
 const defaultHighlights: HeroHighlight[] = [
 	{
-		description: "The search that exposes a deeper enemy.",
+		description: "Exo's search for his mother uncovers a deeper enemy.",
 		term: "The List"
 	},
 	{
-		description: "The Apex Army fractures from within.",
+		description: "The Apex Army fractures as the Zego Order takes control.",
 		term: "The Fall of a Dream"
 	},
 	{
-		description: "Characters, factions, places, and open questions from Tyler's notes.",
-		term: "Tyler's Worlds"
+		description: "Moon bases, outlaw crews, alien worlds, and a war spreading across the stars.",
+		term: "The Retroverse"
 	}
 ];
 

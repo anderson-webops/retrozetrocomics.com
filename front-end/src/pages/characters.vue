@@ -213,7 +213,7 @@ async function undoWorldEntryRemoval() {
 		<WelcomeSection
 			:actions="[
 				{
-					label: 'About the Project',
+					label: 'Enter the Story',
 					style: 'primary',
 					to: '/about'
 				},

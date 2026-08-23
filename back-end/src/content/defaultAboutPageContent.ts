@@ -12,11 +12,11 @@ export function createDefaultAboutPageContent() {
 				id: "arc-the-list",
 				incitingIncident:
 					"During the search, Exo discovers that a friend is missing and notices that the Apex symbols have changed.",
-				label: "Working story file",
+				label: "Investigation arc",
 				midpoint:
 					"Diyo discovers unexplained deaths or disappearances while Giza and Oix follow biological evidence connected to a false Pexus.",
 				note:
-					"Tyler's two plot outlines may be sequential, parallel, or alternate drafts. Their exact relationship remains for Tyler to confirm.",
+					"Every clue inside the moon base pulls Exo beyond his personal search and toward the enemy consuming the Apex Army.",
 				resolution:
 					"Evidence exposes the takeover and begins restoring trust in the loyal Apex Army, but Exo's personal search and the larger threat may continue.",
 				thirdPlotPoint:
@@ -33,12 +33,11 @@ export function createDefaultAboutPageContent() {
 				id: "arc-fall-of-a-dream",
 				incitingIncident:
 					"A bite from Pexus's wife's pet gives Giza material for a DNA test, leading Giza and Oix to investigate a false Pexus.",
-				label: "Working story file",
+				label: "Rebellion arc",
 				midpoint:
 					"Loyal Apex members and the Star Hunters work together because neither side can defeat the takeover alone.",
-				note:
-					"Tyler's two plot outlines may be sequential, parallel, or alternate drafts. Their exact relationship remains for Tyler to confirm.",
-				resolution: "Tyler's ending says the war may be over, but the larger battle has only begun.",
+				note: "Defeating the impostor can end the immediate war, but Zego's wider campaign has only begun.",
+				resolution: "The immediate war may be over, but the larger battle has only begun.",
 				thirdPlotPoint:
 					"Evidence of the operation restores public faith in loyal Apex members and gives the alliance a path toward the impostor and Zego.",
 				title: "The Fall of a Dream"

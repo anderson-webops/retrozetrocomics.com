@@ -7,14 +7,14 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 		<div class="footer__brand">
 			<p class="footer__eyebrow">RetroZetro Comics</p>
 			<h2>Stay in the Retroverse</h2>
-			<p>Stories, characters, and world notes from the Retroverse.</p>
+			<p>Stories, characters, and worlds from the Retroverse.</p>
 		</div>
 
 		<nav aria-label="Footer navigation" class="footer__links">
 			<h3>Explore</h3>
 			<div class="footer__link-list">
 				<RouterLink to="/characters">Characters</RouterLink>
-				<RouterLink to="/about">About the project</RouterLink>
+				<RouterLink to="/about">The story</RouterLink>
 				<RouterLink to="/contact">Contact</RouterLink>
 			</div>
 		</nav>

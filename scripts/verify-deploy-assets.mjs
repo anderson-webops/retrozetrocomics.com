@@ -11,6 +11,7 @@ const relativePaths = {
 	contentHandoff: "deploy/content/SERVER_AI_HANDOFF.md",
 	contentManifest: "deploy/content/tyler-site-content-v1.json",
 	environment: "deploy/systemd/retrozetro.env.example",
+	locale: "front-end/locales/en.json",
 	install: "deploy/systemd/install-service.sh",
 	legacyRuntime: "back-end/src/config/legacyDeployment.ts",
 	nginx: "deploy/nginx/retrozetro.locations.conf",
@@ -59,6 +60,7 @@ const [
 	environment,
 	installPolicy,
 	legacyRuntime,
+	localeText,
 	nginx,
 	npmHelper,
 	ownerStaticSecurity,
@@ -77,6 +79,7 @@ const [
 	read(relativePaths.environment),
 	read(relativePaths.installPolicy),
 	read(relativePaths.legacyRuntime),
+	read(relativePaths.locale),
 	read(relativePaths.nginx),
 	read(relativePaths.npmHelper),
 	read(relativePaths.ownerStaticSecurity),
@@ -91,6 +94,7 @@ const [
 ]);
 
 const contentManifest = JSON.parse(contentManifestText);
+const locale = JSON.parse(localeText);
 const expectedSanitizedHashes = new Map([
 	[
 		"content/tyler-handdrawn-v1/063-ba7430851cc35538.jpg",
@@ -120,6 +124,10 @@ assert.equal(contentManifest.expectedImportedMedia.liveOwnership.user, "tyler");
 assert.equal(contentManifest.expectedImportedMedia.liveOwnership.group, "site_retrozetro");
 assert.equal(contentManifest.expectedImportedMedia.liveOwnership.mode, "0600");
 assert.equal(contentManifest.referencedMedia.length, expectedSanitizedHashes.size);
+const publicationBoundaries = contentManifest.publicationBoundaries.join("\n");
+assert.match(publicationBoundaries, /remain distinct story arcs/);
+assert.doesNotMatch(publicationBoundaries, /labeled working story files/i);
+assert.equal(locale.site.description, "Stories, characters, and worlds from the Retroverse.");
 for (const media of contentManifest.referencedMedia) {
 	assert.equal(expectedSanitizedHashes.has(media.storageKey), true, `Unexpected storage key: ${media.storageKey}`);
 	assert.match(media.sourceSha256, /^[a-f0-9]{64}$/);
@@ -138,6 +146,9 @@ for (const requiredHandoffLanguage of [
 	"no media write or reimport",
 	"no automatic `SiteContent` seed",
 	"no publication action or state change",
+	"Investigation arc",
+	"Rebellion arc",
+	"Public copy must present the story directly",
 	"SOURCE_DATE_EPOCH",
 	"isolated automated editor and backend draft tests",
 	"separate explicit authorization"
@@ -150,6 +161,7 @@ assert.match(contentHandoff, /deployment\s+wall-clock time separately/);
 assert.match(contentHandoff, /not a symlink-based atomic release/);
 assert.doesNotMatch(contentHandoff, /established atomic compatibility-release procedure/);
 assert.doesNotMatch(contentHandoff, /saves a private\s+draft without changing the public API/);
+assert.doesNotMatch(contentHandoff, /Working story file|relationship remains for Tyler to confirm/);
 assert.match(releaseWorkflow, /SOURCE_DATE_EPOCH/);
 assert.match(releaseMetadata, /new Date\(sourceEpoch \* 1000\)\.toISOString\(\)/);
 

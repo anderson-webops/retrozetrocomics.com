@@ -29,7 +29,21 @@ describe("guided site content safety", () => {
 				title: "Bitgam"
 			})
 		]));
-		expect(String(content.developmentNote)).toMatch(/exact order and final canon/i);
+		expect(String(content.developmentNote)).toMatch(/Zego Order has turned the Apex Army against itself/i);
+	});
+
+	it("keeps editorial scaffolding out of every public default", () => {
+		const publicCopy = JSON.stringify([
+			createDefaultSiteContent("home"),
+			createDefaultSiteContent("about"),
+			createDefaultSiteContent("characters")
+		]);
+
+		expect(publicCopy).toContain("Investigation arc");
+		expect(publicCopy).toContain("Rebellion arc");
+		expect(publicCopy).not.toMatch(
+			/working story file|Tyler's (?:notes|messages|plot)|still (?:being )?developed|final canon|has not yet|further story details|exact relationship|open question/i
+		);
 	});
 
 	it("allows an unfinished home highlight only in a private draft", () => {

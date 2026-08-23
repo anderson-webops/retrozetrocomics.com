@@ -46,7 +46,7 @@ const highlights = computed(() =>
 );
 
 useHead({
-	title: "About the Project | RetroZetro Comics",
+	title: "The Story | RetroZetro Comics",
 	link: [
 		{
 			rel: "canonical",
@@ -56,15 +56,15 @@ useHead({
 	meta: [
 		{
 			name: "description",
-			content: "Learn the project context, active stories, and world details behind RetroZetro Comics."
+			content: "Follow Exo Dexus, Team Rimlaw, and the rebellion against the Zego Order inside the Apex Army."
 		},
 		{
 			property: "og:title",
-			content: "About the Project | RetroZetro Comics"
+			content: "The Story | RetroZetro Comics"
 		},
 		{
 			property: "og:description",
-			content: "Learn the project context, active stories, and world details behind RetroZetro Comics."
+			content: "Follow Exo Dexus, Team Rimlaw, and the rebellion against the Zego Order inside the Apex Army."
 		},
 		{
 			property: "og:url",
@@ -72,11 +72,11 @@ useHead({
 		},
 		{
 			name: "twitter:title",
-			content: "About the Project | RetroZetro Comics"
+			content: "The Story | RetroZetro Comics"
 		},
 		{
 			name: "twitter:description",
-			content: "Learn the project context, active stories, and world details behind RetroZetro Comics."
+			content: "Follow Exo Dexus, Team Rimlaw, and the rebellion against the Zego Order inside the Apex Army."
 		}
 	]
 });
@@ -220,10 +220,10 @@ async function undoWorldEntryRemoval() {
 					to: '/contact'
 				}
 			]"
-			eyebrow="Project"
+			eyebrow="The conflict"
 			:highlights="highlights"
 			:image-candidates="siteAssetCandidates.aboutHero"
-			image-alt="Tyler's hand-drawn colored portrait of Exo Dexus."
+			image-alt="Hand-drawn colored portrait of Exo Dexus."
 			:message="store.about.description"
 			:title="store.about.title"
 			actions-placement="poster"
@@ -233,10 +233,10 @@ async function undoWorldEntryRemoval() {
 		<section class="about-page__story-section">
 			<header class="about-page__section-header">
 				<p class="about-page__eyebrow">Stories</p>
-				<h2>The current conflicts</h2>
+				<h2>The war begins</h2>
 				<p>
-					The List begins with Exo's search. The Fall of a Dream shows what happens when the Apex Army starts
-					breaking from inside.
+					The List follows Exo's search through a compromised moon base. The Fall of a Dream follows the
+					rebellion that erupts when the Apex Army fractures.
 				</p>
 			</header>
 
@@ -259,9 +259,12 @@ async function undoWorldEntryRemoval() {
 
 		<section class="about-page__story-section">
 			<header class="about-page__section-header">
-				<p class="about-page__eyebrow">World Notes</p>
-				<h2>Terms, places, and factions</h2>
-				<p>These notes explain the names, places, and institutions a reader will meet across the stories.</p>
+				<p class="about-page__eyebrow">The Retroverse</p>
+				<h2>Worlds, powers, and alliances</h2>
+				<p>
+					From Team Rimlaw and the Star Hunters to Bitgam and Orpex, every world and faction has a place in
+					the widening conflict.
+				</p>
 			</header>
 
 			<div class="about-page__world-grid">
