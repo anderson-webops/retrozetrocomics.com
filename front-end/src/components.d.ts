@@ -20,6 +20,7 @@ declare module 'vue' {
     AdminMediaManager: typeof import('./components/admin/AdminMediaManager.vue')['default']
     AdminOwnerWorkspace: typeof import('./components/admin/AdminOwnerWorkspace.vue')['default']
     AdminSecurityPanel: typeof import('./components/admin/AdminSecurityPanel.vue')['default']
+    ContinueReading: typeof import('./components/ContinueReading.vue')['default']
     ResolvedImage: typeof import('./components/ResolvedImage.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

@@ -62,7 +62,11 @@ npm run audit:production
   and an unavailable or invalid published record returns an error instead of stale source defaults. `verify:publishing`
   checks the production renderer, and guided saves reject stale edit versions. Static-only builds are previews and do
   not provide this publishing contract.
-- All 85 default gallery links are in the initial HTML. Builds run `scripts/verify-public-html.mjs` to check the ten public
+- `/start` guides readers through the published story order; reading pages have previous/next links and an optional
+  device-local saved place. Owners can change the reading order through a private draft. `/search` searches published
+  stories, characters, world entries and gallery captions; results are server-rendered, noindex, and excluded from the
+  sitemap. Bookmark identifiers stay in browser storage until the reader removes them; no reading history is collected.
+- All 85 default gallery links are in the initial HTML. Builds run `scripts/verify-public-html.mjs` to check the twelve public
   routes, titles, descriptions, canonical links, sitemap, gallery completeness, and disabled ad placeholders.
 - The three ad placements are commented out in `front-end/src/layouts/default.vue`, with restoration instructions;
   `SiteAdSlot.vue` and its styles remain. Optional ad/analytics scripts are disabled, while AdSense verification

@@ -21,7 +21,7 @@ const [chapter, other, gallery] = await Promise.all([
 	renderPublishedPage("/artwork", first)
 ]);
 assert.match(chapter.html, /A changed heading/);
-assert.match(chapter.html, /<p>Paragraph one\.<\/p>/);
+assert.match(chapter.html, /<p\b[^>]*>Paragraph one\.<\/p>/);
 assert.match(chapter.html, /&lt;script&gt;/);
 assert.doesNotMatch(chapter.html, /<script>alert/);
 assert.match(chapter.head.headTags, /A new chapter \| RetroZetro Comics/);
@@ -34,5 +34,13 @@ assert.match(gallery.html, /A new gallery caption/);
 assert.match(gallery.html, /Showing 1 of 1 designs/);
 assert.doesNotMatch(gallery.html, /artwork-001/);
 assert.deepEqual(chapter.initialState.publishedContent, first);
+const guide = await renderPublishedPage("/start", first);
+assert.match(guide.html, /Begin with A new chapter/);
+const search = await renderPublishedPage("/search?q=changed%20heading&kind=story", first);
+assert.match(search.html, /A new chapter/);
+assert.match(search.html, /href="\/stories\/new-chapter"/);
+assert.doesNotMatch(search.html, /A different published version/);
+assert.match(search.head.headTags, /noindex,follow/);
+assert.doesNotMatch(search.html, /Continue reading/);
 assert.doesNotMatch(JSON.stringify(chapter.initialState), /draftData|authAccount|actorName/);
 console.log("Published renderer passed: edited chapter, title, canonical, paragraphs, escaping, gallery, and concurrent request isolation.");

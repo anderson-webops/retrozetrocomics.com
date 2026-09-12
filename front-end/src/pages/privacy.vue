@@ -18,7 +18,7 @@ useHead({
 		<header>
 			<p class="reading-eyebrow">RetroZetro Comics</p>
 			<h1>Privacy</h1>
-			<p>Last updated: September 11, 2026</p>
+			<p>Last updated: September 12, 2026</p>
 		</header>
 		<section>
 			<h2>Reading the site</h2>
@@ -49,6 +49,15 @@ useHead({
 				The site uses browser storage for display preferences. Owner sign-in uses an essential session cookie;
 				editing tools may keep unfinished drafts in the owner's browser to help recover work. You can clear this
 				information in your browser settings, but doing so may sign you out or remove locally saved drafts.
+			</p>
+			<p>
+				If you choose “Save this place,” your browser stores one story and section identifier on this device.
+				This saved place is not sent to an account or a reading-history service. Choose “Forget saved place” to
+				remove it. Shared devices share this saved place.
+			</p>
+			<p>
+				Search words appear in the search page's address. Like other requested addresses, they may appear in
+				ordinary hosting logs. No separate search-history or audience-tracking service is used.
 			</p>
 		</section>
 		<section>

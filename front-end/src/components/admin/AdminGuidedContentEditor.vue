@@ -376,6 +376,7 @@ function buildPageContent() {
 	const items = content[currentCollection.value] as any[];
 	const index = items.findIndex(item => item.id === draftItem.value?.id);
 	if (index >= 0) items[index] = clone(draftItem.value);
+	else if (editorKind.value === "story") items.push(clone(draftItem.value));
 	else items.unshift(clone(draftItem.value));
 	return content;
 }
@@ -411,16 +412,25 @@ async function saveDraft(announce = true) {
 	}
 }
 
-async function moveArtwork(index: number, direction: number) {
-	const state = contentStates.value.artwork;
-	if (!state) return;
-	const draft = clone(state.draft as ArtworkPageContent);
-	const [item] = draft.items.splice(index, 1);
-	draft.items.splice(index + direction, 0, item);
+async function moveItem(index: number, direction: number) {
+	const page = currentPage.value;
+	const collection = currentCollection.value;
+	if (!page || !collection || !["about", "artwork"].includes(page)) return;
+	const state = contentStates.value[page];
+	if (!state || busy.value) return;
+	const draft = clone(state.draft);
+	const items = draft[collection] as Array<AboutStoryArc | ArtworkItem>;
+	if (index + direction < 0 || index + direction >= items.length) return;
+	const [item] = items.splice(index, 1);
+	items.splice(index + direction, 0, item);
 	busy.value = true;
+	error.value = "";
 	try {
-		contentStates.value.artwork = await saveAdminSiteContentDraft("artwork", draft, state.editVersion);
-		status.value = "The new order is saved as a private draft. Open an artwork, preview, then publish the gallery.";
+		contentStates.value[page] = await saveAdminSiteContentDraft(page, draft, state.editVersion);
+		status.value =
+			page === "artwork"
+				? "The new order is saved as a private draft. Open an artwork, preview, then publish the gallery."
+				: "The new reading order is saved as a private draft. Open a story, check its preview and reading order, then publish.";
 	} catch (caught: any) {
 		error.value = messageFromError(caught, "The new order could not be saved.");
 	} finally {
@@ -707,18 +717,18 @@ onBeforeRouteUpdate(() => {
 					<div>
 						<button type="button" @click="beginEdit(item)">Edit {{ titleForItem(item) }}</button>
 						<button
-							v-if="editorKind === 'artwork'"
+							v-if="editorKind === 'artwork' || editorKind === 'story'"
 							type="button"
 							:disabled="busy || index === 0"
-							@click="moveArtwork(index, -1)"
+							@click="moveItem(index, -1)"
 						>
 							Move {{ titleForItem(item) }} earlier
 						</button>
 						<button
-							v-if="editorKind === 'artwork'"
+							v-if="editorKind === 'artwork' || editorKind === 'story'"
 							type="button"
 							:disabled="busy || index === currentItems.length - 1"
-							@click="moveArtwork(index, 1)"
+							@click="moveItem(index, 1)"
 						>
 							Move {{ titleForItem(item) }} later
 						</button>
@@ -1023,6 +1033,14 @@ onBeforeRouteUpdate(() => {
 					</p>
 				</template>
 				<template v-else-if="editorKind === 'story' && currentStory">
+					<details>
+						<summary>Reading order after publication</summary>
+						<ol>
+							<li v-for="arc in (buildPageContent() as AboutPageContent)?.storyArcs" :key="arc.id">
+								{{ arc.title || "Untitled story" }}
+							</li>
+						</ol>
+					</details>
 					<p>{{ currentStory.label || "Label not finished" }}</p>
 					<h3>{{ currentStory.title || "Story title not finished" }}</h3>
 					<p>{{ currentStory.description || "Summary not finished" }}</p>

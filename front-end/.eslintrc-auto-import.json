@@ -257,6 +257,7 @@
     "usePrevious": true,
     "usePublishedPage": true,
     "useRafFn": true,
+    "useReadingPlace": true,
     "useRefHistory": true,
     "useResizeObserver": true,
     "useRoute": true,

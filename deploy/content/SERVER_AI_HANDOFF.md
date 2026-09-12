@@ -5,6 +5,10 @@ exact annotated `v2.9.0` tag. Do not infer additional canon or publish any sourc
 
 ## Publishing additions in this release
 
+- `/start` follows the published story order. Story pages include previous/next navigation and optional on-device
+  reading-place controls. New stories are appended; owner ordering remains a private draft until publication.
+- `/search` searches existing published text and captions, including source-backed Worlds entries. Results render
+  without JavaScript, use noindex, and stay outside the sitemap. No search service, accounts or analytics are added.
 - Owners can create dedicated story and chapter URLs, change section headings, write longer passages, choose opening
   and section illustrations, reorder sections, and preview the complete reading page. Existing outline fields remain.
 - The gallery is an editable `artwork-page` document with selection from the existing media library, captions, categories,
@@ -121,7 +125,7 @@ authorizes and reviews it.
    timestamp in ISO 8601 UTC format with milliseconds, as produced from `SOURCE_DATE_EPOCH`. Record deployment
    wall-clock time separately; it is not `releasedAt`. Require the exact version and full commit revision in the
    compatibility release metadata used by both the static site and backend.
-6. Verify Nginx forwards `/`, `/about`, `/characters`, `/artwork`, `/worlds`, `/contact`, `/creator`, `/privacy`,
+6. Verify Nginx forwards `/`, `/start`, `/search`, `/about`, `/characters`, `/artwork`, `/worlds`, `/contact`, `/creator`, `/privacy`,
    `/stories/` and `/sitemap.xml` to the backend, including trailing-slash forms. The checked Nginx locations file
    already proxies these requests. If the live server instead uses static `try_files` for documents, adjust those
    document locations as part of this compatibility deployment, snapshot the prior Nginx configuration, validate
@@ -198,6 +202,12 @@ authorizes and reviews it.
 
 ## Publishing synchronization acceptance
 
+- Require `/start` and previous/next links to follow current published story order. Verify the search form with an
+  existing public name; results must link to actual story, character, world and artwork targets. Preserve query strings
+  when proxying `/search`. Require noindex on search responses and exclusion of `/search` from the sitemap.
+- The optional saved place writes only a story/section identifier to the visitor's local browser after an explicit
+  click. Test save, reload, resume, removal, and unavailable storage in isolation. Do not use owner credentials for a
+  reader test. No live content save, media change, new database collection or server migration is needed for this feature.
 - Read only public API data for comparison with raw HTTP HTML, without executing JavaScript. Compare story headings,
   passages, illustration URLs, gallery captions and order. Titles and canonical URLs must match each reading route.
 - Every currently published story address appears in `/sitemap.xml`; owner and draft-only routes do not. An unknown

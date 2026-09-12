@@ -109,7 +109,7 @@ describe("owner publishing workflow with isolated content", () => {
 		cy.contains("button", "Publish to the site").click();
 		cy.wait("@publish");
 		cy.then(() => {
-			const story = states.about.published.storyArcs[0];
+			const story = states.about.published.storyArcs.find((item: any) => item.title === "Practice chapter");
 			expect(story.readingSections[0].heading).to.equal("A second section");
 			cy.visit(`/stories/${story.slug}`);
 		});
@@ -140,6 +140,25 @@ describe("owner publishing workflow with isolated content", () => {
 		cy.document().then(document =>
 			expect(document.documentElement.scrollWidth).to.equal(document.documentElement.clientWidth)
 		);
+	});
+
+	it("keeps a reordered reading list private until publication", () => {
+		cy.visit("/studio/admin?task=edit");
+		cy.contains("button", "A story").click();
+		cy.get(".item-chooser__list article").last().contains("button", "earlier").click();
+		cy.wait("@saveDraft");
+		cy.then(() => expect(states.about.published.storyArcs[0].title).to.equal("The List"));
+		cy.get(".item-chooser__list article").first().contains("button", "Edit ").click();
+		cy.contains("button", "Next: Reading sections").click();
+		cy.contains("button", "Next: Notes").click();
+		cy.contains("button", "Next: Preview").click();
+		cy.contains("summary", "Reading order after publication").click();
+		cy.get(".item-preview ol li").first().should("have.text", "The Fall of a Dream");
+		cy.contains("button", "Publish to the site").click();
+		cy.wait("@publish");
+		cy.visit("/start");
+		cy.contains("a", "Begin with The Fall of a Dream").click();
+		cy.get(".story-sequence").should("contain.text", "Next story").and("contain.text", "The List");
 	});
 
 	it("adds a character and picture, revises prose, and shows the same saved version to visitors", () => {

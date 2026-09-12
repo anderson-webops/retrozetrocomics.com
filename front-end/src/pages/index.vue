@@ -52,6 +52,7 @@ useHead({
 <template>
 	<div class="page page--home">
 		<WelcomeSection actions-placement="poster" highlights-layout="stack" />
+		<ContinueReading />
 
 		<section class="home-showcase">
 			<header class="home-showcase__header">

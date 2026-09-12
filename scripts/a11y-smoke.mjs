@@ -13,6 +13,18 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(scriptDir, "..");
 const frontendPackagePath = resolve(projectRoot, "front-end/package.json");
 const frontendPackage = JSON.parse(readFileSync(frontendPackagePath, "utf8"));
+const [aboutContent, artworkContent, charactersContent, homeContent] = await Promise.all([
+	import(new URL("../back-end/src/content/defaultAboutPageContent.ts", import.meta.url)),
+	import(new URL("../back-end/src/content/defaultArtworkPageContent.ts", import.meta.url)),
+	import(new URL("../back-end/src/content/defaultCharactersPageContent.ts", import.meta.url)),
+	import(new URL("../back-end/src/content/defaultHomePageContent.ts", import.meta.url))
+]);
+const publicContent = {
+	about: aboutContent.createDefaultAboutPageContent(),
+	artwork: artworkContent.createDefaultArtworkPageContent(),
+	characters: charactersContent.createDefaultCharactersPageContent(),
+	home: homeContent.createDefaultHomePageContent()
+};
 
 const siteName = "Retro Zetro Comics";
 const frontendKind = "vite";
@@ -28,6 +40,9 @@ const routes = [
 	"/contact",
 	"/creator",
 	"/privacy",
+	"/start",
+	"/search",
+	"/search?q=Linkpods&kind=world",
 	"/stories/the-list",
 	"/stories/fall-of-a-dream",
 	"/studio/admin",
@@ -79,6 +94,7 @@ function emptyCollection() {
 
 function responseFor(url) {
 	const pathname = url.pathname.replace(/\/+/g, "/");
+	if (pathname.startsWith("/api/site-content/")) return { content: publicContent[pathname.split("/").at(-1)] };
 	if (pathname.endsWith("/pageview")) return { pageview: 0, startAt: Date.now() };
 	if (pathname.includes("/session")) return { authenticated: false, user: null, admin: null };
 	if (pathname.includes("/auth") || pathname.includes("/login")) return { authenticated: false, user: null, token: "" };

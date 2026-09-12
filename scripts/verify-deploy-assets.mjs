@@ -221,7 +221,7 @@ assert.equal(contentManifest.visualPresentation.adPlaceholders, "commented-out-f
 const layout = await read("front-end/src/layouts/default.vue");
 assert.equal([...layout.matchAll(/<!-- Parked (?:top|left|right) placement\.[\s\S]*?<SiteAdSlot[\s\S]*?-->/g)].length, 3);
 assert.equal(contentManifest.siteContent["artwork-page"].initialHtmlImages, 85);
-assert.equal(contentManifest.publicRoutes.length, 10);
+assert.equal(contentManifest.publicRoutes.length, 12);
 assert.equal(contentManifest.visualPresentation.controlRadius, "8px");
 const publicationBoundaries = contentManifest.publicationBoundaries.join("\n");
 assert.match(publicationBoundaries, /remain distinct story arcs/);

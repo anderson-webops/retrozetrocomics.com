@@ -248,6 +248,7 @@ declare global {
   const usePrevious: typeof import('@vueuse/core').usePrevious
   const usePublishedPage: typeof import('./composables/publishedContent').usePublishedPage
   const useRafFn: typeof import('@vueuse/core').useRafFn
+  const useReadingPlace: typeof import('./composables/useReadingPlace').useReadingPlace
   const useRefHistory: typeof import('@vueuse/core').useRefHistory
   const useResizeObserver: typeof import('@vueuse/core').useResizeObserver
   const useRoute: typeof import('vue-router').useRoute
@@ -579,6 +580,7 @@ declare module 'vue' {
     readonly usePrevious: UnwrapRef<typeof import('@vueuse/core')['usePrevious']>
     readonly usePublishedPage: UnwrapRef<typeof import('./composables/publishedContent')['usePublishedPage']>
     readonly useRafFn: UnwrapRef<typeof import('@vueuse/core')['useRafFn']>
+    readonly useReadingPlace: UnwrapRef<typeof import('./composables/useReadingPlace')['useReadingPlace']>
     readonly useRefHistory: UnwrapRef<typeof import('@vueuse/core')['useRefHistory']>
     readonly useResizeObserver: UnwrapRef<typeof import('@vueuse/core')['useResizeObserver']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>

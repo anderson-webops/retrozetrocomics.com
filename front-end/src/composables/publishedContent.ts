@@ -44,6 +44,7 @@ export function usePublishedPage<K extends keyof PublishedSnapshot>(page: K) {
 		current.loading.value = true;
 		try {
 			const { data } = await api.get(`/site-content/${page}`);
+			if (!data?.content || typeof data.content !== "object") throw new Error("Published content is missing");
 			apply(data.content);
 		} catch {
 			current.error.value = "The latest published content could not be loaded. Please try again.";

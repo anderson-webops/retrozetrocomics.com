@@ -17,7 +17,7 @@ import {
 } from "./siteContent.js";
 
 const pages: SiteContentPage[] = ["home", "about", "characters", "artwork"];
-const publicRoutes = ["/", "/about", "/characters", "/artwork", "/worlds", "/contact", "/creator", "/privacy"];
+const publicRoutes = ["/", "/start", "/search", "/about", "/characters", "/artwork", "/worlds", "/contact", "/creator", "/privacy"];
 export type PublishedSnapshot = Record<SiteContentPage, SiteContentData>;
 
 export async function readPublishedSnapshot(): Promise<PublishedSnapshot> {
@@ -107,7 +107,7 @@ export function createPublishedPageRouter(staticRoot: string, options: Published
 			return renderer.renderPublishedPage(url, snapshot) as Promise<RendererResult>;
 		});
 	const documentPath =
-		/^\/(?:|index\.html|(?:about|characters|artwork|worlds|contact|creator|privacy)(?:\/(?:index\.html)?)?|stories(?:\/.*)?|sitemap\.xml)$/;
+		/^\/(?:|index\.html|(?:start|search|about|characters|artwork|worlds|contact|creator|privacy)(?:\/(?:index\.html)?)?|stories(?:\/.*)?|sitemap\.xml)$/;
 	router.get(documentPath, publicPageRateLimiter, async (req, res, next) => {
 		const route = req.path.replace(/\/+$/, "") || "/";
 		const canonicalPage = publicRoutes.find(page => `${page === "/" ? "" : page}/index.html` === route);
@@ -125,7 +125,7 @@ export function createPublishedPageRouter(staticRoot: string, options: Published
 				return res
 					.type("application/xml")
 					.send(
-						`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${[...publicRoutes, ...storyPaths].map(url => `<url><loc>https://retrozetrocomics.com${url}</loc></url>`).join("")}</urlset>`
+						`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${[...publicRoutes.filter(url => url !== "/search"), ...storyPaths].map(url => `<url><loc>https://retrozetrocomics.com${url}</loc></url>`).join("")}</urlset>`
 					);
 			}
 			if (route.startsWith("/stories/") && !storyPaths.includes(route)) {
@@ -138,7 +138,17 @@ export function createPublishedPageRouter(staticRoot: string, options: Published
 					);
 			}
 			const nonce = randomBytes(24).toString("base64");
-			const rendered = await render(route, snapshot);
+			let renderUrl = route;
+			if (route === "/search") {
+				const query = new URLSearchParams();
+				for (const key of ["q", "kind"]) {
+					const value = Array.isArray(req.query[key]) ? req.query[key][0] : req.query[key];
+					if (typeof value === "string") query.set(key, value.slice(0, 160));
+				}
+				renderUrl += `?${query}`;
+				res.set("X-Robots-Tag", "noindex,follow");
+			}
+			const rendered = await render(renderUrl, snapshot);
 			const directives = buildContentSecurityPolicyDirectives(
 				"public",
 				[`'nonce-${nonce}'`],

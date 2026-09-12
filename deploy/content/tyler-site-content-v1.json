@@ -288,6 +288,8 @@
 	],
 	"publicRoutes": [
 		"/",
+		"/start",
+		"/search",
 		"/about",
 		"/characters",
 		"/worlds",

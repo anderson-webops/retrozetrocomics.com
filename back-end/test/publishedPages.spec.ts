@@ -101,13 +101,16 @@ describe("published reading contract", () => {
 		);
 		const snapshot = defaults();
 		const load = vi.fn(async () => snapshot);
+		const renderedRoutes: string[] = [];
 		const app = express();
 		app.use(
 			createPublishedPageRouter(directory, {
 				isProduction: true,
 				imageSources: [],
 				load,
-				render: async (_url, current) => ({
+				render: async (url, current) => {
+					renderedRoutes.push(url);
+					return {
 					html: `<h1>${(current.about.storyArcs as any[])[0].title}</h1>`,
 					initialState: { publishedContent: current },
 					head: {
@@ -117,7 +120,8 @@ describe("published reading contract", () => {
 						bodyTags: "",
 						bodyTagsOpen: ""
 					}
-				})
+					};
+				}
 			})
 		);
 		const server = app.listen(0, "127.0.0.1");
@@ -148,6 +152,12 @@ describe("published reading contract", () => {
 		(snapshot.about.storyArcs as any[])[0].title = "New published chapter";
 		expect(await (await fetch(`${origin}/stories/new-chapter`)).text()).toContain("New published chapter");
 		const sitemap = await (await fetch(`${origin}/sitemap.xml`)).text();
+		expect(sitemap).toContain("/start</loc>");
+		expect(sitemap).not.toContain("/search");
+		const search = await fetch(`${origin}/search?q=Exo%20Dexus&kind=story&ignored=private`);
+		expect(search.status).toBe(200);
+		expect(search.headers.get("x-robots-tag")).toBe("noindex,follow");
+		expect(renderedRoutes.at(-1)).toBe("/search?q=Exo+Dexus&kind=story");
 		expect(sitemap).toContain("/stories/new-chapter");
 		expect(sitemap).not.toContain("/stories/the-list");
 		expect((await fetch(`${origin}/stories/the-list`)).status).toBe(404);
