@@ -3,6 +3,8 @@ import type { AuthAccount } from "../middleware/auth.js";
 import mongoose from "mongoose";
 import { z } from "zod";
 
+import { AppError } from "../errors/appError.js";
+import { readPublishedSnapshot } from "../services/publishedPages.js";
 import { readAuthAccount } from "../middleware/auth.js";
 import { ContentTrashItem } from "../models/schemas/ContentTrashItem.js";
 import { SiteContent } from "../models/schemas/SiteContent.js";
@@ -25,7 +27,7 @@ import {
 } from "../services/siteContent.js";
 
 const trashItemSchema = z.object({
-	collection: z.enum(["characters", "showcaseItems", "storyArcs", "worldEntries"]),
+	collection: z.enum(["characters", "items", "showcaseItems", "storyArcs", "worldEntries"]),
 	itemId: z.string().trim().min(1).max(80)
 });
 
@@ -40,6 +42,7 @@ function parsePage(req: Request, res: Response): SiteContentPage | null {
 }
 
 function pageFromKey(key: string): SiteContentPage | null {
+	if (key === getSiteContentConfig("artwork").key) return "artwork";
 	if (key === getSiteContentConfig("about").key) return "about";
 	if (key === getSiteContentConfig("characters").key) return "characters";
 	if (key === getSiteContentConfig("home").key) return "home";
@@ -54,11 +57,10 @@ function readPublishedVersion(document: any) {
 function createContentState(page: SiteContentPage, document: any) {
 	const published = normalizePublishedSiteContent(page, document?.data);
 	const hasDraft = document?.draftData != null;
-	const draft = hasDraft
-		? normalizeDraftSiteContent(page, document.draftData, published)
-		: published;
+	const draft = hasDraft ? normalizeDraftSiteContent(page, document.draftData, published) : published;
 
 	return {
+		editVersion: Number(document?.editVersion || 0),
 		draft,
 		draftUpdatedAt: document?.draftUpdatedAt || null,
 		hasDraft,
@@ -109,42 +111,55 @@ async function recordContentChange(
 	});
 }
 
-async function saveDraftDocument(page: SiteContentPage, content: SiteContentData) {
-	const config = getSiteContentConfig(page);
-	const now = new Date();
-	return SiteContent.findOneAndUpdate(
-		{ key: config.key },
-		{
-			$set: {
-				draftData: content,
-				draftUpdatedAt: now
-			},
-			$setOnInsert: {
-				data: createDefaultSiteContent(page),
-				publishedVersion: 1
-			}
-		},
-		{
-			new: true,
-			setDefaultsOnInsert: true,
-			upsert: true
-		}
+function contentConflict() {
+	return new AppError(
+		"Another edit was saved while this page was open. Your work is still on this device. Reload this page to review the latest version, then use the saved-work recovery option before trying again.",
+		{ statusCode: 409, expose: true }
 	);
+}
+function checkExpectedVersion(req: Request, existing: any) {
+	if (req.body?.expectedVersion !== undefined && req.body.expectedVersion !== Number(existing?.editVersion || 0))
+		throw contentConflict();
+}
+function editFilter(key: string, existing: any) {
+	return existing ? { key, editVersion: existing.editVersion || { $in: [0, null] } } : { key };
+}
+async function saveDraftDocument(page: SiteContentPage, content: SiteContentData, existing?: any) {
+	const config = getSiteContentConfig(page);
+	if (existing === undefined) existing = await SiteContent.findOne({ key: config.key });
+	try {
+		const document = await SiteContent.findOneAndUpdate(
+			editFilter(config.key, existing),
+			{
+				$set: { draftData: content, draftUpdatedAt: new Date() },
+				$inc: { editVersion: 1 },
+				$setOnInsert: { data: createDefaultSiteContent(page), publishedVersion: 1 }
+			},
+			{ new: true, setDefaultsOnInsert: true, upsert: !existing }
+		);
+		if (!document) throw contentConflict();
+		return document;
+	} catch (error: any) {
+		if (error?.code === 11000) throw contentConflict();
+		throw error;
+	}
 }
 
 async function publishContent(
 	req: Request,
 	page: SiteContentPage,
 	content: SiteContentData,
-	reason: "direct-publish" | "draft-publish" | "revision-restore"
+	reason: "direct-publish" | "draft-publish" | "revision-restore",
+	expectedDocument?: any
 ) {
 	const config = getSiteContentConfig(page);
-	const existingDocument = await SiteContent.findOne({ key: config.key });
+	const existingDocument =
+		expectedDocument === undefined ? await SiteContent.findOne({ key: config.key }) : expectedDocument;
 	const previousContent = normalizePublishedSiteContent(page, existingDocument?.data);
 	const previousVersion = readPublishedVersion(existingDocument);
 	const viewer = readAuthAccount(req) as AuthAccount;
 
-	await SiteContentRevision.create({
+	const revision = await SiteContentRevision.create({
 		actorId: viewer.id,
 		actorName: viewer.name,
 		data: previousContent,
@@ -163,25 +178,29 @@ async function publishContent(
 		nextPublishedFields.draftUpdatedAt = null;
 	}
 
-	const document = await SiteContent.findOneAndUpdate(
-		{ key: config.key },
-		{
-			$set: nextPublishedFields
-		},
-		{
-			new: true,
-			setDefaultsOnInsert: true,
-			upsert: true
-		}
-	);
+	let document;
+	try {
+		document = await SiteContent.findOneAndUpdate(
+			editFilter(config.key, existingDocument),
+			{
+				$set: nextPublishedFields,
+				$inc: { editVersion: 1 }
+			},
+			{ new: true, setDefaultsOnInsert: true, upsert: !existingDocument }
+		);
+		if (!document) throw contentConflict();
+	} catch (error: any) {
+		// This revision belongs only to the failed publication attempt.
+		await SiteContentRevision.deleteOne({ _id: revision._id });
+		if (error?.code === 11000) throw contentConflict();
+		throw error;
+	}
 
 	await recordContentChange(
 		req,
 		page,
 		reason === "direct-publish" ? "SITE_CONTENT_UPDATED" : "SITE_CONTENT_PUBLISHED",
-		reason === "direct-publish"
-			? `Updated ${config.label}`
-			: `Published the saved ${config.label} draft`,
+		reason === "direct-publish" ? `Updated ${config.label}` : `Published the saved ${config.label} draft`,
 		previousContent,
 		content
 	);
@@ -190,27 +209,18 @@ async function publishContent(
 }
 
 export async function getCharactersPageContent(_req: Request, res: Response) {
-	const config = getSiteContentConfig("characters");
-	const document = await SiteContent.findOne({ key: config.key });
-	return res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300").json({
-		content: normalizePublishedSiteContent("characters", document?.data)
-	});
+	const snapshot = await readPublishedSnapshot();
+	return res.set("Cache-Control", "no-store").json({ content: snapshot.characters });
 }
 
 export async function getAboutPageContent(_req: Request, res: Response) {
-	const config = getSiteContentConfig("about");
-	const document = await SiteContent.findOne({ key: config.key });
-	return res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300").json({
-		content: normalizePublishedSiteContent("about", document?.data)
-	});
+	const snapshot = await readPublishedSnapshot();
+	return res.set("Cache-Control", "no-store").json({ content: snapshot.about });
 }
 
 export async function getHomePageContent(_req: Request, res: Response) {
-	const config = getSiteContentConfig("home");
-	const document = await SiteContent.findOne({ key: config.key });
-	return res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300").json({
-		content: normalizePublishedSiteContent("home", document?.data)
-	});
+	const snapshot = await readPublishedSnapshot();
+	return res.set("Cache-Control", "no-store").json({ content: snapshot.home });
 }
 
 export async function getAdminSiteContent(req: Request, res: Response) {
@@ -233,8 +243,9 @@ export async function saveSiteContentDraft(req: Request, res: Response) {
 
 	const config = getSiteContentConfig(page);
 	const existingDocument = await SiteContent.findOne({ key: config.key });
+	checkExpectedVersion(req, existingDocument);
 	const previousDraft = createContentState(page, existingDocument).draft;
-	const document = await saveDraftDocument(page, parsed.data);
+	const document = await saveDraftDocument(page, parsed.data, existingDocument);
 	await recordContentChange(
 		req,
 		page,
@@ -253,6 +264,7 @@ export async function publishSiteContentDraft(req: Request, res: Response) {
 
 	const config = getSiteContentConfig(page);
 	const existingDocument = await SiteContent.findOne({ key: config.key });
+	checkExpectedVersion(req, existingDocument);
 	if (!existingDocument?.draftData) {
 		return res.status(409).json({ message: "Save a draft before publishing." });
 	}
@@ -262,7 +274,7 @@ export async function publishSiteContentDraft(req: Request, res: Response) {
 		return validationFailure(res, parsed);
 	}
 
-	const document = await publishContent(req, page, parsed.data, "draft-publish");
+	const document = await publishContent(req, page, parsed.data, "draft-publish", existingDocument);
 	return res.json(createContentState(page, document));
 }
 
@@ -398,12 +410,7 @@ export async function trashSiteContentItem(req: Request, res: Response) {
 	const config = getSiteContentConfig(page);
 	const existingDocument = await SiteContent.findOne({ key: config.key });
 	const state = createContentState(page, existingDocument);
-	const removed = removeSiteContentItem(
-		page,
-		state.draft,
-		parsedRequest.data.collection,
-		parsedRequest.data.itemId
-	);
+	const removed = removeSiteContentItem(page, state.draft, parsedRequest.data.collection, parsedRequest.data.itemId);
 	if (!removed.success) {
 		return res.status(409).json({ message: removed.message });
 	}
@@ -422,8 +429,7 @@ export async function trashSiteContentItem(req: Request, res: Response) {
 	let document;
 	try {
 		document = await saveDraftDocument(page, removed.content);
-	}
-	catch (error) {
+	} catch (error) {
 		await ContentTrashItem.findByIdAndDelete(trashItem.id);
 		throw error;
 	}
@@ -504,4 +510,9 @@ export async function restoreContentTrashItem(req: Request, res: Response) {
 	});
 
 	return res.json(createContentState(page, updatedDocument));
+}
+
+export async function getArtworkPageContent(_req: Request, res: Response) {
+	const snapshot = await readPublishedSnapshot();
+	return res.set("Cache-Control", "no-store").json({ content: snapshot.artwork });
 }

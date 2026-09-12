@@ -5,6 +5,7 @@ const siteContentSchema = new Schema(
 	{
 		key: { type: String, required: true, unique: true, index: true },
 		data: { type: Schema.Types.Mixed, required: true },
+ editVersion: { type: Number, default: 0, min: 0 },
 		draftData: { type: Schema.Types.Mixed, default: null },
 		draftUpdatedAt: { type: Date, default: null },
 		lastPublishedAt: { type: Date, default: null },

@@ -9,3 +9,6 @@ node_modules
 *.log
 cypress/downloads
 #public/assets/fonts
+
+cypress/screenshots
+cypress/videos

@@ -5,7 +5,16 @@ import { useRoute, useRouter } from "vue-router";
 import { useSessionStore } from "@/stores/session";
 
 type WorkspaceTask =
-	"add-character" | "add-story" | "add-world" | "advanced" | "edit" | "edit-home" | "home" | "media" | "security";
+	| "add-character"
+	| "add-story"
+	| "add-world"
+	| "artwork"
+	| "advanced"
+	| "edit"
+	| "edit-home"
+	| "home"
+	| "media"
+	| "security";
 
 const route = useRoute();
 const router = useRouter();
@@ -18,6 +27,7 @@ const allowedTasks = new Set<WorkspaceTask>([
 	"add-character",
 	"add-story",
 	"add-world",
+	"artwork",
 	"advanced",
 	"edit",
 	"edit-home",
@@ -34,6 +44,11 @@ const taskCards: Array<{
 	task?: WorkspaceTask;
 	tone?: "advanced" | "preview";
 }> = [
+	{
+		description: "Choose, caption, and arrange the public artwork collection, with drafts and recovery.",
+		label: "Edit the artwork gallery",
+		task: "artwork"
+	},
 	{
 		description: "Add a passkey or replace the one-time recovery codes for owner access.",
 		label: "Account security",
@@ -56,7 +71,7 @@ const taskCards: Array<{
 	},
 	{
 		description: "Build a story one short section at a time, then preview it.",
-		label: "Add a story idea",
+		label: "Add a story or chapter",
 		task: "add-story"
 	},
 	{
@@ -86,7 +101,7 @@ const taskTitle = computed(() => {
 	const card = taskCards.find(item => item.task === activeTask.value);
 	return card?.label || "Owner home";
 });
-const guidedTask = computed(() => activeTask.value as "add-character" | "add-story" | "add-world" | "edit");
+const guidedTask = computed(() => activeTask.value as "add-character" | "add-story" | "add-world" | "artwork" | "edit");
 
 function readTask(): WorkspaceTask {
 	const requested = String(route.query.task || "home") as WorkspaceTask;
@@ -182,7 +197,7 @@ watch(
 				<h1 id="workspace-task-heading" class="sr-only" tabindex="-1">{{ taskTitle }}</h1>
 
 				<AdminGuidedContentEditor
-					v-if="['add-character', 'add-story', 'add-world', 'edit'].includes(activeTask)"
+					v-if="['add-character', 'add-story', 'add-world', 'artwork', 'edit'].includes(activeTask)"
 					:task="guidedTask"
 					@back="chooseTask('home')"
 					@dirty-change="guidedDirty = $event"

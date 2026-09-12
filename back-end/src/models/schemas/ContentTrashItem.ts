@@ -5,7 +5,7 @@ const contentTrashItemSchema = new Schema(
 	{
 		contentCollection: {
 			type: String,
-			enum: ["characters", "showcaseItems", "storyArcs", "worldEntries"],
+			enum: ["characters", "items", "showcaseItems", "storyArcs", "worldEntries"],
 			required: true,
 			index: true
 		},

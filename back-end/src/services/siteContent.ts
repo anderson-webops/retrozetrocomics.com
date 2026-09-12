@@ -2,29 +2,96 @@ import { z } from "zod";
 
 import { isAllowedContentImageUrl } from "../config/contentImages.js";
 import { createDefaultAboutPageContent } from "../content/defaultAboutPageContent.js";
+import { createDefaultArtworkPageContent } from "../content/defaultArtworkPageContent.js";
 import { createDefaultCharactersPageContent } from "../content/defaultCharactersPageContent.js";
 import { createDefaultHomePageContent } from "../content/defaultHomePageContent.js";
 
-export const siteContentPageSchema = z.enum(["about", "characters", "home"]);
+export const siteContentPageSchema = z.enum(["about", "artwork", "characters", "home"]);
 export type SiteContentPage = z.infer<typeof siteContentPageSchema>;
-export type SiteContentCollection = "characters" | "showcaseItems" | "storyArcs" | "worldEntries";
+export type SiteContentCollection = "characters" | "items" | "showcaseItems" | "storyArcs" | "worldEntries";
 export type SiteContentData = Record<string, unknown>;
 
 const CONTENT_IMAGE_HELP = "Choose a picture from the media library or an approved site image.";
 
-const requiredContentImageSchema = z.string()
+const requiredContentImageSchema = z
+	.string()
 	.trim()
 	.min(1)
 	.max(260)
 	.refine(value => isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP);
-const optionalContentImageSchema = z.string()
+const optionalContentImageSchema = z
+	.string()
 	.trim()
 	.max(260)
 	.refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP)
 	.optional()
 	.default("");
 
-const homeDestinationSchema = z.enum(["/about", "/artwork", "/characters", "/worlds", "/stories/the-list", "/stories/fall-of-a-dream"]);
+const localReadingLink = z
+	.string()
+	.max(180)
+	.refine(
+		value =>
+			!value ||
+			/^\/(?:about|characters|worlds|artwork|stories\/[a-z0-9]+(?:-[a-z0-9]+)*)(?:#[a-z0-9-]+)?$/.test(value),
+		"Choose a reading page on this site."
+	);
+const artworkItemSchema = z
+	.object({
+		id: z.string().regex(/^[a-z0-9-]{1,80}$/),
+		title: z.string().trim().min(1).max(120),
+		image: requiredContentImageSchema,
+		alt: z.string().trim().min(2).max(180),
+		collection: z.enum(["characters", "exo", "machines", "opex", "peoples", "zetro"]),
+		caption: z.string().max(2000).optional(),
+		link: localReadingLink.optional(),
+		linkLabel: z.string().max(120).optional()
+	})
+	.refine(item => !item.link || Boolean(item.linkLabel?.trim()), {
+		path: ["linkLabel"],
+		message: "Give the reading link a name."
+	});
+const draftArtworkItemSchema = z.object({
+	...artworkItemSchema.shape,
+	title: z.string().max(120),
+	image: optionalContentImageSchema,
+	alt: z.string().max(180)
+});
+const uniqueArtworkIds = (page: { items: Array<{ id: string }> }) =>
+	new Set(page.items.map(item => item.id)).size === page.items.length;
+const artworkPageSchema = z
+	.object({ items: z.array(artworkItemSchema).max(120) })
+	.refine(uniqueArtworkIds, "Each gallery entry needs its own identifier.");
+const draftArtworkPageSchema = z
+	.object({ items: z.array(draftArtworkItemSchema).max(120) })
+	.refine(uniqueArtworkIds, "Each gallery entry needs its own identifier.");
+const storyIllustrationSchema = z.object({
+	image: optionalContentImageSchema,
+	alt: z.string().max(180),
+	caption: z.string().max(500)
+});
+const storySectionSchema = z.object({
+	id: z.string().regex(/^[a-z0-9-]{1,80}$/),
+	heading: z.string().max(120),
+	text: z.string().max(12000),
+	image: optionalContentImageSchema,
+	alt: z.string().max(180).optional(),
+	caption: z.string().max(500).optional()
+});
+const readingFields = {
+	slug: z
+		.string()
+		.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+		.max(80)
+		.optional(),
+	artwork: storyIllustrationSchema.optional(),
+	readingSections: z.array(storySectionSchema).max(32).optional()
+};
+
+const homeDestinationSchema = z
+	.string()
+	.max(100)
+	.regex(/^\/(?:about|artwork|characters|worlds|stories\/[a-z0-9]+(?:-[a-z0-9]+)*)$/);
 
 const homeShowcaseItemSchema = z.object({
 	destination: homeDestinationSchema,
@@ -51,20 +118,26 @@ const characterFactSchema = z.object({
 	value: z.string().trim().min(1).max(220)
 });
 
-const characterProfileSchema = z.object({
-	biography: z.string().trim().max(5000).optional(),
-	description: z.string().trim().min(12).max(420),
-	fallbackImage: optionalContentImageSchema,
-	frequency: z.string().trim().min(2).max(120),
-	id: z.string().trim().min(1).max(80),
-	image: z.string().max(260).refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
-	imgAlt: z.string().trim().max(180),
-	name: z.string().trim().min(1).max(80),
-	role: z.string().trim().min(1).max(80),
-	specialty: z.string().trim().min(2).max(120)
-}).refine(profile => !profile.image || profile.imgAlt.length >= 2, {
-	path: ["imgAlt"], message: "Describe the character picture in at least two characters."
-});
+const characterProfileSchema = z
+	.object({
+		biography: z.string().trim().max(5000).optional(),
+		description: z.string().trim().min(12).max(420),
+		fallbackImage: optionalContentImageSchema,
+		frequency: z.string().trim().min(2).max(120),
+		id: z.string().trim().min(1).max(80),
+		image: z
+			.string()
+			.max(260)
+			.refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
+		imgAlt: z.string().trim().max(180),
+		name: z.string().trim().min(1).max(80),
+		role: z.string().trim().min(1).max(80),
+		specialty: z.string().trim().min(2).max(120)
+	})
+	.refine(profile => !profile.image || profile.imgAlt.length >= 2, {
+		path: ["imgAlt"],
+		message: "Describe the character picture in at least two characters."
+	});
 
 const worldEntrySchema = z.object({
 	body: z.string().trim().min(12).max(520),
@@ -74,24 +147,86 @@ const worldEntrySchema = z.object({
 	title: z.string().trim().min(1).max(120)
 });
 
-const aboutStoryArcSchema = z.object({
-	climax: z.string().trim().min(4).max(420),
-	description: z.string().trim().min(12).max(520),
-	firstPlotPoint: z.string().trim().min(4).max(420),
-	hook: z.string().trim().min(4).max(320),
-	id: z.string().trim().min(1).max(80),
-	incitingIncident: z.string().trim().min(4).max(420),
-	label: z.string().trim().min(1).max(80),
-	midpoint: z.string().trim().min(4).max(420),
-	note: z.string().trim().min(4).max(320),
-	resolution: z.string().trim().min(4).max(420),
-	thirdPlotPoint: z.string().trim().min(4).max(420),
-	title: z.string().trim().min(1).max(120)
-});
+const aboutStoryArcSchema = z
+	.object({
+		...readingFields,
+		climax: z.string().trim().max(420),
+		description: z.string().trim().min(12).max(520),
+		firstPlotPoint: z.string().trim().max(420),
+		hook: z.string().trim().max(320),
+		id: z.string().trim().min(1).max(80),
+		incitingIncident: z.string().trim().max(420),
+		label: z.string().trim().min(1).max(80),
+		midpoint: z.string().trim().max(420),
+		note: z.string().trim().max(320),
+		resolution: z.string().trim().max(420),
+		thirdPlotPoint: z.string().trim().max(420),
+		title: z.string().trim().min(1).max(120)
+	})
+	.superRefine((arc, ctx) => {
+		const sections = arc.readingSections;
+		if (sections?.length) {
+			const ids = new Set<string>();
+			for (const [index, section] of sections.entries()) {
+				if (!section.heading.trim() || section.text.trim().length < 4)
+					ctx.addIssue({
+						code: "custom",
+						path: ["readingSections", index],
+						message: "Give each section a heading and story text."
+					});
+				if (ids.has(section.id))
+					ctx.addIssue({
+						code: "custom",
+						path: ["readingSections", index, "id"],
+						message: "Each section needs its own identifier."
+					});
+				ids.add(section.id);
+				if (section.image && (section.alt?.trim().length || 0) < 2)
+					ctx.addIssue({
+						code: "custom",
+						path: ["readingSections", index, "alt"],
+						message: "Describe this illustration."
+					});
+			}
+		} else {
+			for (const key of [
+				"hook",
+				"incitingIncident",
+				"firstPlotPoint",
+				"midpoint",
+				"thirdPlotPoint",
+				"climax",
+				"resolution"
+			] as const) {
+				if (arc[key].trim().length < 4)
+					ctx.addIssue({
+						code: "custom",
+						path: [key],
+						message: "Add story text or complete the reading sections."
+					});
+			}
+		}
+		if (arc.artwork?.image && arc.artwork.alt.trim().length < 2)
+			ctx.addIssue({ code: "custom", path: ["artwork", "alt"], message: "Describe the story picture." });
+	});
 
-const aboutPageSchema = z.object({
-	storyArcs: z.array(aboutStoryArcSchema).min(1).max(16)
-});
+const aboutPageSchema = z
+	.object({
+		storyArcs: z.array(aboutStoryArcSchema).min(1).max(16)
+	})
+	.superRefine((page, ctx) => {
+		const slugs = new Set<string>();
+		for (const [index, arc] of page.storyArcs.entries()) {
+			const slug = arc.slug || arc.id.replace(/^arc-/, "");
+			if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slugs.has(slug))
+				ctx.addIssue({
+					code: "custom",
+					path: ["storyArcs", index, "slug"],
+					message: "Choose a unique story address using lowercase words and hyphens."
+				});
+			slugs.add(slug);
+		}
+	});
 
 const charactersPageSchema = z.object({
 	characters: z.array(characterProfileSchema).min(1).max(16),
@@ -114,7 +249,10 @@ const draftHomeShowcaseItemSchema = z.object({
 	fallbackImage: optionalContentImageSchema,
 	format: z.string().max(80),
 	id: z.string().trim().min(1).max(80),
-	image: z.string().max(260).refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
+	image: z
+		.string()
+		.max(260)
+		.refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
 	imageAlt: z.string().max(180),
 	status: z.string().max(160),
 	summary: z.string().max(520),
@@ -135,7 +273,10 @@ const draftCharacterProfileSchema = z.object({
 	fallbackImage: optionalContentImageSchema,
 	frequency: z.string().max(120),
 	id: z.string().trim().min(1).max(80),
-	image: z.string().max(260).refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
+	image: z
+		.string()
+		.max(260)
+		.refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
 	imgAlt: z.string().max(180),
 	name: z.string().max(80),
 	role: z.string().max(80),
@@ -151,6 +292,7 @@ const draftWorldEntrySchema = z.object({
 });
 
 const draftAboutStoryArcSchema = z.object({
+	...readingFields,
 	climax: z.string().max(420),
 	description: z.string().max(520),
 	firstPlotPoint: z.string().max(420),
@@ -173,7 +315,10 @@ const draftCharactersPageSchema = z.object({
 	characters: z.array(draftCharacterProfileSchema).min(1).max(16),
 	description: z.string().max(320),
 	eyebrow: z.string().max(80),
-	heroImage: z.string().max(260).refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
+	heroImage: z
+		.string()
+		.max(260)
+		.refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
 	heroImageAlt: z.string().max(180),
 	heroImageFallback: optionalContentImageSchema,
 	title: z.string().max(120),
@@ -192,10 +337,10 @@ interface ValidationIssue {
 }
 
 export type SiteContentParseResult =
-	| { data: SiteContentData; success: true }
-	| { issues: ValidationIssue[]; message: string; success: false };
+	{ data: SiteContentData; success: true } | { issues: ValidationIssue[]; message: string; success: false };
 
 const configs: Record<SiteContentPage, SiteContentConfig> = {
+	artwork: { collections: ["items"], key: "artwork-page", label: "Artwork Gallery" },
 	about: {
 		collections: ["storyArcs"],
 		key: "about-page",
@@ -217,12 +362,6 @@ function cloneContent<T>(value: T): T {
 	return JSON.parse(JSON.stringify(value)) as T;
 }
 
-function toParseResult(result: ReturnType<typeof aboutPageSchema.safeParse>): SiteContentParseResult;
-function toParseResult(result: ReturnType<typeof charactersPageSchema.safeParse>): SiteContentParseResult;
-function toParseResult(result: ReturnType<typeof homePageSchema.safeParse>): SiteContentParseResult;
-function toParseResult(result: ReturnType<typeof draftAboutPageSchema.safeParse>): SiteContentParseResult;
-function toParseResult(result: ReturnType<typeof draftCharactersPageSchema.safeParse>): SiteContentParseResult;
-function toParseResult(result: ReturnType<typeof draftHomePageSchema.safeParse>): SiteContentParseResult;
 function toParseResult(result: { data?: unknown; error?: z.ZodError; success: boolean }): SiteContentParseResult {
 	if (result.success) {
 		return {
@@ -248,18 +387,21 @@ export function getSiteContentConfig(page: SiteContentPage) {
 }
 
 export function createDefaultSiteContent(page: SiteContentPage): SiteContentData {
+	if (page === "artwork") return cloneContent(createDefaultArtworkPageContent()) as SiteContentData;
 	if (page === "about") return cloneContent(createDefaultAboutPageContent()) as SiteContentData;
 	if (page === "characters") return cloneContent(createDefaultCharactersPageContent()) as SiteContentData;
 	return cloneContent(createDefaultHomePageContent()) as SiteContentData;
 }
 
 export function parsePublishedSiteContent(page: SiteContentPage, value: unknown): SiteContentParseResult {
+	if (page === "artwork") return toParseResult(artworkPageSchema.safeParse(value));
 	if (page === "about") return toParseResult(aboutPageSchema.safeParse(value));
 	if (page === "characters") return toParseResult(charactersPageSchema.safeParse(value));
 	return toParseResult(homePageSchema.safeParse(value));
 }
 
 export function parseDraftSiteContent(page: SiteContentPage, value: unknown): SiteContentParseResult {
+	if (page === "artwork") return toParseResult(draftArtworkPageSchema.safeParse(value));
 	if (page === "about") return toParseResult(draftAboutPageSchema.safeParse(value));
 	if (page === "characters") return toParseResult(draftCharactersPageSchema.safeParse(value));
 	return toParseResult(draftHomePageSchema.safeParse(value));
@@ -280,6 +422,7 @@ export function normalizeDraftSiteContent(
 }
 
 export function summarizeSiteContent(page: SiteContentPage, content: SiteContentData) {
+	if (page === "artwork") return { artworkCount: Array.isArray(content.items) ? content.items.length : 0 };
 	if (page === "about") {
 		return {
 			storyArcCount: Array.isArray(content.storyArcs) ? content.storyArcs.length : 0
@@ -313,15 +456,13 @@ export function removeSiteContentItem(
 		return { message: "The item list could not be found.", success: false as const };
 	}
 
-	const itemIndex = currentItems.findIndex(item => (
-		Boolean(item)
-		&& typeof item === "object"
-		&& (item as Record<string, unknown>).id === itemId
-	));
+	const itemIndex = currentItems.findIndex(
+		item => Boolean(item) && typeof item === "object" && (item as Record<string, unknown>).id === itemId
+	);
 	if (itemIndex < 0) {
 		return { message: "That item is no longer in the draft.", success: false as const };
 	}
-	if (currentItems.length <= 1) {
+	if (currentItems.length <= 1 && page !== "artwork") {
 		return { message: "Keep at least one item in this section before publishing.", success: false as const };
 	}
 
@@ -354,19 +495,21 @@ export function restoreSiteContentItem(
 	if (!Array.isArray(currentItems)) {
 		return { message: "The item list could not be found.", success: false as const };
 	}
-	if (currentItems.length >= 16) {
-		return { message: "This section already has the maximum of 16 items.", success: false as const };
+	const limit = page === "artwork" ? 120 : 16;
+	if (currentItems.length >= limit) {
+		return { message: `This section already has the maximum of ${limit} items.`, success: false as const };
 	}
 
 	const itemId = String(item.id || "");
 	if (!itemId) {
 		return { message: "The saved item is missing its identifier.", success: false as const };
 	}
-	if (currentItems.some(current => (
-		Boolean(current)
-		&& typeof current === "object"
-		&& (current as Record<string, unknown>).id === itemId
-	))) {
+	if (
+		currentItems.some(
+			current =>
+				Boolean(current) && typeof current === "object" && (current as Record<string, unknown>).id === itemId
+		)
+	) {
 		return { message: "That item is already in the draft.", success: false as const };
 	}
 

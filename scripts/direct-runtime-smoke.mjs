@@ -71,7 +71,9 @@ try {
 	assert.deepEqual(await readinessResponse.json(), { ok: false });
 
 	const rootResponse = await request("/");
-	assert.equal(rootResponse.status, 200);
+	// No database is connected in this isolated smoke test. Do not leak stale defaults.
+	assert.equal(rootResponse.status, 503);
+	assert.equal(rootResponse.headers.get("cache-control"), "no-store");
 	const csp = rootResponse.headers.get("content-security-policy") || "";
 	assert.match(csp, /script-src/);
 	assert.doesNotMatch(

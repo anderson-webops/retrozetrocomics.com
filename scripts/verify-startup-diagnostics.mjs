@@ -28,6 +28,8 @@ await writeFile(
 	})
 );
 
+await writeFile(path.join(staticRoot, "index.html"), "<!doctype html><html><head><title>Startup fixture</title></head><body><div id=\"app\"></div></body></html>");
+
 const environment = {
 	...process.env,
 	DEPLOYED_AT: "2026-08-02T00:00:00.000Z",

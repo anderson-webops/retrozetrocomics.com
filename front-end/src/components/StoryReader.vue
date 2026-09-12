@@ -1,24 +1,28 @@
 <script setup lang="ts">
 import { useAboutPageContent } from "@/composables/useAboutPageContent";
-import { storyArtwork, storyRoutes, storySections } from "@/content/storyReading";
+import { readingArtwork, storyPath, storySections } from "@/content/storyReading";
 import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
 import { useSessionStore } from "@/stores/session";
 
-const props = defineProps<{ storyId: string }>();
+const props = defineProps<{ storyId?: string; slug?: string }>();
 const { content, load } = useAboutPageContent();
 const session = useSessionStore();
-const story = computed(() => content.value.storyArcs.find(arc => arc.id === props.storyId));
-const artwork = computed(() => storyArtwork[props.storyId]);
+const story = computed(() =>
+	content.value.storyArcs.find(arc =>
+		props.slug ? storyPath(arc) === `/stories/${props.slug}` : arc.id === props.storyId
+	)
+);
+const artwork = computed(() => (story.value ? readingArtwork(story.value) : undefined));
 const sections = computed(() => (story.value ? storySections(story.value) : []));
 
 useHead(() => ({
 	title: `${story.value?.title || "Story unavailable"} | RetroZetro Comics`,
-	link: [{ rel: "canonical", href: toAbsoluteSiteUrl(storyRoutes[props.storyId]) }],
+	link: [{ rel: "canonical", href: toAbsoluteSiteUrl(story.value ? storyPath(story.value) : "/about") }],
 	meta: [
 		{ name: "description", content: story.value?.description || "This story is not currently available." },
 		{ property: "og:title", content: `${story.value?.title || "Story unavailable"} | RetroZetro Comics` },
 		{ property: "og:description", content: story.value?.description || "This story is not currently available." },
-		{ property: "og:url", content: toAbsoluteSiteUrl(storyRoutes[props.storyId]) },
+		{ property: "og:url", content: toAbsoluteSiteUrl(story.value ? storyPath(story.value) : "/about") },
 		{ name: "robots", content: story.value ? "index,follow" : "noindex,follow" }
 	]
 }));
@@ -33,9 +37,9 @@ onMounted(() => void load());
 			<h1>{{ story.title }}</h1>
 			<p class="reading-byline">A story by Tyler Morgan</p>
 			<p class="reading-lead">{{ story.description }}</p>
-			<RouterLink v-if="session.showAdminTools" :to="`/about?manage=1#${story.id}`">Edit this story</RouterLink>
+			<RouterLink v-if="session.showAdminTools" to="/studio/admin?task=edit">Edit this story</RouterLink>
 		</header>
-		<figure v-if="artwork" class="story-reader__portrait">
+		<figure v-if="artwork?.image" class="story-reader__portrait">
 			<ResolvedImage :alt="artwork.alt" :candidates="[artwork.image]" />
 			<figcaption>{{ artwork.caption }}</figcaption>
 		</figure>
@@ -49,7 +53,13 @@ onMounted(() => void load());
 		</nav>
 		<section v-for="section in sections" :id="section.id" :key="section.id">
 			<h2>{{ section.heading }}</h2>
-			<p>{{ section.text }}</p>
+			<p v-for="(paragraph, index) in section.text.split(/\n\s*\n/).filter(Boolean)" :key="index">
+				{{ paragraph }}
+			</p>
+			<figure v-if="section.image" class="story-reader__portrait">
+				<ResolvedImage :alt="section.alt || ''" :candidates="[section.image]" />
+				<figcaption v-if="section.caption">{{ section.caption }}</figcaption>
+			</figure>
 		</section>
 		<footer class="reading-next">
 			<p v-if="story.note">{{ story.note }}</p>

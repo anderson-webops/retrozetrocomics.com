@@ -47,16 +47,22 @@ npm run audit:production
   added narrowly to the browser image policy.
 - The home page, story arcs, characters, and world entries use the managed `SiteContent` API. When a page has no
   database record, reviewed source defaults remain available. The public navigation also includes source-backed Worlds
-  and Artwork pages. The Artwork page presents the exact 85 reviewed hand-drawn images already in the local media
-  library, with no copying, re-uploading, or media-record changes. See
+  and a managed Artwork gallery. Its initial default contains the 85 reviewed images; owners can caption, arrange, add,
+  or remove gallery entries using drafts, publication and recovery, without changing the underlying media files. See
   [`deploy/content/tyler-site-content-v1.json`](./deploy/content/tyler-site-content-v1.json) for the complete 85-key
   gallery inventory and the five available raw creative-source versus live importer-sanitized hash baselines, and
   [`deploy/content/SERVER_AI_HANDOFF.md`](./deploy/content/SERVER_AI_HANDOFF.md) for bounded activation checks.
 - The List and The Fall of a Dream have separate illustrated reading pages at `/stories/the-list` and
-  `/stories/fall-of-a-dream`, exposing all seven existing editable beats. Twelve default character profiles support
+  `/stories/fall-of-a-dream`, retaining their existing seven sections. Owners can now create further reading pages, edit headings and longer prose,
+  add illustrations, reorder sections, and preview the complete page. Twelve default character profiles support
   optional longer biographies and text-only entries. Source review is documented in
   [`READER_RELEASE_REVIEW.md`](./deploy/content/READER_RELEASE_REVIEW.md), not shown to visitors.
-- All 85 gallery links are in the initial HTML. Builds run `scripts/verify-public-html.mjs` to check the ten public
+- Production HTML and sitemap use validated published database content, with per-request isolated state and CSP nonces.
+  Deploy `back-end/dist/public-renderer/` with the backend and route document requests through Node. Drafts are excluded,
+  and an unavailable or invalid published record returns an error instead of stale source defaults. `verify:publishing`
+  checks the production renderer, and guided saves reject stale edit versions. Static-only builds are previews and do
+  not provide this publishing contract.
+- All 85 default gallery links are in the initial HTML. Builds run `scripts/verify-public-html.mjs` to check the ten public
   routes, titles, descriptions, canonical links, sitemap, gallery completeness, and disabled ad placeholders.
 - The three ad placements are commented out in `front-end/src/layouts/default.vue`, with restoration instructions;
   `SiteAdSlot.vue` and its styles remain. Optional ad/analytics scripts are disabled, while AdSense verification

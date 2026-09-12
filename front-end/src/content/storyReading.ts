@@ -1,4 +1,4 @@
-import type { AboutStoryArc } from "@/types/site";
+import type { AboutStoryArc, StorySection } from "@/types/site";
 
 export const storyRoutes: Record<string, string> = {
 	"arc-the-list": "/stories/the-list",
@@ -48,7 +48,8 @@ const headings: Record<string, string[]> = {
 	]
 };
 
-export function storySections(arc: AboutStoryArc) {
+export function storySections(arc: AboutStoryArc): StorySection[] {
+	if (arc.readingSections?.length) return arc.readingSections;
 	return beatKeys
 		.map((key, index) => ({
 			id: key,
@@ -56,4 +57,12 @@ export function storySections(arc: AboutStoryArc) {
 			text: arc[key]
 		}))
 		.filter(section => section.text.trim());
+}
+
+export function storyPath(arc: AboutStoryArc) {
+	return `/stories/${arc.slug || arc.id.replace(/^arc-/, "")}`;
+}
+
+export function readingArtwork(arc: AboutStoryArc) {
+	return arc.artwork ?? storyArtwork[arc.id];
 }

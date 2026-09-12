@@ -81,13 +81,25 @@ export async function fetchAdminSiteContent<T extends EditableSiteContent>(page:
 	return data;
 }
 
-export async function saveAdminSiteContentDraft<T extends EditableSiteContent>(page: SiteContentPage, content: T) {
-	const { data } = await api.put<AdminSiteContentState<T>>(`/admin/site-content/${page}/draft`, { content });
+export async function saveAdminSiteContentDraft<T extends EditableSiteContent>(
+	page: SiteContentPage,
+	content: T,
+	expectedVersion?: number
+) {
+	const { data } = await api.put<AdminSiteContentState<T>>(`/admin/site-content/${page}/draft`, {
+		content,
+		expectedVersion
+	});
 	return data;
 }
 
-export async function publishAdminSiteContentDraft<T extends EditableSiteContent>(page: SiteContentPage) {
-	const { data } = await api.post<AdminSiteContentState<T>>(`/admin/site-content/${page}/publish`, {});
+export async function publishAdminSiteContentDraft<T extends EditableSiteContent>(
+	page: SiteContentPage,
+	expectedVersion?: number
+) {
+	const { data } = await api.post<AdminSiteContentState<T>>(`/admin/site-content/${page}/publish`, {
+		expectedVersion
+	});
 	return data;
 }
 

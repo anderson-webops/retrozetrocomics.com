@@ -3,6 +3,8 @@ import type {
 	AboutPageContent,
 	AboutStoryArc,
 	AdminSiteContentState,
+	ArtworkItem,
+	ArtworkPageContent,
 	CharacterBoardProfile,
 	CharacterBoardWorldEntry,
 	CharactersPageContent,
@@ -15,7 +17,10 @@ import type {
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from "vue-router";
 
+import { publishedContentKey } from "@/composables/publishedContent";
 import { useLocalDraft } from "@/composables/useLocalDraft";
+import { readingArtwork, storySections } from "@/content/storyReading";
+import { artworkCollectionLabels } from "@/content/tylerArtwork";
 import {
 	fetchAdminSiteContent,
 	fetchContentTrash,
@@ -27,8 +32,8 @@ import {
 	trashSiteContentItem
 } from "@/lib/siteApi";
 
-type GuidedTask = "add-character" | "add-story" | "add-world" | "edit";
-type EditorKind = "character" | "story" | "world";
+type GuidedTask = "add-character" | "add-story" | "add-world" | "artwork" | "edit";
+type EditorKind = "character" | "story" | "world" | "artwork";
 
 const props = defineProps<{ task: GuidedTask }>();
 const emit = defineEmits<{
@@ -36,17 +41,15 @@ const emit = defineEmits<{
 	dirtyChange: [dirty: boolean];
 }>();
 
-const contentStates = ref<{
-	about: AdminSiteContentState<AboutPageContent> | null;
-	characters: AdminSiteContentState<CharactersPageContent> | null;
-}>({ about: null, characters: null });
+const contentStates = ref<Partial<Record<SiteContentPage, AdminSiteContentState<any>>>>({});
+const publicState = inject(publishedContentKey);
 const loading = ref(true);
 const busy = ref(false);
 const error = ref("");
 const status = ref("");
 const validationIssues = ref<Array<{ field: string; message: string }>>([]);
 const editorKind = ref<EditorKind | null>(null);
-const draftItem = ref<AboutStoryArc | CharacterBoardProfile | CharacterBoardWorldEntry | null>(null);
+const draftItem = ref<AboutStoryArc | ArtworkItem | CharacterBoardProfile | CharacterBoardWorldEntry | null>(null);
 const editingId = ref("");
 const isNew = ref(false);
 const step = ref(1);
@@ -75,7 +78,10 @@ const localDraft = useLocalDraft({
 		`retrozetro:owner-draft:${editorKind.value || "none"}:${isNew.value ? "new" : editingId.value || "none"}`
 });
 
-const storyBeatFields: Array<{ key: keyof AboutStoryArc; label: string }> = [
+const storyBeatFields: Array<{
+	key: "hook" | "incitingIncident" | "firstPlotPoint" | "midpoint" | "thirdPlotPoint" | "climax" | "resolution";
+	label: string;
+}> = [
 	{ key: "hook", label: "Hook" },
 	{ key: "incitingIncident", label: "Inciting incident" },
 	{ key: "firstPlotPoint", label: "First plot point" },
@@ -109,23 +115,21 @@ const fieldLabels: Record<string, string> = {
 };
 
 const currentPage = computed<SiteContentPage | null>(() => {
+	if (editorKind.value === "artwork") return "artwork";
 	if (editorKind.value === "story") return "about";
 	if (editorKind.value) return "characters";
 	return null;
 });
 
 const currentCollection = computed<SiteContentCollection | null>(() => {
+	if (editorKind.value === "artwork") return "items";
 	if (editorKind.value === "character") return "characters";
 	if (editorKind.value === "story") return "storyArcs";
 	if (editorKind.value === "world") return "worldEntries";
 	return null;
 });
 
-const currentState = computed(() => {
-	if (currentPage.value === "about") return contentStates.value.about;
-	if (currentPage.value === "characters") return contentStates.value.characters;
-	return null;
-});
+const currentState = computed(() => (currentPage.value ? contentStates.value[currentPage.value] : null));
 
 const currentItems = computed<any[]>(() => {
 	if (!currentState.value || !currentCollection.value) return [];
@@ -134,13 +138,20 @@ const currentItems = computed<any[]>(() => {
 
 const stepLabels = computed(() => {
 	if (editorKind.value === "character") return ["Essentials", "More details", "Preview"];
-	if (editorKind.value === "story") return ["Basics", "Story beats", "Notes", "Preview"];
+	if (editorKind.value === "story") return ["Basics", "Reading sections", "Notes", "Preview"];
+	if (editorKind.value === "artwork") return ["Picture and caption", "Preview"];
 	if (editorKind.value === "world") return ["Basics", "Facts", "Preview"];
 	return [];
 });
 
 const currentCharacter = computed(() => draftItem.value as CharacterBoardProfile | null);
-const currentStory = computed(() => draftItem.value as AboutStoryArc | null);
+const currentStory = computed({
+	get: () => draftItem.value as AboutStoryArc | null,
+	set: value => {
+		draftItem.value = value;
+	}
+});
+const currentArtwork = computed(() => draftItem.value as ArtworkItem | null);
 const currentWorld = computed(() => draftItem.value as CharacterBoardWorldEntry | null);
 
 function clone<T>(value: T): T {
@@ -166,12 +177,15 @@ function createCharacter(): CharacterBoardProfile {
 }
 
 function createStory(): AboutStoryArc {
+	const id = nextId("story");
 	return {
+		slug: id,
+		readingSections: [{ id: nextId("section"), heading: "", text: "" }],
 		climax: "",
 		description: "",
 		firstPlotPoint: "",
 		hook: "",
-		id: nextId("story-arc"),
+		id,
 		incitingIncident: "",
 		label: "",
 		midpoint: "",
@@ -179,6 +193,19 @@ function createStory(): AboutStoryArc {
 		resolution: "",
 		thirdPlotPoint: "",
 		title: ""
+	};
+}
+
+function createArtwork(): ArtworkItem {
+	return {
+		id: nextId("artwork"),
+		title: "",
+		image: "",
+		alt: "",
+		collection: "characters",
+		caption: "",
+		link: "",
+		linkLabel: ""
 	};
 }
 
@@ -230,11 +257,12 @@ async function loadContent() {
 	loading.value = true;
 	error.value = "";
 	try {
-		const [about, characters] = await Promise.all([
+		const [about, characters, artwork] = await Promise.all([
 			fetchAdminSiteContent<AboutPageContent>("about"),
-			fetchAdminSiteContent<CharactersPageContent>("characters")
+			fetchAdminSiteContent<CharactersPageContent>("characters"),
+			fetchAdminSiteContent<ArtworkPageContent>("artwork")
 		]);
-		contentStates.value = { about, characters };
+		contentStates.value = { about, characters, artwork };
 		startRequestedTask();
 	} catch (caught: any) {
 		error.value = messageFromError(caught, "The saved site content could not be loaded.");
@@ -244,6 +272,7 @@ async function loadContent() {
 }
 
 function startRequestedTask() {
+	if (props.task === "artwork") void selectKind("artwork");
 	if (props.task === "edit") return;
 	if (props.task === "add-character") void beginNew("character");
 	if (props.task === "add-story") void beginNew("story");
@@ -265,7 +294,14 @@ async function beginNew(kind: EditorKind) {
 	hydrating.value = true;
 	isNew.value = true;
 	step.value = 1;
-	draftItem.value = kind === "character" ? createCharacter() : kind === "story" ? createStory() : createWorldEntry();
+	draftItem.value =
+		kind === "artwork"
+			? createArtwork()
+			: kind === "character"
+				? createCharacter()
+				: kind === "story"
+					? createStory()
+					: createWorldEntry();
 	editingId.value = draftItem.value.id;
 	dirty.value = true;
 	await nextTick();
@@ -276,6 +312,12 @@ async function beginNew(kind: EditorKind) {
 async function beginEdit(item: any) {
 	hydrating.value = true;
 	draftItem.value = clone(item);
+	if (editorKind.value === "story") {
+		const arc = draftItem.value as AboutStoryArc;
+		arc.slug ||= arc.id.replace(/^arc-/, "");
+		arc.readingSections = clone(storySections(arc));
+		arc.artwork = clone(readingArtwork(arc) || { image: "", alt: "", caption: "" });
+	}
 	editingId.value = item.id;
 	isNew.value = false;
 	step.value = 1;
@@ -347,14 +389,11 @@ async function saveDraft(announce = true) {
 	error.value = "";
 	validationIssues.value = [];
 	try {
-		if (currentPage.value === "about") {
-			contentStates.value.about = await saveAdminSiteContentDraft<AboutPageContent>("about", content);
-		} else {
-			contentStates.value.characters = await saveAdminSiteContentDraft<CharactersPageContent>(
-				"characters",
-				content
-			);
-		}
+		contentStates.value[currentPage.value] = await saveAdminSiteContentDraft(
+			currentPage.value,
+			content,
+			currentState.value?.editVersion
+		);
 		localDraft.clearDraft();
 		editingId.value = draftItem.value.id;
 		isNew.value = false;
@@ -372,6 +411,23 @@ async function saveDraft(announce = true) {
 	}
 }
 
+async function moveArtwork(index: number, direction: number) {
+	const state = contentStates.value.artwork;
+	if (!state) return;
+	const draft = clone(state.draft as ArtworkPageContent);
+	const [item] = draft.items.splice(index, 1);
+	draft.items.splice(index + direction, 0, item);
+	busy.value = true;
+	try {
+		contentStates.value.artwork = await saveAdminSiteContentDraft("artwork", draft, state.editVersion);
+		status.value = "The new order is saved as a private draft. Open an artwork, preview, then publish the gallery.";
+	} catch (caught: any) {
+		error.value = messageFromError(caught, "The new order could not be saved.");
+	} finally {
+		busy.value = false;
+	}
+}
+
 async function publishDraft() {
 	if (!currentPage.value || !draftItem.value) return;
 	if (dirty.value && !(await saveDraft(false))) return;
@@ -380,10 +436,14 @@ async function publishDraft() {
 	error.value = "";
 	validationIssues.value = [];
 	try {
-		if (currentPage.value === "about") {
-			contentStates.value.about = await publishAdminSiteContentDraft<AboutPageContent>("about");
-		} else {
-			contentStates.value.characters = await publishAdminSiteContentDraft<CharactersPageContent>("characters");
+		contentStates.value[currentPage.value] = await publishAdminSiteContentDraft(
+			currentPage.value,
+			currentState.value?.editVersion
+		);
+		if (publicState) {
+			publicState[currentPage.value].content.value = clone(
+				contentStates.value[currentPage.value]!.published
+			) as any;
 		}
 		status.value = `${titleForItem(draftItem.value)} is published. The public site now shows this saved version.`;
 		await loadRecovery(currentPage.value);
@@ -422,6 +482,17 @@ function previousStep() {
 }
 
 function chooseMedia(asset: MediaAsset) {
+	if (editorKind.value === "artwork" && currentArtwork.value) {
+		if (asset.kind !== "image") {
+			error.value = "Choose an image for the artwork gallery.";
+			return;
+		}
+		currentArtwork.value.image = asset.url;
+		currentArtwork.value.alt = asset.altText;
+		if (!currentArtwork.value.title) currentArtwork.value.title = asset.title;
+		mediaPickerOpen.value = false;
+		return;
+	}
 	if (!currentCharacter.value) return;
 	if (asset.kind !== "image") {
 		error.value = "Choose a picture for a character. PDF files can stay in the media library for other uses.";
@@ -462,19 +533,11 @@ async function confirmTrashItem() {
 	error.value = "";
 	try {
 		if (editingId.value === pendingTrash.value.id && dirty.value && !(await saveDraft(false))) return;
-		if (currentPage.value === "about") {
-			contentStates.value.about = await trashSiteContentItem<AboutPageContent>(
-				"about",
-				pendingTrash.value.collection,
-				pendingTrash.value.id
-			);
-		} else {
-			contentStates.value.characters = await trashSiteContentItem<CharactersPageContent>(
-				"characters",
-				pendingTrash.value.collection,
-				pendingTrash.value.id
-			);
-		}
+		contentStates.value[currentPage.value] = await trashSiteContentItem(
+			currentPage.value,
+			pendingTrash.value.collection,
+			pendingTrash.value.id
+		);
 		status.value = `${pendingTrash.value.label} was moved to trash. The public site will not change until you publish.`;
 		if (editingId.value === pendingTrash.value.id) {
 			draftItem.value = null;
@@ -494,11 +557,7 @@ async function restoreTrash(item: ContentTrashItem) {
 	busy.value = true;
 	error.value = "";
 	try {
-		if (item.page === "about") {
-			contentStates.value.about = await restoreContentTrashItem<AboutPageContent>(item.id);
-		} else {
-			contentStates.value.characters = await restoreContentTrashItem<CharactersPageContent>(item.id);
-		}
+		contentStates.value[item.page] = await restoreContentTrashItem(item.id);
 		status.value = `${item.itemLabel} was restored to the unpublished draft.`;
 		await loadRecovery(item.page);
 	} catch (caught: any) {
@@ -513,17 +572,10 @@ async function confirmRevisionRestore() {
 	busy.value = true;
 	error.value = "";
 	try {
-		if (currentPage.value === "about") {
-			contentStates.value.about = await restoreSiteContentRevision<AboutPageContent>(
-				"about",
-				pendingRevision.value.id
-			);
-		} else {
-			contentStates.value.characters = await restoreSiteContentRevision<CharactersPageContent>(
-				"characters",
-				pendingRevision.value.id
-			);
-		}
+		contentStates.value[currentPage.value] = await restoreSiteContentRevision(
+			currentPage.value,
+			pendingRevision.value.id
+		);
 		status.value = `Version ${pendingRevision.value.version} was restored as an unpublished draft. Preview it before publishing.`;
 		pendingRevision.value = null;
 		draftItem.value = null;
@@ -635,6 +687,7 @@ onBeforeRouteUpdate(() => {
 				<button type="button" @click="selectKind('character')">A character</button>
 				<button type="button" @click="selectKind('story')">A story</button>
 				<button type="button" @click="selectKind('world')">A world entry</button>
+				<button type="button" @click="selectKind('artwork')">The artwork gallery</button>
 			</div>
 		</div>
 
@@ -649,10 +702,26 @@ onBeforeRouteUpdate(() => {
 				</button>
 			</header>
 			<div class="item-chooser__list">
-				<article v-for="item in currentItems" :key="item.id">
+				<article v-for="(item, index) in currentItems" :key="item.id">
 					<strong>{{ titleForItem(item) }}</strong>
 					<div>
 						<button type="button" @click="beginEdit(item)">Edit {{ titleForItem(item) }}</button>
+						<button
+							v-if="editorKind === 'artwork'"
+							type="button"
+							:disabled="busy || index === 0"
+							@click="moveArtwork(index, -1)"
+						>
+							Move {{ titleForItem(item) }} earlier
+						</button>
+						<button
+							v-if="editorKind === 'artwork'"
+							type="button"
+							:disabled="busy || index === currentItems.length - 1"
+							@click="moveArtwork(index, 1)"
+						>
+							Move {{ titleForItem(item) }} later
+						</button>
 						<button class="item-chooser__trash" type="button" @click="askToTrash(item)">
 							Move {{ titleForItem(item) }} to trash
 						</button>
@@ -708,6 +777,49 @@ onBeforeRouteUpdate(() => {
 				</li>
 			</ol>
 
+			<fieldset v-if="editorKind === 'artwork' && currentArtwork && step === 1">
+				<legend>Artwork gallery</legend>
+				<p>Choose a picture, name it, and add a caption. Save privately before publishing.</p>
+				<button type="button" @click="mediaPickerOpen = !mediaPickerOpen">
+					Choose or upload an artwork picture
+				</button>
+				<img
+					v-if="currentArtwork.image"
+					:src="currentArtwork.image"
+					:alt="currentArtwork.alt"
+					style="max-height: 15rem; object-fit: contain"
+				/>
+				<AdminMediaManager v-if="mediaPickerOpen" selectable @select="chooseMedia" />
+				<label
+					><span>Artwork title</span><input v-model="currentArtwork.title" required maxlength="120"
+				/></label>
+				<label
+					><span>Describe the picture</span
+					><input v-model="currentArtwork.alt" required minlength="2" maxlength="180"
+				/></label>
+				<label
+					><span>Collection</span
+					><select v-model="currentArtwork.collection">
+						<option v-for="(label, key) in artworkCollectionLabels" :key="key" :value="key">
+							{{ label }}
+						</option>
+					</select></label
+				>
+				<label
+					><span>Caption (optional)</span
+					><textarea v-model="currentArtwork.caption" maxlength="2000" rows="5" />
+				</label>
+				<details class="advanced-fields">
+					<summary>Connect this artwork to a reading page</summary>
+					<label
+						><span>Page address on this site</span
+						><input
+							v-model="currentArtwork.link"
+							maxlength="180"
+							placeholder="/characters#exo-dexus" /></label
+					><label><span>Link label</span><input v-model="currentArtwork.linkLabel" maxlength="120" /></label>
+				</details>
+			</fieldset>
 			<fieldset v-if="editorKind === 'character' && currentCharacter && step === 1">
 				<legend>Character essentials</legend>
 				<p>Start with a name and description. A picture is optional; you can add one later.</p>
@@ -815,23 +927,24 @@ onBeforeRouteUpdate(() => {
 				</label>
 			</fieldset>
 
-			<fieldset v-if="editorKind === 'story' && currentStory && step === 2">
-				<legend>Story beats</legend>
-				<p>Work through one moment at a time. Each answer can be short.</p>
-				<div class="story-beats">
-					<label v-for="field in storyBeatFields" :key="field.key">
-						<span>{{ field.label }}</span>
-						<textarea v-model="currentStory[field.key]" maxlength="420" minlength="4" required rows="3" />
+			<div v-if="editorKind === 'story' && currentStory && step === 2">
+				<StoryReadingEditor v-model="currentStory" :is-new="isNew" />
+				<details class="advanced-fields">
+					<summary>Original outline fields</summary>
+					<p>These remain available for planning. The reading sections above are shown on the story page.</p>
+					<label v-for="field in storyBeatFields" :key="field.key"
+						><span>{{ field.label }}</span
+						><textarea v-model="currentStory[field.key]" maxlength="420" rows="3" />
 					</label>
-				</div>
-			</fieldset>
+				</details>
+			</div>
 
 			<fieldset v-if="editorKind === 'story' && currentStory && step === 3">
 				<legend>Additional note</legend>
-				<p>Add one useful fact or reminder about this story.</p>
+				<p>Add a closing note for readers, if you want one.</p>
 				<label>
 					<span>Note</span>
-					<textarea v-model="currentStory.note" maxlength="320" minlength="4" required rows="5" />
+					<textarea v-model="currentStory.note" maxlength="320" rows="5" />
 				</label>
 			</fieldset>
 
@@ -884,6 +997,17 @@ onBeforeRouteUpdate(() => {
 			<section v-if="step === stepLabels.length" class="item-preview" aria-labelledby="item-preview-title">
 				<p class="guided-editor__eyebrow">Preview</p>
 				<h4 id="item-preview-title">Check how this will read</h4>
+				<p>
+					Publishing updates all saved
+					{{
+						currentPage === "artwork"
+							? "gallery"
+							: currentPage === "about"
+								? "story"
+								: "character and world"
+					}}
+					drafts on this page. Other pages stay as they are.
+				</p>
 				<template v-if="editorKind === 'character' && currentCharacter">
 					<img v-if="currentCharacter.image" :alt="currentCharacter.imgAlt" :src="currentCharacter.image" />
 					<p>{{ currentCharacter.role || "Role not finished" }}</p>
@@ -902,9 +1026,26 @@ onBeforeRouteUpdate(() => {
 					<p>{{ currentStory.label || "Label not finished" }}</p>
 					<h3>{{ currentStory.title || "Story title not finished" }}</h3>
 					<p>{{ currentStory.description || "Summary not finished" }}</p>
-					<strong>Climax</strong>
-					<p>{{ currentStory.climax || "Climax not finished" }}</p>
+					<figure v-if="currentStory.artwork?.image">
+						<img :src="currentStory.artwork.image" :alt="currentStory.artwork.alt" />
+						<figcaption>{{ currentStory.artwork.caption }}</figcaption>
+					</figure>
+					<section v-for="section in storySections(currentStory)" :key="section.id">
+						<h4>{{ section.heading || "Heading not finished" }}</h4>
+						<p style="white-space: pre-line">{{ section.text || "Story text not finished" }}</p>
+						<figure v-if="section.image">
+							<img :src="section.image" :alt="section.alt" />
+							<figcaption>{{ section.caption }}</figcaption>
+						</figure>
+					</section>
+					<p v-if="currentStory.note">{{ currentStory.note }}</p>
 				</template>
+				<template v-else-if="editorKind === 'artwork' && currentArtwork"
+					><img v-if="currentArtwork.image" :src="currentArtwork.image" :alt="currentArtwork.alt" />
+					<h3>{{ currentArtwork.title }}</h3>
+					<p>{{ currentArtwork.caption }}</p>
+					<p>{{ currentArtwork.linkLabel }}</p></template
+				>
 				<template v-else-if="editorKind === 'world' && currentWorld">
 					<p>{{ currentWorld.label || "Label not finished" }}</p>
 					<h3>{{ currentWorld.title || "Title not finished" }}</h3>
@@ -1387,7 +1528,8 @@ onBeforeRouteUpdate(() => {
 	padding: clamp(1rem, 3vw, 1.4rem);
 }
 
-.item-preview > img {
+.item-preview img {
+	display: block;
 	width: min(100%, 20rem);
 	max-height: 20rem;
 	object-fit: contain;
@@ -1395,7 +1537,15 @@ onBeforeRouteUpdate(() => {
 	background: #08111f;
 }
 
-.item-preview > p:not(.guided-editor__eyebrow) {
+.item-preview figure,
+.item-preview section {
+	display: grid;
+	gap: 0.8rem;
+	margin: 0;
+}
+
+.item-preview p:not(.guided-editor__eyebrow),
+.item-preview figcaption {
 	color: rgba(255, 255, 255, 0.75);
 	line-height: 1.7;
 }

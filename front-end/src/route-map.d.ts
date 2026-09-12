@@ -87,18 +87,11 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/stories/fall-of-a-dream': RouteRecordInfo<
-      '/stories/fall-of-a-dream',
-      '/stories/fall-of-a-dream',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '/stories/the-list': RouteRecordInfo<
-      '/stories/the-list',
-      '/stories/the-list',
-      Record<never, never>,
-      Record<never, never>,
+    '/stories/[slug]': RouteRecordInfo<
+      '/stories/[slug]',
+      '/stories/:slug',
+      { slug: ParamValue<true> },
+      { slug: ParamValue<false> },
       | never
     >,
     '/studio/admin': RouteRecordInfo<
@@ -192,21 +185,13 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/stories/fall-of-a-dream.vue': {
+    'src/pages/stories/[slug].vue': {
       routes:
-        | '/stories/fall-of-a-dream'
+        | '/stories/[slug]'
       views:
         | never
       pathParamNames:
-        | never
-    }
-    'src/pages/stories/the-list.vue': {
-      routes:
-        | '/stories/the-list'
-      views:
-        | never
-      pathParamNames:
-        | never
+        | 'slug'
     }
     'src/pages/studio/admin.vue': {
       routes:

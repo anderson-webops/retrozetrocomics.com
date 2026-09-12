@@ -8,6 +8,7 @@ import { ViteSSG } from "vite-ssg";
 import { routes } from "vue-router/auto-routes";
 
 import App from "./App.vue";
+import { createPublishedContent, publishedContentKey } from "./composables/publishedContent";
 // Assuming you have styles defined in these files
 import "@unocss/reset/tailwind.css";
 import "./styles/main.css";
@@ -29,6 +30,7 @@ export const createApp = ViteSSG(
 		base: import.meta.env.BASE_URL
 	},
 	ctx => {
+		ctx.app.provide(publishedContentKey, createPublishedContent(ctx.initialState.publishedContent));
 		// ctx is the context where you can add global components or plugins
 		ctx.app.component("font-awesome-icon", FontAwesomeIcon);
 		ctx.router.beforeEach(to => {

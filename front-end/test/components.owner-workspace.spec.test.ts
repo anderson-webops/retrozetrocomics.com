@@ -44,7 +44,7 @@ describe("owner workspace", () => {
 		expect(wrapper.text()).toContain("Add a picture or comic");
 		expect(wrapper.text()).toContain("Edit the home page");
 		expect(wrapper.text()).toContain("Add a character");
-		expect(wrapper.text()).toContain("Add a story idea");
+		expect(wrapper.text()).toContain("Add a story or chapter");
 		expect(wrapper.text()).toContain("Edit something");
 		expect(wrapper.text()).toContain("Preview as a visitor");
 		expect(wrapper.text()).toContain("Advanced tools");

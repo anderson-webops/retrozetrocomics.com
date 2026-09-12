@@ -243,7 +243,7 @@ for (const publicContentSource of [artworkPage, worldEntryPresentation, worldsDa
 		/working story|source notes|story files|world notes|final canon|open questions|still being developed/i
 	);
 }
-assert.match(artworkPage, /85 hand-drawn/);
+assert.match(artworkPage, /\{\{ tylerArtworkItems\.length \}\} hand-drawn/);
 assert.doesNotMatch(artworkPage, /Show more artwork/);
 assert.match(artworkPage, /background-color: #09182a/);
 assert.doesNotMatch(artworkPage, /background: rgba\(249, 234, 219/);
