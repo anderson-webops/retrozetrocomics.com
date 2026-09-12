@@ -1,7 +1,7 @@
 {
 	"name": "retrozetro-monorepo",
 	"type": "module",
-	"version": "2.8.0",
+	"version": "2.9.0",
 	"private": true,
 	"packageManager": "npm@12.0.2",
 	"engines": {
@@ -22,7 +22,7 @@
 		"audit": "node scripts/run-pinned-npm.mjs audit --workspaces --audit-level=low",
 		"audit:production": "node scripts/run-pinned-npm.mjs audit --workspaces --omit=dev --audit-level=low",
 		"audit:signatures": "node scripts/run-pinned-npm.mjs audit signatures",
-		"build": "node scripts/run-pinned-npm.mjs run -w front-end build && node scripts/run-pinned-npm.mjs run -w back-end build && node scripts/write-release-metadata.mjs",
+		"build": "node scripts/run-pinned-npm.mjs run -w front-end build && node scripts/run-pinned-npm.mjs run -w back-end build && node scripts/run-pinned-npm.mjs exec -w front-end -- vite build --config vite.ssr.config.mts && node scripts/write-release-metadata.mjs && node scripts/verify-publishing.mjs",
 		"build:netlify": "node scripts/run-pinned-npm.mjs run -w front-end build && node scripts/write-release-metadata.mjs && node scripts/write-netlify-headers.mjs",
 		"clean": "node scripts/clean.mjs",
 		"dev": "node scripts/run-pinned-npm.mjs run -w front-end dev",
@@ -46,7 +46,8 @@
 		"verify:native-lock": "node scripts/verify-native-lock.mjs",
 		"verify:platform-install": "node scripts/verify-platform-install.mjs",
 		"verify:production-install": "node scripts/verify-production-install.mjs",
-		"verify:startup-diagnostics": "node scripts/verify-startup-diagnostics.mjs"
+		"verify:startup-diagnostics": "node scripts/verify-startup-diagnostics.mjs",
+		"verify:publishing": "node scripts/verify-publishing.mjs"
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^9.2.0",

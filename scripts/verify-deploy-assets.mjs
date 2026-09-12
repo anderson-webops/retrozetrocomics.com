@@ -221,7 +221,7 @@ assert.equal(contentManifest.visualPresentation.adPlaceholders, "commented-out-f
 const layout = await read("front-end/src/layouts/default.vue");
 assert.equal([...layout.matchAll(/<!-- Parked (?:top|left|right) placement\.[\s\S]*?<SiteAdSlot[\s\S]*?-->/g)].length, 3);
 assert.equal(contentManifest.siteContent["artwork-page"].initialHtmlImages, 85);
-assert.equal(contentManifest.publicRoutes.length, 10);
+assert.equal(contentManifest.publicRoutes.length, 12);
 assert.equal(contentManifest.visualPresentation.controlRadius, "8px");
 const publicationBoundaries = contentManifest.publicationBoundaries.join("\n");
 assert.match(publicationBoundaries, /remain distinct story arcs/);
@@ -243,7 +243,7 @@ for (const publicContentSource of [artworkPage, worldEntryPresentation, worldsDa
 		/working story|source notes|story files|world notes|final canon|open questions|still being developed/i
 	);
 }
-assert.match(artworkPage, /85 hand-drawn/);
+assert.match(artworkPage, /\{\{ tylerArtworkItems\.length \}\} hand-drawn/);
 assert.doesNotMatch(artworkPage, /Show more artwork/);
 assert.match(artworkPage, /background-color: #09182a/);
 assert.doesNotMatch(artworkPage, /background: rgba\(249, 234, 219/);

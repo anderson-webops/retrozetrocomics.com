@@ -17,7 +17,7 @@ import VueRouter from "vue-router/vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const siteHostname = "https://retrozetrocomics.com";
-const sitemapExcludedRoutes = ["/studio/admin", "/stories", "/:all(.*)"];
+const sitemapExcludedRoutes = ["/studio/admin", "/stories", "/search", "/:all(.*)"];
 const staticRenderExcludedRoutes = ["/studio", "/:all(.*)"];
 
 export default defineConfig(({ command }) => ({
@@ -92,7 +92,13 @@ export default defineConfig(({ command }) => ({
 			reduceInlineStyles: false
 		},
 		includedRoutes(paths: string[]) {
-			return paths.filter((path: string) => !staticRenderExcludedRoutes.includes(path));
+			return [
+				...paths.filter(
+					(path: string) => !staticRenderExcludedRoutes.includes(path) && !path.includes(":slug")
+				),
+				"/stories/the-list",
+				"/stories/fall-of-a-dream"
+			];
 		},
 		onFinished() {
 			generateSitemap({

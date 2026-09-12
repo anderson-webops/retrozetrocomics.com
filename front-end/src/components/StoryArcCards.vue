@@ -2,7 +2,7 @@
 import type { AboutStoryArc } from "@/types/site";
 import { nextTick } from "vue";
 import { useLocalDraft } from "@/composables/useLocalDraft";
-import { storyRoutes, storySections } from "@/content/storyReading";
+import { storyPath } from "@/content/storyReading";
 
 type StoryArcBeatKey =
 	"climax" | "firstPlotPoint" | "hook" | "incitingIncident" | "midpoint" | "resolution" | "thirdPlotPoint";
@@ -191,7 +191,8 @@ watch(
 						<textarea v-model="draftArc.description" maxlength="520" minlength="12" required rows="4" />
 					</label>
 
-					<div class="story-arc-card__beats">
+					<StoryReadingEditor v-if="draftArc.readingSections?.length" v-model="draftArc" :is-new="false" />
+					<div v-else class="story-arc-card__beats">
 						<label v-for="field in editorBeatFields" :key="field.key">
 							<span>{{ field.label }}</span>
 							<textarea v-model="draftArc[field.key]" maxlength="420" minlength="4" required rows="3" />
@@ -200,7 +201,7 @@ watch(
 
 					<label>
 						<span>Closing beat</span>
-						<textarea v-model="draftArc.note" maxlength="320" minlength="4" required rows="3" />
+						<textarea v-model="draftArc.note" maxlength="320" rows="3" />
 					</label>
 
 					<div class="story-arc-card__footer">
@@ -223,14 +224,7 @@ watch(
 				<p class="story-arc-card__eyebrow">{{ arc.label }}</p>
 				<h3>{{ arc.title }}</h3>
 				<p class="story-arc-card__summary">{{ arc.description }}</p>
-				<RouterLink v-if="storyRoutes[arc.id]" :to="storyRoutes[arc.id]">Read {{ arc.title }}</RouterLink>
-				<details v-else>
-					<summary>Read {{ arc.title }}</summary>
-					<section v-for="section in storySections(arc)" :key="section.id">
-						<h4>{{ section.heading }}</h4>
-						<p>{{ section.text }}</p>
-					</section>
-				</details>
+				<RouterLink :to="storyPath(arc)">Read {{ arc.title }}</RouterLink>
 			</template>
 		</article>
 

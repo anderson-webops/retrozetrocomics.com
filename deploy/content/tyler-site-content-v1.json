@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"contentId": "tyler-source-backed-site-content-v1",
-	"activationPolicy": "Use checked-in defaults only when the matching SiteContent record is absent or invalid. Never overwrite an owner-created record automatically.",
+	"activationPolicy": "Use checked-in defaults only when the matching SiteContent record is absent. Never overwrite an owner-created record automatically. Invalid published records return an unavailable response; they must not silently fall back to defaults.",
 	"hashSemantics": {
 		"sourceSha256": "SHA-256 of the raw creative-source file retained for provenance.",
 		"storedSanitizedSha256": "SHA-256 of the importer-sanitized bytes stored on the server and returned by the public media URL."
@@ -288,6 +288,8 @@
 	],
 	"publicRoutes": [
 		"/",
+		"/start",
+		"/search",
 		"/about",
 		"/characters",
 		"/worlds",

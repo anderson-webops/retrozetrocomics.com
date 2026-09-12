@@ -31,6 +31,7 @@ import {
 import { canonicalRedirectUrl } from "./services/domainRouting.js";
 import { createProbeRouter } from "./services/probes.js";
 import { publicPageRateLimiter } from "./services/rateLimits.js";
+import { createPublishedPageRouter } from "./services/publishedPages.js";
 import {
 	ensureUploadDirectories,
 	uploadRoot
@@ -194,6 +195,9 @@ export function createApp() {
 	);
 
 		if (existsSync(staticRoot)) {
+			app.use(createPublishedPageRouter(staticRoot, {
+				isProduction: config.isProduction, imageSources: config.contentImageSources
+			}));
 			app.get("/.well-known/security.txt", publicPageRateLimiter, (_req, res, next) => {
 				res.type("text/plain").set("Cache-Control", "public, max-age=86400");
 				return res.sendFile(

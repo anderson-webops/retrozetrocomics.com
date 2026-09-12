@@ -131,6 +131,11 @@ try {
 	}
 
 	await import(new URL(`file://${join(temporaryDirectory, "back-end", "dist", "app.js")}`));
+	const renderer = await import(new URL(`file://${join(temporaryDirectory, "back-end", "dist", "public-renderer", "entry-server.mjs")}`));
+	const content = await import(new URL(`file://${join(temporaryDirectory, "back-end", "dist", "services", "siteContent.js")}`));
+	const snapshot = Object.fromEntries(["about", "artwork", "characters", "home"].map(page => [page, content.createDefaultSiteContent(page)]));
+	const rendered = await renderer.renderPublishedPage("/stories/the-list", snapshot);
+	if (!rendered.html.includes("The List")) throw new Error("Production renderer did not load the story");
 
 	for (const packageName of omitted) {
 		if (

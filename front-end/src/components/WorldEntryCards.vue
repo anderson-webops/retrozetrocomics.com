@@ -141,6 +141,7 @@ watch(
 	>
 		<article
 			v-for="entry in props.items"
+			:id="`world-${entry.id}`"
 			:key="entry.id"
 			class="world-entry-card"
 			:class="{

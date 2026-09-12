@@ -48,7 +48,7 @@ export interface CharacterBoardWorldEntry {
 }
 
 export interface HomeShowcaseItem {
-	destination: "/about" | "/artwork" | "/characters" | "/worlds" | "/stories/the-list" | "/stories/fall-of-a-dream";
+	destination: "/about" | "/artwork" | "/characters" | "/worlds" | `/stories/${string}`;
 	fallbackImage?: string;
 	format: string;
 	id: string;
@@ -68,6 +68,9 @@ export interface HomePageContent {
 }
 
 export interface AboutStoryArc {
+	slug?: string;
+	readingSections?: StorySection[];
+	artwork?: { image: string; alt: string; caption: string };
 	climax: string;
 	description: string;
 	firstPlotPoint: string;
@@ -80,6 +83,30 @@ export interface AboutStoryArc {
 	resolution: string;
 	thirdPlotPoint: string;
 	title: string;
+}
+
+export interface StorySection {
+	id: string;
+	heading: string;
+	text: string;
+	image?: string;
+	alt?: string;
+	caption?: string;
+}
+
+export interface ArtworkItem {
+	id: string;
+	title: string;
+	image: string;
+	alt: string;
+	collection: "characters" | "exo" | "machines" | "opex" | "peoples" | "zetro";
+	caption?: string;
+	link?: string;
+	linkLabel?: string;
+}
+
+export interface ArtworkPageContent {
+	items: ArtworkItem[];
 }
 
 export interface AboutMilestone {
@@ -140,12 +167,13 @@ export interface DashboardData {
 	storage: DashboardStorage;
 }
 
-export type SiteContentPage = "about" | "characters" | "home";
-export type SiteContentCollection = "characters" | "showcaseItems" | "storyArcs" | "worldEntries";
-export type EditableSiteContent = AboutPageContent | CharactersPageContent | HomePageContent;
+export type SiteContentPage = "about" | "artwork" | "characters" | "home";
+export type SiteContentCollection = "characters" | "items" | "showcaseItems" | "storyArcs" | "worldEntries";
+export type EditableSiteContent = AboutPageContent | ArtworkPageContent | CharactersPageContent | HomePageContent;
 
 export interface AdminSiteContentState<T extends EditableSiteContent = EditableSiteContent> {
 	draft: T;
+	editVersion?: number;
 	draftUpdatedAt: string | null;
 	hasDraft: boolean;
 	lastPublishedAt: string | null;

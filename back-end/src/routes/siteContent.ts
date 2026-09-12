@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
 	getAboutPageContent,
+ getArtworkPageContent,
 	getCharactersPageContent,
 	getHomePageContent
 } from "../controllers/siteContentController.js";
@@ -13,3 +14,5 @@ export const siteContentRouter = Router();
 siteContentRouter.get("/about", publicContentRateLimiter, asyncHandler(getAboutPageContent));
 siteContentRouter.get("/characters", publicContentRateLimiter, asyncHandler(getCharactersPageContent));
 siteContentRouter.get("/home", publicContentRateLimiter, asyncHandler(getHomePageContent));
+
+siteContentRouter.get("/artwork", publicContentRateLimiter, asyncHandler(getArtworkPageContent));

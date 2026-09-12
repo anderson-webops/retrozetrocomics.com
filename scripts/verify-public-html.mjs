@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { parse } from "parse5";
 
 const root = new URL("../", import.meta.url);
-const routes = ["/", "/about", "/characters", "/worlds", "/artwork", "/contact", "/creator", "/privacy", "/stories/the-list", "/stories/fall-of-a-dream"];
+const routes = ["/", "/start", "/search", "/about", "/characters", "/worlds", "/artwork", "/contact", "/creator", "/privacy", "/stories/the-list", "/stories/fall-of-a-dream"];
 const manifest = JSON.parse(await readFile(new URL("deploy/content/tyler-site-content-v1.json", root), "utf8"));
 const sitemap = await readFile(new URL("front-end/dist/sitemap.xml", root), "utf8");
 const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)].map(match => match[1].trim());
@@ -30,7 +30,13 @@ for (const route of routes) {
 	assert.equal(canonical.length, 1, `${route}: exactly one canonical`);
 	const canonicalUrl = attr(canonical[0], "href");
 	assert.equal(new URL(canonicalUrl).pathname, route, `${route}: correct canonical`);
-	assert.ok(sitemapUrls.includes(canonicalUrl), `${route}: included in sitemap`);
+	if (route === "/search") {
+		assert.ok(!sitemapUrls.includes(canonicalUrl), "Search is excluded from the sitemap");
+		assert.ok(all.some(node => attr(node, "name") === "robots" && attr(node, "content").includes("noindex")), "Search is not indexed");
+	}
+	else {
+		assert.ok(sitemapUrls.includes(canonicalUrl), `${route}: included in sitemap`);
+	}
 	const description = all.filter(node => node.tagName === "meta" && attr(node, "name") === "description");
 	assert.equal(description.length, 1, `${route}: one description`);
 	assert.ok(attr(description[0], "content").length >= 30, `${route}: useful description`);

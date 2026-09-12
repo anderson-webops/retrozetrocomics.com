@@ -8,8 +8,11 @@ import type {
 } from "@/types/site";
 import { computed, onMounted, ref, watch } from "vue";
 
+import { useAboutPageContent } from "@/composables/useAboutPageContent";
+import { useHomePageContent } from "@/composables/useHomePageContent";
 import { useLocalDraft } from "@/composables/useLocalDraft";
 import { cloneHomePageContent, createDefaultHomePageContent } from "@/content/defaultHomePageContent";
+import { storyPath } from "@/content/storyReading";
 import {
 	fetchAdminSiteContent,
 	fetchSiteContentRevisions,
@@ -22,6 +25,10 @@ const emit = defineEmits<{
 	back: [];
 	dirtyChange: [dirty: boolean];
 }>();
+
+const { content: stories, load: loadStories } = useAboutPageContent();
+const { apply: applyPublishedHome } = useHomePageContent();
+onMounted(() => void loadStories(true));
 
 const state = ref<AdminSiteContentState<HomePageContent> | null>(null);
 const form = ref<HomePageContent>(createDefaultHomePageContent());
@@ -92,6 +99,7 @@ function formatDate(value: string | null | undefined) {
 
 function applyState(nextState: AdminSiteContentState<HomePageContent>, clearLocal = true) {
 	state.value = nextState;
+	applyPublishedHome(nextState.published);
 	form.value = cloneHomePageContent(nextState.draft);
 	savedSnapshot.value = JSON.stringify(form.value);
 	selectedIndex.value = Math.min(selectedIndex.value, form.value.showcaseItems.length - 1);
@@ -129,7 +137,11 @@ async function saveDraft() {
 	status.value = "";
 	validationIssues.value = [];
 	try {
-		const nextState = await saveAdminSiteContentDraft<HomePageContent>("home", form.value);
+		const nextState = await saveAdminSiteContentDraft<HomePageContent>(
+			"home",
+			form.value,
+			state.value?.editVersion
+		);
 		applyState(nextState);
 		status.value = "The home page was saved privately. Visitors still see the current published version.";
 		return true;
@@ -149,7 +161,7 @@ async function publishDraft() {
 	error.value = "";
 	status.value = "";
 	try {
-		const nextState = await publishAdminSiteContentDraft<HomePageContent>("home");
+		const nextState = await publishAdminSiteContentDraft<HomePageContent>("home", state.value?.editVersion);
 		applyState(nextState);
 		revisions.value = await fetchSiteContentRevisions("home");
 		status.value = "The home page is published. Visitors can now see these pictures and descriptions.";
@@ -353,8 +365,9 @@ onMounted(() => {
 						<span>Where “Read more” goes</span>
 						<select v-model="currentItem.destination">
 							<option value="/about">Story</option>
-							<option value="/stories/the-list">Read The List</option>
-							<option value="/stories/fall-of-a-dream">Read The Fall of a Dream</option>
+							<option v-for="story in stories.storyArcs" :key="story.id" :value="storyPath(story)">
+								Read {{ story.title }}
+							</option>
 							<option value="/characters">Characters and factions</option>
 							<option value="/worlds">Worlds, peoples, and technology</option>
 							<option value="/artwork">Artwork gallery</option>

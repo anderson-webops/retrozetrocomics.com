@@ -1,8 +1,12 @@
 <script lang="ts" setup>
 import type { ArtworkCollection } from "@/content/tylerArtwork";
-import { artworkConnections } from "@/content/artworkConnections";
-import { artworkCollectionLabels, tylerArtworkItems } from "@/content/tylerArtwork";
+import { usePublishedPage } from "@/composables/publishedContent";
+import { artworkCollectionLabels } from "@/content/tylerArtwork";
 import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
+
+const { content, load } = usePublishedPage("artwork");
+const tylerArtworkItems = computed(() => content.value.items);
+onMounted(() => void load());
 
 type ArtworkFilter = "all" | ArtworkCollection;
 
@@ -11,12 +15,12 @@ const searchQuery = ref("");
 
 const collections = computed(() => [
 	{
-		count: tylerArtworkItems.length,
+		count: tylerArtworkItems.value.length,
 		id: "all" as const,
 		label: "All artwork"
 	},
 	...Object.entries(artworkCollectionLabels).map(([id, label]) => ({
-		count: tylerArtworkItems.filter(item => item.collection === id).length,
+		count: tylerArtworkItems.value.filter(item => item.collection === id).length,
 		id: id as ArtworkCollection,
 		label
 	}))
@@ -25,7 +29,7 @@ const collections = computed(() => [
 const filteredArtwork = computed(() => {
 	const query = searchQuery.value.trim().toLowerCase();
 
-	return tylerArtworkItems.filter(item => {
+	return tylerArtworkItems.value.filter(item => {
 		const matchesCollection = activeCollection.value === "all" || item.collection === activeCollection.value;
 		const matchesSearch =
 			!query || `${item.title} ${artworkCollectionLabels[item.collection]}`.toLowerCase().includes(query);
@@ -48,7 +52,7 @@ useHead({
 	meta: [
 		{
 			name: "description",
-			content: "Explore 85 hand-drawn RetroZetro character, creature, armor, and machine designs."
+			content: "Explore original hand-drawn RetroZetro character, creature, armor, and machine designs."
 		},
 		{
 			property: "og:title",
@@ -56,7 +60,7 @@ useHead({
 		},
 		{
 			property: "og:description",
-			content: "Explore 85 hand-drawn RetroZetro character, creature, armor, and machine designs."
+			content: "Explore original hand-drawn RetroZetro character, creature, armor, and machine designs."
 		},
 		{
 			property: "og:url",
@@ -77,8 +81,8 @@ useHead({
 					<span>Retroverse</span>
 				</h1>
 				<p>
-					Explore Exo, Zetro, Opex, alien peoples, armor, robots, and character studies through 85 hand-drawn
-					designs.
+					Explore Exo, Zetro, Opex, alien peoples, armor, robots, and character studies through
+					{{ tylerArtworkItems.length }} hand-drawn designs.
 				</p>
 				<div class="artwork-hero__actions">
 					<RouterLink to="/characters">Meet the characters</RouterLink>
@@ -87,16 +91,10 @@ useHead({
 			</div>
 			<div class="artwork-hero__images" aria-label="Featured hand-drawn artwork">
 				<ResolvedImage
-					alt="Hand-drawn Exo and Shaman character designs."
-					:candidates="['/uploads/content/tyler-handdrawn-v1/063-ba7430851cc35538.jpg']"
-				/>
-				<ResolvedImage
-					alt="Hand-drawn original resketch of Zetro."
-					:candidates="['/uploads/content/tyler-handdrawn-v1/045-7896e301de44957c.jpg']"
-				/>
-				<ResolvedImage
-					alt="Hand-drawn CBot design."
-					:candidates="['/uploads/content/tyler-handdrawn-v1/035-6142ad22797171ad.jpg']"
+					v-for="item in tylerArtworkItems.slice(0, 3)"
+					:key="item.id"
+					:alt="item.alt"
+					:candidates="[item.image]"
 				/>
 			</div>
 		</section>
@@ -138,12 +136,8 @@ useHead({
 					<figcaption>
 						<strong>{{ item.title }}</strong>
 						<span>{{ artworkCollectionLabels[item.collection] }}</span>
-						<template v-if="artworkConnections[item.id]">
-							<p>{{ artworkConnections[item.id].text }}</p>
-							<RouterLink :to="artworkConnections[item.id].href">{{
-								artworkConnections[item.id].label
-							}}</RouterLink>
-						</template>
+						<p v-if="item.caption">{{ item.caption }}</p>
+						<RouterLink v-if="item.link" :to="item.link">{{ item.linkLabel }}</RouterLink>
 					</figcaption>
 				</figure>
 			</div>

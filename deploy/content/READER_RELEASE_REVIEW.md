@@ -2,6 +2,9 @@
 
 Reviewed for v2.8.0 on 2026-09-11. This is an operator document, not public site content.
 
+The static-content synchronization limitation below describes v2.8.0. The v2.9.0 publishing handoff supersedes it
+with runtime rendering of published records. The creative-source boundaries remain unchanged.
+
 ## Source boundaries
 
 The attached Tyler archive was read without modifying it. Primary evidence is the retained original-message text in

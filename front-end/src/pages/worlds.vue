@@ -66,6 +66,7 @@ useHead({
 			<div class="world-card-grid">
 				<article
 					v-for="feature in retroverseWorlds"
+					:id="feature.id"
 					:key="feature.id"
 					class="world-card"
 					:class="{ 'world-card--text-only': !feature.image }"
@@ -109,7 +110,12 @@ useHead({
 			</header>
 
 			<div class="conflict-grid">
-				<article v-for="feature in retroverseConflicts" :key="feature.id" class="conflict-card">
+				<article
+					v-for="feature in retroverseConflicts"
+					:id="feature.id"
+					:key="feature.id"
+					class="conflict-card"
+				>
 					<div class="conflict-card__media">
 						<ResolvedImage
 							:alt="feature.imageAlt || ''"
@@ -145,7 +151,12 @@ useHead({
 			</header>
 
 			<div class="technology-grid">
-				<article v-for="feature in retroverseTechnology" :key="feature.id" class="technology-card">
+				<article
+					v-for="feature in retroverseTechnology"
+					:id="feature.id"
+					:key="feature.id"
+					class="technology-card"
+				>
 					<div
 						class="technology-card__media"
 						:class="{ 'technology-card__media--pair': feature.secondImage }"

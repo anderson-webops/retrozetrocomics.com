@@ -14,6 +14,7 @@
 // ***********************************************************
 
 import { createDefaultAboutPageContent } from "../../src/content/defaultAboutPageContent";
+import { createDefaultArtworkPageContent } from "../../src/content/defaultArtworkPageContent";
 
 import { createDefaultCharactersPageContent } from "../../src/content/defaultCharactersPageContent";
 import { createDefaultHomePageContent } from "../../src/content/defaultHomePageContent";
@@ -21,6 +22,7 @@ import { createDefaultHomePageContent } from "../../src/content/defaultHomePageC
 import "./commands";
 
 beforeEach(() => {
+	cy.intercept("GET", "/api/site-content/artwork", { body: { content: createDefaultArtworkPageContent() } });
 	cy.intercept("GET", "/api/site-content/home", {
 		body: { content: createDefaultHomePageContent() },
 		statusCode: 200

@@ -59,8 +59,8 @@ interface HeroHighlight {
 }
 
 const defaultActions: HeroAction[] = [
-	{ label: "Meet the Characters", style: "primary", to: "/characters" },
-	{ label: "Enter the Story", style: "secondary", to: "/about" }
+	{ label: "Start reading", style: "primary", to: "/start" },
+	{ label: "Meet the Characters", style: "secondary", to: "/characters" }
 ];
 
 const defaultHighlights: HeroHighlight[] = [

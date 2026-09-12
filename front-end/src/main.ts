@@ -1,5 +1,5 @@
 import type { UserModule } from "~/types.ts";
-import { library } from "@fortawesome/fontawesome-svg-core";
+import { config, library } from "@fortawesome/fontawesome-svg-core";
 import { faFacebook, faGithub, faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -8,12 +8,15 @@ import { ViteSSG } from "vite-ssg";
 import { routes } from "vue-router/auto-routes";
 
 import App from "./App.vue";
+import { createPublishedContent, publishedContentKey } from "./composables/publishedContent";
+import "@fortawesome/fontawesome-svg-core/styles.css";
 // Assuming you have styles defined in these files
 import "@unocss/reset/tailwind.css";
 import "./styles/main.css";
 import "uno.css";
 
 // FontAwesome library setup
+config.autoAddCss = false;
 library.add(faFacebook, faGithub, faInstagram, faEnvelope);
 
 // https://github.com/antfu/vite-ssg
@@ -29,6 +32,7 @@ export const createApp = ViteSSG(
 		base: import.meta.env.BASE_URL
 	},
 	ctx => {
+		ctx.app.provide(publishedContentKey, createPublishedContent(ctx.initialState.publishedContent));
 		// ctx is the context where you can add global components or plugins
 		ctx.app.component("font-awesome-icon", FontAwesomeIcon);
 		ctx.router.beforeEach(to => {

@@ -3,6 +3,7 @@ import { flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import AdminHomeContentEditor from "../src/components/admin/AdminHomeContentEditor.vue";
+import { createPublishedContent, publishedContentKey } from "../src/composables/publishedContent";
 import { createDefaultHomePageContent } from "../src/content/defaultHomePageContent";
 
 const apiMocks = vi.hoisted(() => ({
@@ -41,6 +42,7 @@ describe("admin home content editor", () => {
 	it("loads the reviewed highlights and keeps publication behind confirmation", async () => {
 		const wrapper = mount(AdminHomeContentEditor, {
 			global: {
+				provide: { [publishedContentKey as symbol]: createPublishedContent() },
 				stubs: {
 					AdminConfirmDialog: {
 						emits: ["cancel", "confirm"],
