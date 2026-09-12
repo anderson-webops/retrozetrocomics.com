@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { parseFragment } from "parse5";
 
 const { renderPublishedPage } = await import(new URL("../back-end/dist/public-renderer/entry-server.mjs", import.meta.url));
 const { createDefaultSiteContent } = await import(new URL("../back-end/dist/services/siteContent.js", import.meta.url));
@@ -24,7 +25,8 @@ assert.match(chapter.html, /<p>Paragraph one\.<\/p>/);
 assert.match(chapter.html, /&lt;script&gt;/);
 assert.doesNotMatch(chapter.html, /<script>alert/);
 assert.match(chapter.head.headTags, /A new chapter \| RetroZetro Comics/);
-assert.match(chapter.head.headTags, /https:\/\/retrozetrocomics\.com\/stories\/new-chapter/);
+const canonical = parseFragment(chapter.head.headTags).childNodes.find(node => node.tagName === "link" && node.attrs.some(attribute => attribute.name === "rel" && attribute.value === "canonical"));
+assert.equal(canonical?.attrs.find(attribute => attribute.name === "href")?.value, "https://retrozetrocomics.com/stories/new-chapter");
 assert.doesNotMatch(chapter.html, /A different published version/);
 assert.match(other.html, /A different published version/);
 assert.doesNotMatch(other.html, /A changed heading/);

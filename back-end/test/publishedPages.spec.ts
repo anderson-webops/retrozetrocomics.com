@@ -124,6 +124,14 @@ describe("published reading contract", () => {
 		servers.push(server);
 		await once(server, "listening");
 		const origin = `http://127.0.0.1:${(server.address() as any).port}`;
+		const homeIndex = await fetch(`${origin}/index.html`, { redirect: "manual" });
+		expect(homeIndex.headers.get("location")).toBe("/");
+		const storyIndex = await fetch(`${origin}/stories/the-list/index.html`, { redirect: "manual" });
+		expect(storyIndex.status).toBe(308);
+		expect(storyIndex.headers.get("location")).toBe("/stories/the-list");
+		const unknownIndex = await fetch(`${origin}/stories/attacker.invalid/index.html`, { redirect: "manual" });
+		expect(unknownIndex.status).toBe(404);
+		expect(unknownIndex.headers.has("location")).toBe(false);
 		const first = await fetch(`${origin}/stories/the-list`);
 		expect(first.status).toBe(200);
 		expect(first.headers.get("cache-control")).toBe("no-store");

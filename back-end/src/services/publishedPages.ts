@@ -110,17 +110,17 @@ export function createPublishedPageRouter(staticRoot: string, options: Published
 		/^\/(?:|index\.html|(?:about|characters|artwork|worlds|contact|creator|privacy)(?:\/(?:index\.html)?)?|stories(?:\/.*)?|sitemap\.xml)$/;
 	router.get(documentPath, publicPageRateLimiter, async (req, res, next) => {
 		const route = req.path.replace(/\/+$/, "") || "/";
-		if (route.endsWith("/index.html")) {
-			const canonical = route.slice(0, -11) || "/";
-			if (publicRoutes.includes(canonical) || canonical.startsWith("/stories/"))
-				return res.redirect(308, canonical);
-		}
+		const canonicalPage = publicRoutes.find(page => `${page === "/" ? "" : page}/index.html` === route);
+		if (canonicalPage) return res.redirect(308, canonicalPage);
 		if (route === "/stories") return res.redirect(308, "/about");
 		if (!publicRoutes.includes(route) && !route.startsWith("/stories/") && route !== "/sitemap.xml") return next();
 		res.set("Cache-Control", "no-store");
 		try {
 			const snapshot = await (options.load || readPublishedSnapshot)();
 			const storyPaths = publishedStoryPaths(snapshot);
+			// Select the destination from validated published routes, never from request text.
+			const canonicalStory = storyPaths.find(story => `${story}/index.html` === route);
+			if (canonicalStory) return res.redirect(308, canonicalStory);
 			if (route === "/sitemap.xml") {
 				return res
 					.type("application/xml")
