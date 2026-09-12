@@ -110,8 +110,9 @@ Never commit or push dependency/package changes if root `npm ci` fails.
 
 ## Direct Delivery and Pull Requests
 
-- After a coherent change set passes the repository's required checks, default to committing it and pushing it directly to the repository's default branch. Do not open a pull request unless the user explicitly asks for one, branch protection requires it, or an external-contribution policy makes direct integration inappropriate.
+- Default to direct commits and merges after automated validation. Do not require a manual review or ask Jacob to merge routine work. Open a pull request only when explicitly requested or required for an external contribution.
+- Required GitHub checks remain enabled, but manual pull-request approval is not required. To validate a candidate before direct integration, push a `codex/` branch, wait for its CI and CodeQL checks, then fast-forward the default branch to that exact validated commit and delete the merged branch. If the default branch has advanced, integrate its changes and validate the new candidate before pushing. Do not bypass failing automated checks.
 - For a release-worthy application change, update the project version as required, create an annotated tag, and publish or update the corresponding GitHub release in the same work session. Keep documentation-only, formatting-only, and other non-deployable housekeeping changes as committed and pushed source changes without inventing an application release.
 - Never force-push a shared branch or move an existing published tag unless the user explicitly authorizes that exact history rewrite.
-- If automation or repository policy creates a pull request, review it, wait for required checks, merge it when safe, and remove the merged branch before wrapping up. Do not leave redundant pull requests or branches open.
+- If automation or an explicit request creates a pull request, review the changes yourself, wait for required automated checks, merge it without adding a human-review gate, and remove the merged branch before wrapping up. Do not leave redundant pull requests or branches open.
 - Treat commit, push, tag, and GitHub release publication as source delivery only. Do not claim or perform production deployment unless it was separately authorized and verified.
