@@ -56,7 +56,13 @@ describe("reader-facing content defaults", () => {
 			"Shaman",
 			"Zetro",
 			"Fuzo",
-			"Mozo and Zoha"
+			"Mozo and Zoha",
+			"Giza",
+			"Oix",
+			"Diyo",
+			"Pexus and the impostor",
+			"Zego",
+			"Zorix"
 		]);
 		expect(characters.worldEntries).toHaveLength(9);
 		expect(orderWorldEntriesForDisplay(characters.worldEntries).map(entry => entry.id)).toEqual([

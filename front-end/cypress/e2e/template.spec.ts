@@ -21,7 +21,7 @@ context("Content pages", () => {
 		cy.contains("The Zlugnoid Hive Wars").should("exist");
 		cy.contains("Zetro and Retro").should("exist");
 		cy.get(".home-showcase").then($surface => expectDarkSurface($surface[0]));
-		cy.get(".site-ad-slot--top").then($slot => expectDarkSurface($slot[0]));
+		cy.get(".site-ad-slot").should("not.exist");
 		cy.get(".home-showcase__link")
 			.last()
 			.then($link => {
@@ -39,14 +39,14 @@ context("Content pages", () => {
 		cy.visit("/worlds");
 		cy.get(".worlds-section--atlas").each($surface => expectDarkSurface($surface[0]));
 		cy.get(".world-card-grid, .technology-grid").each($grid => {
-			expect(getComputedStyle($grid[0]).gridTemplateColumns.split(" ")).to.have.length(1);
+			expect(getComputedStyle($grid[0]).gridTemplateColumns.split(" ")).to.have.length(2);
 		});
 
 		cy.visit("/artwork");
 		cy.get(".artwork-browser").then($surface => expectDarkSurface($surface[0]));
 		cy.get(".artwork-browser__search input").should("have.css", "border-radius", "8px");
 		cy.contains("button", "Exo designs").click().should("have.attr", "aria-pressed", "true");
-		cy.contains("Showing 15 of 15 designs").should("exist");
+		cy.contains("Showing 15 of 85 designs").should("exist");
 
 		cy.viewport(390, 844);
 		cy.document().then(document => {
@@ -60,6 +60,7 @@ context("Content pages", () => {
 		cy.contains("Exo Dexus").should("exist");
 		cy.contains("Fazo").should("exist");
 		cy.contains("Mozo and Zoha").should("exist");
+		cy.get(".characters-grid__image").should("have.css", "object-fit", "contain");
 		cy.contains("Armies, planets, and other wars").should("exist");
 
 		const expectedWorldEntryOrder = [

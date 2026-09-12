@@ -1,7 +1,7 @@
-# Tyler source-backed site content handoff
+# Tyler reader-first release handoff: v2.8.0
 
-Install the exact annotated release tag supplied by Jacob. Follow this file as the scope authority for the content
-activation. Do not infer additional canon or publish any source archive document.
+This is a deployment procedure, not authorization to deploy. Once Jacob authorizes server installation, install the
+exact annotated `v2.8.0` tag. Do not infer additional canon or publish any source archive document.
 
 ## Intended result
 
@@ -9,12 +9,20 @@ activation. Do not infer additional canon or publish any source archive document
   hand-drawn images.
 - The public Story and Characters pages carry expanded direct descriptions, while the new Worlds page presents four
   worlds, three conflicts or adventures, and four technology entries.
-- The Characters and Story pages present the nine wider-Retroverse entries as three readable story clusters: the Apex
-  conflict, connected worlds and peoples, and the wider wars and technology.
+- Two illustrated reading pages expose all seven editable story sections for The List and The Fall of a Dream.
+  Characters expands to twelve profiles, with optional longer biographies and text-only entries where no portrait
+  is confidently identified. The nine wider-Retroverse entries remain on Characters; their editing tools remain on
+  Story but the duplicate visitor section is removed.
 - The new Artwork page presents the exact 85 reviewed hand-drawn images listed in
-  `deploy/content/tyler-site-content-v1.json`, with filters and full-size views.
-- The Home showcase, Worlds collections, Artwork gallery, and empty advertisement placements use the continuous muted
-  dark Retroverse palette. Paper tones remain limited to bounded artwork frames.
+  `deploy/content/tyler-site-content-v1.json`, with filters and full-size views. All 85 image links are in the initial
+  HTML; no Show More interaction is needed. Ten confidently matched drawings link to related stories or profiles.
+- The Home showcase, Worlds collections, and Artwork gallery use the continuous muted dark Retroverse palette.
+  Paper tones remain limited to bounded artwork frames. The three empty ad placements are commented out in
+  `front-end/src/layouts/default.vue`, with restoration instructions; their component and styles remain available.
+  Do not uncomment them during this deployment.
+- Creator and Privacy pages are linked in the footer. Optional analytics and ad scripts are disabled, while the
+  AdSense verification metadata and ads.txt remain. Advertising must not be enabled by this handoff.
+- Generated HTML now carries route-specific titles, descriptions, and canonical URLs, checked during every build.
 - Public copy presents the stories and worlds directly without publishing archive notes, source-message history, or
   editorial commentary.
 - The owner workspace includes **Edit the home page**, with private drafts, preview, media-library selection,
@@ -66,8 +74,11 @@ authorizes and reviews it.
    - media capacity remains within the 120-item limit;
    - metadata for `home-page`, `about-page`, and `characters-page`, including record existence, published version,
      draft presence, and timestamps. Do not read or print content-bearing fields merely to establish this gate.
-6. Expect those three `SiteContent` records to be absent based on the last verified state. If any record now exists,
+6. Recheck record presence; do not assume the historical absent-record state still holds. If any record now exists,
    preserve it. Report which checked-in defaults it overrides, and do not seed, replace, merge, or publish it.
+   The static build contains source defaults and the browser then loads owner content. If an owner record overrides
+   those defaults, stop before promotion for a separately scoped static-content synchronization decision, rather than
+   knowingly deploying conflicting crawlable HTML. Do not export private drafts into the build.
 7. Record pre-deploy release identity, service status, `/healthz`, `/readyz`, media counts, relevant content-record
    metadata, all 85 storage keys and stored-byte hashes, and `storedSanitizedSha256` results for the five baseline
    files. Record a pre-deploy upload inventory whose invariants are content, path, hash, ownership, mode, ACLs, and file
@@ -113,23 +124,25 @@ authorizes and reviews it.
    present the story directly, without mentioning source notes, working files, draft status, final canon, or a
    relationship awaiting confirmation. Preserve source uncertainty by making no unsupported claim about the two arcs'
    sequence or continuity relationship.
-5. When `characters-page` has no owner record, require `GET /api/site-content/characters` to return six character cards
-   for Exo Dexus, Fazo, Shaman, Zetro, Fuzo, and Mozo and Zoha, plus nine world, faction, conflict, or technology
+5. When `characters-page` has no owner record, require `GET /api/site-content/characters` to return twelve character cards
+   for Exo Dexus, Fazo, Shaman, Zetro, Fuzo, Mozo and Zoha, Giza, Oix, Diyo, Pexus and the impostor, Zego, and Zorix,
+   plus nine world, faction, conflict, or technology
    entries. If an owner record exists, preserve its public response and verify these checked-in defaults through
    isolated automated tests instead. Do not accept the former invented role text for Zetro, Kazay, Exo, Shaman, or
-   Zorix as fallback output. On both Characters and Story, require the recognized entries to begin with Apex Army,
+   Zorix as fallback output. On Characters, require the recognized entries to begin with Apex Army,
    Team Rimlaw and the Star Hunters, and Zego Order; then Bitgam, Galgri and the Galnoids, and the Council of Orpex;
    then the Zlugnoid Hive Wars, Linkpods and CBots, and FZ and Oddverse. Require Apex Army, Bitgam, and the Zlugnoid
    Hive Wars to be full-width lead cards above their paired related cards on desktop and require a single readable
    column with no horizontal overflow on mobile. Preserve any owner-created entries after these recognized entries.
 6. Require `/worlds` to return the direct public Worlds page with four worlds, three conflicts or adventures, and four
    technology entries. Require `/artwork` to expose all 85 manifest-listed reviewed images, six category filters plus
-   **All artwork**, a search control, the progressive **Show more artwork** control, and full-size image links. Confirm
+   **All artwork**, a search control, and all 85 full-size image links in the initial HTML without JavaScript. Confirm
    the seven excluded images and every other archive category remain absent.
-7. At desktop and phone widths, require the home showcase, both Worlds collection sections, Artwork gallery, and empty
-   advertisement placements to use the muted dark palette. Reject the former bright full-section paper background.
-   Require the seventh home showcase card to span the final desktop row and return to one column on phones. When side
-   ads are visible, require Worlds collection cards to use one readable column instead of paired narrow cards. Confirm
+7. At desktop and phone widths, require the home showcase, both Worlds collection sections, and Artwork gallery to use
+   the muted dark palette. Reject the former bright full-section paper background. Require no rendered empty
+   advertisement placements or reserved blank ad columns; preserve their commented source for future reinstatement.
+   Require the seventh home showcase card to span the final desktop row and return to one column on phones.
+   Worlds collections use two columns above 900px and one column below. Confirm
    missing-image text remains readable, controls retain rounded corners, and no public route develops horizontal
    overflow. Do not require loaded hand-drawn images themselves to be darkened or transformed.
 8. From an authenticated owner session, verify **Edit the home page** loads and displays its preview and media-library
@@ -146,6 +159,15 @@ authorizes and reviews it.
    deployment. A `ctime` refresh alone is permitted and is not evidence of a content change.
 11. Recheck security headers, owner-route noindex behavior, unauthorized admin response, IPv4 and IPv6 public health,
    and the intended `www` redirect.
+12. Require all ten `publicRoutes` in the manifest to return their own content, unique title, description, canonical URL,
+   and sitemap entry. Run `node scripts/verify-public-html.mjs` against the exact staged build and compare served HTML
+   to it. `/stories` must lead to the Story index rather than an empty parent route; it is not in the sitemap.
+   Both reading routes must contain seven story sections and a contents navigation. Follow a contents link and the
+   links back to the index, characters, and artwork. Check source outline separation against `READER_RELEASE_REVIEW.md`.
+13. Verify Privacy describes the actual server/mail configuration and that no optional advertising or analytics
+   scripts are injected by Nginx or another layer. Confirm creator/privacy footer links, essential owner login and
+   local-draft behavior, and text-only character editing with the isolated tests. Any future ads/analytics activation
+   needs a separate privacy/consent review and authorization. AdSense approval is not an acceptance claim.
 
 ## Rollback and report
 

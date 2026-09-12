@@ -27,6 +27,7 @@ export interface CharacterBoardFact {
 }
 
 export interface CharacterBoardProfile {
+	biography?: string;
 	description: string;
 	fallbackImage?: string;
 	frequency: string;
@@ -47,7 +48,7 @@ export interface CharacterBoardWorldEntry {
 }
 
 export interface HomeShowcaseItem {
-	destination: "/about" | "/artwork" | "/characters" | "/worlds";
+	destination: "/about" | "/artwork" | "/characters" | "/worlds" | "/stories/the-list" | "/stories/fall-of-a-dream";
 	fallbackImage?: string;
 	format: string;
 	id: string;

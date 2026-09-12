@@ -89,6 +89,7 @@ const fieldLabels: Record<string, string> = {
 	body: "Body",
 	climax: "Climax",
 	description: "Description",
+	biography: "More about this character",
 	firstPlotPoint: "First plot point",
 	frequency: "Secondary line",
 	hook: "Hook",
@@ -399,13 +400,7 @@ function validateVisibleStep() {
 	error.value = "";
 	validationIssues.value = [];
 	if (editorKind.value === "character" && currentCharacter.value && step.value === 1) {
-		if (!currentCharacter.value.image.trim()) {
-			error.value = "Choose or upload a picture before continuing.";
-			mediaPickerOpen.value = true;
-			void nextTick(() => errorMessage.value?.focus());
-			return false;
-		}
-		if (currentCharacter.value.imgAlt.trim().length < 2) {
+		if (currentCharacter.value.image.trim() && currentCharacter.value.imgAlt.trim().length < 2) {
 			error.value = "Describe the character picture before continuing.";
 			void nextTick(() => errorMessage.value?.focus());
 			return false;
@@ -715,7 +710,7 @@ onBeforeRouteUpdate(() => {
 
 			<fieldset v-if="editorKind === 'character' && currentCharacter && step === 1">
 				<legend>Character essentials</legend>
-				<p>Start with the three things readers need most.</p>
+				<p>Start with a name and description. A picture is optional; you can add one later.</p>
 				<label>
 					<span>Character name</span>
 					<input v-model="currentCharacter.name" maxlength="80" required type="text" />
@@ -734,7 +729,7 @@ onBeforeRouteUpdate(() => {
 					<p>Use these only when a picture already lives at a known web address.</p>
 					<label>
 						<span>Picture URL or path</span>
-						<input v-model="currentCharacter.image" maxlength="260" required type="text" />
+						<input v-model="currentCharacter.image" maxlength="260" type="text" />
 					</label>
 					<label>
 						<span>Backup picture path</span>
@@ -742,7 +737,13 @@ onBeforeRouteUpdate(() => {
 					</label>
 					<label>
 						<span>Picture description</span>
-						<input v-model="currentCharacter.imgAlt" maxlength="180" minlength="2" required type="text" />
+						<input
+							v-model="currentCharacter.imgAlt"
+							maxlength="180"
+							:minlength="currentCharacter.image ? 2 : 0"
+							:required="Boolean(currentCharacter.image)"
+							type="text"
+						/>
 					</label>
 				</details>
 				<label>
@@ -761,6 +762,11 @@ onBeforeRouteUpdate(() => {
 
 			<fieldset v-if="editorKind === 'character' && currentCharacter && step === 2">
 				<legend>More character details</legend>
+				<label>
+					<span>More about this character (optional)</span>
+					<textarea v-model="currentCharacter.biography" maxlength="5000" rows="8" />
+					<small>Use a blank line between paragraphs.</small>
+				</label>
 				<p>These appear as supporting information and help keep character cards consistent.</p>
 				<div class="editor-card__grid">
 					<label>
@@ -883,6 +889,14 @@ onBeforeRouteUpdate(() => {
 					<p>{{ currentCharacter.role || "Role not finished" }}</p>
 					<h3>{{ currentCharacter.name || "Character name not finished" }}</h3>
 					<p>{{ currentCharacter.description || "Description not finished" }}</p>
+					<p
+						v-for="(paragraph, index) in (currentCharacter.biography || '')
+							.split(/\n\s*\n/)
+							.filter(Boolean)"
+						:key="index"
+					>
+						{{ paragraph }}
+					</p>
 				</template>
 				<template v-else-if="editorKind === 'story' && currentStory">
 					<p>{{ currentStory.label || "Label not finished" }}</p>

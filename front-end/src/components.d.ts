@@ -25,6 +25,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SiteAdSlot: typeof import('./components/SiteAdSlot.vue')['default']
     StoryArcCards: typeof import('./components/StoryArcCards.vue')['default']
+    StoryReader: typeof import('./components/StoryReader.vue')['default']
     TheCharacters: typeof import('./components/TheCharacters.vue')['default']
     TheCounter: typeof import('./components/TheCounter.vue')['default']
     TheFooter: typeof import('./components/TheFooter.vue')['default']

@@ -73,6 +73,34 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/creator': RouteRecordInfo<
+      '/creator',
+      '/creator',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/privacy': RouteRecordInfo<
+      '/privacy',
+      '/privacy',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/stories/fall-of-a-dream': RouteRecordInfo<
+      '/stories/fall-of-a-dream',
+      '/stories/fall-of-a-dream',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/stories/the-list': RouteRecordInfo<
+      '/stories/the-list',
+      '/stories/the-list',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/studio/admin': RouteRecordInfo<
       '/studio/admin',
       '/studio/admin',
@@ -143,6 +171,38 @@ declare module 'vue-router/auto-routes' {
     'src/pages/contact.vue': {
       routes:
         | '/contact'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/creator.vue': {
+      routes:
+        | '/creator'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/privacy.vue': {
+      routes:
+        | '/privacy'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/stories/fall-of-a-dream.vue': {
+      routes:
+        | '/stories/fall-of-a-dream'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/stories/the-list.vue': {
+      routes:
+        | '/stories/the-list'
       views:
         | never
       pathParamNames:

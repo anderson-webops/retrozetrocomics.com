@@ -11,7 +11,7 @@ export function createDefaultHomePageContent(): HomePageContent {
 		eyebrow: "The Retroverse",
 		showcaseItems: [
 			{
-				destination: "/about",
+				destination: "/stories/the-list",
 				fallbackImage: "/brand/poster-the-list.svg",
 				format: "Investigation arc",
 				id: "home-the-list",
@@ -23,7 +23,7 @@ export function createDefaultHomePageContent(): HomePageContent {
 				title: "The List"
 			},
 			{
-				destination: "/about",
+				destination: "/stories/fall-of-a-dream",
 				fallbackImage: "/brand/poster-fall-of-a-dream.svg",
 				format: "Rebellion arc",
 				id: "home-fall-of-a-dream",
@@ -31,7 +31,7 @@ export function createDefaultHomePageContent(): HomePageContent {
 				imageAlt: "Hand-drawn Apex Army character in purple and green.",
 				status: "The Apex Army fractures under the Zego Order",
 				summary:
-					"Giza and Oix investigate a false Pexus while Diyo warns of unexplained Apex deaths or disappearances. The takeover forces loyal Apex members and the Star Hunters into an uneasy alliance.",
+					"Giza and Oix investigate a false Pexus while Diyo sends the outlaw teams a telepathic warning. Within a divided army, the conflict leads to Exo's confrontation with Zego.",
 				title: "The Fall of a Dream"
 			},
 			{

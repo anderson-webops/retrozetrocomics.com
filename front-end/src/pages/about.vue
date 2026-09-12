@@ -259,9 +259,9 @@ async function undoWorldEntryRemoval() {
 			</div>
 		</section>
 
-		<section class="about-page__story-section">
+		<section v-if="session.showAdminTools" class="about-page__story-section">
 			<header class="about-page__section-header">
-				<p class="about-page__eyebrow">The Retroverse</p>
+				<p class="about-page__eyebrow">Owner tools</p>
 				<h2>Worlds, powers, and alliances</h2>
 				<p>
 					From Team Rimlaw and the Star Hunters to Bitgam and Orpex, every world and faction has a place in
@@ -286,6 +286,12 @@ async function undoWorldEntryRemoval() {
 				<button type="button" @click="addWorldEntryInline">Add a world entry</button>
 			</div>
 		</section>
+		<aside class="reading-next">
+			<h2>Beyond these stories</h2>
+			<p>Explore the people, worlds, and machines that fill Tyler Morgan's work.</p>
+			<RouterLink to="/worlds">Worlds and factions</RouterLink>
+			<RouterLink to="/artwork">Original artwork</RouterLink>
+		</aside>
 	</div>
 </template>
 

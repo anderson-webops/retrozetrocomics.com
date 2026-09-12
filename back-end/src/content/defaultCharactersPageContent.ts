@@ -8,6 +8,7 @@ export function createDefaultCharactersPageContent() {
 					"Exo Dexus leads Team Rimlaw, infiltrates an Apex moon base, searches for his mother and a missing friend, and confronts Zego in the war for the Apex Army.",
 				fallbackImage: "/brand/characters-exo.svg",
 				frequency: "Searching for his mother and a missing friend",
+				biography: "In The List, Exo's personal search takes him into an Apex Army moon base. Finding that a friend is missing too, he begins following the differences in the army's symbols. Team Rimlaw receives a request for help from the Council of Orpex, and the outlaws eventually work with Apex against the Zego Order. In The Fall of a Dream, Exo faces Zego directly.\n\nExo's design has changed over time. An earlier version had short horns, while a later version has antennae. His original name was Dexus; the Exo-Exodus name carries a biblical reference. Original-universe and alternate-universe Exo Dexus designs both exist in Tyler's work.",
 				id: "exo-dexus",
 				image: `${tylerHandDrawnBase}/012-198b5c15c9c93a50.jpg`,
 				imgAlt: "Hand-drawn character design for Exo Dexus.",
@@ -20,6 +21,7 @@ export function createDefaultCharactersPageContent() {
 					"Fazo was born and raised on Bitgam, home to the red-skinned, exoskeleton-bearing people of Gambit Pointe.",
 				fallbackImage: "/brand/world-bitgam.svg",
 				frequency: "Born and raised on Bitgam",
+				biography: "Bitgam lies in Gamborus. Its Gambit Pointe people have red skin, yellow and white eyes, and exoskeletons. Gambit archives trace the planet's history back to the Great Manifested.\n\nFazo's drawings span different designs, including early sketches and later versions with white eyes. Fuzo is an alternate-universe counterpart, not another name for the original Fazo.",
 				id: "fazo",
 				image: `${tylerHandDrawnBase}/005-0905d798b55c8bb8.jpg`,
 				imgAlt: "Hand-drawn colored portrait of Fazo, a character from Bitgam.",
@@ -30,6 +32,7 @@ export function createDefaultCharactersPageContent() {
 			{
 				description: "Shaman is a Lightnoid who appears alongside Exo. Cosmos is Shaman's girlfriend.",
 				frequency: "Linked to Exo and Cosmos",
+				biography: "The paired drawing brings Shaman and Exo together in one of Tyler's original character studies.",
 				id: "shaman",
 				image: `${tylerHandDrawnBase}/063-ba7430851cc35538.jpg`,
 				imgAlt: "Hand-drawn character designs for Exo and Shaman.",
@@ -40,6 +43,7 @@ export function createDefaultCharactersPageContent() {
 			{
 				description: "Zetro is repeatedly paired with Retro and joins Zatral and Zat in an adventure trio.",
 				frequency: "Paired with Retro",
+				biography: "Tyler's drawings include original resketches and alternate designs of Zetro. His recurring partners are Retro, Zatral, and Zat.",
 				id: "zetro",
 				image: `${tylerHandDrawnBase}/045-7896e301de44957c.jpg`,
 				imgAlt: "Hand-drawn original resketch of Zetro.",
@@ -67,9 +71,71 @@ export function createDefaultCharactersPageContent() {
 				role: "FZ duo",
 				specialty: "Characters from FZ"
 			}
+			,
+			{
+				id: "giza",
+				name: "Giza",
+				role: "Galgrey Galnoid",
+				description: "Giza performs a DNA test after Pexus is bitten by his wife's pet. In The Fall of a Dream, she works with Oix inside the Apex Army to expose the false Pexus.",
+				biography: "Giza is a female Galnoid from the Galgrey people of Galgri. Gelth, a male Galnoid, is her boyfriend. Her investigation follows biological evidence into the deception within the army.",
+				frequency: "Works with Oix",
+				specialty: "Investigating the false Pexus",
+				image: "",
+				imgAlt: "No portrait assigned"
+			},
+			{
+				id: "oix",
+				name: "Oix",
+				role: "The Pexus investigation",
+				description: "Oix works with Giza in the Apex Army to plan the exposure of the fake Pexus. Their investigation is one of the central threads of The Fall of a Dream.",
+				frequency: "Works with Giza",
+				specialty: "Exposing the impostor",
+				image: "",
+				imgAlt: "No portrait assigned"
+			},
+			{
+				id: "diyo",
+				name: "Diyo",
+				role: "Telepathic messenger",
+				description: "Diyo warns the outlaw teams through telepathy that Apex Army members are mysteriously self-deleting in The Fall of a Dream. In The List, he discovers that members of a group are dying.",
+				frequency: "Warns the outlaw teams",
+				specialty: "Telepathic communication",
+				image: "",
+				imgAlt: "No portrait assigned"
+			},
+			{
+				id: "pexus",
+				name: "Pexus and the impostor",
+				role: "A false identity inside Apex",
+				description: "Pexus's wife's pet bites him, after which Giza performs a DNA test. Giza and Oix plan to expose a fake Pexus within the Apex Army in The Fall of a Dream.",
+				frequency: "Investigated by Giza and Oix",
+				specialty: "At the center of an identity investigation",
+				image: "",
+				imgAlt: "No portrait assigned"
+			},
+			{
+				id: "zego",
+				name: "Zego",
+				role: "Exo's opponent",
+				description: "Exo faces Zego in the climax of The Fall of a Dream. The Zego Order is the force that has overtaken the Apex Army.",
+				frequency: "Faces Exo",
+				specialty: "The Fall of a Dream",
+				image: "",
+				imgAlt: "No portrait assigned"
+			},
+			{
+				id: "zorix",
+				name: "Zorix",
+				role: "Antagonist",
+				description: "Cool and ruthless, Zorix is straight to the point. He does not play around with the people he confronts.",
+				frequency: "Direct and ruthless",
+				specialty: "Antagonist",
+				image: "",
+				imgAlt: "No portrait assigned"
+			}
 		],
 		description:
-			"Meet Exo Dexus, Fazo, Shaman, Zetro, Fuzo, Mozo, and Zoha, then explore the armies, outlaw crews, councils, and worlds surrounding them.",
+			"Meet the heroes, investigators, and antagonists of the Retroverse, from Exo Dexus and Fazo to Giza, Diyo, Zego, and Zorix.",
 		eyebrow: "The Retroverse",
 		heroImage: `${tylerHandDrawnBase}/084-fb97b37cd5c66f0e.jpg`,
 		heroImageAlt: "Hand-drawn colored portrait of Exo Dexus.",

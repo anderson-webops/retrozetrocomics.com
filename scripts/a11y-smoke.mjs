@@ -26,6 +26,10 @@ const routes = [
 	"/artwork",
 	"/characters",
 	"/contact",
+	"/creator",
+	"/privacy",
+	"/stories/the-list",
+	"/stories/fall-of-a-dream",
 	"/studio/admin",
 	"/worlds"
 ];

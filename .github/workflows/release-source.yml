@@ -77,5 +77,6 @@ jobs:
             echo
             echo "- Release: \`${GITHUB_REF_NAME}\`"
             echo "- Revision: \`${{ steps.release.outputs.revision }}\`"
-            echo "- Deployment: atomic host systemd and Nginx promotion"
+            echo "- Source release only; production deployment is not performed by this workflow."
+            echo "- Compatibility deployment and rollback: deploy/content/SERVER_AI_HANDOFF.md"
           } >> "$GITHUB_STEP_SUMMARY"

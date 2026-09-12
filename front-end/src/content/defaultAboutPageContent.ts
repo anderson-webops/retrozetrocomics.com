@@ -4,42 +4,43 @@ export function createDefaultAboutPageContent(): AboutPageContent {
 	return {
 		storyArcs: [
 			{
-				climax: "Loyal Apex members and the Star Hunters form an uneasy alliance to expose the hidden operation and fight their common enemy.",
+				climax: "The Apex Army and the outlaw community join forces to take down the Zego Order. The people who have been fighting one another now work together against the organization behind the crisis. Exposing that operation is as important as confronting it.",
 				description:
-					"Exo Dexus searches an Apex Army moon base for his mother, discovers that a friend is also missing, and follows altered symbols toward a hidden puppet master.",
+					"Exo Dexus enters an Apex Army moon base to find his mother. Instead of a single answer, he finds another disappearance and a symbol that no longer looks right. His search leads Team Rimlaw into a conflict that neither the army nor the outlaws can settle alone.",
 				firstPlotPoint:
-					"The changed Apex symbols turn a personal search into evidence that the force occupying the base may not be the organization it claims to be.",
-				hook: "Exo infiltrates an Apex Army moon base to learn where his mother is.",
+					"The changed symbol turns Exo's attention toward a larger question: who is really pulling the strings? His search for the missing people now runs alongside an investigation into the power behind the army.",
+				hook: "Team Rimlaw is an outlaw group led by Exo Dexus. Groups like theirs are known as Star Hunters. They pursue Apex Army members responsible for crimes on other planets, placing them in conflict with the same institution whose moon base Exo must enter.",
 				id: "arc-the-list",
 				incitingIncident:
-					"During the search, Exo discovers that a friend is missing and notices that the Apex symbols have changed.",
+					"While investigating his mother's whereabouts, Exo discovers that a friend is missing too. He also notices a difference in the Apex symbols. Something inside the base does not match the army he expects to find.",
 				label: "Investigation arc",
 				midpoint:
-					"Diyo discovers unexplained deaths or disappearances while Giza and Oix follow biological evidence connected to a false Pexus.",
-				note: "Every clue inside the moon base pulls Exo beyond his personal search and toward the enemy consuming the Apex Army.",
+					"Members of the Council of Orpex ask Rimlaw for help. A crew that operates outside the Apex Army is now being called upon by a council, drawing Exo and his team further into the struggle.",
+				note: "A personal search has become a fight over who can be trusted.",
 				resolution:
-					"Evidence exposes the takeover and begins restoring trust in the loyal Apex Army, but Exo's personal search and the larger threat may continue.",
+					"Evidence of the Zego Order's operation restores faith in the Apex Army across the universe and galaxy. The alliance's achievement is not simply a victory over an enemy: it brings the explanation for the crisis into the open.",
 				thirdPlotPoint:
-					"The Council of Orpex asks Team Rimlaw for help, turning the outlaw crew into a necessary ally against the compromised command structure.",
+					"Diyo discovers that members of a group are dying. His discovery adds another threat to an investigation already shaped by missing people and changed symbols. Rimlaw's search is no longer only about finding someone inside a moon base.",
 				title: "The List"
 			},
 			{
-				climax: "Exo confronts Zego as the alliance fights the impostor and the Zego Order's forces.",
+				climax: "Exo faces Zego. The conflict that has divided the Apex Army now brings the two into direct confrontation, alongside the struggle against the impostor.",
 				description:
-					"The Zego Order's takeover fractures the Apex Army while Giza, Oix, Diyo, Exo, and the Star Hunters work to expose the deception.",
+					"The Zego Order has overtaken the Apex Army. As the army divides, Giza and Oix investigate a false Pexus, Diyo warns the outlaw teams, and Exo faces Zego.",
 				firstPlotPoint:
-					"Diyo telepathically warns the outlaw teams that Apex members are mysteriously self deleting, disappearing, or dying.",
-				hook: "The Zego Order has overtaken the Apex Army, and loyal members rebel and split away.",
+					'Diyo reaches the outlaw teams through telepathy. His warning is disturbing: members of the Apex Army are "self-deleting" for a reason he cannot explain. The danger within the army extends beyond the split in its ranks.',
+				hook: "A group within the Apex Army begins to rebel and divide after the Zego Order's takeover. The army is no longer a united force, and the conflict reaches into the identities of the people inside it.",
 				id: "arc-fall-of-a-dream",
 				incitingIncident:
-					"A bite from Pexus's wife's pet gives Giza material for a DNA test, leading Giza and Oix to investigate a false Pexus.",
+					"Pexus is bitten by his wife's pet. After the bite, Giza performs a DNA test. This small, physical incident becomes part of an investigation into a much larger deception.",
 				label: "Rebellion arc",
 				midpoint:
-					"Loyal Apex members and the Star Hunters work together because neither side can defeat the takeover alone.",
-				note: "Defeating the impostor can end the immediate war, but Zego's wider campaign has only begun.",
-				resolution: "The immediate war may be over, but the larger battle has only begun.",
+					"Inside the Apex Army, Giza and Oix plan to expose the fake Pexus. Their investigation centers on an impostor operating among the army's own people. The struggle is not only against an outside enemy, but against a false identity within.",
+				note: "The end of one war is not the end of the struggle.",
+				resolution:
+					"The war may be over, but the battle has begun. The confrontation leaves a larger struggle ahead rather than closing every front.",
 				thirdPlotPoint:
-					"Evidence of the operation restores public faith in loyal Apex members and gives the alliance a path toward the impostor and Zego.",
+					"The last fight brings the impostor and the Ultimate Ultra Beam into the conflict. The beam stands as a symbol of a mad creator's dream, giving the battle its connection to the dream at the heart of the story.",
 				title: "The Fall of a Dream"
 			}
 		]

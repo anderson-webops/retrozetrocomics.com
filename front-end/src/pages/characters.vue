@@ -244,13 +244,13 @@ async function undoWorldEntryRemoval() {
 			@save="handleCharacterSave"
 		/>
 
-		<section class="characters-page__lore" aria-labelledby="retroverse-lore-title">
+		<section id="factions" class="characters-page__lore" aria-labelledby="retroverse-lore-title">
 			<header class="characters-page__lore-header">
 				<p>The Wider Retroverse</p>
 				<h2 id="retroverse-lore-title">Armies, planets, and other wars</h2>
 				<p>
-					The battle for the Apex Army draws in Team Rimlaw and the Zego Order before the story reaches
-					Bitgam, Orpex, Galgri, and the distant Zlugnoid Hive Wars.
+					Meet Team Rimlaw, the Apex Army, and the Zego Order, then explore Bitgam, Orpex, Galgri, and the
+					Zlugnoid Hive Wars.
 				</p>
 			</header>
 

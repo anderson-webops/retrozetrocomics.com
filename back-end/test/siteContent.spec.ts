@@ -13,6 +13,33 @@ import {
 } from "../src/services/siteContent.js";
 
 describe("guided site content safety", () => {
+	it("preserves longer biographies in published content and private drafts", () => {
+		const content = createDefaultSiteContent("characters");
+		const characters = content.characters as Array<Record<string, unknown>>;
+		characters[0].biography = "A first paragraph.\n\nA second paragraph.";
+		for (const parse of [parseDraftSiteContent, parsePublishedSiteContent]) {
+			const result = parse("characters", content);
+			expect(result.success).toBe(true);
+			if (result.success) expect(JSON.stringify(result.data)).toContain("A second paragraph.");
+		}
+		characters[0].biography = "x".repeat(5001);
+		expect(parseDraftSiteContent("characters", content).success).toBe(false);
+		expect(parsePublishedSiteContent("characters", content).success).toBe(false);
+	});
+
+	it("allows text-only characters but still validates every assigned image", () => {
+		const content = createDefaultSiteContent("characters");
+		const character = (content.characters as Array<Record<string, unknown>>)[0];
+		character.image = "";
+		character.imgAlt = "";
+		expect(parsePublishedSiteContent("characters", content).success).toBe(true);
+		character.image = "javascript:alert(1)";
+		expect(parsePublishedSiteContent("characters", content).success).toBe(false);
+		character.image = "/uploads/content/tyler-handdrawn-v1/084-fb97b37cd5c66f0e.jpg";
+		expect(parsePublishedSiteContent("characters", content).success).toBe(false);
+		character.imgAlt = "Exo Dexus";
+		expect(parsePublishedSiteContent("characters", content).success).toBe(true);
+	});
 	it("ships a publishable home page backed by the reviewed Tyler media paths", () => {
 		const content = createDefaultSiteContent("home");
 		const parsed = parsePublishedSiteContent("home", content);
@@ -45,7 +72,7 @@ describe("guided site content safety", () => {
 		const parsed = parsePublishedSiteContent("characters", content);
 
 		expect(parsed.success).toBe(true);
-		expect(content.characters).toHaveLength(6);
+		expect(content.characters).toHaveLength(12);
 		expect(content.worldEntries).toHaveLength(9);
 		expect(content.characters).toEqual(expect.arrayContaining([
 			expect.objectContaining({ name: "Shaman" }),
@@ -107,7 +134,7 @@ describe("guided site content safety", () => {
 		expect(published.success).toBe(false);
 		if (!published.success) {
 			expect(published.issues.some(issue => issue.field.includes("description"))).toBe(true);
-			expect(published.issues.some(issue => issue.field.includes("image"))).toBe(true);
+			expect(published.issues.some(issue => issue.field.includes("image"))).toBe(false);
 		}
 	});
 

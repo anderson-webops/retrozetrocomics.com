@@ -115,8 +115,13 @@
 			"storedSanitizedSha256": "67759447b4ee9270852543c702c988bc49f32dc02d9530e63940ce78df2e876f",
 			"storageKey": "content/tyler-handdrawn-v1/063-ba7430851cc35538.jpg",
 			"title": "Tyler original 063: Exo and Shaman",
-			"placements": ["home:hero", "site:social preview"],
-			"evidence": ["Adjacent single-image visual confirmation: Exo and Shaman"]
+			"placements": [
+				"home:hero",
+				"site:social preview"
+			],
+			"evidence": [
+				"Adjacent single-image visual confirmation: Exo and Shaman"
+			]
 		},
 		{
 			"manifestSequence": 84,
@@ -124,8 +129,14 @@
 			"storedSanitizedSha256": "2e21081198704842a205cbd0b17e287506ff30103b94ae0fb8ef40195b1df2f4",
 			"storageKey": "content/tyler-handdrawn-v1/084-fb97b37cd5c66f0e.jpg",
 			"title": "Tyler original 084: Exo",
-			"placements": ["home:The List", "about:hero", "characters:hero"],
-			"evidence": ["Direct same-message label: Exo"]
+			"placements": [
+				"home:The List",
+				"about:hero",
+				"characters:hero"
+			],
+			"evidence": [
+				"Direct same-message label: Exo"
+			]
 		},
 		{
 			"manifestSequence": 10,
@@ -133,8 +144,12 @@
 			"storedSanitizedSha256": "e01d1da026f3d7fb033ee9cb1d1e76cb4a29f312c9df6d3017645ab3d590c506",
 			"storageKey": "content/tyler-handdrawn-v1/010-171f13ce370c9716.jpg",
 			"title": "Tyler original 010: Apex Army character",
-			"placements": ["home:The Fall of a Dream"],
-			"evidence": ["Direct same-message label: Apex Army"]
+			"placements": [
+				"home:The Fall of a Dream"
+			],
+			"evidence": [
+				"Direct same-message label: Apex Army"
+			]
 		},
 		{
 			"manifestSequence": 12,
@@ -142,8 +157,13 @@
 			"storedSanitizedSha256": "2f32733e9b0a8909f6e40e4ffb876a44169978aa38f6dd9a7ef31d38d496438f",
 			"storageKey": "content/tyler-handdrawn-v1/012-198b5c15c9c93a50.jpg",
 			"title": "Tyler original 012: Exo, first new design",
-			"placements": ["home:Exo Dexus", "characters:Exo Dexus"],
-			"evidence": ["Direct same-message label: first new design of Exo"]
+			"placements": [
+				"home:Exo Dexus",
+				"characters:Exo Dexus"
+			],
+			"evidence": [
+				"Direct same-message label: first new design of Exo"
+			]
 		},
 		{
 			"manifestSequence": 5,
@@ -151,8 +171,13 @@
 			"storedSanitizedSha256": "b355da95d13779719502775ede3d6a8cf875037f3b9b41817f9f9ca9439c4a8a",
 			"storageKey": "content/tyler-handdrawn-v1/005-0905d798b55c8bb8.jpg",
 			"title": "Tyler original 005: Fazo",
-			"placements": ["home:Bitgam", "characters:Fazo"],
-			"evidence": ["Direct same-message label: Fazo"]
+			"placements": [
+				"home:Bitgam",
+				"characters:Fazo"
+			],
+			"evidence": [
+				"Direct same-message label: Fazo"
+			]
 		}
 	],
 	"siteContent": {
@@ -169,12 +194,18 @@
 		"about-page": {
 			"sourceDefault": "front-end/src/content/defaultAboutPageContent.ts",
 			"serverDefault": "back-end/src/content/defaultAboutPageContent.ts",
-			"storyArcs": 2
+			"storyArcs": 2,
+			"readingRoutes": [
+				"/stories/the-list",
+				"/stories/fall-of-a-dream"
+			],
+			"storySectionsPerArc": 7,
+			"duplicateWorldEntries": "owner-tools-only"
 		},
 		"characters-page": {
 			"sourceDefault": "front-end/src/content/defaultCharactersPageContent.ts",
 			"serverDefault": "back-end/src/content/defaultCharactersPageContent.ts",
-			"characters": 6,
+			"characters": 12,
 			"worldEntries": 9,
 			"worldEntryPresentation": {
 				"displayOrder": [
@@ -188,8 +219,14 @@
 					"linkpods-and-cbots",
 					"fz-and-oddverse"
 				],
-				"featuredEntries": ["apex-army", "bitgam", "zlugnoid-hive-wars"]
-			}
+				"featuredEntries": [
+					"apex-army",
+					"bitgam",
+					"zlugnoid-hive-wars"
+				]
+			},
+			"biographyMaxLength": 5000,
+			"portraitsOptional": true
 		},
 		"worlds-page": {
 			"sourcePage": "front-end/src/pages/worlds.vue",
@@ -199,8 +236,8 @@
 			"technologyEntries": 4,
 			"visualPresentation": {
 				"collectionSurface": "dark-retroverse",
-				"sideAdDesktopColumns": 1,
-				"mobileColumns": 1
+				"mobileColumns": 1,
+				"desktopColumns": 2
 			}
 		},
 		"artwork-page": {
@@ -210,22 +247,36 @@
 			"visualPresentation": {
 				"gallerySurface": "dark-retroverse",
 				"paperToneUse": "artwork-frames-only"
-			}
+			},
+			"initialHtmlImages": 85,
+			"contextualLinks": 10
 		}
 	},
 	"visualPresentation": {
-		"adPlaceholders": "muted-dark",
-		"controlRadius": "8px"
+		"adPlaceholders": "commented-out-for-future-reinstatement",
+		"controlRadius": "8px",
+		"readerWidth": "760px"
 	},
 	"sourceEvidenceIds": [
+		"SM-0023",
+		"SM-0024",
 		"SM-0025",
 		"SM-0041",
 		"SM-0048",
 		"SM-0049",
+		"SM-0067",
 		"SM-0089",
 		"SM-0096",
+		"SM-0154",
+		"SM-0184",
 		"SM-0191",
-		"SM-0199"
+		"SM-0197",
+		"SM-0199",
+		"SM-0202",
+		"SM-0239",
+		"SM-0245",
+		"SM-0251",
+		"SM-0279"
 	],
 	"publicationBoundaries": [
 		"The List and The Fall of a Dream remain distinct story arcs. Their sequence and continuity relationship are not established by the source, so public copy does not assert one.",
@@ -234,5 +285,19 @@
 		"Raw messages, private storyline documents, source message identifiers, and archive paths are not exposed through public APIs or pages.",
 		"The public artwork gallery is limited to the 85 reviewed hand-drawn images already imported under content/tyler-handdrawn-v1/. The seven excluded images and all other archive categories remain unpublished.",
 		"No S3 migration, media re-upload, media-record write, or image transformation is part of this content release."
-	]
+	],
+	"publicRoutes": [
+		"/",
+		"/about",
+		"/characters",
+		"/worlds",
+		"/artwork",
+		"/contact",
+		"/creator",
+		"/privacy",
+		"/stories/the-list",
+		"/stories/fall-of-a-dream"
+	],
+	"optionalTracking": "No optional advertising or analytics scripts; AdSense verification metadata and ads.txt retained.",
+	"sourceReview": "deploy/content/READER_RELEASE_REVIEW.md"
 }

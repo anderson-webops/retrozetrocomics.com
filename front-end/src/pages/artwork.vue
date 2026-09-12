@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { ArtworkCollection } from "@/content/tylerArtwork";
+import { artworkConnections } from "@/content/artworkConnections";
 import { artworkCollectionLabels, tylerArtworkItems } from "@/content/tylerArtwork";
 import { toAbsoluteSiteUrl } from "@/lib/siteAssets";
 
@@ -7,7 +8,6 @@ type ArtworkFilter = "all" | ArtworkCollection;
 
 const activeCollection = ref<ArtworkFilter>("all");
 const searchQuery = ref("");
-const visibleLimit = ref(24);
 
 const collections = computed(() => [
 	{
@@ -33,16 +33,9 @@ const filteredArtwork = computed(() => {
 	});
 });
 
-const visibleArtwork = computed(() => filteredArtwork.value.slice(0, visibleLimit.value));
-const hasMoreArtwork = computed(() => visibleArtwork.value.length < filteredArtwork.value.length);
-
-watch([activeCollection, searchQuery], () => {
-	visibleLimit.value = 24;
-});
-
-function showMoreArtwork() {
-	visibleLimit.value += 24;
-}
+// Every reviewed work is in the initial HTML. Search is progressive enhancement,
+// not a prerequisite for readers or crawlers to discover the collection.
+const visibleArtwork = filteredArtwork;
 
 useHead({
 	title: "Artwork | RetroZetro Comics",
@@ -134,25 +127,27 @@ useHead({
 			</div>
 
 			<p class="artwork-browser__status" role="status">
-				Showing {{ visibleArtwork.length }} of {{ filteredArtwork.length }} designs
+				Showing {{ visibleArtwork.length }} of {{ tylerArtworkItems.length }} designs
 			</p>
 
 			<div v-if="visibleArtwork.length" class="artwork-grid">
-				<figure v-for="item in visibleArtwork" :key="item.id" class="artwork-card">
+				<figure v-for="item in visibleArtwork" :id="item.id" :key="item.id" class="artwork-card">
 					<a :aria-label="`View ${item.title} full size`" :href="item.image" rel="noopener" target="_blank">
 						<ResolvedImage :alt="item.alt" :candidates="[item.image]" decoding="async" loading="lazy" />
 					</a>
 					<figcaption>
 						<strong>{{ item.title }}</strong>
 						<span>{{ artworkCollectionLabels[item.collection] }}</span>
+						<template v-if="artworkConnections[item.id]">
+							<p>{{ artworkConnections[item.id].text }}</p>
+							<RouterLink :to="artworkConnections[item.id].href">{{
+								artworkConnections[item.id].label
+							}}</RouterLink>
+						</template>
 					</figcaption>
 				</figure>
 			</div>
 			<p v-else class="artwork-browser__empty">No designs match that search yet.</p>
-
-			<button v-if="hasMoreArtwork" class="artwork-browser__more" type="button" @click="showMoreArtwork">
-				Show more artwork
-			</button>
 		</section>
 	</div>
 </template>
@@ -398,7 +393,7 @@ useHead({
 	box-shadow: 0 0.55rem 1.2rem rgba(0, 0, 0, 0.16);
 }
 
-.artwork-card a {
+.artwork-card > a {
 	display: grid;
 	place-items: center;
 	min-width: 0;
@@ -414,6 +409,12 @@ useHead({
 .artwork-card a:focus-visible {
 	outline: 0.2rem solid #9d360d;
 	outline-offset: 0.15rem;
+}
+
+.artwork-card figcaption a {
+	color: #ffd27d;
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
 }
 
 .artwork-card img {

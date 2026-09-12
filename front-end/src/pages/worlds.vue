@@ -137,7 +137,7 @@ useHead({
 			</div>
 		</section>
 
-		<section class="worlds-section worlds-section--atlas" aria-labelledby="technology-title">
+		<section id="technology" class="worlds-section worlds-section--atlas" aria-labelledby="technology-title">
 			<header class="worlds-section__header">
 				<p class="worlds-page__eyebrow">Machines and armor</p>
 				<h2 id="technology-title">Built for alien battlefields</h2>
@@ -547,13 +547,6 @@ useHead({
 
 	.worlds-hero__art {
 		min-height: 18rem;
-	}
-}
-
-@media (min-width: 1101px) {
-	.world-card-grid,
-	.technology-grid {
-		grid-template-columns: 1fr;
 	}
 }
 

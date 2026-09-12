@@ -2,6 +2,7 @@
 import type { AboutStoryArc } from "@/types/site";
 import { nextTick } from "vue";
 import { useLocalDraft } from "@/composables/useLocalDraft";
+import { storyRoutes, storySections } from "@/content/storyReading";
 
 type StoryArcBeatKey =
 	"climax" | "firstPlotPoint" | "hook" | "incitingIncident" | "midpoint" | "resolution" | "thirdPlotPoint";
@@ -131,6 +132,7 @@ watch(
 	<section class="story-arc-grid" :class="{ 'story-arc-grid--editing': inlineEditing && !!editingId }">
 		<article
 			v-for="arc in props.items"
+			:id="arc.id"
 			:key="arc.id"
 			class="story-arc-card"
 			:class="{ 'story-arc-card--editing': editingId === arc.id }"
@@ -221,7 +223,14 @@ watch(
 				<p class="story-arc-card__eyebrow">{{ arc.label }}</p>
 				<h3>{{ arc.title }}</h3>
 				<p class="story-arc-card__summary">{{ arc.description }}</p>
-				<p class="story-arc-card__stake">{{ arc.climax }}</p>
+				<RouterLink v-if="storyRoutes[arc.id]" :to="storyRoutes[arc.id]">Read {{ arc.title }}</RouterLink>
+				<details v-else>
+					<summary>Read {{ arc.title }}</summary>
+					<section v-for="section in storySections(arc)" :key="section.id">
+						<h4>{{ section.heading }}</h4>
+						<p>{{ section.text }}</p>
+					</section>
+				</details>
 			</template>
 		</article>
 

@@ -105,7 +105,7 @@ export const retroverseConflicts: RetroverseFeature[] = [
 
 export const retroverseTechnology: RetroverseFeature[] = [
 	{
-		body: "A Linkpod places an Orpenoid consciousness inside a CBot shell. One model is a ground unit; another transforms into a small oval spacecraft.",
+		body: "Orpenoids created Linkpods to place their consciousness inside robot bodies called CBots. The consciousness does more than issue instructions: it powers the robot. Without an Orpenoid consciousness inhabiting it, the CBot is an inactive shell. There are two models. One is a ground unit; the other can transform into a small oval spacecraft or disk craft. The same central idea connects both forms: the body is a machine, but the presence that makes it function is an Orpenoid consciousness.",
 		facts: [
 			{ label: "Power source", value: "Orpenoid consciousness" },
 			{ label: "CBot forms", value: "Ground unit and transforming craft" }

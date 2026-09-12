@@ -3,12 +3,17 @@ import { onMounted } from "vue";
 
 import { siteAssetCandidates } from "@/lib/siteAssets";
 import { useSessionStore } from "@/stores/session";
-import SiteAdSlot from "~/components/SiteAdSlot.vue";
+// Ad placements are parked, not deleted. To restore them, uncomment this import,
+// focusedOwnerEditing, and the three SiteAdSlot blocks below. Set the grid wrapper to
+// class="content-grid" :class="{ 'content-grid--focused': focusedOwnerEditing }".
+// Restore .site-masthead grid-template-columns to minmax(220px, 320px) minmax(0, 1fr).
+// This restores layout placeholders only, not ad scripts or consent handling.
+// import SiteAdSlot from "~/components/SiteAdSlot.vue";
 
 const session = useSessionStore();
 const route = useRoute();
 const isAdminRoute = computed(() => route.path.replace(/\/+$/, "") === "/studio/admin");
-const focusedOwnerEditing = computed(() => session.isAdmin && route.query.manage === "1" && !session.adminViewerMode);
+// const focusedOwnerEditing = computed(() => session.isAdmin && route.query.manage === "1" && !session.adminViewerMode);
 const showAdminViewerBanner = computed(() => session.isAdmin && session.adminViewerMode && !isAdminRoute.value);
 
 onMounted(() => {
@@ -26,12 +31,15 @@ onMounted(() => {
 					<span>RetroZetro Comics</span>
 				</RouterLink>
 
+				<p class="site-masthead__credit">Stories and artwork by Tyler Morgan</p>
+				<!-- Parked top placement. Replace the creator credit above when restoring.
 				<SiteAdSlot
 					v-if="!focusedOwnerEditing"
 					class="site-masthead__ad"
 					label="Advertisement"
 					placement="top"
 				/>
+				-->
 			</header>
 
 			<TheHeader class="site-frame__nav" />
@@ -44,22 +52,26 @@ onMounted(() => {
 				<button type="button" @click="session.toggleAdminViewerMode()">Return to owner tools</button>
 			</div>
 
-			<div class="content-grid" :class="{ 'content-grid--focused': focusedOwnerEditing }">
+			<div class="content-grid content-grid--focused">
+				<!-- Parked left placement.
 				<SiteAdSlot
 					v-if="!focusedOwnerEditing"
 					class="content-grid__ad content-grid__ad--left"
 					label="Advertisement"
 					placement="side"
 				/>
+				-->
 				<div id="center-plate" class="center-plate">
 					<RouterView class="page-slot" />
 				</div>
+				<!-- Parked right placement.
 				<SiteAdSlot
 					v-if="!focusedOwnerEditing"
 					class="content-grid__ad content-grid__ad--right"
 					label="Advertisement"
 					placement="side"
 				/>
+				-->
 			</div>
 
 			<TheFooter class="site-shell__footer" />
@@ -87,7 +99,7 @@ onMounted(() => {
 
 .site-masthead {
 	display: grid;
-	grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+	grid-template-columns: minmax(0, 1fr) auto;
 	align-items: center;
 	gap: clamp(1rem, 3vw, 2rem);
 	padding: 0 0 clamp(0.9rem, 2vw, 1.15rem);
@@ -101,6 +113,13 @@ onMounted(() => {
 	max-width: 100%;
 	color: #ffffff;
 	text-decoration: none;
+}
+
+.site-masthead__credit {
+	color: #d6c9d5;
+	font-size: 0.9rem;
+	text-align: right;
+	max-width: 22ch;
 }
 
 .site-masthead__brand img {
@@ -251,6 +270,11 @@ onMounted(() => {
 	.site-masthead__brand {
 		justify-content: center;
 		width: 100%;
+	}
+
+	.site-masthead__credit {
+		text-align: center;
+		max-width: none;
 	}
 
 	.site-masthead__brand span {

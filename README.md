@@ -26,11 +26,13 @@ npm run audit:production
 - The root `package-lock.json` is the authoritative lockfile for monorepo installs from the repo root.
 - Do not create nested workspace lockfiles or use the removed pnpm workspace configuration.
 - Use `npm run server` and `npm run serve` when you want the API and front-end started separately.
-- Production uses the unprivileged `retrozetro` systemd service behind Nginx. The loopback-only Node process serves the
-  built frontend and Express API together; `/api/*` always returns JSON and cannot fall through to the SPA.
+- The canonical direct-release profile uses the unprivileged `retrozetro` systemd service behind Nginx. The audited
+  compatibility host instead uses `tyler-backend.service`; see the content handoff before server changes. In either
+  profile, `/api/*` must return JSON and cannot fall through to the SPA.
 - If you override the public site hostname during builds, also set `VITE_PUBLIC_SITE_ORIGIN` so canonical URLs and SSG API resolution stay correct.
 - Use [`HEALTHCHECKS.md`](./HEALTHCHECKS.md) for deployment monitor targets instead of `/`.
-- Production uploads live outside immutable releases at `/srv/retrozetro/shared/uploads`. Only JPEG, PNG, GIF, WebP,
+- Canonical uploads live outside immutable releases at `/srv/retrozetro/shared/uploads`; the compatibility host uses
+  `/srv/retrozetrocomics.com/back-end/uploads`. Only JPEG, PNG, GIF, WebP,
   and PDF files are accepted. The backend verifies signatures, decodes and re-encodes images without metadata, rejects
   active or encrypted PDFs, and serves PDFs as attachments. Permanent deletion is available only from trash after a
   recent passkey confirmation and is blocked while current saved or published content still uses the file.
@@ -50,6 +52,16 @@ npm run audit:production
   [`deploy/content/tyler-site-content-v1.json`](./deploy/content/tyler-site-content-v1.json) for the complete 85-key
   gallery inventory and the five available raw creative-source versus live importer-sanitized hash baselines, and
   [`deploy/content/SERVER_AI_HANDOFF.md`](./deploy/content/SERVER_AI_HANDOFF.md) for bounded activation checks.
+- The List and The Fall of a Dream have separate illustrated reading pages at `/stories/the-list` and
+  `/stories/fall-of-a-dream`, exposing all seven existing editable beats. Twelve default character profiles support
+  optional longer biographies and text-only entries. Source review is documented in
+  [`READER_RELEASE_REVIEW.md`](./deploy/content/READER_RELEASE_REVIEW.md), not shown to visitors.
+- All 85 gallery links are in the initial HTML. Builds run `scripts/verify-public-html.mjs` to check the ten public
+  routes, titles, descriptions, canonical links, sitemap, gallery completeness, and disabled ad placeholders.
+- The three ad placements are commented out in `front-end/src/layouts/default.vue`, with restoration instructions;
+  `SiteAdSlot.vue` and its styles remain. Optional ad/analytics scripts are disabled, while AdSense verification
+  metadata and ads.txt remain. Creator and Privacy pages are linked in the footer. Re-enabling tracking requires a
+  separate privacy/consent review, not merely uncommenting a placement.
 - Every generated page carries a restrictive hash-based static script policy, and the owner page also carries no-index
   metadata. This preserves the intended browser boundary if a legacy edge configuration temporarily lags the application
   release. The Nginx route policy remains the authoritative production header and is checked independently after promotion.

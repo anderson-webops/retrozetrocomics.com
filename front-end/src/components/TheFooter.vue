@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 		<div class="footer__brand">
 			<p class="footer__eyebrow">RetroZetro Comics</p>
 			<h2>Stay in the Retroverse</h2>
-			<p>Stories, characters, and worlds from the Retroverse.</p>
+			<p>Original stories, characters, and drawings by Tyler Morgan.</p>
 		</div>
 
 		<nav aria-label="Footer navigation" class="footer__links">
@@ -18,6 +18,8 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 				<RouterLink to="/worlds">Worlds</RouterLink>
 				<RouterLink to="/artwork">Artwork</RouterLink>
 				<RouterLink to="/contact">Contact</RouterLink>
+				<RouterLink to="/creator">Meet the creator</RouterLink>
+				<RouterLink to="/privacy">Privacy</RouterLink>
 			</div>
 		</nav>
 

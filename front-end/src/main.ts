@@ -21,12 +21,18 @@ export const createApp = ViteSSG(
 	App,
 	{
 		routes: setupLayouts([...routes]),
+		scrollBehavior(to, _from, savedPosition) {
+			if (savedPosition) return savedPosition;
+			if (to.hash) return { el: to.hash, top: 24 };
+			return { top: 0 };
+		},
 		base: import.meta.env.BASE_URL
 	},
 	ctx => {
 		// ctx is the context where you can add global components or plugins
 		ctx.app.component("font-awesome-icon", FontAwesomeIcon);
 		ctx.router.beforeEach(to => {
+			if (to.path.replace(/\/+$/, "") === "/stories") return { path: "/about", replace: true };
 			if (to.path === "/studio") {
 				return {
 					path: "/studio/admin",

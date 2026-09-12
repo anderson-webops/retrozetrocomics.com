@@ -353,6 +353,8 @@ onMounted(() => {
 						<span>Where “Read more” goes</span>
 						<select v-model="currentItem.destination">
 							<option value="/about">Story</option>
+							<option value="/stories/the-list">Read The List</option>
+							<option value="/stories/fall-of-a-dream">Read The Fall of a Dream</option>
 							<option value="/characters">Characters and factions</option>
 							<option value="/worlds">Worlds, peoples, and technology</option>
 							<option value="/artwork">Artwork gallery</option>

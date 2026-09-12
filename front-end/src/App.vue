@@ -4,7 +4,7 @@ import { resolvePreferredLocalAsset, siteAssetCandidates, toAbsoluteSiteUrl } fr
 const defaultHeroImageAlt = "Tyler's hand-drawn Exo and Shaman character artwork.";
 const siteUrl = "https://retrozetrocomics.com";
 const siteDescription =
-	"RetroZetro Comics presents Tyler Morgan's developing stories, hand-drawn characters, factions, and worlds.";
+	"Original science-fiction stories and hand-drawn characters by Tyler Morgan. Enter the worlds of RetroZetro Comics.";
 const route = useRoute();
 const appleTouchIconHref = ref<string>(siteAssetCandidates.favicons.appleTouch[0]);
 const favicon16Href = ref<string>(siteAssetCandidates.favicons.favicon16[0]);
@@ -62,7 +62,7 @@ useHead(
 					: []),
 				{
 					name: "description",
-					content: "Explore Tyler Morgan's developing stories, hand-drawn characters, factions, and worlds."
+					content: siteDescription
 				},
 				{
 					name: "theme-color",
@@ -150,25 +150,8 @@ useHead(
 				}
 			],
 			script: [
-				...(import.meta.env.PROD && !isOwnerRoute.value
-					? [
-							{
-								async: true,
-								crossorigin: "anonymous",
-								src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4342594327430874"
-							},
-							{
-								defer: true,
-								src: "https://analytics.retrozetrocomics.com/script.js",
-								"data-website-id": "568434bd-9bbe-44f9-9537-3bb0cb65f242"
-							},
-							{
-								defer: true,
-								src: "https://analytics.jacobdanderson.net/script.js",
-								"data-website-id": "0085594f-0e98-4159-ba2b-4fc8fcd717cb"
-							}
-						]
-					: []),
+				// AdSense ownership verification stays above and in ads.txt. Ad serving
+				// and optional measurement stay off pending a reviewed consent setup.
 				...(!isOwnerRoute.value ? structuredData.value : []).map((entry, index) => ({
 					innerHTML: JSON.stringify(entry),
 					key: `ld-json-${index}`,

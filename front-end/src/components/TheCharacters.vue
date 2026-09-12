@@ -2,6 +2,7 @@
 import type { CharacterBoardProfile } from "@/types/site";
 import { computed, nextTick } from "vue";
 import { useLocalDraft } from "@/composables/useLocalDraft";
+import { characterArtworkLinks } from "@/content/artworkConnections";
 import { createDefaultCharactersPageContent } from "@/content/defaultCharactersPageContent";
 import { useSessionStore } from "@/stores/session";
 
@@ -132,6 +133,7 @@ watch(
 		<div class="characters-grid__items">
 			<div
 				v-for="item in characters"
+				:id="item.id"
 				:key="item.id"
 				class="characters-grid__card"
 				:class="{
@@ -211,8 +213,8 @@ watch(
 								/>
 							</label>
 							<label>
-								<span>Image URL</span>
-								<input v-model="draftCharacter.image" maxlength="260" required type="text" />
+								<span>Image URL (optional)</span>
+								<input v-model="draftCharacter.image" maxlength="260" type="text" />
 							</label>
 							<label>
 								<span>Fallback image</span>
@@ -223,8 +225,8 @@ watch(
 								<input
 									v-model="draftCharacter.imgAlt"
 									maxlength="180"
-									minlength="2"
-									required
+									:minlength="draftCharacter.image ? 2 : 0"
+									:required="Boolean(draftCharacter.image)"
 									type="text"
 								/>
 							</label>
@@ -241,6 +243,13 @@ watch(
 							/>
 						</label>
 
+						<label>
+							<span>More about this character (optional)</span>
+							<textarea v-model="draftCharacter.biography" maxlength="5000" rows="8" />
+							<small
+								>Use a blank line between paragraphs. Write only details you want readers to see.</small
+							>
+						</label>
 						<div class="characters-grid__actions">
 							<button type="submit" :disabled="props.savingId === item.id">
 								{{ props.savingId === item.id ? "Saving..." : "Save" }}
@@ -254,7 +263,7 @@ watch(
 				</template>
 
 				<template v-else>
-					<div class="characters-grid__media">
+					<div v-if="item.image" class="characters-grid__media">
 						<ResolvedImage
 							:alt="item.imgAlt"
 							:candidates="definedImageCandidates([item.image, item.fallbackImage])"
@@ -264,8 +273,18 @@ watch(
 					<div class="characters-grid__copy">
 						<p class="characters-grid__role">{{ item.role }}</p>
 						<h3>{{ item.name }}</h3>
+						<RouterLink v-if="characterArtworkLinks[item.id]" :to="characterArtworkLinks[item.id]"
+							>View the original artwork</RouterLink
+						>
 						<p class="characters-grid__description">
 							{{ item.description }}
+						</p>
+						<p
+							v-for="(paragraph, index) in (item.biography || '').split(/\n\s*\n/).filter(Boolean)"
+							:key="index"
+							class="characters-grid__description"
+						>
+							{{ paragraph }}
 						</p>
 					</div>
 				</template>
@@ -292,7 +311,8 @@ watch(
 .characters-grid__items {
 	display: grid;
 	gap: 1rem;
-	grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+	align-items: start;
 }
 
 .characters-grid__card {
@@ -300,9 +320,7 @@ watch(
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
-	height: 100%;
 	padding: 1rem;
-	padding-top: 4.5rem;
 	border-radius: var(--radius-card);
 	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid rgba(255, 255, 255, 0.08);
@@ -311,6 +329,10 @@ watch(
 
 .characters-grid__card--editing {
 	padding-top: 4.8rem;
+}
+
+.characters-grid__card:has(.characters-grid__edit) {
+	padding-top: 4.5rem;
 }
 
 .characters-grid__edit {
@@ -468,7 +490,8 @@ watch(
 .characters-grid__image {
 	width: 100%;
 	max-height: 18rem;
-	height: auto;
+	height: 18rem;
+	object-fit: contain;
 	display: block;
 	border-radius: var(--radius-card);
 	background: #08111f;

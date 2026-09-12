@@ -36,16 +36,10 @@ context("Basic", () => {
 		cy.get(".site-header").contains("Artwork").click();
 		cy.url().should("eq", `${Cypress.config().baseUrl}/artwork`);
 		cy.get(".artwork-hero h1").should("contain.text", "Drawn across").and("contain.text", "Retroverse");
-		cy.get(".artwork-card").should("have.length", 24);
-		cy.contains("Showing 24 of 85 designs").should("exist");
-		cy.contains("button", "Show more artwork").click();
-		cy.get(".artwork-card").should("have.length", 48);
-		cy.contains("button", "Show more artwork").click();
-		cy.get(".artwork-card").should("have.length", 72);
-		cy.contains("button", "Show more artwork").click();
 		cy.get(".artwork-card").should("have.length", 85);
+		cy.contains("Showing 85 of 85 designs").should("exist");
 		cy.contains("button", "Exo designs").click();
-		cy.contains("Showing 15 of 15 designs").should("exist");
+		cy.contains("Showing 15 of 85 designs").should("exist");
 		cy.get(".artwork-card").should("have.length", 15);
 	});
 });

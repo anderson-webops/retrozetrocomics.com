@@ -24,7 +24,7 @@ const optionalContentImageSchema = z.string()
 	.optional()
 	.default("");
 
-const homeDestinationSchema = z.enum(["/about", "/artwork", "/characters", "/worlds"]);
+const homeDestinationSchema = z.enum(["/about", "/artwork", "/characters", "/worlds", "/stories/the-list", "/stories/fall-of-a-dream"]);
 
 const homeShowcaseItemSchema = z.object({
 	destination: homeDestinationSchema,
@@ -52,15 +52,18 @@ const characterFactSchema = z.object({
 });
 
 const characterProfileSchema = z.object({
+	biography: z.string().trim().max(5000).optional(),
 	description: z.string().trim().min(12).max(420),
 	fallbackImage: optionalContentImageSchema,
 	frequency: z.string().trim().min(2).max(120),
 	id: z.string().trim().min(1).max(80),
-	image: requiredContentImageSchema,
-	imgAlt: z.string().trim().min(2).max(180),
+	image: z.string().max(260).refine(value => !value || isAllowedContentImageUrl(value), CONTENT_IMAGE_HELP),
+	imgAlt: z.string().trim().max(180),
 	name: z.string().trim().min(1).max(80),
 	role: z.string().trim().min(1).max(80),
 	specialty: z.string().trim().min(2).max(120)
+}).refine(profile => !profile.image || profile.imgAlt.length >= 2, {
+	path: ["imgAlt"], message: "Describe the character picture in at least two characters."
 });
 
 const worldEntrySchema = z.object({
@@ -127,6 +130,7 @@ const draftHomePageSchema = z.object({
 });
 
 const draftCharacterProfileSchema = z.object({
+	biography: z.string().max(5000).optional(),
 	description: z.string().max(420),
 	fallbackImage: optionalContentImageSchema,
 	frequency: z.string().max(120),

@@ -16,10 +16,15 @@
 import { createDefaultAboutPageContent } from "../../src/content/defaultAboutPageContent";
 
 import { createDefaultCharactersPageContent } from "../../src/content/defaultCharactersPageContent";
+import { createDefaultHomePageContent } from "../../src/content/defaultHomePageContent";
 // Import commands.js using ES2015 syntax:
 import "./commands";
 
 beforeEach(() => {
+	cy.intercept("GET", "/api/site-content/home", {
+		body: { content: createDefaultHomePageContent() },
+		statusCode: 200
+	});
 	cy.intercept("GET", "/api/auth/me", {
 		body: {
 			account: null,

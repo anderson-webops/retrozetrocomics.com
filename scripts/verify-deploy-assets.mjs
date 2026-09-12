@@ -171,7 +171,7 @@ assert.equal(contentManifest.siteContent["home-page"].visualPresentation.surface
 assert.equal(contentManifest.siteContent["home-page"].visualPresentation.oddFinalCard, "full-width-desktop");
 assert.equal(contentManifest.siteContent["home-page"].visualPresentation.mobileColumns, 1);
 assert.equal(contentManifest.siteContent["about-page"].storyArcs, 2);
-assert.equal(contentManifest.siteContent["characters-page"].characters, 6);
+assert.equal(contentManifest.siteContent["characters-page"].characters, 12);
 assert.equal(contentManifest.siteContent["characters-page"].worldEntries, 9);
 const expectedWorldEntryDisplayOrder = [
 	"apex-army",
@@ -212,12 +212,16 @@ assert.equal(contentManifest.siteContent["worlds-page"].worlds, 4);
 assert.equal(contentManifest.siteContent["worlds-page"].conflicts, 3);
 assert.equal(contentManifest.siteContent["worlds-page"].technologyEntries, 4);
 assert.equal(contentManifest.siteContent["worlds-page"].visualPresentation.collectionSurface, "dark-retroverse");
-assert.equal(contentManifest.siteContent["worlds-page"].visualPresentation.sideAdDesktopColumns, 1);
+assert.equal(contentManifest.siteContent["worlds-page"].visualPresentation.desktopColumns, 2);
 assert.equal(contentManifest.siteContent["worlds-page"].visualPresentation.mobileColumns, 1);
 assert.equal(contentManifest.siteContent["artwork-page"].reviewedImages, 85);
 assert.equal(contentManifest.siteContent["artwork-page"].visualPresentation.gallerySurface, "dark-retroverse");
 assert.equal(contentManifest.siteContent["artwork-page"].visualPresentation.paperToneUse, "artwork-frames-only");
-assert.equal(contentManifest.visualPresentation.adPlaceholders, "muted-dark");
+assert.equal(contentManifest.visualPresentation.adPlaceholders, "commented-out-for-future-reinstatement");
+const layout = await read("front-end/src/layouts/default.vue");
+assert.equal([...layout.matchAll(/<!-- Parked (?:top|left|right) placement\.[\s\S]*?<SiteAdSlot[\s\S]*?-->/g)].length, 3);
+assert.equal(contentManifest.siteContent["artwork-page"].initialHtmlImages, 85);
+assert.equal(contentManifest.publicRoutes.length, 10);
 assert.equal(contentManifest.visualPresentation.controlRadius, "8px");
 const publicationBoundaries = contentManifest.publicationBoundaries.join("\n");
 assert.match(publicationBoundaries, /remain distinct story arcs/);
@@ -240,7 +244,7 @@ for (const publicContentSource of [artworkPage, worldEntryPresentation, worldsDa
 	);
 }
 assert.match(artworkPage, /85 hand-drawn/);
-assert.match(artworkPage, /Show more artwork/);
+assert.doesNotMatch(artworkPage, /Show more artwork/);
 assert.match(artworkPage, /background-color: #09182a/);
 assert.doesNotMatch(artworkPage, /background: rgba\(249, 234, 219/);
 assert.match(homePage, /background-color: #0a1627/);
@@ -292,7 +296,7 @@ assert.match(releaseWorkflow, /SOURCE_DATE_EPOCH/);
 assert.match(releaseMetadata, /new Date\(sourceEpoch \* 1000\)\.toISOString\(\)/);
 
 assert.doesNotMatch(`${ci}\n${releaseWorkflow}`, /\bdocker\b|\bghcr\.io\b/i);
-assert.match(releaseWorkflow, /atomic host systemd and Nginx promotion/);
+assert.match(releaseWorkflow, /production deployment is not performed by this workflow/);
 assert.match(ci, /verify:production-install/);
 assert.match(ci, /verify:direct-runtime/);
 assert.match(ci, /verify:install-scripts/);

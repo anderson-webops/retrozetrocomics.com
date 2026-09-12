@@ -26,6 +26,7 @@ function closeMenu() {
 }
 
 function isActive(path: string) {
+	if (path === "/about" && route.path.startsWith("/stories/")) return true;
 	if (path === "/") {
 		return route.path === path;
 	}

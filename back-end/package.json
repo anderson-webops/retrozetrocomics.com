@@ -1,6 +1,6 @@
 {
 	"name": "back-end",
-	"version": "2.7.0",
+	"version": "2.8.0",
 	"private": true,
 	"packageManager": "npm@12.0.2",
 	"engines": {
@@ -34,7 +34,7 @@
 		"brace-expansion": "5.0.9",
 		"esbuild": "$esbuild",
 		"js-yaml": "4.3.1",
-		"qs": "6.15.3"
+		"qs": "6.16.0"
 	},
 	"dependencies": {
 		"@simplewebauthn/server": "^13.3.2",
@@ -45,11 +45,11 @@
 		"express-rate-limit": "^8.6.1",
 		"helmet": "^8.1.0",
 		"mongoose": "^9.9.1",
-		"multer": "^2.2.0",
-		"nodemailer": "^9.0.1",
+		"multer": "^2.3.0",
+		"nodemailer": "^9.1.1",
 		"parse5": "^8.0.1",
 		"readline-sync": "^1.4.10",
-		"sharp": "^0.35.3",
+		"sharp": "^0.35.4",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
@@ -63,6 +63,6 @@
 		"tsx": "^4.23.4",
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.59.0",
-		"vitest": "^4.1.2"
+		"vitest": "^4.1.11"
 	}
 }
