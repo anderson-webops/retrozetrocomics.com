@@ -9,6 +9,9 @@ describe("reader journey", () => {
 		cy.contains("Place saved on this device.").should("be.visible");
 		cy.visit("/");
 		cy.get(".continue-reading a").should("have.attr", "href", "/stories/the-list#midpoint").click();
+		cy.location("pathname").should("equal", "/stories/the-list");
+		cy.location("hash").should("equal", "#midpoint");
+		cy.get("#midpoint").should("contain.text", "Place saved on this device.");
 		cy.reload();
 		cy.get("#midpoint").should("contain.text", "Place saved on this device.");
 		cy.get(".story-sequence")
