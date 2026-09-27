@@ -36,9 +36,14 @@ NODE
 builder_home="$output/.builder-home"
 npm_cache="$output/.npm-cache"
 builder_tmp="$output/.tmp"
+npm_user_config="$builder_home/user.npmrc"
+npm_global_config="$builder_home/global.npmrc"
 if [[ "${RETROZETRO_BUILDER_ENV_CLEAN:-}" != 1 ]]; then
   test -z "$(find "$output" -mindepth 1 -maxdepth 1 -print -quit)"
   mkdir -m 0700 "$builder_home" "$npm_cache" "$builder_tmp"
+  : > "$npm_user_config"
+  : > "$npm_global_config"
+  chmod 0600 "$npm_user_config" "$npm_global_config"
   node_bin=$(realpath "$(command -v node)")
   clean_path="$(dirname -- "$node_bin"):/usr/local/bin:/usr/bin:/bin"
   exec /usr/bin/env -i \
@@ -47,8 +52,8 @@ if [[ "${RETROZETRO_BUILDER_ENV_CLEAN:-}" != 1 ]]; then
     HOME="$builder_home" \
     LANG=C.UTF-8 \
     NPM_CONFIG_CACHE="$npm_cache" \
-    NPM_CONFIG_GLOBALCONFIG=/dev/null \
-    NPM_CONFIG_USERCONFIG=/dev/null \
+    NPM_CONFIG_GLOBALCONFIG="$npm_global_config" \
+    NPM_CONFIG_USERCONFIG="$npm_user_config" \
     PATH="$clean_path" \
     PUPPETEER_SKIP_DOWNLOAD=true \
     RETROZETRO_ARTIFACT_MONGODB_URI="$RETROZETRO_ARTIFACT_MONGODB_URI" \
@@ -58,8 +63,8 @@ if [[ "${RETROZETRO_BUILDER_ENV_CLEAN:-}" != 1 ]]; then
     TZ=UTC \
     /bin/bash "$root/scripts/package-runtime.sh" "$output"
 fi
-if [[ "$HOME" != "$builder_home" || "${NPM_CONFIG_USERCONFIG:-}" != /dev/null \
-  || "${NPM_CONFIG_GLOBALCONFIG:-}" != /dev/null ]]; then
+if [[ "$HOME" != "$builder_home" || "${NPM_CONFIG_USERCONFIG:-}" != "$npm_user_config" \
+  || "${NPM_CONFIG_GLOBALCONFIG:-}" != "$npm_global_config" ]]; then
   echo "The release build must run inside its isolated environment." >&2
   exit 1
 fi
