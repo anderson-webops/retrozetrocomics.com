@@ -125,10 +125,10 @@ The repository contains the complete non-container deployment contract:
   isolated home and npm configuration so dependency and build scripts cannot inherit operator or CI credentials.
 - `scripts/test-unpacked-artifact.sh` runs the exact archive read-only without source or development dependencies and
   exercises native bindings, the compiled recovery CLI, health/readiness, dependency loss, published HTML, graceful
-  shutdown, copier integrity, and missing-module rejection. The ARM64 CI runner invokes Bubblewrap through its
-  passwordless runner-only sudo boundary because that runner disables unprivileged user namespaces; the application
-  still runs inside the sandbox with no supplementary groups, capabilities, or privilege escalation as UID/GID 65534.
-  Other builders retain the unprivileged Bubblewrap path.
+  shutdown, copier integrity, and missing-module rejection. ARM64 workflows load AppArmor's reviewed Bubblewrap
+  user-namespace restriction profile before a cheap UID/GID 65534 preflight, then invoke Bubblewrap through the
+  ephemeral runner's passwordless sudo boundary. AppArmor strips capabilities from the sandboxed application while
+  preserving the host's global unprivileged-user-namespace restriction. Other builders retain the unprivileged path.
 - `deploy/systemd/promote-release.sh` is installed as a root-owned, digest-pinned control. It verifies the protected
   archive and retained rollback artifact independently, creates a new root-owned immutable release, atomically changes
   `/srv/retrozetro/current`, verifies local readiness and both public address families, dispatches independent GitHub

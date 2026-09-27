@@ -6,6 +6,10 @@ import path from "node:path";
 import process from "node:process";
 
 const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
+const bwrapProfile = await readFile(
+	path.join(repositoryRoot, ".github/apparmor/bwrap-userns-restrict"),
+	"utf8"
+);
 const relativePaths = {
 	artifactAcceptance: "scripts/artifact-acceptance.mjs",
 	artifactContract: "deploy/runtime-artifact.json",
@@ -312,6 +316,14 @@ assert.match(releaseMetadata, /new Date\(sourceEpoch \* 1000\)\.toISOString\(\)/
 
 assert.doesNotMatch(`${ci}\n${releaseWorkflow}`, /\bdocker\b|\bghcr\.io\b/i);
 assert.match(releaseWorkflow, /production deployment is not performed by this workflow/);
+for (const workflow of [ci, releaseWorkflow]) {
+	assert.match(workflow, /apparmor_parser --replace \.github\/apparmor\/bwrap-userns-restrict/);
+	assert.match(workflow, /--unshare-user --uid 65534 --gid 65534/);
+	assert.match(workflow, /RETROZETRO_ARTIFACT_BWRAP_SUDO: "1"/);
+}
+assert.match(bwrapProfile, /profile bwrap \/usr\/bin\/bwrap/);
+assert.match(bwrapProfile, /allow userns,/);
+assert.match(bwrapProfile, /audit deny capability,/);
 assert.match(packageRuntime, /verify:production-install/);
 assert.match(ci, /package:runtime/);
 assert.match(ci, /verify:install-scripts/);

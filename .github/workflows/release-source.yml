@@ -63,12 +63,21 @@ jobs:
           test "$(git rev-parse HEAD)" = "$(git rev-parse refs/remotes/origin/main)"
 
       - name: Install isolated-artifact tooling
+        shell: bash
         run: |
+          set -euo pipefail
           sudo apt-get update
-          sudo apt-get install --yes bubblewrap
+          sudo apt-get install --yes apparmor bubblewrap
+          sudo apparmor_parser --replace .github/apparmor/bwrap-userns-restrict
+          sudo -n bwrap \
+            --unshare-user --uid 65534 --gid 65534 \
+            --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind-try /lib64 /lib64 \
+            --proc /proc --dev /dev \
+            --clearenv -- /usr/bin/id -u | grep -qx 65534
 
       - name: Build and accept immutable runtime archive
         env:
+          RETROZETRO_ARTIFACT_BWRAP_SUDO: "1"
           RETROZETRO_ARTIFACT_MONGODB_URI: mongodb://artifact_admin:retrozetro-artifact-password-2026@127.0.0.1:27017/retrozetro_artifact_release?authSource=admin
         run: |
           printf '/.ai-work/\n' >> .git/info/exclude

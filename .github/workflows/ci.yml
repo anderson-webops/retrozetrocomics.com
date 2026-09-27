@@ -152,9 +152,17 @@ jobs:
         run: npm install --global "npm@${NPM_VERSION}"
 
       - name: Install isolated-artifact tooling
+        shell: bash
         run: |
+          set -euo pipefail
           sudo apt-get update
-          sudo apt-get install --yes bubblewrap
+          sudo apt-get install --yes apparmor bubblewrap
+          sudo apparmor_parser --replace .github/apparmor/bwrap-userns-restrict
+          sudo -n bwrap \
+            --unshare-user --uid 65534 --gid 65534 \
+            --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind-try /lib64 /lib64 \
+            --proc /proc --dev /dev \
+            --clearenv -- /usr/bin/id -u | grep -qx 65534
 
       - name: Build and accept exact immutable ARM64 runtime
         env:

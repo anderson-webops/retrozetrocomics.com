@@ -16,24 +16,12 @@ command -v timeout >/dev/null
 
 bwrap_command=("$(command -v bwrap)")
 identity_options=(--unshare-user)
-runtime_prefix=()
 expected_uid=""
 if [[ "${RETROZETRO_ARTIFACT_BWRAP_SUDO:-0}" == 1 ]]; then
   command -v sudo >/dev/null
-  setpriv=$(realpath "$(command -v setpriv)")
   sudo -n true
   bwrap_command=(sudo -n -- "${bwrap_command[0]}")
-  identity_options=()
-  runtime_prefix=(
-    "$setpriv"
-    --reuid=65534
-    --regid=65534
-    --clear-groups
-    --no-new-privs
-    --inh-caps=-all
-    --ambient-caps=-all
-    --bounding-set=-all
-  )
+  identity_options+=(--uid 65534 --gid 65534)
   expected_uid=65534
 fi
 
@@ -71,7 +59,6 @@ timeout -k 5 90 "${bwrap_command[@]}" \
   --setenv RETROZETRO_ARTIFACT_MONGODB_URI "${RETROZETRO_ARTIFACT_MONGODB_URI:-}" \
   --setenv RETROZETRO_ARTIFACT_EXPECTED_UID "$expected_uid" \
   --chdir /app \
-  "${runtime_prefix[@]}" \
   /runtime/node /harness/artifact-acceptance.mjs /app "$case_name"
 
 if [[ "$case_name" == complete ]]; then
