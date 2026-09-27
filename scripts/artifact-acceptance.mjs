@@ -13,7 +13,14 @@ const identity = JSON.parse(
 	readFileSync(resolve(artifact, ".retrozetro-release-prepared.json"), "utf8")
 );
 const sourceMongoUri = process.env.RETROZETRO_ARTIFACT_MONGODB_URI || "";
+const expectedUid = process.env.RETROZETRO_ARTIFACT_EXPECTED_UID || "";
 const children = new Set();
+
+if (expectedUid) {
+	assert.equal(typeof process.getuid, "function");
+	assert.equal(process.getuid(), Number(expectedUid));
+	assert.notEqual(process.getuid(), 0);
+}
 
 function delay(milliseconds) {
 	return new Promise(resolvePromise => setTimeout(resolvePromise, milliseconds));
