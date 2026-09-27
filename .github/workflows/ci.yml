@@ -158,6 +158,7 @@ jobs:
 
       - name: Build and accept exact immutable ARM64 runtime
         env:
+          RETROZETRO_ARTIFACT_BWRAP_SUDO: "1"
           RETROZETRO_ARTIFACT_MONGODB_URI: mongodb://artifact_admin:retrozetro-artifact-password-2026@127.0.0.1:27017/retrozetro_artifact_ci?authSource=admin
         run: |
           printf '/.ai-work/\n' >> .git/info/exclude

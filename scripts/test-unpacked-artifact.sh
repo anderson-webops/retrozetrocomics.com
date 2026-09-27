@@ -14,6 +14,15 @@ test "$("$node" --version)" = v24.18.1
 command -v bwrap >/dev/null
 command -v timeout >/dev/null
 
+bwrap_command=("$(command -v bwrap)")
+identity_options=(--unshare-user)
+if [[ "${RETROZETRO_ARTIFACT_BWRAP_SUDO:-0}" == 1 ]]; then
+  command -v sudo >/dev/null
+  sudo -n true
+  bwrap_command=(sudo -n -- "${bwrap_command[0]}")
+  identity_options+=(--uid 65534 --gid 65534)
+fi
+
 if [[ "$case_name" == complete ]]; then
   : "${RETROZETRO_ARTIFACT_MONGODB_URI:?Pass a loopback retrozetro_artifact_* MongoDB fixture URI}"
   python3 -B "$script_dir/runtime-artifact.py" verify "$artifact"
@@ -24,7 +33,9 @@ mounts=(
   --proc /proc
   --dev /dev
   --tmpfs /tmp
+  --chmod 1777 /tmp
   --tmpfs /state
+  --chmod 1777 /state
 )
 for directory in /lib /lib64; do
   if [[ -e "$directory" ]]; then
@@ -32,8 +43,9 @@ for directory in /lib /lib64; do
   fi
 done
 
-timeout -k 5 90 bwrap \
-  --unshare-user --unshare-pid --unshare-uts --unshare-ipc --unshare-cgroup \
+timeout -k 5 90 "${bwrap_command[@]}" \
+  "${identity_options[@]}" \
+  --unshare-pid --unshare-uts --unshare-ipc --unshare-cgroup \
   --die-with-parent --new-session \
   "${mounts[@]}" \
   --ro-bind "$node" /runtime/node \

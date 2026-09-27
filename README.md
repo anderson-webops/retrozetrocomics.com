@@ -125,7 +125,9 @@ The repository contains the complete non-container deployment contract:
   isolated home and npm configuration so dependency and build scripts cannot inherit operator or CI credentials.
 - `scripts/test-unpacked-artifact.sh` runs the exact archive read-only without source or development dependencies and
   exercises native bindings, the compiled recovery CLI, health/readiness, dependency loss, published HTML, graceful
-  shutdown, copier integrity, and missing-module rejection.
+  shutdown, copier integrity, and missing-module rejection. The ARM64 CI runner invokes Bubblewrap through its
+  passwordless runner-only sudo boundary because that runner disables unprivileged user namespaces; the application
+  still runs inside the sandbox as UID/GID 65534. Other builders retain the unprivileged Bubblewrap path.
 - `deploy/systemd/promote-release.sh` is installed as a root-owned, digest-pinned control. It verifies the protected
   archive and retained rollback artifact independently, creates a new root-owned immutable release, atomically changes
   `/srv/retrozetro/current`, verifies local readiness and both public address families, dispatches independent GitHub
