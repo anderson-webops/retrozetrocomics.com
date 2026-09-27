@@ -16,6 +16,7 @@
     "back-end/dist/app.js",
     "back-end/dist/admin-lifecycle.js",
     "back-end/dist/public-renderer/entry-server.mjs",
+    "back-end/node_modules/zod/package.json",
     "node_modules/argon2/package.json",
     "node_modules/argon2/prebuilds/linux-arm64/argon2.armv8.glibc.node",
     "node_modules/@img/sharp-linux-arm64/package.json",
@@ -29,6 +30,7 @@
   "allowedRoots": [
     "front-end/dist",
     "back-end/dist",
+    "back-end/node_modules",
     "node_modules"
   ],
   "allowedFiles": [

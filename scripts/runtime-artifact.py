@@ -216,7 +216,7 @@ def validate_identity(root, manifest):
 
 
 def package_directories(root):
-    for package_file in sorted((root / "node_modules").glob("**/package.json")):
+    for package_file in sorted(root.glob("**/package.json")):
         relative = package_file.parent.relative_to(root).as_posix()
         parts = PurePosixPath(relative).parts
         if "node_modules" not in parts:
