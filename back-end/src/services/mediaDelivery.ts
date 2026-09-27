@@ -11,7 +11,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { isReviewedLegacyPublicMedia } from "./legacyPublicMedia.js";
 import {
 	presentMediaAsset,
-	resolveLocalStoragePath
+	resolveLocalStoragePath,
+	uploadRoot
 } from "./storage.js";
 
 function contentContainsMediaReference(value: unknown, references: Set<string>): boolean {
@@ -53,7 +54,7 @@ async function sendLocalMedia(
 
 	setMediaHeaders(res, storageKey, cacheControl);
 	return new Promise<void>((resolve, reject) => {
-		res.sendFile(filePath, { dotfiles: "deny" }, (error) => {
+		res.sendFile(path.relative(uploadRoot, filePath), { dotfiles: "deny", root: uploadRoot }, (error) => {
 			if (!error) return resolve();
 			if (!res.headersSent) {
 				res.status((error as NodeJS.ErrnoException).code === "ENOENT" ? 404 : 500)

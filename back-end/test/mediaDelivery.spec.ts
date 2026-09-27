@@ -96,6 +96,11 @@ describe("publication-aware media delivery", () => {
 		await servePublishedMedia(requestDouble(storageKey), response);
 
 		expect(response.sendFile).toHaveBeenCalledOnce();
+		expect(response.sendFile).toHaveBeenCalledWith(
+			storageKey,
+			expect.objectContaining({ dotfiles: "deny", root: expect.any(String) }),
+			expect.any(Function)
+		);
 		expect(response.status).not.toHaveBeenCalledWith(404);
 	});
 
