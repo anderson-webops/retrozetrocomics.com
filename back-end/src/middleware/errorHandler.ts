@@ -61,7 +61,7 @@ export function errorHandler(
 	}
 
 	const statusCode = getErrorStatusCode(error);
-	if (error instanceof AppError && error.expose && statusCode >= 400 && statusCode < 500) {
+	if (error instanceof AppError && error.expose && statusCode >= 400 && statusCode <= 599) {
 		return res.status(statusCode).json({
 			message: error.publicMessage
 		});

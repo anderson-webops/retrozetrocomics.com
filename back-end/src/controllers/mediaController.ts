@@ -54,7 +54,8 @@ function serializeMediaAsset(asset: MediaAssetDocument) {
 		storageKey: presented.storageKey,
 		title: presented.title,
 		updatedAt: presented.updatedAt,
-		url: presented.url
+		url: presented.url,
+		previewUrl: `/api/admin/media/${asset.id}/file`
 	};
 }
 
@@ -107,7 +108,7 @@ async function moveLocalFileForDeletion(asset: MediaAssetDocument) {
 export async function createMediaAsset(req: Request, res: Response) {
 	const file = readUploadedFile(req);
 	if (!file) {
-		return res.status(400).json({ message: "Choose a picture, comic, storyboard, or PDF to upload." });
+		return res.status(400).json({ message: "Choose a JPEG, PNG, GIF, or WebP image to upload." });
 	}
 
 	const metadata = uploadMetadataSchema.safeParse(req.body);

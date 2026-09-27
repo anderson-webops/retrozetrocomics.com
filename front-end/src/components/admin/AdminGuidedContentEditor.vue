@@ -505,7 +505,7 @@ function chooseMedia(asset: MediaAsset) {
 	}
 	if (!currentCharacter.value) return;
 	if (asset.kind !== "image") {
-		error.value = "Choose a picture for a character. PDF files can stay in the media library for other uses.";
+		error.value = "Choose an image for a character.";
 		return;
 	}
 	if (!asset.altText.trim()) {

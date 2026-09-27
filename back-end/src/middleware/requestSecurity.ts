@@ -8,7 +8,7 @@ const ALLOWED_HEADERS = "Content-Type";
 
 function isAdminMediaUpload(req: Parameters<RequestHandler>[0]) {
 	return req.method === "POST"
-		&& req.path === "/api/admin/media"
+		&& req.path.toLowerCase() === "/api/admin/media"
 		&& Boolean(req.is("multipart/form-data"));
 }
 
@@ -71,7 +71,7 @@ export function createRequestSecurityMiddleware(
 
 		if (
 			!isSafeMethod
-			&& req.path.startsWith("/api/")
+			&& req.path.toLowerCase().startsWith("/api/")
 			&& !isAdminMediaUpload(req)
 			&& req.is("application/json") === false
 		) {

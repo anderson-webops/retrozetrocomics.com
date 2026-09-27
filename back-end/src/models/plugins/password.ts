@@ -2,13 +2,11 @@
 import type { Document, HydratedDocument, Schema } from "mongoose";
 import argon2 from "argon2";
 
-export const ARGON2_OPTIONS = {
-	hashLength: 32,
-	memoryCost: 65_536,
-	parallelism: 1,
-	timeCost: 3,
-	type: argon2.argon2id
-} as const;
+import {
+	ARGON2_OPTIONS,
+	hashPassword,
+	verifyPassword
+} from "../../services/passwordHashing.js";
 
 interface PasswordDocument extends Document {
 	password: string;
@@ -24,13 +22,13 @@ export function passwordPlugin<T extends PasswordDocument>(
 			return;
 		}
 
-		this.password = await argon2.hash(this.password, ARGON2_OPTIONS);
+		this.password = await hashPassword(this.password);
 		this.set("passwordChangedAt", new Date());
 		this.set("sessionVersion", Number(this.get("sessionVersion") || 0) + 1);
 	});
 
 	schema.methods.comparePassword = function (pw: string) {
-		return argon2.verify(this.password, pw);
+		return verifyPassword(this.password, pw);
 	};
 
 	schema.methods.passwordNeedsRehash = function () {

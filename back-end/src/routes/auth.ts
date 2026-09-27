@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import {
+	authorizeRecoveryEnrollment,
 	cancelMfa,
 	login,
 	logout,
@@ -22,12 +23,13 @@ import {
 } from "../services/rateLimits.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-export const authRouter = Router();
+export const authRouter = Router({ caseSensitive: true });
 
 authRouter.get("/me", authReadRateLimiter, asyncHandler(me));
 authRouter.post("/login", loginIpRateLimiter, loginAccountRateLimiter, asyncHandler(login));
 authRouter.post("/logout", mfaRateLimiter, asyncHandler(logout));
 authRouter.post("/mfa/cancel", mfaRateLimiter, asyncHandler(cancelMfa));
+authRouter.post("/mfa/enrollment-grant", mfaRateLimiter, asyncHandler(authorizeRecoveryEnrollment));
 authRouter.post("/mfa/passkey/registration/options", mfaRateLimiter, asyncHandler(passkeyRegistrationOptions));
 authRouter.post(
 	"/mfa/passkey/registration/verify",

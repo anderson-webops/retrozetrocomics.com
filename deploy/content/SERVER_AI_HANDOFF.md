@@ -1,7 +1,7 @@
-# Tyler publishing workflow handoff: v2.9.0
+# Tyler publishing workflow handoff: v2.10.0
 
 This is a deployment procedure, not authorization to deploy. Once Jacob authorizes server installation, install the
-exact annotated `v2.9.0` tag. Do not infer additional canon or publish any source archive document.
+exact annotated `v2.10.0` tag. Do not infer additional canon or publish any source archive document.
 
 ## Publishing additions in this release
 
@@ -71,6 +71,32 @@ separately reviewed migration to the canonical direct-release service:
 Do not force this server into the `/srv/retrozetro/current` or `retrozetro.service` profile merely to satisfy the
 canonical deployment scripts. A service-layout migration is outside this content release unless Jacob separately
 authorizes and reviews it.
+
+## Immutable runtime artifact requirement
+
+Use the CI-accepted Linux ARM64 runtime archive, `SHA256SUMS`,
+`runtime-manifest.json`, and `acceptance.json` from the exact tagged revision.
+Verify the archive against the independently reviewed SHA-256 and the
+root-installed `deploy/runtime-artifact.json` contract before extracting it.
+Do not build as `tyler`, `retrozetro`, root, or any identity that can read the
+production environment. The separate builder must not belong to a runtime or
+media group and must receive only a disposable loopback MongoDB fixture.
+
+For the compatibility host, copy only the verified artifact's compiled backend,
+static output, production dependency closure, and package manifests into a new
+staging tree. Verify every required path, hash, mode, native binding, release
+identity, and entrypoint again after that exact copy. Run the isolated runtime
+acceptance against the staged tree before any live mutation. Preserve the
+existing protected environments and uploads outside the staged tree. Never run
+dependency installation or package lifecycle scripts as the runtime identity or
+during privileged promotion.
+
+The archive includes the compiled `admin-lifecycle.js` recovery entrypoint and
+the reviewed Linux ARM64 Argon2, Sharp, and libvips bindings. It intentionally
+contains no source checkout, development dependency, credential, environment
+file, upload, database, cache, queue, or other writable state. A missing module,
+unexpected file, hash change, mutable artifact, or identity mismatch is a hard
+stop. Do not repair an installed tree in place.
 
 ## Preflight
 

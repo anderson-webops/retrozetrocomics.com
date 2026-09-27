@@ -12,6 +12,7 @@ const loginForm = reactive({
 	password: ""
 });
 const recoveryForm = reactive({ code: "" });
+const recoveryGrantForm = reactive({ grant: "" });
 
 const localError = ref("");
 const showPassword = ref(false);
@@ -26,6 +27,7 @@ const heading = computed(
 			authenticate: "Confirm with your passkey",
 			enroll: "Protect owner access",
 			password: "Admin sign in",
+			"recover-enroll": "Confirm account recovery",
 			"recovery-codes": "Save your recovery codes"
 		})[authStep.value]
 );
@@ -35,6 +37,8 @@ const description = computed(
 			authenticate: "Use the fingerprint, face, screen lock, or security key already connected to this account.",
 			enroll: "Create a passkey so a stolen password cannot open the owner workspace.",
 			password: "Sign in only when you need to edit site content or review owner activity.",
+			"recover-enroll":
+				"Enter the short-lived recovery grant provided by the site operator before creating a replacement passkey.",
 			"recovery-codes":
 				"These one-time codes are the backup if the passkey is unavailable. They will not be shown again."
 		})[authStep.value]
@@ -44,6 +48,7 @@ function resetForm() {
 	loginForm.email = "";
 	loginForm.password = "";
 	recoveryForm.code = "";
+	recoveryGrantForm.grant = "";
 	localError.value = "";
 	showPassword.value = false;
 }
@@ -95,6 +100,16 @@ async function setUpPasskey() {
 		await session.registerPasskey();
 	} catch {
 		localError.value = authError.value || "The passkey could not be set up.";
+	}
+}
+
+async function submitRecoveryGrant() {
+	localError.value = "";
+	try {
+		await session.authorizeRecoveryEnrollment(recoveryGrantForm.grant);
+		recoveryGrantForm.grant = "";
+	} catch {
+		localError.value = authError.value || "That recovery grant could not be verified.";
 	}
 }
 
@@ -221,6 +236,30 @@ onBeforeUnmount(() => {
 
 					<button class="auth-form__submit" :disabled="busy" type="submit">
 						{{ busy ? "Signing in..." : "Sign in" }}
+					</button>
+				</form>
+
+				<form v-else-if="authStep === 'recover-enroll'" class="auth-form" @submit.prevent="submitRecoveryGrant">
+					<label>
+						<span>One-time recovery grant</span>
+						<input
+							v-model="recoveryGrantForm.grant"
+							autocapitalize="none"
+							autocomplete="one-time-code"
+							placeholder="RZ-MFA-..."
+							required
+							type="text"
+						/>
+					</label>
+					<p v-if="localError || authError" id="admin-login-error" class="auth-form__error" role="alert">
+						{{ localError || authError }}
+					</p>
+					<p class="auth-form__help">
+						The grant expires quickly and works for one recovery. If it is missing or expired, ask the site
+						operator to reset MFA again.
+					</p>
+					<button ref="primaryAction" class="auth-form__submit" :disabled="busy" type="submit">
+						{{ busy ? "Checking grant..." : "Continue recovery" }}
 					</button>
 				</form>
 

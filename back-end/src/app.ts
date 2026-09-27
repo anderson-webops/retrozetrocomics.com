@@ -29,13 +29,11 @@ import {
 	readInlineScriptHashes
 } from "./services/contentSecurityPolicy.js";
 import { canonicalRedirectUrl } from "./services/domainRouting.js";
+import { createMediaDeliveryRouter } from "./services/mediaDelivery.js";
 import { createProbeRouter } from "./services/probes.js";
 import { publicPageRateLimiter } from "./services/rateLimits.js";
 import { createPublishedPageRouter } from "./services/publishedPages.js";
-import {
-	ensureUploadDirectories,
-	uploadRoot
-} from "./services/storage.js";
+import { ensureUploadDirectories } from "./services/storage.js";
 
 const backendRoot = path.resolve(
 	path.dirname(fileURLToPath(import.meta.url)),
@@ -58,7 +56,7 @@ export function createApp() {
 	const config = readSecurityConfig();
 	const releaseIdentity = readReleaseIdentity(env, config.isProduction);
 	const app = express();
-	const apiRouter = express.Router();
+	const apiRouter = express.Router({ caseSensitive: true });
 	const staticRoot = env.STATIC_SITE_DIR?.trim()
 		? path.resolve(env.STATIC_SITE_DIR)
 		: defaultStaticRoot;
@@ -86,6 +84,7 @@ export function createApp() {
 	verifyStaticReleaseIdentity(staticRoot, releaseIdentity, config.isProduction);
 
 	app.disable("x-powered-by");
+	app.set("case sensitive routing", true);
 	if (config.trustedProxyIps.length > 0) {
 		const trustedProxyIps = new Set(config.trustedProxyIps);
 		app.set("trust proxy", (ip: string) => trustedProxyIps.has(ip));
@@ -100,21 +99,21 @@ export function createApp() {
 			: publicSecurityHeaders;
 		securityHeaders(req, res, next);
 	});
-	app.use((req, res, next) => {
-		const redirectUrl = canonicalRedirectUrl(req.hostname, req.originalUrl, config.siteOrigin);
-		if (redirectUrl) return res.redirect(308, redirectUrl);
-		next();
-	});
 	app.use(
 		createProbeRouter(async () => {
 			const connection = mongoose.connection;
 			if (connection.readyState !== 1 || !connection.db) {
 				return false;
 			}
-			await connection.db.admin().ping();
+			await connection.db.admin().command({ maxTimeMS: 1000, ping: 1 });
 			return true;
 		})
 	);
+	app.use((req, res, next) => {
+		const redirectUrl = canonicalRedirectUrl(req.hostname, req.originalUrl, config.siteOrigin);
+		if (redirectUrl) return res.redirect(308, redirectUrl);
+		next();
+	});
 	app.use(createRequestSecurityMiddleware(config));
 	app.use((req, res, next) => {
 		if (isOwnerSecurityRoute(req.path)) {
@@ -178,20 +177,7 @@ export function createApp() {
 	app.use(
 		"/uploads",
 		publicPageRateLimiter,
-		express.static(uploadRoot, {
-			dotfiles: "deny",
-			fallthrough: false,
-			index: false,
-			maxAge: "1h",
-			setHeaders(response, filePath) {
-				response.setHeader("Content-Security-Policy", "default-src 'none'; sandbox");
-				response.setHeader("Cross-Origin-Resource-Policy", "same-origin");
-				response.setHeader("X-Content-Type-Options", "nosniff");
-				if (filePath.endsWith(".pdf")) {
-					response.setHeader("Content-Disposition", "attachment");
-				}
-			}
-		})
+		createMediaDeliveryRouter()
 	);
 
 		if (existsSync(staticRoot)) {

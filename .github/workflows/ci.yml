@@ -124,7 +124,20 @@ jobs:
 
   native-arm64:
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 25
+    timeout-minutes: 60
+    services:
+      mongo:
+        image: mongo:8.0.28@sha256:5351bff2b5d1563e3fa603a74b9be85ef9323e10aeb0b45cea933a93876e77fd
+        env:
+          MONGO_INITDB_ROOT_USERNAME: artifact_admin
+          MONGO_INITDB_ROOT_PASSWORD: retrozetro-artifact-password-2026
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --username artifact_admin --password retrozetro-artifact-password-2026 --authenticationDatabase admin --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 1)'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -138,38 +151,16 @@ jobs:
       - name: Use the repository npm version
         run: npm install --global "npm@${NPM_VERSION}"
 
-      - name: Validate ARM64 install and build
+      - name: Install isolated-artifact tooling
         run: |
-          npm ci --include=optional --strict-allow-scripts
-          npm run verify:native-lock
-          npm run typecheck
-          npm test
-          npm run build
+          sudo apt-get update
+          sudo apt-get install --yes bubblewrap
 
-  direct-runtime:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-
-      - name: Use the repository npm version
-        run: npm install --global "npm@${NPM_VERSION}"
-
-      - name: Build exact direct-runtime candidate
+      - name: Build and accept exact immutable ARM64 runtime
+        env:
+          RETROZETRO_ARTIFACT_MONGODB_URI: mongodb://artifact_admin:retrozetro-artifact-password-2026@127.0.0.1:27017/retrozetro_artifact_ci?authSource=admin
         run: |
-          npm ci --include=optional --strict-allow-scripts
-          RETROZETRO_RELEASE_VERSION="v$(node -p "require('./package.json').version")"
-          export RETROZETRO_RELEASE_VERSION
-          export SOURCE_REVISION=0000000000000000000000000000000000000000
-          export SOURCE_DATE_EPOCH=1
-          npm run build
-          npm run verify:startup-diagnostics
-          npm run verify:production-install
-          npm run verify:direct-runtime
+          printf '/.ai-work/\n' >> .git/info/exclude
+          mkdir -p .ai-work/runs/ci-runtime
+          npm run package:runtime -- .ai-work/runs/ci-runtime
+          test -f .ai-work/runs/ci-runtime/acceptance.json

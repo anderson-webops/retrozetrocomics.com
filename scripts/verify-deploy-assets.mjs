@@ -7,6 +7,9 @@ import process from "node:process";
 
 const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
 const relativePaths = {
+	artifactAcceptance: "scripts/artifact-acceptance.mjs",
+	artifactContract: "deploy/runtime-artifact.json",
+	artifactVerifier: "scripts/runtime-artifact.py",
 	artworkIndex: "front-end/src/content/tylerArtwork.ts",
 	artworkPage: "front-end/src/pages/artwork.vue",
 	ci: ".github/workflows/ci.yml",
@@ -20,6 +23,7 @@ const relativePaths = {
 	mainStyles: "front-end/src/styles/main.css",
 	nginx: "deploy/nginx/retrozetro.locations.conf",
 	npmHelper: "scripts/run-pinned-npm.mjs",
+	packageRuntime: "scripts/package-runtime.sh",
 	ownerStaticSecurity: "scripts/write-owner-static-security.mjs",
 	installPolicy: "scripts/verify-install-script-policy.mjs",
 	prepare: "deploy/systemd/prepare-release.sh",
@@ -63,6 +67,9 @@ for (const removedPath of [
 }
 
 const [
+	artifactAcceptance,
+	artifactContractText,
+	artifactVerifier,
 	artworkIndex,
 	artworkPage,
 	ci,
@@ -70,12 +77,14 @@ const [
 	contentManifestText,
 	environment,
 	homePage,
+	install,
 	installPolicy,
 	legacyRuntime,
 	localeText,
 	mainStyles,
 	nginx,
 	npmHelper,
+	packageRuntime,
 	ownerStaticSecurity,
 	prepare,
 	promote,
@@ -91,6 +100,9 @@ const [
 	worldsData,
 	worldsPage
 ] = await Promise.all([
+	read(relativePaths.artifactAcceptance),
+	read(relativePaths.artifactContract),
+	read(relativePaths.artifactVerifier),
 	read(relativePaths.artworkIndex),
 	read(relativePaths.artworkPage),
 	read(relativePaths.ci),
@@ -98,12 +110,14 @@ const [
 	read(relativePaths.contentManifest),
 	read(relativePaths.environment),
 	read(relativePaths.homePage),
+	read(relativePaths.install),
 	read(relativePaths.installPolicy),
 	read(relativePaths.legacyRuntime),
 	read(relativePaths.locale),
 	read(relativePaths.mainStyles),
 	read(relativePaths.nginx),
 	read(relativePaths.npmHelper),
+	read(relativePaths.packageRuntime),
 	read(relativePaths.ownerStaticSecurity),
 	read(relativePaths.prepare),
 	read(relativePaths.promote),
@@ -121,6 +135,7 @@ const [
 ]);
 
 const contentManifest = JSON.parse(contentManifestText);
+const artifactContract = JSON.parse(artifactContractText);
 const locale = JSON.parse(localeText);
 const expectedSanitizedHashes = new Map([
 	[
@@ -292,22 +307,28 @@ assert.match(contentHandoff, /not a symlink-based atomic release/);
 assert.doesNotMatch(contentHandoff, /established atomic compatibility-release procedure/);
 assert.doesNotMatch(contentHandoff, /saves a private\s+draft without changing the public API/);
 assert.doesNotMatch(contentHandoff, /Working story file|relationship remains for Tyler to confirm/);
-assert.match(releaseWorkflow, /SOURCE_DATE_EPOCH/);
+assert.match(packageRuntime, /SOURCE_DATE_EPOCH/);
 assert.match(releaseMetadata, /new Date\(sourceEpoch \* 1000\)\.toISOString\(\)/);
 
 assert.doesNotMatch(`${ci}\n${releaseWorkflow}`, /\bdocker\b|\bghcr\.io\b/i);
 assert.match(releaseWorkflow, /production deployment is not performed by this workflow/);
-assert.match(ci, /verify:production-install/);
-assert.match(ci, /verify:direct-runtime/);
+assert.match(packageRuntime, /verify:production-install/);
+assert.match(ci, /package:runtime/);
 assert.match(ci, /verify:install-scripts/);
-assert.match(releaseWorkflow, /verify:install-scripts/);
+assert.match(releaseWorkflow, /package:runtime/);
+assert.match(packageRuntime, /verify:direct-runtime/);
+assert.match(packageRuntime, /verify:install-scripts/);
+assert.match(packageRuntime, /test:runtime-artifact/);
 
 for (const directive of [
 	"User=retrozetro",
 	"Group=retrozetro",
+	"MemorySwapMax=0",
 	"ProtectSystem=strict",
 	"NoNewPrivileges=true",
+	"PrivateMounts=true",
 	"RestrictNamespaces=true",
+	"RuntimeDirectory=retrozetro",
 	"ReadWritePaths=/srv/retrozetro/shared/uploads"
 ]) {
 	assert.match(service, new RegExp(`^${directive.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "m"));
@@ -329,8 +350,8 @@ assert.match(runtimeServer, /await import\("dotenv\/config"\)/);
 assert.match(runtimeServer, /applyLegacyDeploymentDefaults\(env\)/);
 assert.match(runtimeServer, /describeRuntimeError\(error\)/);
 assert.match(ci, /verify:startup-diagnostics/);
-assert.match(releaseWorkflow, /verify:startup-diagnostics/);
-assert.match(prepare, /verify:startup-diagnostics/);
+assert.match(packageRuntime, /verify:startup-diagnostics/);
+assert.match(prepare, /package-runtime\.sh/);
 assert.match(startupDiagnostics, /RuntimeConfigurationError/);
 assert.match(startupDiagnostics, /assert\.doesNotMatch\(stderr, \/mongodb:/);
 assert.match(storage, /resolvedApplicationRoot === LEGACY_BACKEND_ROOT/);
@@ -356,21 +377,56 @@ assert.match(nginx, /location = \/api\/internal\/dbinfo[\s\S]*?return 404;/);
 assert.match(nginx, /proxy_pass http:\/\/127\.0\.0\.1:3006;/);
 assert.match(nginx, /proxy_set_header X-Internal-Diagnostics-Key "";/);
 
-assert.match(prepare, /Node 24\.18\.1 and npm 12\.0\.2/);
-assert.match(prepare, /unset npm_config_global_ignore_file NPM_CONFIG_GLOBAL_IGNORE_FILE/);
-assert.match(prepare, /verify:install-scripts/);
-assert.match(prepare, /verify:production-install/);
-assert.match(prepare, /npm audit --include=prod --omit=dev --include=optional/);
-assert.match(promote, /--ipv4/);
-assert.match(promote, /--ipv6/);
-assert.match(promote, /probe_is_minimal_and_healthy/);
+assert.match(packageRuntime, /v24\.18\.1/);
+assert.match(packageRuntime, /12\.0\.2/);
+assert.match(packageRuntime, /RETROZETRO_RUNTIME_CONTRACT/);
+assert.match(packageRuntime, /protected production environment/);
+assert.match(packageRuntime, /\/usr\/bin\/env -i/);
+assert.match(packageRuntime, /NPM_CONFIG_USERCONFIG=\/dev\/null/);
+assert.match(packageRuntime, /copy-production-dependencies\.py/);
+assert.match(packageRuntime, /test-unpacked-artifact\.sh/);
+assert.match(packageRuntime, /missing-module/);
+assert.match(promote, /site_resolve_ipv4/);
+assert.match(promote, /site_resolve_ipv6/);
+assert.match(promote, /probe_is_minimal/);
 assert.match(promote, /dispatch_post_deploy_verification/);
-assert.doesNotMatch(promote, /^identity_matches\(\)/m);
-assert.match(promote, /Candidate verification failed; restoring the previous release/);
+assert.match(promote, /runtime-artifact\.py/);
+assert.match(promote, /assert_protected_path/);
+assert.match(promote, /independently verified previous release/);
+assert.match(promote, /frame-ancestors\[\[:space:\]\]\+'none'/);
 assert.match(promote, /api\/admin\/dashboard/);
 assert.match(promote, /api\/internal\/dbinfo/);
+assert.match(install, /deploy\/systemd\/install-service\.sh/);
 
-for (const script of [relativePaths.install, relativePaths.prepare, relativePaths.promote]) {
+assert.equal(artifactContract.version, 1);
+assert.deepEqual(
+	artifactContract.entrypoints,
+	["back-end/dist/server.js", "back-end/dist/admin-lifecycle.js"]
+);
+assert.ok(artifactContract.required.includes("runtime-manifest.json") === false);
+assert.ok(artifactContract.required.includes("back-end/dist/public-renderer/entry-server.mjs"));
+assert.deepEqual(
+	artifactContract.nativeBindings,
+	[
+		"node_modules/argon2/prebuilds/linux-arm64/argon2.armv8.glibc.node",
+		"node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.4.node",
+		"node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.6"
+	]
+);
+assert.ok(artifactContract.writableState.some(item => item.name === "uploaded media"));
+assert.match(artifactVerifier, /forbidden private or writable artifact file/);
+assert.match(artifactVerifier, /runtime dependencies differ from the back-end production closure/);
+assert.match(artifactAcceptance, /admin-lifecycle\.js/);
+assert.match(artifactAcceptance, /argon2/);
+assert.match(artifactAcceptance, /sharp/);
+assert.match(artifactAcceptance, /SIGTERM/);
+
+for (const script of [
+	relativePaths.install,
+	relativePaths.packageRuntime,
+	relativePaths.prepare,
+	relativePaths.promote
+]) {
 	const absolutePath = path.join(repositoryRoot, script);
 	const syntax = spawnSync("bash", ["-n", absolutePath], {
 		encoding: "utf8"

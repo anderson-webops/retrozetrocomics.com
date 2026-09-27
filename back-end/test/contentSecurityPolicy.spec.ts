@@ -14,8 +14,10 @@ describe("content security policy profiles", () => {
 	it("keeps advertising and analytics out of owner and authentication routes", () => {
 		for (const requestPath of [
 			"/studio/admin",
+			"/StUdIo/AdMiN/media",
 			"/studio/admin/media",
 			"/api/auth/login",
+			"/API/AUTH/login",
 			"/api/admin/media"
 		]) {
 			expect(isOwnerSecurityRoute(requestPath)).toBe(true);

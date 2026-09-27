@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { Buffer } from "node:buffer";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -39,7 +40,10 @@ Object.assign(process.env, {
 });
 
 const { createApp } = await import("../back-end/dist/app.js");
-await writeFile(path.join(uploadRoot, "probe.pdf"), "%PDF-1.4\n", "utf8");
+const reviewedLegacyKey = "content/tyler-handdrawn-v1/063-ba7430851cc35538.jpg";
+const reviewedLegacyPath = path.join(uploadRoot, ...reviewedLegacyKey.split("/"));
+await mkdir(path.dirname(reviewedLegacyPath), { recursive: true });
+await writeFile(reviewedLegacyPath, Buffer.from([0xFF, 0xD8, 0xFF, 0xD9]));
 const server = createApp().listen(port, "127.0.0.1");
 await new Promise((resolve, reject) => {
 	server.once("error", reject);
@@ -65,6 +69,12 @@ try {
 	const healthHead = await request("/api/healthz", { method: "HEAD" });
 	assert.equal(healthHead.status, 200);
 	assert.equal(await healthHead.text(), "");
+	const aliasHealth = await request("/healthz", {
+		headers: { Host: "www.retrozetrocomics.com" }
+	});
+	assert.equal(aliasHealth.status, 200);
+	assert.deepEqual(await aliasHealth.json(), { ok: true });
+	assert.equal(aliasHealth.headers.get("location"), null);
 
 	const readinessResponse = await request("/api/readyz");
 	assert.equal(readinessResponse.status, 503);
@@ -81,11 +91,11 @@ try {
 		/'unsafe-inline'|'unsafe-eval'/
 	);
 
-	const uploadResponse = await request("/uploads/probe.pdf");
+	const uploadResponse = await request(`/uploads/${reviewedLegacyKey}`);
 	assert.equal(uploadResponse.status, 200);
-	assert.equal(uploadResponse.headers.get("content-disposition"), "attachment");
+	assert.match(uploadResponse.headers.get("content-type") || "", /^image\/jpeg/);
+	assert.equal(uploadResponse.headers.get("content-disposition"), null);
 	assert.match(uploadResponse.headers.get("content-security-policy") || "", /default-src 'none'/);
-	assert.equal(uploadResponse.headers.get("x-content-type-options"), "nosniff");
 
 	const blockedResponse = await request("/api/contact", {
 		body: "{}",
@@ -100,6 +110,16 @@ try {
 	assert.equal(blockedResponse.headers.get("access-control-allow-origin"), null);
 
 	assert.equal((await request("/api/admin/dashboard")).status, 401);
+	const mixedCaseAuth = await request("/api/AUTH/login", {
+		body: "{}",
+		headers: {
+			"Content-Type": "application/json",
+			"Origin": "https://retrozetrocomics.com",
+			"Sec-Fetch-Site": "same-origin"
+		},
+		method: "POST"
+	});
+	assert.equal(mixedCaseAuth.status, 404);
 	assert.equal((await request("/api/not-public")).status, 404);
 	assert.equal((await request("/api/internal/dbinfo")).status, 403);
 

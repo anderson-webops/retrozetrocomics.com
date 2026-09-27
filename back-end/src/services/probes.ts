@@ -3,6 +3,12 @@ import { Router } from "express";
 
 export type ReadinessCheck = () => boolean | Promise<boolean>;
 
+interface ProbeRouterOptions {
+	clock?: () => number;
+	failureCacheMs?: number;
+	successCacheMs?: number;
+}
+
 function sendProbe(res: Response, ok: boolean, method: Request["method"]): void {
 	res.status(ok ? 200 : 503).set("Cache-Control", "no-store");
 	if (method === "HEAD") {
@@ -13,16 +19,43 @@ function sendProbe(res: Response, ok: boolean, method: Request["method"]): void 
 	res.json({ ok });
 }
 
-export function createProbeRouter(checkReadiness: ReadinessCheck): Router {
-	const router = Router();
-	const readinessHandler = async (req: Request, res: Response) => {
-		let ready = false;
+export function createProbeRouter(
+	checkReadiness: ReadinessCheck,
+	options: ProbeRouterOptions = {}
+): Router {
+	const router = Router({ caseSensitive: true });
+	const clock = options.clock || Date.now;
+	const successCacheMs = options.successCacheMs ?? 1000;
+	const failureCacheMs = options.failureCacheMs ?? 250;
+	let lastNow = 0;
+	let cached: { expiresAt: number; ok: boolean } | undefined;
+	let inFlight: Promise<boolean> | undefined;
+
+	const readReadyState = async (): Promise<boolean> => {
+		lastNow = Math.max(lastNow, clock());
+		if (cached && cached.expiresAt > lastNow) return cached.ok;
+		if (inFlight) return inFlight;
+
+		inFlight = Promise.resolve()
+			.then(checkReadiness)
+			.then(Boolean)
+			.catch(() => false);
+
 		try {
-			ready = await checkReadiness();
+			const ok = await inFlight;
+			lastNow = Math.max(lastNow, clock());
+			cached = {
+				expiresAt: lastNow + (ok ? successCacheMs : failureCacheMs),
+				ok
+			};
+			return ok;
 		}
-		catch {
-			ready = false;
+		finally {
+			inFlight = undefined;
 		}
+	};
+	const readinessHandler = async (req: Request, res: Response) => {
+		const ready = await readReadyState();
 		sendProbe(res, ready, req.method);
 	};
 

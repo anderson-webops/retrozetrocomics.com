@@ -81,7 +81,7 @@ interface PublishedPageOptions {
 }
 
 export function createPublishedPageRouter(staticRoot: string, options: PublishedPageOptions) {
-	const router = Router();
+	const router = Router({ caseSensitive: true });
 	const rendererPath = path.resolve(
 		path.dirname(fileURLToPath(import.meta.url)),
 		"../public-renderer/entry-server.mjs"

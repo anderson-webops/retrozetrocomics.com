@@ -35,6 +35,7 @@ async function addPasskey() {
 	error.value = "";
 	message.value = "";
 	try {
+		await session.authenticatePasskey();
 		await session.registerPasskey();
 		message.value = "Another passkey is now connected to the owner account.";
 		await loadStatus();

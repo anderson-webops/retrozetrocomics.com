@@ -60,4 +60,27 @@ describe("monitoring probes", () => {
 		await expectProbe(baseUrl, "/readyz", "GET", 503, '{"ok":false}');
 		await expectProbe(baseUrl, "/readyz", "HEAD", 503, "");
 	});
+
+	it("coalesces concurrent readiness checks and briefly caches success", async () => {
+		let checks = 0;
+		let release!: () => void;
+		const blocked = new Promise<void>((resolve) => {
+			release = resolve;
+		});
+		const baseUrl = await startServer(async () => {
+			checks += 1;
+			await blocked;
+			return true;
+		});
+
+		const first = fetch(`${baseUrl}/readyz`);
+		const second = fetch(`${baseUrl}/api/readyz`);
+		await new Promise(resolve => setTimeout(resolve, 20));
+		expect(checks).toBe(1);
+		release();
+		expect((await first).status).toBe(200);
+		expect((await second).status).toBe(200);
+		expect((await fetch(`${baseUrl}/readyz`)).status).toBe(200);
+		expect(checks).toBe(1);
+	});
 });

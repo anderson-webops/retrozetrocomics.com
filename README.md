@@ -32,10 +32,13 @@ npm run audit:production
 - If you override the public site hostname during builds, also set `VITE_PUBLIC_SITE_ORIGIN` so canonical URLs and SSG API resolution stay correct.
 - Use [`HEALTHCHECKS.md`](./HEALTHCHECKS.md) for deployment monitor targets instead of `/`.
 - Canonical uploads live outside immutable releases at `/srv/retrozetro/shared/uploads`; the compatibility host uses
-  `/srv/retrozetrocomics.com/back-end/uploads`. Only JPEG, PNG, GIF, WebP,
-  and PDF files are accepted. The backend verifies signatures, decodes and re-encodes images without metadata, rejects
-  active or encrypted PDFs, and serves PDFs as attachments. Permanent deletion is available only from trash after a
-  recent passkey confirmation and is blocked while current saved or published content still uses the file.
+  `/srv/retrozetrocomics.com/back-end/uploads`. Only JPEG, PNG, GIF, and WebP files are accepted. The backend verifies
+  signatures and decodes and re-encodes images without metadata. PDF uploads are intentionally rejected because safe
+  token scanning cannot normalize every active-content form. Existing reviewed published documents remain downloadable
+  as attachments. Dynamic media is public only while an active record is referenced by published content; drafts and
+  trash use an authenticated owner-only preview. Permanent deletion is available only from trash after a recent
+  passkey confirmation and is blocked while current saved or published content still uses the file. Production also
+  enforces an aggregate upload limit, free-space reserve, and one active upload-processing slot.
 - The public contact form now submits through the backend. Set `CONTACT_FROM_EMAIL` and either `CONTACT_USE_SENDMAIL=true` or the `CONTACT_SMTP_*` settings. If `CONTACT_TO_EMAIL` is unset, submissions default to `contacts@jacobdanderson.net`; `CONTACT_BCC_EMAIL` stays optional so future alias-plus-BCC routing is a simple env change.
 - Use `deploy/systemd/retrozetro.env.example` for production. Session and diagnostics secrets must be non-placeholder
   random values, production origins must use HTTPS, and `TRUSTED_PROXY_IPS` must contain only the exact loopback proxy
@@ -98,6 +101,12 @@ npm run admin -- replay-audit-outbox
 npm run admin -- replay-audit-outbox --apply
 ```
 
+An applied MFA reset revokes every existing session and prints a short-lived,
+one-time enrollment grant exactly once. Deliver it through a separately verified
+channel. The owner must enter that grant before registering a replacement
+passkey. Adding another passkey from an authenticated session requires a fresh
+assertion from an already enrolled passkey.
+
 Production defaults WebAuthn to `PUBLIC_SITE_ORIGIN`; the explicit `WEBAUTHN_ORIGIN` and `WEBAUTHN_RP_ID` values in the
 environment example document the required relying-party boundary. Development on another origin must set both values
 to the exact browser origin and its hostname.
@@ -110,12 +119,22 @@ The repository contains the complete non-container deployment contract:
   view and only the shared upload directory writable.
 - `deploy/nginx/retrozetro.locations.conf` proxies the existing IPv4 and IPv6 TLS listeners to `127.0.0.1:3006` and
   blocks public diagnostics headers and routes.
-- `deploy/systemd/prepare-release.sh` validates a clean release checkout, performs all dependency and application gates,
-  builds exact source metadata, and reduces the tree to audited backend runtime dependencies.
-- `deploy/systemd/promote-release.sh` atomically changes `/srv/retrozetro/current`, writes exact deployment identity,
-  verifies local readiness and both public address families, dispatches independent GitHub post-deploy verification,
-  and restores the prior release if any gate or dispatch fails. The required root-owned GitHub token file and minimum
-  permission are documented in `deploy/systemd/README.md`.
+- `deploy/systemd/prepare-release.sh` delegates to a secret-inaccessible builder that produces a hashed,
+  topology-neutral Linux ARM64 archive containing only compiled output, static assets, package manifests, reviewed
+  native bindings, and the root-lock-backed backend production dependency closure. The builder re-executes with an
+  isolated home and npm configuration so dependency and build scripts cannot inherit operator or CI credentials.
+- `scripts/test-unpacked-artifact.sh` runs the exact archive read-only without source or development dependencies and
+  exercises native bindings, the compiled recovery CLI, health/readiness, dependency loss, published HTML, graceful
+  shutdown, copier integrity, and missing-module rejection.
+- `deploy/systemd/promote-release.sh` is installed as a root-owned, digest-pinned control. It verifies the protected
+  archive and retained rollback artifact independently, creates a new root-owned immutable release, atomically changes
+  `/srv/retrozetro/current`, verifies local readiness and both public address families, dispatches independent GitHub
+  post-deploy verification, and restores the prior verified release if any gate or dispatch fails.
+
+The production host currently uses the separately reviewed compatibility layout. Do not replace it with the canonical
+direct-service layout merely to use these controls. A compatibility deployment must consume the same verified archive,
+verify the exact copied tree again, and preserve the existing service, paths, environment files, uploads, port, Nginx
+policy, and certificates. The complete artifact and host-control procedure is in `deploy/systemd/README.md`.
 
 Before the first direct promotion, back up MongoDB and uploads, rotate the Vault AppRole SecretID exposed in historical
 commit `8b8a2a4d431f1a2599a69ac0a56c0423285b9332`, and prove the old login is rejected. Production promotion remains blocked

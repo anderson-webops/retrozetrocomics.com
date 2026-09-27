@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "entrypoints": [
+    "back-end/dist/server.js",
+    "back-end/dist/admin-lifecycle.js"
+  ],
+  "required": [
+    "package.json",
+    "package-lock.json",
+    "front-end/package.json",
+    "back-end/package.json",
+    ".retrozetro-release-prepared.json",
+    "front-end/dist/index.html",
+    "front-end/dist/release.json",
+    "back-end/dist/server.js",
+    "back-end/dist/app.js",
+    "back-end/dist/admin-lifecycle.js",
+    "back-end/dist/public-renderer/entry-server.mjs",
+    "node_modules/argon2/package.json",
+    "node_modules/argon2/prebuilds/linux-arm64/argon2.armv8.glibc.node",
+    "node_modules/@img/sharp-linux-arm64/package.json",
+    "node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.4.node",
+    "node_modules/@img/sharp-libvips-linux-arm64/package.json",
+    "node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.6",
+    "node_modules/express/package.json",
+    "node_modules/mongoose/package.json",
+    "node_modules/sharp/package.json"
+  ],
+  "allowedRoots": [
+    "front-end/dist",
+    "back-end/dist",
+    "node_modules"
+  ],
+  "allowedFiles": [
+    "package.json",
+    "package-lock.json",
+    "front-end/package.json",
+    "back-end/package.json",
+    ".retrozetro-release-prepared.json"
+  ],
+  "allowedExecutables": [],
+  "runtime": {
+    "os": "linux",
+    "arch": "arm64",
+    "libc": "glibc",
+    "node": "24.18.1",
+    "npmBuildOnly": "12.0.2"
+  },
+  "modulesOutsideBuildDirectories": [],
+  "generatedClients": [],
+  "nativeBindings": [
+    "node_modules/argon2/prebuilds/linux-arm64/argon2.armv8.glibc.node",
+    "node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.4.node",
+    "node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.6"
+  ],
+  "staticAssets": [
+    "front-end/dist",
+    "back-end/dist/public-renderer"
+  ],
+  "dependencyRoots": [
+    "back-end"
+  ],
+  "writableState": [
+    {
+      "name": "uploaded media",
+      "location": "/srv/retrozetro/shared/uploads",
+      "rollback": "Preserve outside immutable releases during promotion and rollback. The compatibility host retains its reviewed upload root instead."
+    },
+    {
+      "name": "runtime state",
+      "location": "/run/retrozetro",
+      "rollback": "Ephemeral systemd RuntimeDirectory; never package it."
+    },
+    {
+      "name": "MongoDB data",
+      "location": "host-managed external database",
+      "rollback": "Back up independently and preserve schema compatibility with the exact retained application release."
+    }
+  ],
+  "privateConfiguration": "Protected host environment files, credentials, MongoDB data, uploads, caches, queues, logs, and other writable state remain outside the artifact.",
+  "topology": "The archive is topology-neutral. Preserve the reviewed host paths, runtime user, port 3006, protected environment files, Nginx policy, certificates, IPv4/IPv6 listeners, and the existing compatibility layout unless a separate migration is approved."
+}

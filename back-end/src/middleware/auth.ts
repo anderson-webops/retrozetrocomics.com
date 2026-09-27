@@ -16,13 +16,17 @@ export interface SessionState {
 	challenge?: string;
 	challengeExpiresAt?: number;
 	challengePurpose?: "authentication" | "registration" | "step-up";
+	factorManagementAuthorizedAt?: number;
+	factorManagementCredentialId?: string;
+	factorManagementSessionVersion?: number;
 	issuedAt?: number;
 	lastSeenAt?: number;
-	mfaMode?: "authenticate" | "enroll";
+	mfaMode?: "authenticate" | "enroll" | "recover-enroll";
 	mfaVerifiedAt?: number;
 	pendingAccountId?: string;
 	pendingIssuedAt?: number;
 	pendingSessionVersion?: number;
+	recoveryEnrollmentGrantHash?: string;
 	role?: SessionRole;
 	sessionVersion?: number;
 	version?: 2;
@@ -41,10 +45,21 @@ export function getSessionState(req: Request) {
 	return (((req as any).session as SessionState | null | undefined) || {}) as SessionState;
 }
 
-export function writeSession(req: Request, account: AuthAccount) {
+export function writeSession(
+	req: Request,
+	account: AuthAccount,
+	options: { factorManagementCredentialId?: string } = {}
+) {
 	const now = Date.now();
 	(req as any).session = {
 		accountId: account.id,
+		...(options.factorManagementCredentialId
+			? {
+					factorManagementAuthorizedAt: now,
+					factorManagementCredentialId: options.factorManagementCredentialId,
+					factorManagementSessionVersion: account.sessionVersion
+				}
+			: {}),
 		issuedAt: now,
 		lastSeenAt: now,
 		mfaVerifiedAt: now,
@@ -57,7 +72,7 @@ export function writeSession(req: Request, account: AuthAccount) {
 export function writePendingMfaSession(
 	req: Request,
 	account: AuthAccount,
-	mode: "authenticate" | "enroll"
+	mode: "authenticate" | "enroll" | "recover-enroll"
 ) {
 	const now = Date.now();
 	(req as any).session = {
@@ -111,15 +126,46 @@ export function clearSession(req: Request) {
 	(req as any).session = null;
 }
 
-export function markSessionMfaVerified(req: Request) {
+export function markSessionMfaVerified(req: Request, credentialId: string) {
 	const session = getSessionState(req);
+	const now = Date.now();
 	(req as any).session = {
 		...session,
 		challenge: undefined,
 		challengeExpiresAt: undefined,
 		challengePurpose: undefined,
-		mfaVerifiedAt: Date.now()
+		factorManagementAuthorizedAt: now,
+		factorManagementCredentialId: credentialId,
+		factorManagementSessionVersion: session.sessionVersion,
+		mfaVerifiedAt: now
 	} satisfies SessionState;
+}
+
+export function authorizeRecoveryEnrollment(req: Request, grantHash: string) {
+	const session = getSessionState(req);
+	if (session.mfaMode !== "recover-enroll") return false;
+	(req as any).session = {
+		...session,
+		mfaMode: "enroll",
+		recoveryEnrollmentGrantHash: grantHash
+	} satisfies SessionState;
+	return true;
+}
+
+export function factorManagementCredential(req: Request, account: AuthAccount) {
+	const session = getSessionState(req);
+	const authorizedAt = session.factorManagementAuthorizedAt;
+	if (
+		typeof authorizedAt !== "number"
+		|| !Number.isSafeInteger(authorizedAt)
+		|| Date.now() - authorizedAt > MFA_STEP_UP_LIFETIME_MS
+		|| authorizedAt > Date.now()
+		|| session.factorManagementSessionVersion !== account.sessionVersion
+		|| typeof session.factorManagementCredentialId !== "string"
+	) {
+		return null;
+	}
+	return session.factorManagementCredentialId;
 }
 
 export async function getAuthenticatedAccount(req: Request) {
@@ -197,7 +243,9 @@ export async function getPendingMfaAccount(req: Request) {
 		return null;
 	}
 
-	const admin = await Admin.findById(session.pendingAccountId).select("+recoveryCodes");
+	const admin = await Admin.findById(session.pendingAccountId).select(
+		"+recoveryCodes +mfaEnrollmentGrantExpiresAt +mfaEnrollmentGrantHash"
+	);
 	if (
 		!admin
 		|| admin.role !== "admin"

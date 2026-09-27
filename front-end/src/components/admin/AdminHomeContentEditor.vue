@@ -208,7 +208,7 @@ function confirmRemoval() {
 function selectMedia(asset: MediaAsset) {
 	if (!currentItem.value) return;
 	if (asset.kind !== "image") {
-		error.value = "Choose a picture rather than a PDF for a home page highlight.";
+		error.value = "Choose an image for a home page highlight.";
 		return;
 	}
 	currentItem.value.image = asset.url;

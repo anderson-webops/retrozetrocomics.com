@@ -4,24 +4,14 @@ import path from "node:path";
 import sharp from "sharp";
 
 import { UploadValidationError } from "../errors/appError.js";
-import { resolveUploadedFilePath, type UploadedFile } from "./storage.js";
+import {
+	MAX_UPLOAD_BYTES,
+	resolveUploadedFilePath,
+	type UploadedFile
+} from "./storage.js";
 
 const MAX_IMAGE_PIXELS = 50_000_000;
 const MAX_ANIMATION_FRAMES = 200;
-const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
-const PDF_ACTIVE_CONTENT_NAMES = [
-	"aa",
-	"embeddedfile",
-	"importdata",
-	"javascript",
-	"js",
-	"launch",
-	"openaction",
-	"richmedia",
-	"submitform",
-	"xfa"
-];
-
 const SHARP_FORMAT_BY_MIME = new Map<string, "gif" | "jpeg" | "png" | "webp">([
 	["image/gif", "gif"],
 	["image/jpeg", "jpeg"],
@@ -52,34 +42,6 @@ export function detectUploadMimeType(buffer: Buffer): string | null {
 	}
 
 	return null;
-}
-
-function decodePdfNames(source: string) {
-	return source.replace(/#([\da-f]{2})/gi, (_match, hexadecimal: string) =>
-		String.fromCharCode(Number.parseInt(hexadecimal, 16)));
-}
-
-export function inspectPdf(buffer: Buffer) {
-	if (detectUploadMimeType(buffer) !== "application/pdf") {
-		throw new UploadValidationError("That file is not a valid PDF.");
-	}
-
-	const ending = buffer.subarray(Math.max(0, buffer.length - 2_048)).toString("latin1");
-	if (!/%%EOF[\0\t\n\f\r ]*$/.test(ending)) {
-		throw new UploadValidationError("That PDF appears to be incomplete or damaged.");
-	}
-
-	const normalized = decodePdfNames(buffer.toString("latin1")).toLowerCase();
-	if (/\/encrypt(?:\s|\/|>|\[|$)/.test(normalized)) {
-		throw new UploadValidationError("Password-protected PDFs cannot be checked safely. Upload an unlocked copy.");
-	}
-	const activeName = PDF_ACTIVE_CONTENT_NAMES.find(name =>
-		new RegExp(`/${name}(?:\\s|/|>|\\[|$)`, "i").test(normalized));
-	if (activeName) {
-		throw new UploadValidationError(
-			"That PDF contains an interactive or embedded feature that cannot be accepted safely. Save a flattened copy and try again."
-		);
-	}
 }
 
 function outputPipeline(image: ReturnType<typeof sharp>, mimeType: string) {
@@ -148,9 +110,9 @@ export async function inspectAndSanitizeUpload(file: UploadedFile) {
 	}
 
 	if (detectedMimeType === "application/pdf") {
-		inspectPdf(buffer);
-		file.size = buffer.length;
-		return file;
+		throw new UploadValidationError(
+			"PDF uploads are disabled because their active content cannot be normalized safely. Export the page as a JPEG, PNG, GIF, or WebP image."
+		);
 	}
 
 	await sanitizeImage(file);

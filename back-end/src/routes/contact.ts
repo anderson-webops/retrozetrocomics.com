@@ -7,7 +7,7 @@ import {
 	sendContactMessage
 } from "../services/contact.js";
 
-export const contactRouter = Router();
+export const contactRouter = Router({ caseSensitive: true });
 
 contactRouter.post("/", contactRateLimiter, async (req, res) => {
 	const parsedBody = contactFormSchema.safeParse(req.body);

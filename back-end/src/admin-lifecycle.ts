@@ -10,6 +10,7 @@ import { AuditOutbox } from "./models/schemas/AuditOutbox.js";
 import { withAdminLifecycleLock } from "./services/adminLifecycleLock.js";
 import { recordAuditLog } from "./services/auditLog.js";
 import { connectToMongo } from "./services/database.js";
+import { createEnrollmentGrant } from "./services/enrollmentGrant.js";
 import "dotenv/config";
 
 const commandSchema = z.enum([
@@ -84,15 +85,26 @@ async function handleMfaReset(email: string, apply: boolean) {
 		return;
 	}
 
-	await withAdminLifecycleLock(async () => {
+	const recoveryGrant = await withAdminLifecycleLock(async () => {
 		const currentAdmin = await Admin.findOne({ email }).select("+recoveryCodes");
 		if (!currentAdmin) {
 			throw new Error(`No account exists for ${maskEmail(email)}`);
 		}
 		const passkeyCount = currentAdmin.passkeys.length;
+		await recordLifecycleAction(
+			"ADMIN_MFA_RESET_AUTHORIZED",
+			currentAdmin,
+			"Authorized reset of owner passkeys, recovery codes, and existing sessions",
+			{ passkeyCount },
+			null
+		);
 		currentAdmin.passkeys.splice(0);
 		currentAdmin.recoveryCodes.splice(0);
 		currentAdmin.mfaEnrolledAt = null;
+		const grant = createEnrollmentGrant();
+		currentAdmin.mfaEnrollmentGrantExpiresAt = grant.expiresAt;
+		currentAdmin.mfaEnrollmentGrantHash = grant.hash;
+		currentAdmin.mfaRecoveryRequired = true;
 		currentAdmin.sessionVersion += 1;
 		await currentAdmin.save();
 		await recordLifecycleAction(
@@ -100,9 +112,14 @@ async function handleMfaReset(email: string, apply: boolean) {
 			currentAdmin,
 			"Reset owner passkeys, recovery codes, and existing sessions",
 			{ passkeyCount },
-			{ passkeyCount: 0, sessionsRevoked: true }
+			{ passkeyCount: 0, sessionsRevoked: true },
+			true
 		);
+		return grant;
 	});
+	console.log("One-time MFA recovery grant (shown once; deliver through a separate verified channel):");
+	console.log(recoveryGrant.plainTextGrant);
+	console.log(`Expires: ${recoveryGrant.expiresAt.toISOString()}`);
 }
 
 async function handleAuditOutboxReplay(apply: boolean) {
@@ -123,26 +140,35 @@ async function recordLifecycleAction(
 	admin: { id: string; name: string },
 	summary: string,
 	before: Record<string, unknown> | null,
-	after: Record<string, unknown> | null
+	after: Record<string, unknown> | null,
+	completionAfterIntent = false
 ) {
-	await recordAuditLog({
-		action,
-		actor: {
-			id: "operator-cli",
-			name: "Operator CLI",
-			role: "admin"
-		},
-		after,
-		before,
-		category: "auth",
-		entityId: admin.id,
-		entityLabel: admin.id,
-		entityType: "account",
-		summary,
-		targetId: admin.id,
-		targetLabel: admin.id,
-		targetType: "account"
-	});
+	try {
+		await recordAuditLog({
+			action,
+			actor: {
+				id: "operator-cli",
+				name: "Operator CLI",
+				role: "admin"
+			},
+			after,
+			before,
+			category: "auth",
+			entityId: admin.id,
+			entityLabel: admin.id,
+			entityType: "account",
+			summary,
+			targetId: admin.id,
+			targetLabel: admin.id,
+			targetType: "account"
+		});
+	}
+	catch (error) {
+		if (!completionAfterIntent) throw error;
+		console.error("Lifecycle completion audit could not be projected; the authorization intent remains durable", {
+			error: error instanceof Error ? error.name : "UnknownError"
+		});
+	}
 }
 
 async function handleCreate(email: string, apply: boolean) {
@@ -163,7 +189,7 @@ async function handleCreate(email: string, apply: boolean) {
 			throw new Error(`An account already exists for ${maskEmail(email)}`);
 		}
 
-		const admin = await Admin.create({
+		const admin = new Admin({
 			email,
 			name,
 			password,
@@ -171,11 +197,20 @@ async function handleCreate(email: string, apply: boolean) {
 			status: "active"
 		});
 		await recordLifecycleAction(
+			"ADMIN_ACCOUNT_CREATE_AUTHORIZED",
+			admin,
+			"Authorized creation of an admin account",
+			null,
+			{ role: "admin", status: "active" }
+		);
+		await admin.save();
+		await recordLifecycleAction(
 			"ADMIN_ACCOUNT_CREATED",
 			admin,
 			"Created an admin account",
 			null,
-			{ role: "admin", status: "active" }
+			{ role: "admin", status: "active" },
+			true
 		);
 	});
 }
@@ -229,6 +264,13 @@ async function handleStatusChange(
 		}
 
 		const previousStatus = currentAdmin.status;
+		await recordLifecycleAction(
+			status === "active" ? "ADMIN_ACCOUNT_ENABLE_AUTHORIZED" : "ADMIN_ACCOUNT_DISABLE_AUTHORIZED",
+			currentAdmin,
+			status === "active" ? "Authorized enabling an admin account" : "Authorized disabling an admin account",
+			{ status: previousStatus },
+			{ status }
+		);
 		currentAdmin.status = status;
 		currentAdmin.sessionVersion += 1;
 		await currentAdmin.save();
@@ -237,7 +279,8 @@ async function handleStatusChange(
 			currentAdmin,
 			status === "active" ? "Enabled an admin account" : "Disabled an admin account",
 			{ status: previousStatus },
-			{ status }
+			{ status },
+			true
 		);
 	});
 }
@@ -260,6 +303,13 @@ async function handlePasswordReset(email: string, apply: boolean) {
 			throw new Error(`No account exists for ${maskEmail(email)}`);
 		}
 
+		await recordLifecycleAction(
+			"ADMIN_PASSWORD_RESET_AUTHORIZED",
+			currentAdmin,
+			"Authorized reset of an admin password and existing sessions",
+			null,
+			{ sessionsRevoked: true }
+		);
 		currentAdmin.password = password;
 		await currentAdmin.save();
 		await recordLifecycleAction(
@@ -267,7 +317,8 @@ async function handlePasswordReset(email: string, apply: boolean) {
 			currentAdmin,
 			"Reset an admin password and revoked existing sessions",
 			null,
-			{ sessionsRevoked: true }
+			{ sessionsRevoked: true },
+			true
 		);
 	});
 }

@@ -38,6 +38,9 @@ const adminSchema = new Schema(
 		password: { type: String, required: true },
 		passwordChangedAt: { type: Date, default: null },
 		mfaEnrolledAt: { type: Date, default: null },
+		mfaEnrollmentGrantExpiresAt: { type: Date, default: null, select: false },
+		mfaEnrollmentGrantHash: { type: String, default: null, select: false },
+		mfaRecoveryRequired: { type: Boolean, default: false, required: true },
 		passkeys: { type: [adminPasskeySchema], default: [] },
 		recoveryCodes: { type: [recoveryCodeSchema], default: [], select: false },
 		role: {

@@ -55,7 +55,7 @@ const taskCards: Array<{
 		task: "security"
 	},
 	{
-		description: "Upload a picture, comic page, storyboard, or PDF and check it before saving.",
+		description: "Upload a checked JPEG, PNG, GIF, or WebP picture, comic page, or storyboard.",
 		label: "Add a picture or comic",
 		task: "media"
 	},

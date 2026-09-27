@@ -3,26 +3,32 @@ import type {
 	RegistrationResponseJSON
 } from "@simplewebauthn/server";
 import type { Request, Response } from "express";
-import argon2 from "argon2";
 import { z } from "zod";
 
 import type { SecurityConfig } from "../config/security.js";
 import {
+	authorizeRecoveryEnrollment as authorizeRecoveryEnrollmentSession,
 	clearSession,
 	consumeMfaChallenge,
+	factorManagementCredential,
 	getAuthenticatedAccount,
 	getPendingMfaAccount,
+	getSessionState,
 	markSessionMfaVerified,
 	writeMfaChallenge,
 	writePendingMfaSession,
 	writeSession
 } from "../middleware/auth.js";
-import { ARGON2_OPTIONS } from "../models/plugins/password.js";
 import { Admin } from "../models/schemas/Admin.js";
 import {
+	recordAuditIntent,
 	recordAuditLog,
 	recordFailedAuthentication
 } from "../services/auditLog.js";
+import {
+	enrollmentGrantMatches,
+	hashEnrollmentGrant
+} from "../services/enrollmentGrant.js";
 import {
 	createPasskeyAuthenticationOptions,
 	createPasskeyRegistrationOptions,
@@ -32,6 +38,10 @@ import {
 	verifyPasskeyAuthentication,
 	verifyPasskeyRegistration
 } from "../services/mfa.js";
+import {
+	hashPassword,
+	verifyPassword
+} from "../services/passwordHashing.js";
 
 const loginSchema = z.object({
 	email: z.string().trim().email().max(254),
@@ -40,16 +50,16 @@ const loginSchema = z.object({
 const recoveryCodeSchema = z.object({
 	code: z.string().trim().min(1).max(64)
 });
+const enrollmentGrantSchema = z.object({
+	grant: z.string().trim().min(1).max(256)
+});
 const publicKeyResponseSchema = z.object({
 	id: z.string().min(1).max(2048),
 	rawId: z.string().min(1).max(2048),
 	response: z.record(z.string(), z.unknown()),
 	type: z.literal("public-key")
 }).passthrough();
-const dummyHashPromise = argon2.hash(
-	"retrozetro-login-timing-placeholder",
-	ARGON2_OPTIONS
-);
+const dummyHashPromise = hashPassword("retrozetro-login-timing-placeholder");
 
 function securityConfig(req: Request) {
 	return req.app.locals.securityConfig as SecurityConfig;
@@ -81,7 +91,9 @@ function accountFromAdmin(admin: any) {
 }
 
 async function findAdminByEmail(email: string) {
-	return Admin.findOne({ email: email.toLowerCase().trim() }).select("+recoveryCodes");
+	return Admin.findOne({ email: email.toLowerCase().trim() }).select(
+		"+recoveryCodes +mfaEnrollmentGrantExpiresAt +mfaEnrollmentGrantHash"
+	);
 }
 
 async function findCeremonyAdmin(req: Request, purpose: "authentication" | "registration") {
@@ -101,14 +113,26 @@ async function findCeremonyAdmin(req: Request, purpose: "authentication" | "regi
 		return null;
 	}
 	const admin = await Admin.findById(account.id).select("+recoveryCodes");
-	return admin ? { admin, pending: false } as const : null;
+	if (!admin) return null;
+	if (purpose === "registration") {
+		const credentialId = factorManagementCredential(req, account);
+		if (
+			!credentialId
+			|| !admin.passkeys.some((item: any) => item.credentialId === credentialId)
+		) {
+			return null;
+		}
+		return { admin, authorizingCredentialId: credentialId, pending: false } as const;
+	}
+	return { admin, pending: false } as const;
 }
 
 async function auditMfaEvent(
 	action: string,
 	admin: any,
 	summary: string,
-	details: Record<string, unknown> = {}
+	details: Record<string, unknown> = {},
+	req?: Request
 ) {
 	await recordAuditLog({
 		action,
@@ -118,6 +142,30 @@ async function auditMfaEvent(
 		entityId: admin.id,
 		entityLabel: admin.id,
 		entityType: "account",
+		req,
+		summary,
+		targetId: admin.id,
+		targetLabel: admin.id,
+		targetType: "account"
+	});
+}
+
+async function auditMfaIntent(
+	req: Request,
+	action: string,
+	admin: any,
+	summary: string,
+	details: Record<string, unknown> = {}
+) {
+	return recordAuditIntent({
+		action,
+		actor: accountFromAdmin(admin),
+		category: "auth",
+		details,
+		entityId: admin.id,
+		entityLabel: admin.id,
+		entityType: "account",
+		req,
 		summary,
 		targetId: admin.id,
 		targetLabel: admin.id,
@@ -136,7 +184,7 @@ export async function login(req: Request, res: Response) {
 
 	const admin = await findAdminByEmail(parsed.data.email);
 	if (!admin) {
-		await argon2.verify(await dummyHashPromise, parsed.data.password);
+		await verifyPassword(await dummyHashPromise, parsed.data.password);
 		await recordFailedAuthentication("AUTH_LOGIN_FAILED");
 		return res.status(401).json({ message: "Invalid email or password" });
 	}
@@ -152,22 +200,39 @@ export async function login(req: Request, res: Response) {
 	}
 
 	if (passwordMethods.passwordNeedsRehash()) {
+		await auditMfaIntent(
+			req,
+			"AUTH_PASSWORD_REHASH_AUTHORIZED",
+			admin,
+			"Authorized an owner password-hash policy upgrade"
+		);
 		admin.password = parsed.data.password;
 		await admin.save();
+		await auditMfaEvent(
+			"AUTH_PASSWORD_REHASHED",
+			admin,
+			"Upgraded the owner password hash and revoked older sessions",
+			{ sessionsRevoked: true },
+			req
+		);
 	}
 
 	const account = accountFromAdmin(admin);
-	const mode = admin.passkeys.length > 0 ? "authenticate" : "enroll";
-	writePendingMfaSession(req, account, mode);
-
+	const mode = admin.passkeys.length > 0
+		? "authenticate"
+		: admin.mfaRecoveryRequired
+			? "recover-enroll"
+			: "enroll";
 	await auditMfaEvent(
 		"AUTH_PASSWORD_ACCEPTED",
 		admin,
-		mode === "enroll"
+		mode !== "authenticate"
 			? "Accepted an owner password and required passkey setup"
 			: "Accepted an owner password and required passkey confirmation",
-		{ mfaMode: mode }
+		{ mfaMode: mode },
+		req
 	);
+	writePendingMfaSession(req, account, mode);
 
 	return res.status(202).json({
 		account: null,
@@ -176,11 +241,49 @@ export async function login(req: Request, res: Response) {
 	});
 }
 
+export async function authorizeRecoveryEnrollment(req: Request, res: Response) {
+	const parsed = enrollmentGrantSchema.safeParse(req.body);
+	const pending = await getPendingMfaAccount(req);
+	if (!parsed.success || !pending || pending.mode !== "recover-enroll") {
+		return res.status(400).json({ message: "Start account recovery again with the owner password." });
+	}
+
+	const grantHash = pending.admin.mfaEnrollmentGrantHash;
+	const expiresAt = pending.admin.mfaEnrollmentGrantExpiresAt;
+	if (
+		typeof grantHash !== "string"
+		|| !(expiresAt instanceof Date)
+		|| expiresAt.getTime() <= Date.now()
+		|| !enrollmentGrantMatches(parsed.data.grant, grantHash)
+	) {
+		await recordFailedAuthentication("AUTH_MFA_RECOVERY_GRANT_FAILED", pending.admin.id);
+		return res.status(401).json({ message: "That recovery grant is invalid or expired." });
+	}
+
+	await auditMfaEvent(
+		"AUTH_MFA_RECOVERY_GRANT_ACCEPTED",
+		pending.admin,
+		"Accepted an operator-issued MFA recovery grant",
+		{},
+		req
+	);
+	if (!authorizeRecoveryEnrollmentSession(req, hashEnrollmentGrant(parsed.data.grant))) {
+		return res.status(400).json({ message: "Start account recovery again with the owner password." });
+	}
+	return res.status(204).send();
+}
+
 export async function passkeyRegistrationOptions(req: Request, res: Response) {
 	const ceremony = await findCeremonyAdmin(req, "registration");
 	if (!ceremony) {
-		clearSession(req);
-		return res.status(401).json({ message: "Enter the owner password again to set up a passkey." });
+		const authenticated = Boolean(getSessionState(req).accountId);
+		if (!authenticated) clearSession(req);
+		return res.status(authenticated ? 403 : 401).json({
+			...(authenticated ? { code: "MFA_STEP_UP_REQUIRED" } : {}),
+			message: authenticated
+				? "Confirm with an existing passkey before adding another passkey."
+				: "Enter the owner password again to set up a passkey."
+		});
 	}
 
 	const options = await createPasskeyRegistrationOptions(
@@ -219,25 +322,94 @@ export async function verifyPasskeyRegistrationResponse(req: Request, res: Respo
 	}
 
 	const firstPasskey = ceremony.admin.passkeys.length === 0;
-	ceremony.admin.passkeys.push(passkey as any);
+	const session = getSessionState(req);
+	const recoveryGrantHash = session.recoveryEnrollmentGrantHash;
+	const authorizingCredentialId = "authorizingCredentialId" in ceremony
+		? ceremony.authorizingCredentialId
+		: null;
+	if (firstPasskey && ceremony.admin.mfaRecoveryRequired && !recoveryGrantHash) {
+		return res.status(403).json({ message: "Enter the operator recovery grant before setting up a passkey." });
+	}
+	if (!firstPasskey && !authorizingCredentialId) {
+		return res.status(403).json({
+			code: "MFA_STEP_UP_REQUIRED",
+			message: "Confirm with an existing passkey before adding another passkey."
+		});
+	}
+	await auditMfaIntent(
+		req,
+		"AUTH_PASSKEY_REGISTRATION_AUTHORIZED",
+		ceremony.admin,
+		firstPasskey
+			? "Authorized first owner passkey enrollment"
+			: "Authorized an additional owner passkey enrollment",
+		{ firstPasskey }
+	);
 	let plainTextCodes: string[] = [];
+	let updatedAdmin: any = null;
 	if (firstPasskey) {
 		const recovery = await createRecoveryCodes();
 		plainTextCodes = recovery.plainTextCodes;
-		ceremony.admin.recoveryCodes = recovery.storedCodes as any;
-		ceremony.admin.mfaEnrolledAt = new Date();
+		const filter: Record<string, unknown> = {
+			_id: ceremony.admin.id,
+			"passkeys.0": { $exists: false },
+			sessionVersion: ceremony.admin.sessionVersion,
+			status: "active"
+		};
+		if (ceremony.admin.mfaRecoveryRequired) {
+			filter.mfaEnrollmentGrantExpiresAt = { $gt: new Date() };
+			filter.mfaEnrollmentGrantHash = recoveryGrantHash;
+			filter.mfaRecoveryRequired = true;
+		}
+		updatedAdmin = await Admin.findOneAndUpdate(
+			filter,
+			{
+				$inc: { sessionVersion: 1 },
+				$push: { passkeys: passkey as any },
+				$set: {
+					mfaEnrolledAt: new Date(),
+					mfaRecoveryRequired: false,
+					recoveryCodes: recovery.storedCodes as any
+				},
+				$unset: {
+					mfaEnrollmentGrantExpiresAt: "",
+					mfaEnrollmentGrantHash: ""
+				}
+			},
+			{ new: true }
+		).select("+recoveryCodes");
 	}
-	await ceremony.admin.save();
+	else {
+		updatedAdmin = await Admin.findOneAndUpdate(
+			{
+				_id: ceremony.admin.id,
+				$and: [
+					{ "passkeys.credentialId": authorizingCredentialId },
+					{ passkeys: { $not: { $elemMatch: { credentialId: passkey.credentialId } } } }
+				],
+				sessionVersion: ceremony.admin.sessionVersion,
+				status: "active"
+			},
+			{
+				$inc: { sessionVersion: 1 },
+				$push: { passkeys: passkey as any }
+			},
+			{ new: true }
+		);
+	}
+	if (!updatedAdmin) {
+		clearSession(req);
+		return res.status(409).json({ message: "Account security changed. Sign in and try again." });
+	}
 
-	const account = accountFromAdmin(ceremony.admin);
-	if (ceremony.pending) {
-		writeSession(req, account);
-	}
+	const account = accountFromAdmin(updatedAdmin);
+	writeSession(req, account);
 	await auditMfaEvent(
 		"AUTH_PASSKEY_REGISTERED",
-		ceremony.admin,
+		updatedAdmin,
 		firstPasskey ? "Set up owner passkey protection" : "Added another owner passkey",
-		{ passkeyCount: ceremony.admin.passkeys.length }
+		{ passkeyCount: updatedAdmin.passkeys.length, sessionsRevoked: true },
+		req
 	);
 
 	return res.status(201).json({
@@ -295,6 +467,14 @@ export async function verifyPasskeyAuthenticationResponse(req: Request, res: Res
 		return res.status(401).json({ message: "The passkey could not confirm this sign-in." });
 	}
 
+	await auditMfaIntent(
+		req,
+		ceremony.pending ? "AUTH_LOGIN_AUTHORIZED" : "AUTH_STEP_UP_AUTHORIZED",
+		ceremony.admin,
+		ceremony.pending
+			? "Authorized an owner session after password and passkey verification"
+			: "Authorized a sensitive owner action after passkey verification"
+	);
 	const storedPasskey = ceremony.admin.passkeys.find(
 		(item: any) => item.credentialId === parsed.data.id
 	) as any;
@@ -304,17 +484,19 @@ export async function verifyPasskeyAuthenticationResponse(req: Request, res: Res
 
 	const account = accountFromAdmin(ceremony.admin);
 	if (ceremony.pending) {
-		writeSession(req, account);
+		writeSession(req, account, { factorManagementCredentialId: passkey.credentialId });
 	}
 	else {
-		markSessionMfaVerified(req);
+		markSessionMfaVerified(req, passkey.credentialId);
 	}
 	await auditMfaEvent(
 		ceremony.pending ? "AUTH_LOGIN" : "AUTH_STEP_UP",
 		ceremony.admin,
 		ceremony.pending
 			? `${ceremony.admin.name} signed in with a passkey`
-			: `${ceremony.admin.name} confirmed a sensitive owner action`
+			: `${ceremony.admin.name} confirmed a sensitive owner action`,
+		{},
+		req
 	);
 
 	return res.json({
@@ -339,18 +521,36 @@ export async function useRecoveryCode(req: Request, res: Response) {
 		return res.status(401).json({ message: "That recovery code is not valid." });
 	}
 
-	const storedCode = pending.admin.recoveryCodes.find((item: any) => item.id === matchingCode.id) as any;
-	storedCode.usedAt = new Date();
-	await pending.admin.save();
-	const account = accountFromAdmin(pending.admin);
+	await auditMfaIntent(
+		req,
+		"AUTH_RECOVERY_CODE_USE_AUTHORIZED",
+		pending.admin,
+		"Authorized one-time recovery-code sign-in"
+	);
+	const updatedAdmin = await Admin.findOneAndUpdate(
+		{
+			_id: pending.admin.id,
+			recoveryCodes: { $elemMatch: { id: matchingCode.id, usedAt: null } },
+			sessionVersion: pending.admin.sessionVersion,
+			status: "active"
+		},
+		{ $set: { "recoveryCodes.$.usedAt": new Date() } },
+		{ new: true }
+	).select("+recoveryCodes");
+	if (!updatedAdmin) {
+		await recordFailedAuthentication("AUTH_SECOND_FACTOR_FAILED", pending.admin.id);
+		return res.status(401).json({ message: "That recovery code is not valid." });
+	}
+	const account = accountFromAdmin(updatedAdmin);
 	writeSession(req, account);
 	await auditMfaEvent(
 		"AUTH_RECOVERY_CODE_USED",
-		pending.admin,
-		`${pending.admin.name} signed in with a one-time recovery code`,
+		updatedAdmin,
+		`${updatedAdmin.name} signed in with a one-time recovery code`,
 		{
-			recoveryCodesRemaining: pending.admin.recoveryCodes.filter((item: any) => !item.usedAt).length
-		}
+			recoveryCodesRemaining: updatedAdmin.recoveryCodes.filter((item: any) => !item.usedAt).length
+		},
+		req
 	);
 
 	return res.json({
@@ -371,12 +571,31 @@ export async function regenerateRecoveryCodes(req: Request, res: Response) {
 	}
 
 	const recovery = await createRecoveryCodes();
-	admin.recoveryCodes = recovery.storedCodes as any;
-	await admin.save();
+	await auditMfaIntent(
+		req,
+		"AUTH_RECOVERY_CODES_REGENERATION_AUTHORIZED",
+		admin,
+		"Authorized replacement of all owner recovery codes"
+	);
+	const updatedAdmin = await Admin.findOneAndUpdate(
+		{ _id: admin.id, sessionVersion: admin.sessionVersion, status: "active" },
+		{
+			$inc: { sessionVersion: 1 },
+			$set: { recoveryCodes: recovery.storedCodes as any }
+		},
+		{ new: true }
+	).select("+recoveryCodes");
+	if (!updatedAdmin) {
+		clearSession(req);
+		return res.status(409).json({ message: "Account security changed. Sign in and try again." });
+	}
+	writeSession(req, accountFromAdmin(updatedAdmin));
 	await auditMfaEvent(
 		"AUTH_RECOVERY_CODES_REGENERATED",
-		admin,
-		"Replaced all owner recovery codes"
+		updatedAdmin,
+		"Replaced all owner recovery codes",
+		{ sessionsRevoked: true },
+		req
 	);
 	return res.json({ recoveryCodes: recovery.plainTextCodes });
 }
@@ -406,13 +625,26 @@ export async function cancelMfa(req: Request, res: Response) {
 
 export async function logout(req: Request, res: Response) {
 	const account = await getAuthenticatedAccount(req);
-	clearSession(req);
 
 	if (account) {
+		await recordAuditIntent({
+			action: "AUTH_LOGOUT_AUTHORIZED",
+			actor: account,
+			category: "auth",
+			entityId: account.id,
+			entityLabel: account.id,
+			entityType: "account",
+			req,
+			summary: "Authorized revocation of all owner sessions",
+			targetId: account.id,
+			targetLabel: account.id,
+			targetType: "account"
+		});
 		await Admin.updateOne(
 			{ _id: account.id, sessionVersion: account.sessionVersion },
 			{ $inc: { sessionVersion: 1 } }
 		);
+		clearSession(req);
 		await recordAuditLog({
 			action: "AUTH_LOGOUT",
 			after: {
@@ -430,6 +662,9 @@ export async function logout(req: Request, res: Response) {
 			targetLabel: account.id,
 			targetType: "account"
 		});
+	}
+	else {
+		clearSession(req);
 	}
 
 	res.status(204).send();

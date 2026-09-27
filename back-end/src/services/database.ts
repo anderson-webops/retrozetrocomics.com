@@ -38,12 +38,14 @@ export async function connectToMongo() {
 	);
 	try {
 		await mongoose.connect(validatedUri, {
-			connectTimeoutMS: 10_000,
+			connectTimeoutMS: 5_000,
 			maxIdleTimeMS: 60_000,
-			maxPoolSize: 20,
+			maxConnecting: 1,
+			maxPoolSize: 5,
 			minPoolSize: 0,
-			serverSelectionTimeoutMS: 10_000,
-			socketTimeoutMS: 45_000
+			serverSelectionTimeoutMS: 5_000,
+			socketTimeoutMS: 15_000,
+			waitQueueTimeoutMS: 2_000
 		});
 	}
 	catch (error) {

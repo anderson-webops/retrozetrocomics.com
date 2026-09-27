@@ -1,7 +1,7 @@
 {
 	"name": "retrozetro-monorepo",
 	"type": "module",
-	"version": "2.9.0",
+	"version": "2.10.0",
 	"private": true,
 	"packageManager": "npm@12.0.2",
 	"engines": {
@@ -31,12 +31,14 @@
 		"lint": "node scripts/run-pinned-npm.mjs run lint:root && node scripts/run-pinned-npm.mjs run -w front-end lint && node scripts/run-pinned-npm.mjs run -w back-end lint",
 		"lint:root": "eslint \"scripts/**/*.mjs\" eslint.config.js",
 		"lint-fix": "node scripts/run-pinned-npm.mjs run -w front-end lint-fix && node scripts/run-pinned-npm.mjs run -w back-end lint-fix",
+		"package:runtime": "bash scripts/package-runtime.sh",
 		"postinstall": "simple-git-hooks",
 		"release:metadata": "node scripts/write-release-metadata.mjs",
 		"server": "node scripts/run-pinned-npm.mjs run -w back-end server",
 		"server:once": "node scripts/run-pinned-npm.mjs run -w back-end server:once",
 		"serve": "node scripts/run-pinned-npm.mjs run -w front-end serve",
 		"test": "node scripts/run-pinned-npm.mjs run -w front-end test && node scripts/run-pinned-npm.mjs run -w back-end test",
+		"test:runtime-artifact": "python3 -B -m unittest scripts/test_runtime_artifact.py",
 		"typecheck": "node scripts/run-pinned-npm.mjs run -w front-end typecheck && node scripts/run-pinned-npm.mjs run -w back-end typecheck",
 		"up": "taze major -I && node scripts/run-pinned-npm.mjs run -w front-end up && node scripts/run-pinned-npm.mjs run -w back-end up",
 		"verify:dependency-graph": "node scripts/verify-dependency-graph.mjs",

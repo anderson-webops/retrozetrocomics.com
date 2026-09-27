@@ -11,10 +11,11 @@ import {
 	verifyAuthenticationResponse,
 	verifyRegistrationResponse
 } from "@simplewebauthn/server";
-import argon2 from "argon2";
-
 import type { SecurityConfig } from "../config/security.js";
-import { ARGON2_OPTIONS } from "../models/plugins/password.js";
+import {
+	hashPassword,
+	verifyPassword
+} from "./passwordHashing.js";
 
 export interface StoredPasskey {
 	backedUp: boolean;
@@ -69,7 +70,7 @@ export async function createRecoveryCodes() {
 		const normalized = normalizeRecoveryCode(code);
 		storedCodes.push({
 			createdAt: new Date(),
-			hash: await argon2.hash(normalized, ARGON2_OPTIONS),
+			hash: await hashPassword(normalized),
 			id: normalized.slice(2, 6),
 			usedAt: null
 		});
@@ -88,7 +89,7 @@ export async function findMatchingRecoveryCode(
 	}
 
 	const candidate = codes.find(code => code.id === normalized.slice(2, 6) && !code.usedAt);
-	if (!candidate || !await argon2.verify(candidate.hash, normalized)) {
+	if (!candidate || !await verifyPassword(candidate.hash, normalized)) {
 		return null;
 	}
 

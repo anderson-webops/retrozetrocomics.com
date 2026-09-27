@@ -12,10 +12,30 @@ concurrency:
   group: retrozetrocomics-production-release
   cancel-in-progress: false
 
+env:
+  CYPRESS_INSTALL_BINARY: "0"
+  NODE_VERSION: 24.18.1
+  NPM_VERSION: 12.0.2
+  PUPPETEER_SKIP_DOWNLOAD: "true"
+
 jobs:
-  validate:
-    runs-on: ubuntu-latest
+  immutable-runtime:
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 60
+    services:
+      mongo:
+        image: mongo:8.0.28@sha256:5351bff2b5d1563e3fa603a74b9be85ef9323e10aeb0b45cea933a93876e77fd
+        env:
+          MONGO_INITDB_ROOT_USERNAME: artifact_admin
+          MONGO_INITDB_ROOT_PASSWORD: retrozetro-artifact-password-2026
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --username artifact_admin --password retrozetro-artifact-password-2026 --authenticationDatabase admin --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 1)'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -24,59 +44,59 @@ jobs:
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 24.18.1
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
       - name: Use the repository npm version
-        run: npm install --global npm@12.0.2
+        run: npm install --global "npm@${NPM_VERSION}"
 
       - name: Verify annotated source release
-        id: release
         shell: bash
         run: |
-          test "$(node --version)" = "v24.18.1"
-          test "$(npm --version)" = "12.0.2"
+          test "$(node --version)" = "v${NODE_VERSION}"
+          test "$(npm --version)" = "${NPM_VERSION}"
           PACKAGE_VERSION="$(node -p "require('./package.json').version")"
           test "${GITHUB_REF_NAME}" = "v${PACKAGE_VERSION}"
           test "$(git cat-file -t "refs/tags/${GITHUB_REF_NAME}")" = "tag"
           test "$(git rev-parse "refs/tags/${GITHUB_REF_NAME}^{}")" = "$(git rev-parse HEAD)"
           git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
           test "$(git rev-parse HEAD)" = "$(git rev-parse refs/remotes/origin/main)"
-          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          echo "source_epoch=$(git show -s --format=%ct HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Run direct release gates
-        env:
-          RETROZETRO_RELEASE_VERSION: ${{ github.ref_name }}
-          SOURCE_DATE_EPOCH: ${{ steps.release.outputs.source_epoch }}
-          SOURCE_REVISION: ${{ steps.release.outputs.revision }}
+      - name: Install isolated-artifact tooling
         run: |
-          npm ci --include=optional --strict-allow-scripts
-          npm run audit
-          npm run audit:production
-          npm run audit:signatures
-          npm run verify:dependency-graph
-          npm run verify:deploy-assets
-          npm run verify:install-scripts
-          npm run verify:native-lock
-          npm run verify:platform-install
-          npm run lint
-          npm run typecheck
-          npm test
-          npm run build
-          npm run verify:startup-diagnostics
-          npm run a11y
-          npm run verify:production-install
-          npm run verify:direct-runtime
-          git diff --check
+          sudo apt-get update
+          sudo apt-get install --yes bubblewrap
+
+      - name: Build and accept immutable runtime archive
+        env:
+          RETROZETRO_ARTIFACT_MONGODB_URI: mongodb://artifact_admin:retrozetro-artifact-password-2026@127.0.0.1:27017/retrozetro_artifact_release?authSource=admin
+        run: |
+          printf '/.ai-work/\n' >> .git/info/exclude
+          mkdir -p .ai-work/runs/release-runtime
+          npm run package:runtime -- .ai-work/runs/release-runtime
+
+      - name: Retain reviewed runtime evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: retrozetro-${{ github.ref_name }}-linux-arm64
+          path: |
+            .ai-work/runs/release-runtime/*.tar.gz
+            .ai-work/runs/release-runtime/SHA256SUMS
+            .ai-work/runs/release-runtime/acceptance.json
+            .ai-work/runs/release-runtime/dependency-tree.txt
+            .ai-work/runs/release-runtime/pack.json
+            .ai-work/runs/release-runtime/runtime-manifest.json
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Record deployment contract
         run: |
           {
-            echo "### RetroZetro Comics direct release"
+            echo "### RetroZetro Comics immutable runtime release"
             echo
             echo "- Release: \`${GITHUB_REF_NAME}\`"
-            echo "- Revision: \`${{ steps.release.outputs.revision }}\`"
+            echo "- Revision: \`$(git rev-parse HEAD)\`"
+            echo "- Exact Linux ARM64 archive, checksum, manifest, and acceptance receipt retained."
             echo "- Source release only; production deployment is not performed by this workflow."
-            echo "- Compatibility deployment and rollback: deploy/content/SERVER_AI_HANDOFF.md"
+            echo "- Preserve the compatibility host unless a separate topology migration is approved."
           } >> "$GITHUB_STEP_SUMMARY"

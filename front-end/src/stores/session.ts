@@ -10,7 +10,7 @@ import { defineStore } from "pinia";
 import { api } from "@/api";
 
 const ADMIN_VIEWER_MODE_KEY = "retrozetro:admin-viewer-mode";
-type AuthStep = "authenticate" | "enroll" | "password" | "recovery-codes";
+type AuthStep = "authenticate" | "enroll" | "password" | "recover-enroll" | "recovery-codes";
 
 function errorMessage(error: any, fallback: string) {
 	if (error?.name === "NotAllowedError") {
@@ -96,7 +96,7 @@ export const useSessionStore = defineStore("session", {
 				const { data } = await api.get<{
 					account: SiteAccount | null;
 					authenticated: boolean;
-					mfa?: { mode?: "authenticate" | "enroll"; required: boolean };
+					mfa?: { mode?: "authenticate" | "enroll" | "recover-enroll"; required: boolean };
 				}>("/auth/me");
 				this.account = data.account;
 				if (data.mfa?.required && data.mfa.mode) {
@@ -117,13 +117,27 @@ export const useSessionStore = defineStore("session", {
 				const { data } = await api.post<{
 					account: SiteAccount | null;
 					authenticated: boolean;
-					mfa: { mode: "authenticate" | "enroll"; required: true };
+					mfa: { mode: "authenticate" | "enroll" | "recover-enroll"; required: true };
 				}>("/auth/login", payload);
 				this.account = data.account;
 				this.authStep = data.mfa.mode;
 				return data.account;
 			} catch (error: any) {
 				this.authError = errorMessage(error, "Unable to sign in.");
+				throw error;
+			} finally {
+				this.busy = false;
+			}
+		},
+
+		async authorizeRecoveryEnrollment(grant: string) {
+			this.busy = true;
+			this.authError = "";
+			try {
+				await api.post("/auth/mfa/enrollment-grant", { grant });
+				this.authStep = "enroll";
+			} catch (error: any) {
+				this.authError = errorMessage(error, "That recovery grant could not be verified.");
 				throw error;
 			} finally {
 				this.busy = false;

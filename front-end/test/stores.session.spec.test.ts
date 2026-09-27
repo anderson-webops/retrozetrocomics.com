@@ -82,6 +82,29 @@ describe("session store", () => {
 		expect(session.authStep).toBe("authenticate");
 	});
 
+	it("requires the operator grant before reset recovery can enroll a passkey", async () => {
+		(apiMod.api.post as any)
+			.mockResolvedValueOnce({
+				data: {
+					account: null,
+					authenticated: false,
+					mfa: { mode: "recover-enroll", required: true }
+				}
+			})
+			.mockResolvedValueOnce({ data: null });
+
+		const session = useSessionStore();
+		session.openAuth();
+		await session.login({ email: "owner@example.com", password: "password123" });
+		expect(session.authStep).toBe("recover-enroll");
+
+		await session.authorizeRecoveryEnrollment("RZ-MFA-example");
+		expect(apiMod.api.post).toHaveBeenLastCalledWith("/auth/mfa/enrollment-grant", {
+			grant: "RZ-MFA-example"
+		});
+		expect(session.authStep).toBe("enroll");
+	});
+
 	it("clears local account state on sign out", async () => {
 		(apiMod.api.post as any).mockResolvedValueOnce({ data: {} });
 

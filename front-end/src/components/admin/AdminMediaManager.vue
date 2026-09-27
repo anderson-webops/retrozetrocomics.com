@@ -237,7 +237,7 @@ onBeforeUnmount(releasePreview);
 			<div>
 				<p class="media-manager__eyebrow">Pictures and files</p>
 				<h2 id="media-manager-title">Add a picture, comic, or storyboard</h2>
-				<p>Choose one file, check the preview, and upload it. PDF files are also supported.</p>
+				<p>Choose one image, check the preview, and upload it.</p>
 			</div>
 		</header>
 
@@ -260,7 +260,7 @@ onBeforeUnmount(releasePreview);
 				<span>1</span>
 				<div>
 					<strong>Choose a file</strong>
-					<small>JPEG, PNG, GIF, WebP, or PDF — up to 12 MB.</small>
+					<small>JPEG, PNG, GIF, or WebP, up to 12 MB.</small>
 				</div>
 			</div>
 
@@ -268,7 +268,7 @@ onBeforeUnmount(releasePreview);
 				<span>File to upload</span>
 				<input
 					ref="fileInput"
-					accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+					accept="image/jpeg,image/png,image/gif,image/webp"
 					type="file"
 					@change="handleFileSelection"
 				/>
@@ -362,7 +362,7 @@ onBeforeUnmount(releasePreview);
 			</p>
 			<div v-else class="media-library__grid">
 				<article v-for="asset in visibleAssets" :key="asset.id" class="media-tile">
-					<img v-if="asset.kind === 'image'" :alt="asset.altText" :src="asset.url" />
+					<img v-if="asset.kind === 'image'" :alt="asset.altText" :src="asset.previewUrl" />
 					<div v-else class="media-tile__document" aria-hidden="true">PDF</div>
 					<div class="media-tile__copy">
 						<strong>{{ asset.title }}</strong>
@@ -370,7 +370,7 @@ onBeforeUnmount(releasePreview);
 						<small>{{ formatBytes(asset.size) }}</small>
 					</div>
 					<div class="media-tile__actions">
-						<a :href="asset.url" rel="noopener" target="_blank">Open {{ asset.title }}</a>
+						<a :href="asset.previewUrl" rel="noopener" target="_blank">Open {{ asset.title }}</a>
 						<button v-if="props.selectable && !showTrash" type="button" @click="emit('select', asset)">
 							Use {{ asset.title }}
 						</button>

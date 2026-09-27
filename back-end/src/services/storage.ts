@@ -17,12 +17,12 @@ const backendRoot = path.resolve(__dirname, "../..");
 const DEFAULT_KEY_PREFIX = "content";
 const DEFAULT_LOCAL_PUBLIC_BASE = "/uploads";
 const DEFAULT_S3_REGION = "us-east-1";
+export const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
 const LEADING_OR_TRAILING_SLASHES_REGEX = /^\/+|\/+$/g;
 const LEADING_SLASHES_REGEX = /^\/+/;
 const HTTP_PROTOCOL_REGEX = /^https?:\/\//;
 const TRAILING_SLASHES_REGEX = /\/+$/g;
 const ALLOWED_UPLOAD_TYPES = new Map([
-	["application/pdf", ".pdf"],
 	["image/gif", ".gif"],
 	["image/jpeg", ".jpg"],
 	["image/png", ".png"],
@@ -241,7 +241,7 @@ function joinPublicUrl(base: string, storageKey: string) {
 function createStorageKey(file: Pick<UploadedFile, "mimetype">, now = new Date()) {
 	const extension = ALLOWED_UPLOAD_TYPES.get(file.mimetype);
 	if (!extension) {
-		throw new UploadValidationError("Only JPEG, PNG, GIF, WebP, and PDF uploads are supported");
+		throw new UploadValidationError("Only JPEG, PNG, GIF, and WebP image uploads are supported");
 	}
 
 	return path.posix.join(
@@ -373,7 +373,7 @@ function fileFilter(
 	}
 
 	return callback(
-		new UploadValidationError("Only JPEG, PNG, GIF, WebP, and PDF uploads are supported")
+		new UploadValidationError("Only JPEG, PNG, GIF, and WebP image uploads are supported")
 	);
 }
 
@@ -381,7 +381,7 @@ export const postUpload = multer({
 	storage,
 	fileFilter,
 	limits: {
-		fileSize: 12 * 1024 * 1024,
+		fileSize: MAX_UPLOAD_BYTES,
 		files: 8
 	}
 });

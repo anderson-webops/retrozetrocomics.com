@@ -26,7 +26,9 @@ import {
 } from "../src/config/security.js";
 import { readServerConfig } from "../src/config/server.js";
 import {
+	factorManagementCredential,
 	getAuthenticatedAccount,
+	markSessionMfaVerified,
 	type SessionState
 } from "../src/middleware/auth.js";
 import { createRequestSecurityMiddleware } from "../src/middleware/requestSecurity.js";
@@ -398,7 +400,7 @@ describe("production runtime configuration", () => {
 			UPLOAD_ROOT: path.resolve("back-end/uploads")
 		})).toThrow(/outside/);
 		expect(isAllowedUploadMimeType("image/png")).toBe(true);
-		expect(isAllowedUploadMimeType("application/pdf")).toBe(true);
+		expect(isAllowedUploadMimeType("application/pdf")).toBe(false);
 		expect(isAllowedUploadMimeType("image/svg+xml")).toBe(false);
 		expect(isAllowedUploadMimeType("text/html")).toBe(false);
 		expect(resolveLocalStoragePath("content/2026-08/picture.jpg"))
@@ -625,6 +627,33 @@ describe("admin sessions", () => {
 		expect(account?.role).toBe("admin");
 		expect((request as any).session.issuedAt).toBe(issuedAt);
 		expect((request as any).session.lastSeenAt).toBeGreaterThan(now - 1_000);
+	});
+
+	it("binds factor-management authority to the passkey and session version that proved it", () => {
+		const now = Date.now();
+		const request = {
+			session: {
+				accountId: "admin-1",
+				issuedAt: now,
+				lastSeenAt: now,
+				mfaVerifiedAt: now,
+				role: "admin",
+				sessionVersion: 4,
+				version: 2
+			} satisfies SessionState
+		} as unknown as Request;
+		const account = {
+			email: "admin@example.com",
+			id: "admin-1",
+			name: "Admin",
+			role: "admin" as const,
+			sessionVersion: 4,
+			status: "active"
+		};
+
+		markSessionMfaVerified(request, "existing-passkey");
+		expect(factorManagementCredential(request, account)).toBe("existing-passkey");
+		expect(factorManagementCredential(request, { ...account, sessionVersion: 5 })).toBeNull();
 	});
 });
 

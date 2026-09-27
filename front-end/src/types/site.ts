@@ -210,6 +210,7 @@ export interface MediaAsset {
 	kind: "document" | "image";
 	mimeType: string;
 	originalName: string;
+	previewUrl: string;
 	provider: "local" | "s3";
 	purpose: MediaPurpose;
 	restoredAt: string | null;

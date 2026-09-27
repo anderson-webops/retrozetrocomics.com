@@ -6,8 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { type UploadedFile, uploadRoot } from "../src/services/storage.js";
 import {
 	detectUploadMimeType,
-	inspectAndSanitizeUpload,
-	inspectPdf
+	inspectAndSanitizeUpload
 } from "../src/services/uploadInspection.js";
 
 const temporaryDirectories: string[] = [];
@@ -77,12 +76,12 @@ describe("upload content inspection", () => {
 			.rejects.toThrow(/could not be checked safely/);
 	});
 
-	it("accepts a basic PDF and rejects active or encrypted PDFs", () => {
-		expect(() => inspectPdf(Buffer.from("%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\n%%EOF\n")))
-			.not.toThrow();
-		expect(() => inspectPdf(Buffer.from("%PDF-1.4\n<< /OpenAction 1 0 R >>\n%%EOF\n")))
-			.toThrow(/interactive or embedded/);
-		expect(() => inspectPdf(Buffer.from("%PDF-1.4\n<< /Encrypt 2 0 R >>\n%%EOF\n")))
-			.toThrow(/Password-protected/);
+	it("rejects every PDF rather than relying on bypassable token scanning", async () => {
+		const filePath = await createTemporaryFile(
+			"document.pdf",
+			"%PDF-1.7\n1 0 obj << /Type /Catalog >> endobj\n%%EOF\n"
+		);
+		await expect(inspectAndSanitizeUpload(uploadedFile(filePath, "application/pdf")))
+			.rejects.toThrow(/PDF uploads are disabled/);
 	});
 });

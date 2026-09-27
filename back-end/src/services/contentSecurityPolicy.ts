@@ -13,8 +13,9 @@ interface HtmlNode {
 export type ContentSecurityPolicyProfile = "owner" | "public";
 
 export function isOwnerSecurityRoute(requestPath: string) {
-	return /^\/studio\/admin(?:\/|$)/.test(requestPath)
-		|| /^\/api\/(?:admin|auth)(?:\/|$)/.test(requestPath);
+	const normalizedPath = requestPath.toLowerCase();
+	return /^\/studio\/admin(?:\/|$)/.test(normalizedPath)
+		|| /^\/api\/(?:admin|auth)(?:\/|$)/.test(normalizedPath);
 }
 
 export function buildContentSecurityPolicyDirectives(

@@ -1,6 +1,8 @@
 import type { Request } from "express";
 import type { AuthAccount } from "../middleware/auth.js";
 
+import { randomUUID } from "node:crypto";
+
 import { AuditLog } from "../models/schemas/AuditLog.js";
 import { AuditOutbox } from "../models/schemas/AuditOutbox.js";
 
@@ -9,7 +11,7 @@ export type AuditLogCategory
 		| "media"
 		| "site-content";
 
-interface AuditLogPayload {
+export interface AuditLogPayload {
 	action: string;
 	after?: Record<string, unknown> | null;
 	actor: Pick<AuthAccount, "id" | "name"> & {
@@ -27,6 +29,16 @@ interface AuditLogPayload {
 	targetId?: string;
 	targetLabel?: string;
 	targetType?: string;
+}
+
+interface AuditIntentContext {
+	operationId: string;
+}
+
+function auditIntentContext(req: Request | undefined) {
+	return req
+		? (req as Request & { auditIntentContext?: AuditIntentContext }).auditIntentContext
+		: undefined;
 }
 
 const SENSITIVE_KEY_PATTERN = /email|ip(address)?|password|secret|token|user.?agent/i;
@@ -81,6 +93,7 @@ function sanitizeUnknown(value: unknown): unknown {
 }
 
 export async function recordAuditLog(payload: AuditLogPayload) {
+	const intent = auditIntentContext(payload.req);
 	const document = {
 		action: payload.action,
 		after: sanitizeSnapshot(payload.after),
@@ -89,7 +102,10 @@ export async function recordAuditLog(payload: AuditLogPayload) {
 		actorRole: payload.actor.role,
 		before: sanitizeSnapshot(payload.before),
 		category: payload.category,
-		details: sanitizeDetails(payload.details),
+		details: sanitizeDetails({
+			...payload.details,
+			...(intent ? { operationId: intent.operationId } : {})
+		}),
 		entityId: payload.entityId || payload.targetId || "",
 		entityLabel: payload.entityLabel || payload.targetLabel || "",
 		entityType: payload.entityType || payload.targetType || "",
@@ -117,14 +133,39 @@ export async function recordAuditLog(payload: AuditLogPayload) {
 			console.error("Audit event could not be preserved", {
 				error: outboxError instanceof Error ? outboxError.name : "UnknownError"
 			});
-			throw outboxError;
+			if (!intent) throw outboxError;
 		}
 	}
 }
 
+export async function recordAuditIntent(payload: AuditLogPayload) {
+	const operationId = randomUUID();
+	await recordAuditLog({
+		...payload,
+		details: {
+			...payload.details,
+			auditState: "authorized",
+			operationId
+		},
+		req: undefined
+	});
+
+	if (payload.req) {
+		(payload.req as Request & { auditIntentContext?: AuditIntentContext }).auditIntentContext = {
+			operationId
+		};
+	}
+	return operationId;
+}
+
 export async function recordFailedAuthentication(
-	action: "AUTH_LOGIN_FAILED" | "AUTH_RATE_LIMITED" | "AUTH_SECOND_FACTOR_FAILED",
-	targetId = ""
+	action:
+		| "AUTH_LOGIN_FAILED"
+		| "AUTH_MFA_RECOVERY_GRANT_FAILED"
+		| "AUTH_RATE_LIMITED"
+		| "AUTH_SECOND_FACTOR_FAILED",
+	targetId = "",
+	details: Record<string, unknown> = {}
 ) {
 	return recordAuditLog({
 		action,
@@ -134,6 +175,7 @@ export async function recordFailedAuthentication(
 			role: "anonymous"
 		},
 		category: "auth",
+		details,
 		entityId: targetId,
 		entityLabel: targetId,
 		entityType: "account",
