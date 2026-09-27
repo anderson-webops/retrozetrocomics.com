@@ -258,7 +258,15 @@ async function testCompleteArtifact() {
 	const child = spawnRuntime(environment);
 
 	await assertMinimalProbe(baseUrl, "/healthz", 200, { ok: true });
-	await assertMinimalProbe(baseUrl, "/readyz", 200, { ok: true });
+	try {
+		await assertMinimalProbe(baseUrl, "/readyz", 200, { ok: true });
+	}
+	catch (error) {
+		throw new Error(
+			`Artifact runtime did not become ready: ${child.output.slice(-2_000)}`,
+			{ cause: error }
+		);
+	}
 	const aliasHealth = await fetch(`${baseUrl}/healthz`, {
 		headers: { Host: "www.artifact.retrozetro.test" },
 		redirect: "manual"

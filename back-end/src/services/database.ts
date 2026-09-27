@@ -9,6 +9,17 @@ import {
 } from "../errors/runtimeError.js";
 import { isVaultConfigured, readMongoSecret } from "../vaultClient.js";
 
+export async function checkMongoReadiness(
+	connection: typeof mongoose.connection = mongoose.connection
+): Promise<boolean> {
+	if (connection.readyState !== 1 || !connection.db) {
+		return false;
+	}
+
+	await connection.db.command({ ping: 1, maxTimeMS: 1_000 });
+	return true;
+}
+
 export async function connectToMongo() {
 	let mongoUri: string | undefined;
 

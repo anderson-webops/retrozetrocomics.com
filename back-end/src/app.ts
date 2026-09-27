@@ -28,6 +28,7 @@ import {
 	isOwnerSecurityRoute,
 	readInlineScriptHashes
 } from "./services/contentSecurityPolicy.js";
+import { checkMongoReadiness } from "./services/database.js";
 import { canonicalRedirectUrl } from "./services/domainRouting.js";
 import { createMediaDeliveryRouter } from "./services/mediaDelivery.js";
 import { createProbeRouter } from "./services/probes.js";
@@ -99,16 +100,7 @@ export function createApp() {
 			: publicSecurityHeaders;
 		securityHeaders(req, res, next);
 	});
-	app.use(
-		createProbeRouter(async () => {
-			const connection = mongoose.connection;
-			if (connection.readyState !== 1 || !connection.db) {
-				return false;
-			}
-			await connection.db.admin().command({ maxTimeMS: 1000, ping: 1 });
-			return true;
-		})
-	);
+	app.use(createProbeRouter(checkMongoReadiness));
 	app.use((req, res, next) => {
 		const redirectUrl = canonicalRedirectUrl(req.hostname, req.originalUrl, config.siteOrigin);
 		if (redirectUrl) return res.redirect(308, redirectUrl);
