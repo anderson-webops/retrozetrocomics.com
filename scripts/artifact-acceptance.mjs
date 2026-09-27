@@ -298,7 +298,8 @@ async function testMissingModuleFailure() {
 	);
 	const result = await waitForExit(child, 5000);
 	assert.notEqual(result.code, 0);
-	assert.match(child.output, /ERR_MODULE_NOT_FOUND|Cannot find module/);
+	assert.match(child.output, /Server startup failed/);
+	assert.doesNotMatch(child.output, /ERR_MODULE_NOT_FOUND|Cannot find module|mongodb:\/\//i);
 }
 
 try {
