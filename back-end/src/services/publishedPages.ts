@@ -157,8 +157,8 @@ export function createPublishedPageRouter(staticRoot: string, options: Published
 			);
 			helmet.contentSecurityPolicy({ directives })(req, res, () => {});
 			const head = rendered.head;
-			const html = `<!doctype html><html lang="en" ${head.htmlAttrs}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${head.headTags}<script>window.__INITIAL_STATE__=${serializePublicState(JSON.stringify(rendered.initialState))}</script>${assets}</head><body ${head.bodyAttrs}>${head.bodyTagsOpen}<div id="app">${rendered.html}</div>${head.bodyTags}</body></html>`;
-			return res.type("html").send(html.replace(/<script\b/g, `<script nonce="${nonce}"`));
+			const html = `<!doctype html><html lang="en" ${head.htmlAttrs}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${head.headTags}<script nonce="${nonce}">window.__INITIAL_STATE__=${serializePublicState(JSON.stringify(rendered.initialState))}</script>${assets}</head><body ${head.bodyAttrs}>${head.bodyTagsOpen}<div id="app">${rendered.html}</div>${head.bodyTags}</body></html>`;
+			return res.type("html").send(html);
 		} catch {
 			return res
 				.status(503)
