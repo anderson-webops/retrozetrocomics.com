@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { runInNewContext } from "node:vm";
 import express from "express";
+import { parse } from "parse5";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SiteContent } from "../src/models/schemas/SiteContent.js";
 import {
@@ -171,5 +172,51 @@ describe("published reading contract", () => {
 		const state = serializePublicState(input);
 		expect(state).not.toContain("<");
 		expect(JSON.parse(state)).toEqual(input);
+	});
+	it("never grants a CSP nonce to scripts embedded in published metadata", async () => {
+		const directory = mkdtempSync(path.join(tmpdir(), "retro-published-nonce-"));
+		directories.push(directory);
+		writeFileSync(path.join(directory, "index.html"), '<html><head><script type="module" src="/assets/app.js"></script></head></html>');
+		const snapshot = defaults();
+		const description = '<script><script>globalThis.injected = true</script>';
+		(snapshot.about.storyArcs as any[])[0].description = description;
+		expect(parsePublishedSiteContent("about", snapshot.about).success).toBe(true);
+		const app = express();
+		app.use(createPublishedPageRouter(directory, {
+			isProduction: true,
+			imageSources: [],
+			load: async () => snapshot,
+			render: async () => ({
+				html: "<h1>Story</h1>",
+				initialState: { publishedContent: snapshot },
+				head: {
+					headTags: `<meta name="description" content="${description}">`,
+					htmlAttrs: "",
+					bodyAttrs: "",
+					bodyTags: "",
+					bodyTagsOpen: ""
+				}
+			})
+		}));
+		const server = app.listen(0, "127.0.0.1");
+		servers.push(server);
+		await once(server, "listening");
+		const response = await fetch(`http://127.0.0.1:${(server.address() as any).port}/stories/the-list`);
+		expect(response.status).toBe(200);
+		const nonce = response.headers.get("content-security-policy")?.match(/'nonce-([^']+)'/)?.[1];
+		expect(nonce).toBeTruthy();
+		const scripts: Array<{ nonce?: string; text: string }> = [];
+		function visit(node: any) {
+			if (node.tagName === "script") {
+				scripts.push({
+					nonce: node.attrs?.find((attribute: any) => attribute.name === "nonce")?.value,
+					text: (node.childNodes || []).map((child: any) => child.value || "").join("")
+				});
+			}
+			for (const child of node.childNodes || []) visit(child);
+		}
+		visit(parse(await response.text()));
+		expect(scripts.some(script => script.text.trim() === "globalThis.injected = true")).toBe(false);
+		expect(scripts.find(script => script.text.includes("__INITIAL_STATE__"))?.nonce).toBe(nonce);
 	});
 });

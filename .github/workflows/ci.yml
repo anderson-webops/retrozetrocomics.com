@@ -173,3 +173,13 @@ jobs:
           mkdir -p .ai-work/runs/ci-runtime
           npm run package:runtime -- .ai-work/runs/ci-runtime
           test -f .ai-work/runs/ci-runtime/acceptance.json
+
+  direct-runtime:
+    needs: native-arm64
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require exact ARM64 runtime acceptance
+        env:
+          NATIVE_ARM64_RESULT: ${{ needs.native-arm64.result }}
+        run: test "$NATIVE_ARM64_RESULT" = success
