@@ -1,7 +1,10 @@
-# Tyler publishing workflow handoff: v2.10.0
+# Tyler publishing workflow handoff: v2.10.1
 
 This is a deployment procedure, not authorization to deploy. Once Jacob authorizes server installation, install the
-exact annotated `v2.10.0` tag. Do not infer additional canon or publish any source archive document.
+exact annotated `v2.10.1` tag. Do not infer additional canon or publish any source archive document.
+
+This patch release preserves the v2.10.0 publishing and topology contract. It updates the reviewed dependency graph
+and limits the CSP nonce to the trusted initial-state script, so story metadata cannot create nonce-bearing scripts.
 
 ## Publishing additions in this release
 
