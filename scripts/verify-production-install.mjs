@@ -45,6 +45,7 @@ try {
 	for (const file of ["package.json", "package-lock.json", ".npmrc"]) {
 		await copyFile(new URL(file, repositoryRoot), join(temporaryDirectory, file));
 	}
+	await cp(new URL("vendor", repositoryRoot), join(temporaryDirectory, "vendor"), { recursive: true });
 	for (const workspace of ["back-end", "front-end"]) {
 		await cp(
 			new URL(`${workspace}/package.json`, repositoryRoot),

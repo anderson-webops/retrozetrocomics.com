@@ -375,7 +375,7 @@ const frontEndPackage = JSON.parse(await read("front-end/package.json"));
 assert.equal(Object.hasOwn(rootPackage, "devEngines"), false);
 assert.equal(Object.hasOwn(backEndPackage, "allowScripts"), false);
 assert.equal(rootPackage.allowScripts?.["argon2@0.45.1"], true);
-assert.equal(rootPackage.allowScripts?.["express-rate-limit@8.6.1"], false);
+assert.equal(rootPackage.allowScripts?.["express-rate-limit@8.7.1"], false);
 assert.match(frontEndPackage.scripts.build, /write-owner-static-security\.mjs/);
 assert.match(ownerStaticSecurity, /Content-Security-Policy/);
 assert.match(ownerStaticSecurity, /noindex,nofollow,noarchive,nosnippet/);
@@ -425,8 +425,8 @@ assert.deepEqual(
 	artifactContract.nativeBindings,
 	[
 		"node_modules/argon2/prebuilds/linux-arm64/argon2.armv8.glibc.node",
-		"node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.4.node",
-		"node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.6"
+		"node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.5.node",
+		"node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.7"
 	]
 );
 assert.ok(artifactContract.writableState.some(item => item.name === "uploaded media"));

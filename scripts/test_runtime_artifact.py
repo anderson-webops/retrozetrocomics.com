@@ -25,12 +25,12 @@ class RuntimeArtifactTests(unittest.TestCase):
         self.root = Path(self.temporary.name) / "runtime"
         self.root.mkdir()
         package_dependencies = {
-            "@img/sharp-libvips-linux-arm64": "1.3.3",
-            "@img/sharp-linux-arm64": "0.35.4",
+            "@img/sharp-libvips-linux-arm64": "1.3.4",
+            "@img/sharp-linux-arm64": "0.35.5",
             "argon2": "0.45.1",
             "express": "5.2.1",
             "mongoose": "9.9.1",
-            "sharp": "0.35.4",
+            "sharp": "0.35.5",
             "zod": "4.4.3",
         }
         files = {
@@ -64,15 +64,15 @@ class RuntimeArtifactTests(unittest.TestCase):
                     "back-end": {"dependencies": package_dependencies},
                     "front-end": {},
                     "node_modules/@img/sharp-libvips-linux-arm64": {
-                        "version": "1.3.3"
+                        "version": "1.3.4"
                     },
                     "node_modules/@img/sharp-linux-arm64": {
-                        "version": "0.35.4"
+                        "version": "0.35.5"
                     },
                     "node_modules/argon2": {"version": "0.45.1"},
                     "node_modules/express": {"version": "5.2.1"},
                     "node_modules/mongoose": {"version": "9.9.1"},
-                    "node_modules/sharp": {"version": "0.35.4"},
+                    "node_modules/sharp": {"version": "0.35.5"},
                     "back-end/node_modules/zod": {"version": "4.4.3"},
                 },
             },
@@ -83,8 +83,8 @@ class RuntimeArtifactTests(unittest.TestCase):
             "back-end/dist/app.js": "export {}\n",
             "back-end/dist/admin-lifecycle.js": "console.log('fixture')\n",
             "back-end/dist/public-renderer/entry-server.mjs": "export {}\n",
-            "node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.6": "fixture-libvips",
-            "node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.4.node": "fixture-sharp",
+            "node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.7": "fixture-libvips",
+            "node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.5.node": "fixture-sharp",
             "node_modules/argon2/prebuilds/linux-arm64/argon2.armv8.glibc.node": "fixture-argon2",
         }
         for name, value in files.items():

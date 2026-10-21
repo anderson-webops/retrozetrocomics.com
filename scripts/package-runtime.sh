@@ -133,8 +133,8 @@ python3 -B scripts/copy-production-dependencies.py \
   "$root" "$stage/node_modules" > "$output/dependency-tree.txt"
 
 argon_binding="$stage/node_modules/argon2/prebuilds/linux-arm64/argon2.armv8.glibc.node"
-sharp_binding="$stage/node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.4.node"
-sharp_library="$stage/node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.6"
+sharp_binding="$stage/node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.5.node"
+sharp_library="$stage/node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.7"
 test -f "$argon_binding"
 test -f "$sharp_binding"
 test -f "$sharp_library"

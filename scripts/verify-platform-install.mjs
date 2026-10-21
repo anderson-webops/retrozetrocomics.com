@@ -76,6 +76,7 @@ async function verifyTarget(libc) {
 			cp(path.join(repositoryRoot, "package.json"), path.join(temporaryRoot, "package.json")),
 			cp(path.join(repositoryRoot, "package-lock.json"), path.join(temporaryRoot, "package-lock.json")),
 			cp(path.join(repositoryRoot, ".npmrc"), path.join(temporaryRoot, ".npmrc")),
+			cp(path.join(repositoryRoot, "vendor"), path.join(temporaryRoot, "vendor"), { recursive: true }),
 			cp(
 				path.join(repositoryRoot, "front-end/package.json"),
 				path.join(temporaryRoot, "front-end/package.json")

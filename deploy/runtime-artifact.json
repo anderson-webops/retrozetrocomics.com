@@ -20,9 +20,9 @@
     "node_modules/argon2/package.json",
     "node_modules/argon2/prebuilds/linux-arm64/argon2.armv8.glibc.node",
     "node_modules/@img/sharp-linux-arm64/package.json",
-    "node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.4.node",
+    "node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.5.node",
     "node_modules/@img/sharp-libvips-linux-arm64/package.json",
-    "node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.6",
+    "node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.7",
     "node_modules/express/package.json",
     "node_modules/mongoose/package.json",
     "node_modules/sharp/package.json"
@@ -52,8 +52,8 @@
   "generatedClients": [],
   "nativeBindings": [
     "node_modules/argon2/prebuilds/linux-arm64/argon2.armv8.glibc.node",
-    "node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.4.node",
-    "node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.6"
+    "node_modules/@img/sharp-linux-arm64/lib/sharp-linux-arm64-0.35.5.node",
+    "node_modules/@img/sharp-libvips-linux-arm64/lib/libvips-cpp.so.8.18.7"
   ],
   "staticAssets": [
     "front-end/dist",

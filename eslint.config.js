@@ -16,7 +16,7 @@ export default antfu(
 				endOfLine: "lf"
 			}
 		},
-		ignores: ["**/*.d.ts"],
+		ignores: ["**/*.d.ts", "vendor/**"],
 		rules: {
 			"no-console": "off",
 			"antfu/if-newline": "off",

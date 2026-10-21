@@ -1,4 +1,4 @@
-import type { HydratedDocument, InferSchemaType, Model } from "mongoose";
+import type { HydratedDocument, InferSchemaType } from "mongoose";
 import mongoose, { Schema } from "mongoose";
 
 import { passwordPlugin } from "../plugins/password.js";
@@ -70,4 +70,4 @@ const adminSchema = new Schema(
 adminSchema.plugin(passwordPlugin);
 
 export type AdminDocument = HydratedDocument<InferSchemaType<typeof adminSchema>>;
-export const Admin: Model<InferSchemaType<typeof adminSchema>> = mongoose.model("Admin", adminSchema);
+export const Admin = mongoose.model<InferSchemaType<typeof adminSchema>>("Admin", adminSchema);
