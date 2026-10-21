@@ -73,7 +73,7 @@ class RuntimeArtifactTests(unittest.TestCase):
                     "node_modules/express": {"version": "5.2.1"},
                     "node_modules/mongoose": {"version": "9.9.1"},
                     "node_modules/sharp": {"version": "0.35.5"},
-                    "back-end/node_modules/zod": {"version": "4.4.3"},
+                    "node_modules/zod": {"version": "4.4.3"},
                 },
             },
         }
@@ -92,11 +92,7 @@ class RuntimeArtifactTests(unittest.TestCase):
         for name, value in text_files.items():
             self.write(name, value)
         for package_name, version in package_dependencies.items():
-            package_root = (
-                "back-end/node_modules/zod"
-                if package_name == "zod"
-                else f"node_modules/{package_name}"
-            )
+            package_root = f"node_modules/{package_name}"
             self.write(
                 f"{package_root}/package.json",
                 json.dumps({"name": package_name, "version": version}) + "\n",
