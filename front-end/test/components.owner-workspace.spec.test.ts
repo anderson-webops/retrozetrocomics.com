@@ -40,7 +40,7 @@ describe("owner workspace", () => {
 			}
 		});
 
-		expect(wrapper.get("h1").text()).toBe("What would you like to do?");
+		expect(wrapper.get("h1").text()).toBe("Owner workspace");
 		expect(wrapper.text()).toContain("Add a picture or comic");
 		expect(wrapper.text()).toContain("Edit the home page");
 		expect(wrapper.text()).toContain("Add a character");

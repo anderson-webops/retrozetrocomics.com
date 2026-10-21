@@ -259,11 +259,8 @@ onMounted(() => {
 		<button class="home-editor__back" type="button" @click="requestBack">Back to owner home</button>
 
 		<header class="home-editor__heading">
-			<p class="home-editor__eyebrow">Home page</p>
-			<h2>Choose what visitors see first</h2>
-			<p>
-				Edit the words and pictures here. Save privately first, then publish only after the preview looks right.
-			</p>
+			<h2>Home page</h2>
+			<p>Saved drafts stay private until you publish.</p>
 		</header>
 
 		<p v-if="loading" class="home-editor__message" role="status">Loading the saved home page...</p>
@@ -295,8 +292,7 @@ onMounted(() => {
 				<div class="home-editor__section-heading">
 					<span>1</span>
 					<div>
-						<h3 id="home-intro-heading">Introduce Tyler's work</h3>
-						<p>These words appear above the home page highlights.</p>
+						<h3 id="home-intro-heading">Home page introduction</h3>
 					</div>
 				</div>
 				<div class="home-editor__fields">
@@ -313,9 +309,8 @@ onMounted(() => {
 						<textarea v-model="form.description" maxlength="520" rows="4" />
 					</label>
 					<label class="home-editor__wide">
-						<span>Wider Retroverse</span>
+						<span>Closing text</span>
 						<textarea v-model="form.developmentNote" maxlength="420" rows="3" />
-						<small>Add a short line about other worlds, conflicts, or adventures.</small>
 					</label>
 				</div>
 			</section>
@@ -325,17 +320,15 @@ onMounted(() => {
 					<span>2</span>
 					<div>
 						<h3 id="home-highlights-heading">Edit one highlight</h3>
-						<p>Choose a title below, then edit only that card.</p>
 					</div>
 				</div>
 
-				<div class="home-editor__item-tabs" role="list" aria-label="Home page highlights">
+				<div class="home-editor__item-tabs" role="group" aria-label="Home page highlights">
 					<button
 						v-for="(item, index) in form.showcaseItems"
 						:key="item.id"
 						:aria-pressed="selectedIndex === index"
 						:class="{ 'home-editor__item-tab--selected': selectedIndex === index }"
-						role="listitem"
 						type="button"
 						@click="selectedIndex = index"
 					>
@@ -387,7 +380,6 @@ onMounted(() => {
 					/>
 					<div>
 						<strong>Picture for {{ currentItem.title || "this highlight" }}</strong>
-						<p>Choose from the existing media library or upload a new picture there.</p>
 						<button type="button" @click="mediaPickerOpen = !mediaPickerOpen">
 							{{ mediaPickerOpen ? "Close picture choices" : "Choose a picture" }}
 						</button>
@@ -419,8 +411,7 @@ onMounted(() => {
 				<div class="home-editor__section-heading">
 					<span>3</span>
 					<div>
-						<h3 id="home-preview-heading">Check the preview</h3>
-						<p>Pictures are shown without cropping so Tyler's drawings stay intact.</p>
+						<h3 id="home-preview-heading">Preview</h3>
 					</div>
 				</div>
 

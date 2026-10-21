@@ -127,7 +127,7 @@ jobs:
     timeout-minutes: 60
     services:
       mongo:
-        image: mongo:8.0.28@sha256:5351bff2b5d1563e3fa603a74b9be85ef9323e10aeb0b45cea933a93876e77fd
+        image: mongo:8.0.34@sha256:4a4ab5d4834207389e0d7270fac988e21ffedccecba77991a552f755df229907
         env:
           MONGO_INITDB_ROOT_USERNAME: artifact_admin
           MONGO_INITDB_ROOT_PASSWORD: retrozetro-artifact-password-2026

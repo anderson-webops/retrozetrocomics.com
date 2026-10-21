@@ -4,8 +4,9 @@ import { constants } from "node:fs";
 import { access, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import { fileURLToPath } from "node:url";
 
-const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
+const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const bwrapProfile = await readFile(
 	path.join(repositoryRoot, ".github/apparmor/bwrap-userns-restrict"),
 	"utf8"
@@ -262,7 +263,7 @@ for (const publicContentSource of [artworkPage, worldEntryPresentation, worldsDa
 		/working story|source notes|story files|world notes|final canon|open questions|still being developed/i
 	);
 }
-assert.match(artworkPage, /\{\{ tylerArtworkItems\.length \}\} hand-drawn/);
+assert.match(artworkPage, /Showing \{\{ visibleArtwork\.length \}\} of \{\{ tylerArtworkItems\.length \}\} designs/);
 assert.doesNotMatch(artworkPage, /Show more artwork/);
 assert.match(artworkPage, /background-color: #09182a/);
 assert.doesNotMatch(artworkPage, /background: rgba\(249, 234, 219/);

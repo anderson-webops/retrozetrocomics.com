@@ -1,12 +1,34 @@
-# Tyler publishing workflow handoff: v2.10.1
+# Tyler publishing workflow handoff: v2.10.2
 
 This is a deployment procedure, not authorization to deploy. Once Jacob authorizes server installation, install the
-exact annotated `v2.10.1` tag. Do not infer additional canon or publish any source archive document.
+exact annotated `v2.10.2` tag. Do not infer additional canon or publish any source archive document.
 
-This patch release preserves the v2.10.0 publishing and topology contract. It updates the reviewed dependency graph
-and limits the CSP nonce to the trusted initial-state script, so story metadata cannot create nonce-bearing scripts.
+This patch release preserves the v2.10.1 publishing and topology contract. It removes redundant introductions,
+decorative headings, obvious instructions, and implementation commentary from public pages and owner tools. Story
+material, the 85-image gallery, editing capabilities, recovery, and consequential disclosures remain intact.
 
-## Publishing additions in this release
+It also includes the dependency reconciliation documented in `docs/dependency-reconciliation-2026-10-21.md`. CI and
+release acceptance use a digest-pinned MongoDB 8.0.34 test fixture to support newer runner kernels. This is a disposable
+builder fixture update, not authorization to upgrade or reconfigure the production database. The existing nonce,
+immutable-artifact, isolation, snapshot/restore, and read-only content/media boundaries remain mandatory.
+
+## Editorial acceptance for this release
+
+- Require the public pages to show substantive story and artist material without the removed welcome slogans,
+  duplicate section introductions, or gallery onboarding. `/start` uses **Stories**, `/search` uses **Search**, and the
+  gallery uses **Original artwork**. Preserve story order, summaries, search filtering, and all 85 full-size links.
+- Require **Save place on this device** to save only after explicit selection, resume after reload, and support
+  **Forget saved place**. A storage failure must leave reading and section links usable. Privacy uses the same label.
+- Owner tasks retain one labeled control per action. The home-page highlight selectors are native buttons in a
+  labeled group with pressed state. Keep upload limits, meaningful errors, private-draft/publishing warnings,
+  recovery choices, and permanent-deletion confirmation.
+- At desktop and phone widths, the contact form must not scroll horizontally. Its hidden spam-check input must
+  remain hidden and excluded from keyboard focus. Successful submission reports **Message sent.** without promising
+  a reply. Test submission feedback in isolation, not by sending a live message.
+- These source changes do not rewrite owner-authored `SiteContent`, revise story canon, or mutate media. Follow the
+  existing no-live-save and isolated-editor-test acceptance below.
+
+## Retained publishing workflow
 
 - `/start` follows the published story order. Story pages include previous/next navigation and optional on-device
   reading-place controls. New stories are appended; owner ordering remains a private draft until publication.

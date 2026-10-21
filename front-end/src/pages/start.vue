@@ -23,19 +23,14 @@ useHead({
 <template>
 	<article class="reading-page reader-guide">
 		<header>
-			<p class="reading-eyebrow">Welcome to the Retroverse</p>
 			<h1>Start reading</h1>
-			<p>
-				Moon bases, outlaw crews, alien worlds, and a war spreading across the stars. Enter the stories of Tyler
-				Morgan.
-			</p>
 			<RouterLink v-if="first" class="reader-guide__begin" :to="storyPath(first)"
 				>Begin with {{ first.title }}</RouterLink
 			>
 		</header>
 		<ContinueReading />
 		<section aria-labelledby="reading-order">
-			<h2 id="reading-order">Choose your story</h2>
+			<h2 id="reading-order">Stories</h2>
 			<ol class="reader-guide__stories">
 				<li v-for="(story, index) in content.storyArcs" :key="story.id">
 					<ResolvedImage
@@ -55,8 +50,7 @@ useHead({
 			</ol>
 		</section>
 		<section class="reading-next">
-			<h2>Explore along the way</h2>
-			<p>Meet the people behind the conflict, visit their worlds, and see Tyler's original drawings.</p>
+			<h2>Explore</h2>
 			<RouterLink to="/characters">Meet the characters</RouterLink
 			><RouterLink to="/worlds">Explore the worlds</RouterLink
 			><RouterLink to="/artwork">Browse the artwork</RouterLink

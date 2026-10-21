@@ -61,15 +61,9 @@ onMounted(() => void load());
 				</li>
 			</ol>
 		</nav>
-		<p v-if="canSavePlace" class="reader-tools">
-			Use “Save this place” below a section to return to it later on this device.<button
-				v-if="place"
-				type="button"
-				@click="clearPlace"
-			>
-				Forget saved place
-			</button>
-		</p>
+		<div v-if="canSavePlace && place" class="reader-tools">
+			<button type="button" @click="clearPlace">Forget saved place</button>
+		</div>
 		<p v-if="placeError" role="status">{{ placeError }}</p>
 		<section v-for="section in sections" :id="section.id" :key="section.id">
 			<h2>{{ section.heading }}</h2>
@@ -84,10 +78,10 @@ onMounted(() => void load());
 				<button
 					v-if="canSavePlace"
 					type="button"
-					:aria-label="`Save this place: ${section.heading}`"
+					:aria-label="`Save place on this device: ${section.heading}`"
 					@click="savePlace(story.id, section.id)"
 				>
-					Save this place</button
+					Save place on this device</button
 				><span v-if="place?.storyId === story.id && place.sectionId === section.id" role="status"
 					>Place saved on this device.</span
 				><a :href="`#${encodeURIComponent(section.id)}`">Section link</a>

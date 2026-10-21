@@ -653,7 +653,6 @@ onBeforeRouteUpdate(() => {
 		<header class="guided-editor__heading">
 			<button class="guided-editor__back" type="button" @click="requestClose('back')">Back to owner home</button>
 			<div>
-				<p class="guided-editor__eyebrow">Guided editing</p>
 				<h2 id="guided-editor-title">
 					{{
 						props.task === "add-character"
@@ -705,7 +704,6 @@ onBeforeRouteUpdate(() => {
 			<header>
 				<div>
 					<h3>Choose one item</h3>
-					<p>Select the exact item you want to change.</p>
 				</div>
 				<button type="button" @click="beginNew(editorKind)">
 					Add a new {{ editorKind === "world" ? "world entry" : editorKind }}
@@ -789,7 +787,6 @@ onBeforeRouteUpdate(() => {
 
 			<fieldset v-if="editorKind === 'artwork' && currentArtwork && step === 1">
 				<legend>Artwork gallery</legend>
-				<p>Choose a picture, name it, and add a caption. Save privately before publishing.</p>
 				<button type="button" @click="mediaPickerOpen = !mediaPickerOpen">
 					Choose or upload an artwork picture
 				</button>
@@ -832,7 +829,6 @@ onBeforeRouteUpdate(() => {
 			</fieldset>
 			<fieldset v-if="editorKind === 'character' && currentCharacter && step === 1">
 				<legend>Character essentials</legend>
-				<p>Start with a name and description. A picture is optional; you can add one later.</p>
 				<label>
 					<span>Character name</span>
 					<input v-model="currentCharacter.name" maxlength="80" required type="text" />
@@ -889,7 +885,6 @@ onBeforeRouteUpdate(() => {
 					<textarea v-model="currentCharacter.biography" maxlength="5000" rows="8" />
 					<small>Use a blank line between paragraphs.</small>
 				</label>
-				<p>These appear as supporting information and help keep character cards consistent.</p>
 				<div class="editor-card__grid">
 					<label>
 						<span>Role</span>
@@ -920,7 +915,6 @@ onBeforeRouteUpdate(() => {
 
 			<fieldset v-if="editorKind === 'story' && currentStory && step === 1">
 				<legend>Story basics</legend>
-				<p>Name the story and explain it in a few sentences.</p>
 				<div class="editor-card__grid">
 					<label>
 						<span>Short label</span>
@@ -950,8 +944,7 @@ onBeforeRouteUpdate(() => {
 			</div>
 
 			<fieldset v-if="editorKind === 'story' && currentStory && step === 3">
-				<legend>Additional note</legend>
-				<p>Add a closing note for readers, if you want one.</p>
+				<legend>Closing note (optional)</legend>
 				<label>
 					<span>Note</span>
 					<textarea v-model="currentStory.note" maxlength="320" rows="5" />
@@ -960,7 +953,6 @@ onBeforeRouteUpdate(() => {
 
 			<fieldset v-if="editorKind === 'world' && currentWorld && step === 1">
 				<legend>World entry basics</legend>
-				<p>Name the place, group, or idea and explain what readers should know.</p>
 				<div class="editor-card__grid">
 					<label>
 						<span>Short label</span>
@@ -979,7 +971,6 @@ onBeforeRouteUpdate(() => {
 
 			<fieldset v-if="editorKind === 'world' && currentWorld && step === 2">
 				<legend>Optional facts</legend>
-				<p>Add short label-and-answer facts only when they help the reader.</p>
 				<button
 					class="editor-card__secondary"
 					type="button"
@@ -988,7 +979,6 @@ onBeforeRouteUpdate(() => {
 				>
 					Add a fact
 				</button>
-				<p v-if="!currentWorld.facts?.length" class="editor-card__empty">No extra facts yet. That is okay.</p>
 				<div v-for="(fact, index) in currentWorld.facts || []" :key="index" class="fact-row">
 					<label>
 						<span>Fact label</span>
@@ -1005,8 +995,7 @@ onBeforeRouteUpdate(() => {
 			</fieldset>
 
 			<section v-if="step === stepLabels.length" class="item-preview" aria-labelledby="item-preview-title">
-				<p class="guided-editor__eyebrow">Preview</p>
-				<h4 id="item-preview-title">Check how this will read</h4>
+				<h4 id="item-preview-title">Preview</h4>
 				<p>
 					Publishing updates all saved
 					{{
@@ -1069,9 +1058,6 @@ onBeforeRouteUpdate(() => {
 					<h3>{{ currentWorld.title || "Title not finished" }}</h3>
 					<p>{{ currentWorld.body || "Explanation not finished" }}</p>
 				</template>
-				<p class="item-preview__note">
-					If anything says “not finished,” go back and complete it before publishing.
-				</p>
 			</section>
 
 			<footer class="editor-card__actions">

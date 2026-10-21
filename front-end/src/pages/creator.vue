@@ -18,7 +18,6 @@ useHead({
 		<header>
 			<p class="reading-eyebrow">The creator</p>
 			<h1>Tyler Morgan</h1>
-			<p>Stories, characters, and hand-drawn worlds.</p>
 		</header>
 		<figure>
 			<ResolvedImage

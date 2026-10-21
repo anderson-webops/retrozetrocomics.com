@@ -5,8 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 <template>
 	<footer class="footer">
 		<div class="footer__brand">
-			<p class="footer__eyebrow">RetroZetro Comics</p>
-			<h2>Stay in the Retroverse</h2>
+			<h2>RetroZetro Comics</h2>
 			<p>Original stories, characters, and drawings by Tyler Morgan.</p>
 		</div>
 
@@ -56,15 +55,6 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 	display: grid;
 	gap: 0.3rem;
 	min-width: 0;
-}
-
-.footer__eyebrow {
-	margin: 0;
-	font-size: 0.76rem;
-	letter-spacing: var(--tracking-eyebrow);
-	text-transform: uppercase;
-	font-weight: 700;
-	color: #ffd27d;
 }
 
 .footer__brand h2 {

@@ -234,12 +234,7 @@ async function undoWorldEntryRemoval() {
 
 		<section class="about-page__story-section">
 			<header class="about-page__section-header">
-				<p class="about-page__eyebrow">Stories</p>
-				<h2>The war begins</h2>
-				<p>
-					The List follows Exo's search through a compromised moon base. The Fall of a Dream follows the
-					rebellion that erupts when the Apex Army fractures.
-				</p>
+				<h2>Stories</h2>
 			</header>
 
 			<div class="about-page__story-grid">
@@ -288,7 +283,6 @@ async function undoWorldEntryRemoval() {
 		</section>
 		<aside class="reading-next">
 			<h2>Beyond these stories</h2>
-			<p>Explore the people, worlds, and machines that fill Tyler Morgan's work.</p>
 			<RouterLink to="/worlds">Worlds and factions</RouterLink>
 			<RouterLink to="/artwork">Original artwork</RouterLink>
 		</aside>

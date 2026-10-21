@@ -88,11 +88,11 @@ const resolvedImageCandidates = computed(() =>
 <template>
 	<section aria-labelledby="welcome-title" class="welcome">
 		<div class="welcome__content">
-			<p class="welcome__eyebrow">
+			<p v-if="eyebrow && eyebrow !== title" class="welcome__eyebrow">
 				{{ eyebrow }}
 			</p>
 			<h1 id="welcome-title" class="welcome__title">{{ title }}</h1>
-			<p class="welcome__description">
+			<p v-if="message" class="welcome__description">
 				{{ message }}
 			</p>
 

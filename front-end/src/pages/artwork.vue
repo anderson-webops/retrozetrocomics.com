@@ -74,16 +74,7 @@ useHead({
 	<div class="page artwork-page">
 		<section class="artwork-hero">
 			<div class="artwork-hero__copy">
-				<p class="artwork-page__eyebrow">Original artwork</p>
-				<h1>
-					<span>Drawn across</span>
-					<span>the</span>
-					<span>Retroverse</span>
-				</h1>
-				<p>
-					Explore Exo, Zetro, Opex, alien peoples, armor, robots, and character studies through
-					{{ tylerArtworkItems.length }} hand-drawn designs.
-				</p>
+				<h1>Original artwork</h1>
 				<div class="artwork-hero__actions">
 					<RouterLink to="/characters">Meet the characters</RouterLink>
 					<RouterLink class="artwork-hero__secondary" to="/worlds">Explore the worlds</RouterLink>
@@ -102,7 +93,6 @@ useHead({
 		<section class="artwork-browser" aria-labelledby="artwork-browser-title">
 			<header class="artwork-browser__header">
 				<div>
-					<p class="artwork-page__eyebrow">Browse the collection</p>
 					<h2 id="artwork-browser-title">Character and machine designs</h2>
 				</div>
 				<label class="artwork-browser__search">
@@ -197,17 +187,6 @@ useHead({
 	font-size: clamp(2.25rem, 3.5vw, 2.8rem);
 	line-height: 0.95;
 	text-transform: uppercase;
-}
-
-.artwork-hero h1 span {
-	display: block;
-}
-
-.artwork-hero__copy > p:last-of-type {
-	max-width: 54ch;
-	color: rgba(255, 244, 231, 0.8);
-	font-size: 1.05rem;
-	line-height: 1.75;
 }
 
 .artwork-hero__actions {

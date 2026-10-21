@@ -35,7 +35,7 @@ context("Basic", () => {
 
 		cy.get(".site-header").contains("Artwork").click();
 		cy.url().should("eq", `${Cypress.config().baseUrl}/artwork`);
-		cy.get(".artwork-hero h1").should("contain.text", "Drawn across").and("contain.text", "Retroverse");
+		cy.get(".artwork-hero h1").should("have.text", "Original artwork");
 		cy.get(".artwork-card").should("have.length", 85);
 		cy.contains("Showing 85 of 85 designs").should("exist");
 		cy.contains("button", "Exo designs").click();

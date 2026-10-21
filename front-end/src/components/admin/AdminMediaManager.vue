@@ -235,9 +235,7 @@ onBeforeUnmount(releasePreview);
 	<section class="media-manager" aria-labelledby="media-manager-title">
 		<header class="media-manager__heading">
 			<div>
-				<p class="media-manager__eyebrow">Pictures and files</p>
 				<h2 id="media-manager-title">Add a picture, comic, or storyboard</h2>
-				<p>Choose one image, check the preview, and upload it.</p>
 			</div>
 		</header>
 
@@ -291,7 +289,6 @@ onBeforeUnmount(releasePreview);
 				<span>2</span>
 				<div>
 					<strong>Describe it</strong>
-					<small>These short answers make the file easier to find and understand.</small>
 				</div>
 			</div>
 

@@ -39,13 +39,12 @@ const allowedTasks = new Set<WorkspaceTask>([
 const activeTask = ref<WorkspaceTask>(readTask());
 
 const taskCards: Array<{
-	description: string;
+	description?: string;
 	label: string;
 	task?: WorkspaceTask;
 	tone?: "advanced" | "preview";
 }> = [
 	{
-		description: "Choose, caption, and arrange the public artwork collection, with drafts and recovery.",
 		label: "Edit the artwork gallery",
 		task: "artwork"
 	},
@@ -55,22 +54,18 @@ const taskCards: Array<{
 		task: "security"
 	},
 	{
-		description: "Upload a checked JPEG, PNG, GIF, or WebP picture, comic page, or storyboard.",
 		label: "Add a picture or comic",
 		task: "media"
 	},
 	{
-		description: "Choose the pictures and short descriptions visitors see first, then preview before publishing.",
 		label: "Edit the home page",
 		task: "edit-home"
 	},
 	{
-		description: "Add a character with a name, picture, and short description first.",
 		label: "Add a character",
 		task: "add-character"
 	},
 	{
-		description: "Build a story one short section at a time, then preview it.",
 		label: "Add a story or chapter",
 		task: "add-story"
 	},
@@ -85,7 +80,6 @@ const taskCards: Array<{
 		task: "edit"
 	},
 	{
-		description: "Hide all editing tools and browse the site like a visitor.",
 		label: "Preview as a visitor",
 		tone: "preview"
 	},
@@ -163,14 +157,12 @@ watch(
 		<main class="owner-workspace__main">
 			<section v-if="activeTask === 'home'" class="owner-home" aria-labelledby="owner-home-heading">
 				<header class="owner-home__hero">
-					<p class="owner-home__eyebrow">Owner workspace</p>
-					<h1 id="owner-home-heading" tabindex="-1">What would you like to do?</h1>
-					<p>Choose one job. Your work will be saved privately before anything changes on the public site.</p>
+					<h1 id="owner-home-heading" tabindex="-1">Owner workspace</h1>
 				</header>
 
 				<div class="owner-home__tasks">
 					<article
-						v-for="(card, index) in taskCards"
+						v-for="card in taskCards"
 						:key="card.label"
 						class="task-card"
 						:class="{
@@ -178,17 +170,17 @@ watch(
 							'task-card--preview': card.tone === 'preview'
 						}"
 					>
-						<span aria-hidden="true" class="task-card__number">{{ index + 1 }}</span>
 						<div>
-							<h2>{{ card.label }}</h2>
-							<p>{{ card.description }}</p>
+							<h2>
+								<button v-if="card.tone === 'preview'" type="button" @click="previewAsVisitor">
+									{{ card.label }}
+								</button>
+								<button v-else type="button" @click="chooseTask(card.task || 'home')">
+									{{ card.label }}
+								</button>
+							</h2>
+							<p v-if="card.description">{{ card.description }}</p>
 						</div>
-						<button v-if="card.tone === 'preview'" type="button" @click="previewAsVisitor">
-							{{ card.label }}
-						</button>
-						<button v-else type="button" @click="chooseTask(card.task || 'home')">
-							{{ card.label }}
-						</button>
 					</article>
 				</div>
 			</section>
@@ -224,8 +216,8 @@ watch(
 						<p class="owner-home__eyebrow">Advanced</p>
 						<h2>Direct editing and technical details</h2>
 						<p>
-							These tools are still available. Direct page editing publishes immediately, so use the
-							guided tools when you want drafts, preview, trash, and recovery.
+							Direct page editing publishes immediately. Use the guided tools to save a private draft
+							first.
 						</p>
 						<div>
 							<RouterLink :to="{ path: '/studio/admin', query: { task: 'edit-home' } }">
@@ -379,7 +371,7 @@ watch(
 
 .task-card {
 	display: grid;
-	grid-template-columns: auto minmax(0, 1fr);
+	grid-template-columns: minmax(0, 1fr);
 	gap: 0.9rem;
 	align-items: start;
 	border: 1px solid rgba(255, 255, 255, 0.1);
@@ -389,24 +381,13 @@ watch(
 	padding: clamp(1rem, 3vw, 1.35rem);
 }
 
-.task-card__number {
-	display: grid;
-	width: 2.6rem;
-	height: 2.6rem;
-	place-items: center;
-	border-radius: 999px;
-	background: #ff914d;
-	color: #160021;
-	font-weight: 950;
-}
-
 .task-card > div {
 	display: grid;
 	gap: 0.4rem;
 }
 
 .task-card h2 {
-	font-size: clamp(1.25rem, 3vw, 1.65rem);
+	font: inherit;
 }
 
 .task-card p {
@@ -415,7 +396,6 @@ watch(
 }
 
 .task-card button {
-	grid-column: 2;
 	justify-self: start;
 	min-height: 2.9rem;
 	border: none;
@@ -502,12 +482,7 @@ watch(
 }
 
 @media (max-width: 480px) {
-	.task-card {
-		grid-template-columns: 1fr;
-	}
-
 	.task-card button {
-		grid-column: 1;
 		width: 100%;
 	}
 }

@@ -61,7 +61,7 @@ async function handleSubmit() {
 	try {
 		await api.post("/contact", form.value);
 		responseTone.value = "success";
-		responseMessage.value = "Message sent. RetroZetro will follow up through the email address you provided.";
+		responseMessage.value = "Message sent.";
 
 		form.value.subject = "";
 		form.value.name = "";
@@ -91,7 +91,7 @@ async function handleSubmit() {
 				}
 			]"
 			actions-placement="poster"
-			eyebrow="Contact"
+			eyebrow=""
 			:highlights="[]"
 			:image-candidates="siteAssetCandidates.contactLogo"
 			image-alt="RetroZetro logo mark"
@@ -150,8 +150,7 @@ async function handleSubmit() {
 			</form>
 
 			<article class="contact-panel">
-				<p class="contact-panel__eyebrow">FAQ</p>
-				<h2>Before you hit send</h2>
+				<h2>Common questions</h2>
 				<div class="contact-panel__faq">
 					<div v-for="item in store.contact.faq" :key="item.question">
 						<h3>{{ item.question }}</h3>
@@ -211,14 +210,6 @@ async function handleSubmit() {
 	font-size: 1.08rem;
 }
 
-.contact-panel__eyebrow {
-	text-transform: uppercase;
-	letter-spacing: var(--tracking-eyebrow);
-	font-size: 0.78rem;
-	font-weight: 700;
-	color: #ffd27d;
-}
-
 .contact-panel__list,
 .contact-panel__tags,
 .contact-panel__faq {
@@ -266,7 +257,7 @@ async function handleSubmit() {
 	font-size: 0.9rem;
 }
 
-.contact-form input,
+.contact-form input:not(.sr-only),
 .contact-form textarea {
 	width: 100%;
 	padding: 0.95rem 1rem;

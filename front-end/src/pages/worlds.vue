@@ -58,9 +58,7 @@ useHead({
 
 		<section class="worlds-section worlds-section--atlas" aria-labelledby="worlds-title">
 			<header class="worlds-section__header">
-				<p class="worlds-page__eyebrow">Planets and peoples</p>
-				<h2 id="worlds-title">Four corners of the Retroverse</h2>
-				<p>Each world brings its own people, government, technology, and history.</p>
+				<h2 id="worlds-title">Planets and peoples</h2>
 			</header>
 
 			<div class="world-card-grid">
@@ -104,9 +102,7 @@ useHead({
 
 		<section class="worlds-section worlds-section--dark" aria-labelledby="conflicts-title">
 			<header class="worlds-section__header">
-				<p class="worlds-page__eyebrow">Other fronts</p>
 				<h2 id="conflicts-title">Wars and adventures</h2>
-				<p>The Apex takeover is one conflict in a much larger field of heroes, peoples, and battles.</p>
 			</header>
 
 			<div class="conflict-grid">
@@ -145,9 +141,7 @@ useHead({
 
 		<section id="technology" class="worlds-section worlds-section--atlas" aria-labelledby="technology-title">
 			<header class="worlds-section__header">
-				<p class="worlds-page__eyebrow">Machines and armor</p>
-				<h2 id="technology-title">Built for alien battlefields</h2>
-				<p>Consciousness-powered shells stand beside biosuits, robot units, and heavy mecha.</p>
+				<h2 id="technology-title">Machines and armor</h2>
 			</header>
 
 			<div class="technology-grid">
