@@ -8,8 +8,8 @@ the database.
 ## Preserved host contracts
 
 The runtime archive is topology-neutral. The actual production host currently
-uses the compatibility layout documented in
-`../content/SERVER_AI_HANDOFF.md`. Do not replace that healthy layout with
+uses the reviewed compatibility layout documented in the local-only operator
+handoff. Do not replace that healthy layout with
 `/srv/retrozetro/current` or `retrozetro.service` merely because the canonical
 direct-service controls exist here. A compatibility installer may copy the
 verified archive's backend, static output, and production dependencies into the

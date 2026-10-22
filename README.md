@@ -54,7 +54,7 @@ npm run audit:production
   or remove gallery entries using drafts, publication and recovery, without changing the underlying media files. See
   [`deploy/content/tyler-site-content-v1.json`](./deploy/content/tyler-site-content-v1.json) for the complete 85-key
   gallery inventory and the five available raw creative-source versus live importer-sanitized hash baselines, and
-  [`deploy/content/SERVER_AI_HANDOFF.md`](./deploy/content/SERVER_AI_HANDOFF.md) for bounded activation checks.
+  a local-only operator handoff for bounded activation checks.
 - The List and The Fall of a Dream have separate illustrated reading pages at `/stories/the-list` and
   `/stories/fall-of-a-dream`, retaining their existing seven sections. Owners can now create further reading pages, edit headings and longer prose,
   add illustrations, reorder sections, and preview the complete page. Twelve default character profiles support

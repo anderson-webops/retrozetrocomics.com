@@ -1,5 +1,9 @@
 # Repository Guidelines
 
+Keep server-AI and operator instruction handoffs only in the ignored
+`.ai-work/server-instructions/` directory. Never commit, push, tag, release, or
+package them. Public runtime contracts may remain tracked.
+
 ## GitGuardian Availability
 
 - Use GitGuardian/`ggshield` when available. Quota, authentication, network, or service failures are not commit or push blockers. Record the scan as unavailable, review staged and outgoing changes, run an available independent local secret scan, and proceed with the other required checks. Never ignore a confirmed secret finding or claim a failed scan passed.
