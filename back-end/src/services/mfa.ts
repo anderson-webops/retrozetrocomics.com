@@ -1,6 +1,5 @@
 import type {
 	AuthenticationResponseJSON,
-	AuthenticatorTransportFuture,
 	RegistrationResponseJSON
 } from "@simplewebauthn/server";
 import { randomBytes } from "node:crypto";
@@ -25,7 +24,7 @@ export interface StoredPasskey {
 	deviceType: "multiDevice" | "singleDevice";
 	lastUsedAt?: Date | null;
 	publicKey: Buffer;
-	transports: AuthenticatorTransportFuture[];
+	transports: NonNullable<RegistrationResponseJSON["response"]["transports"]>;
 }
 
 export interface StoredRecoveryCode {
