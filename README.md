@@ -115,7 +115,7 @@ to the exact browser origin and its hostname.
 
 The repository contains the complete non-container deployment contract:
 
-- `deploy/systemd/retrozetro.service` runs Node 24.18.1 as the dedicated `retrozetro` account with a read-only system
+- `deploy/systemd/retrozetro.service` runs Node 26.13.0 as the dedicated `retrozetro` account with a read-only system
   view and only the shared upload directory writable.
 - `deploy/nginx/retrozetro.locations.conf` proxies the existing IPv4 and IPv6 TLS listeners to `127.0.0.1:3006` and
   blocks public diagnostics headers and routes.

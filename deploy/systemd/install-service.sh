@@ -50,8 +50,8 @@ if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
 	echo "Run the host-control installer with root privileges." >&2
 	exit 1
 fi
-if [[ ! -x /usr/bin/node || "$(/usr/bin/node --version)" != v24.18.1 ]]; then
-	echo "The canonical direct service requires Node 24.18.1 at /usr/bin/node." >&2
+if [[ ! -x /usr/bin/node || "$(/usr/bin/node --version)" != v26.13.0 ]]; then
+	echo "The canonical direct service requires Node 26.13.0 at /usr/bin/node." >&2
 	exit 1
 fi
 for account in retrozetro retrozetro-builder; do

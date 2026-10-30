@@ -39,7 +39,7 @@ production environment file. The runtime account must not own or write release
 archives, immutable release directories, the root-installed verifier, or the
 promoter.
 
-On Linux ARM64 with Node 24.18.1 and npm 12.0.2:
+On Linux ARM64 with Node 26.13.0, build-only npm 12.2.1, and libatomic available:
 
 1. Check out the exact source commit as `retrozetro-builder`.
 2. Add `/.ai-work/` to the checkout's local Git exclude and create an empty

@@ -8,8 +8,8 @@ export RETROZETRO_RUNTIME_CONTRACT="$root/deploy/runtime-artifact.json"
 test "$(id -u)" -ne 0
 test "$(uname -s)" = Linux
 test "$(uname -m)" = aarch64
-test "$(node --version)" = v24.18.1
-test "$(npm --version)" = 12.0.2
+test "$(node --version)" = v26.13.0
+test "$(npm --version)" = 12.2.1
 test -z "$(git status --porcelain)"
 : "${RETROZETRO_ARTIFACT_MONGODB_URI:?Pass a loopback retrozetro_artifact_* MongoDB fixture URI}"
 
