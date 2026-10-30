@@ -1,6 +1,6 @@
 {
 	"name": "front-end",
-	"version": "2.10.2",
+	"version": "2.10.3",
 	"description": "",
 	"author": "Jacob Anderson",
 	"keywords": [],
@@ -60,7 +60,7 @@
 		"@vue/test-utils": "^2.5.1",
 		"beasties": "^0.5.5",
 		"cross-env": "^10.1.0",
-		"cypress": "^15.19.0",
+		"cypress": "^16.2.0",
 		"eslint-plugin-format": "^2.0.1",
 		"rolldown": "^1.2.15",
 		"rollup": "^4.65.1",
