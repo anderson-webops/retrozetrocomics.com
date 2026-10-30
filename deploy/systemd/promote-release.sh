@@ -51,8 +51,8 @@ if [[ ! "$archive_sha" =~ ^[0-9a-f]{64}$ || ! "$commit" =~ ^[0-9a-f]{40}$ ]]; th
 	echo "Pass the independently reviewed archive digest and exact source commit." >&2
 	exit 1
 fi
-if [[ ! -x "$node" || "$("$node" --version)" != v24.18.1 ]]; then
-	echo "NODE_BIN must select the approved Node 24.18.1 runtime." >&2
+if [[ ! -x "$node" || "$("$node" --version)" != v26.13.0 ]]; then
+	echo "NODE_BIN must select the approved Node 26.13.0 runtime." >&2
 	exit 1
 fi
 

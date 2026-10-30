@@ -10,7 +10,7 @@ node=$(realpath "$(command -v node)")
 test "$(id -u)" -ne 0
 test "$(uname -s)" = Linux
 test "$(uname -m)" = aarch64
-test "$("$node" --version)" = v24.18.1
+test "$("$node" --version)" = v26.13.0
 command -v bwrap >/dev/null
 command -v timeout >/dev/null
 
