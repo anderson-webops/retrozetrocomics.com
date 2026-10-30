@@ -35,7 +35,7 @@
 		"brace-expansion": "5.0.9",
 		"esbuild": "$esbuild",
 		"js-yaml": "4.3.1",
-		"qs": "6.16.0"
+		"qs": "6.17.1"
 	},
 	"dependencies": {
 		"@simplewebauthn/server": "^13.3.2",
@@ -46,7 +46,7 @@
 		"express-rate-limit": "^8.7.1",
 		"helmet": "^8.1.0",
 		"mongoose": "^9.11.2",
-		"multer": "^2.4.0",
+		"multer": "^2.5.0",
 		"nodemailer": "^10.1.2",
 		"parse5": "^8.0.1",
 		"readline-sync": "^1.4.10",
