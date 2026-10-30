@@ -36,7 +36,7 @@
 		"@simplewebauthn/browser": "^13.3.0",
 		"@unhead/vue": "^2.1.17",
 		"@unocss/reset": "^66.11.0",
-		"@vueuse/core": "^14.2.1",
+		"@vueuse/core": "^15.0.0",
 		"axios": "^1.20.0",
 		"bootstrap": "^5.3.8",
 		"dompurify": "^3.4.17",
