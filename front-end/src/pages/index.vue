@@ -51,7 +51,7 @@ useHead({
 
 <template>
 	<div class="page page--home">
-		<WelcomeSection actions-placement="poster" highlights-layout="stack" />
+		<WelcomeSection actions-placement="poster" :highlights="[]" message="" />
 		<ContinueReading />
 
 		<section class="home-showcase">

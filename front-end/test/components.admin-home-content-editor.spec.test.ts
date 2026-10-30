@@ -60,7 +60,7 @@ describe("admin home content editor", () => {
 		});
 		await flushPromises();
 
-		expect(wrapper.text()).toContain("Choose what visitors see first");
+		expect(wrapper.get("h2").text()).toBe("Home page");
 		expect(wrapper.text()).toContain("The List");
 		expect(wrapper.text()).toContain("The Fall of a Dream");
 		expect(wrapper.text()).toContain("Exo Dexus");

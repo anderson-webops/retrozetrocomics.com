@@ -194,7 +194,6 @@ async function undoWorldEntryRemoval() {
 					}
 				}
 			]"
-			description="These page controls stay collapsed by default. Add or edit the character board right here, or open the owner console for audit and storage details."
 			title="Character page controls"
 		/>
 
@@ -246,12 +245,7 @@ async function undoWorldEntryRemoval() {
 
 		<section id="factions" class="characters-page__lore" aria-labelledby="retroverse-lore-title">
 			<header class="characters-page__lore-header">
-				<p>The Wider Retroverse</p>
 				<h2 id="retroverse-lore-title">Armies, planets, and other wars</h2>
-				<p>
-					Meet Team Rimlaw, the Apex Army, and the Zego Order, then explore Bitgam, Orpex, Galgri, and the
-					Zlugnoid Hive Wars.
-				</p>
 			</header>
 
 			<WorldEntryCards

@@ -54,20 +54,10 @@ useHead({
 <template>
 	<article class="reading-page site-search">
 		<header>
-			<p class="reading-eyebrow">Explore the Retroverse</p>
-			<h1>Find a name or idea</h1>
-			<p>Search stories, characters, worlds, and artwork.</p>
+			<h1>Search</h1>
 		</header>
 		<form action="/search" method="get" role="search" class="site-search__form">
-			<label
-				><span>What are you looking for?</span
-				><input
-					v-model="input"
-					name="q"
-					type="search"
-					maxlength="160"
-					placeholder="Try Exo, Orpex, or Linkpods"
-			/></label>
+			<label><span>Search terms</span><input v-model="input" name="q" type="search" maxlength="160" /></label>
 			<label
 				><span>Look in</span
 				><select v-model="filter" name="kind">
@@ -77,13 +67,11 @@ useHead({
 			<button type="submit">Search</button>
 		</form>
 		<section aria-labelledby="search-results">
-			<h2 id="search-results">{{ query.trim().length >= 2 ? "Search results" : "Begin exploring" }}</h2>
+			<h2 id="search-results">Search results</h2>
 			<p v-if="failed" role="status">
 				Search could not load the latest content. <button type="button" @click="load(true)">Try again</button>
 			</p>
-			<p v-else-if="query.trim().length < 2">
-				Enter at least two letters. Search for a character, place, machine, or story title.
-			</p>
+			<p v-else-if="query.trim().length < 2">Enter at least two characters.</p>
 			<template v-else
 				><p role="status">
 					{{ results.length }} {{ results.length === 1 ? "result" : "results" }} for “{{ query }}”.<span

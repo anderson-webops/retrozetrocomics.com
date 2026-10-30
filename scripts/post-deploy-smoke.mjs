@@ -1,10 +1,38 @@
 import assert from "node:assert/strict";
 import process from "node:process";
+import { parse } from "parse5";
 
 const origin = (process.env.PUBLIC_SITE_ORIGIN || "https://retrozetrocomics.com")
 	.replace(/\/+$/, "");
 const expectedVersion = (process.env.EXPECTED_VERSION || "").replace(/^v/, "");
 const expectedRevision = process.env.EXPECTED_REVISION || "";
+
+function publicBootstrapNonce(response, html) {
+	const csp = response.headers.get("content-security-policy") || "";
+	const directives = csp.split(";").map(directive => directive.trim());
+	const scriptPolicy = directives.find(directive => directive.startsWith("script-src ")) || "";
+	assert.match(scriptPolicy, /^script-src /, "Public pages must send a script policy.");
+	assert.doesNotMatch(scriptPolicy, /'unsafe-inline'|'unsafe-eval'/);
+	assert.ok(directives.includes("script-src-attr 'none'"), "Inline script attributes must stay blocked.");
+	assert.equal(response.headers.get("cache-control"), "no-store", "Published HTML must not be cached.");
+
+	function nodes(node) {
+		return [node, ...(node.childNodes || []).flatMap(nodes)];
+	}
+	const noncedScripts = nodes(parse(html)).filter(node =>
+		node.tagName === "script" && node.attrs.some(attribute => attribute.name === "nonce")
+	);
+	assert.equal(noncedScripts.length, 1, "Only the trusted initial-state script may receive a nonce.");
+	const bootstrap = noncedScripts[0];
+	const nonce = bootstrap.attrs.find(attribute => attribute.name === "nonce").value;
+	assert.match(nonce, /^[A-Z0-9+/]{32}$/i, "The public bootstrap nonce must contain 24 random bytes.");
+	assert.ok(scriptPolicy.split(/\s+/).includes(`'nonce-${nonce}'`), "The bootstrap nonce must match its HTTP policy.");
+	assert.ok(
+		bootstrap.childNodes.map(node => node.value || "").join("").trim().startsWith("window.__INITIAL_STATE__="),
+		"Story metadata must not receive the trusted bootstrap nonce."
+	);
+	return nonce;
+}
 
 assert.match(expectedVersion, /^\d+\.\d+\.\d+$/, "EXPECTED_VERSION must be a semantic version.");
 assert.match(expectedRevision, /^[0-9a-f]{40}$/, "EXPECTED_REVISION must be a full Git revision.");
@@ -53,13 +81,11 @@ assert.deepEqual(readiness, { ok: true }, "API readiness payload must remain min
 const rootResponse = await request("/");
 assert.equal(rootResponse.status, 200, "Public homepage must be available.");
 const rootHtml = await rootResponse.text();
-assert.match(rootHtml, /http-equiv="Content-Security-Policy"/);
-const csp = rootResponse.headers.get("content-security-policy") || "";
-assert.match(csp, /script-src/, "Public homepage must send a script policy.");
-const scriptPolicy = csp.split(";")
-	.map(directive => directive.trim())
-	.find(directive => directive.startsWith("script-src")) || "";
-assert.doesNotMatch(scriptPolicy, /'unsafe-inline'|'unsafe-eval'/);
+const firstNonce = publicBootstrapNonce(rootResponse, rootHtml);
+const freshRootResponse = await request("/", { headers: { "Cache-Control": "no-cache" } });
+assert.equal(freshRootResponse.status, 200, "Repeated public requests must remain available.");
+const freshNonce = publicBootstrapNonce(freshRootResponse, await freshRootResponse.text());
+assert.notEqual(freshNonce, firstNonce, "Public responses must use distinct bootstrap nonces.");
 const hsts = rootResponse.headers.get("strict-transport-security") || "";
 assert.match(hsts, /max-age=63072000/i, "HSTS must retain the two-year preload lifetime.");
 assert.match(hsts, /includeSubDomains/i, "HSTS must include subdomains.");

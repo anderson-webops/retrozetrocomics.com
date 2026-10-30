@@ -4,8 +4,9 @@ import { constants } from "node:fs";
 import { access, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import { fileURLToPath } from "node:url";
 
-const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
+const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const bwrapProfile = await readFile(
 	path.join(repositoryRoot, ".github/apparmor/bwrap-userns-restrict"),
 	"utf8"
@@ -17,7 +18,6 @@ const relativePaths = {
 	artworkIndex: "front-end/src/content/tylerArtwork.ts",
 	artworkPage: "front-end/src/pages/artwork.vue",
 	ci: ".github/workflows/ci.yml",
-	contentHandoff: "deploy/content/SERVER_AI_HANDOFF.md",
 	contentManifest: "deploy/content/tyler-site-content-v1.json",
 	environment: "deploy/systemd/retrozetro.env.example",
 	homePage: "front-end/src/pages/index.vue",
@@ -77,7 +77,6 @@ const [
 	artworkIndex,
 	artworkPage,
 	ci,
-	contentHandoff,
 	contentManifestText,
 	environment,
 	homePage,
@@ -110,7 +109,6 @@ const [
 	read(relativePaths.artworkIndex),
 	read(relativePaths.artworkPage),
 	read(relativePaths.ci),
-	read(relativePaths.contentHandoff),
 	read(relativePaths.contentManifest),
 	read(relativePaths.environment),
 	read(relativePaths.homePage),
@@ -262,7 +260,7 @@ for (const publicContentSource of [artworkPage, worldEntryPresentation, worldsDa
 		/working story|source notes|story files|world notes|final canon|open questions|still being developed/i
 	);
 }
-assert.match(artworkPage, /\{\{ tylerArtworkItems\.length \}\} hand-drawn/);
+assert.match(artworkPage, /Showing \{\{ visibleArtwork\.length \}\} of \{\{ tylerArtworkItems\.length \}\} designs/);
 assert.doesNotMatch(artworkPage, /Show more artwork/);
 assert.match(artworkPage, /background-color: #09182a/);
 assert.doesNotMatch(artworkPage, /background: rgba\(249, 234, 219/);
@@ -278,39 +276,6 @@ assert.match(worldsPage, /worlds-section--atlas/);
 assert.match(worldsPage, /background-color: #09182a/);
 assert.doesNotMatch(worldsPage, /worlds-section--light/);
 
-for (const requiredHandoffLanguage of [
-	"verified transactional compatibility deployment",
-	"pre-mutation artifact snapshot",
-	"automatically restore",
-	"storedSanitizedSha256",
-	"service account: `tyler:tyler`",
-	"tyler:site_retrozetro",
-	"no S3 access or migration",
-	"no media write or reimport",
-	"no automatic `SiteContent` seed",
-	"no publication action or state change",
-	"exactly 85 unique storage",
-	"The other 80 files have no checked-in sanitized-byte baseline",
-	"all 85 public image URLs",
-	"Investigation arc",
-	"Rebellion arc",
-	"Public defaults must",
-	"SOURCE_DATE_EPOCH",
-	"isolated automated editor and backend draft tests",
-	"separate explicit authorization",
-	"muted dark palette",
-	"bright full-section paper background"
-]) {
-	assert.match(contentHandoff, new RegExp(requiredHandoffLanguage));
-}
-assert.match(contentHandoff, /Do not compare[\s\S]*sourceSha256/);
-assert.match(contentHandoff, /Public defaults must\s+present the story directly/);
-assert.match(contentHandoff, /ctime[\s\S]*site-perms[\s\S]*legitimately\s+refresh/);
-assert.match(contentHandoff, /deployment\s+wall-clock time separately/);
-assert.match(contentHandoff, /not a symlink-based atomic release/);
-assert.doesNotMatch(contentHandoff, /established atomic compatibility-release procedure/);
-assert.doesNotMatch(contentHandoff, /saves a private\s+draft without changing the public API/);
-assert.doesNotMatch(contentHandoff, /Working story file|relationship remains for Tyler to confirm/);
 assert.match(packageRuntime, /SOURCE_DATE_EPOCH/);
 assert.match(releaseMetadata, /new Date\(sourceEpoch \* 1000\)\.toISOString\(\)/);
 

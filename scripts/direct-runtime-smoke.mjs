@@ -5,8 +5,9 @@ import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import process from "node:process";
+import { fileURLToPath } from "node:url";
 
-const repositoryRoot = path.resolve(new URL("../", import.meta.url).pathname);
+const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const release = JSON.parse(
 	await readFile(path.join(repositoryRoot, "front-end", "dist", "release.json"), "utf8")
 );

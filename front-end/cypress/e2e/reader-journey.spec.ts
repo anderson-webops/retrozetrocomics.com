@@ -5,7 +5,7 @@ describe("reader journey", () => {
 		cy.visit("/start");
 		cy.contains("a", "Begin with The List").click();
 		cy.window().then(window => expect(window.localStorage.getItem("retrozetro:reading-place:v1")).to.be.null);
-		cy.get('[aria-label="Save this place: A call from Orpex"]').click();
+		cy.get('[aria-label="Save place on this device: A call from Orpex"]').click();
 		cy.contains("Place saved on this device.").should("be.visible");
 		cy.visit("/");
 		cy.get(".continue-reading a").should("have.attr", "href", "/stories/the-list#midpoint").click();
@@ -43,7 +43,7 @@ describe("reader journey", () => {
 				cy.stub(window.Storage.prototype, "setItem").throws(new Error("storage unavailable"));
 			}
 		});
-		cy.get('[aria-label="Save this place: The Star Hunters"]').click();
+		cy.get('[aria-label="Save place on this device: The Star Hunters"]').click();
 		cy.contains("Your browser could not save this place.").should("be.visible");
 		cy.get(".story-sequence").contains("a", "The Fall of a Dream").click();
 		cy.get("h1").should("have.text", "The Fall of a Dream");

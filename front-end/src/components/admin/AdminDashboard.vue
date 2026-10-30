@@ -142,9 +142,7 @@ onMounted(() => {
 	<section class="admin-dashboard">
 		<header class="admin-dashboard__hero">
 			<div>
-				<p class="admin-dashboard__eyebrow">Owner Console</p>
 				<h1>Site content tools</h1>
-				<p>Editable public pages, owner activity, and storage readiness.</p>
 			</div>
 
 			<div class="admin-dashboard__actions">
@@ -185,7 +183,6 @@ onMounted(() => {
 		<div class="admin-dashboard__grid">
 			<article class="admin-panel admin-panel--content">
 				<div class="admin-panel__heading">
-					<p>Editable Pages</p>
 					<h2>Public content</h2>
 				</div>
 
@@ -344,9 +341,7 @@ onMounted(() => {
 						&times;
 					</button>
 
-					<p class="admin-dashboard__eyebrow">Storage Details</p>
-					<h2 id="storage-dialog-heading">Asset infrastructure</h2>
-					<p>Deployment details for future asset infrastructure work.</p>
+					<h2 id="storage-dialog-heading">Storage details</h2>
 
 					<dl class="storage-dialog__list">
 						<div v-for="[label, value] in storageRows" :key="label">

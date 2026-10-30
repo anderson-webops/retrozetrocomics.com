@@ -51,9 +51,9 @@ useHead({
 				information in your browser settings, but doing so may sign you out or remove locally saved drafts.
 			</p>
 			<p>
-				If you choose “Save this place,” your browser stores one story and section identifier on this device.
-				This saved place is not sent to an account or a reading-history service. Choose “Forget saved place” to
-				remove it. Shared devices share this saved place.
+				If you choose “Save place on this device,” your browser stores one story and section identifier on this
+				device. This saved place is not sent to an account or a reading-history service. Choose “Forget saved
+				place” to remove it. Shared devices share this saved place.
 			</p>
 			<p>
 				Search words appear in the search page's address. Like other requested addresses, they may appear in
@@ -62,11 +62,7 @@ useHead({
 		</section>
 		<section>
 			<h2>Advertising and audience measurement</h2>
-			<p>
-				This version of the site does not load advertising or optional audience-measurement scripts. An AdSense
-				ownership-verification record is retained, but it does not itself display ads or load Google's
-				advertising script.
-			</p>
+			<p>The site does not load advertising or optional audience-measurement scripts.</p>
 			<p>
 				If advertising is introduced, this page and the site's privacy choices will be updated before those
 				services are enabled. Google and other advertising providers may use cookies, web beacons, IP addresses,

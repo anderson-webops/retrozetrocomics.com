@@ -50,11 +50,8 @@ function choose(asset: MediaAsset) {
 
 <template>
 	<fieldset v-if="model" class="reading-editor">
-		<legend>Build the reading page</legend>
-		<p>
-			Write one section at a time. Use a blank line between paragraphs. The preview shows every section in this
-			order.
-		</p>
+		<legend>Story sections</legend>
+		<p>Use a blank line between paragraphs.</p>
 		<p v-if="message" role="status">{{ message }}</p>
 		<details>
 			<summary>Story address</summary>

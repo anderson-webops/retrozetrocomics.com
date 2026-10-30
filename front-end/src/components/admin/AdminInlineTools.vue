@@ -18,7 +18,7 @@ const props = withDefaults(
 		title?: string;
 	}>(),
 	{
-		description: "Quick admin shortcuts for this part of the public site.",
+		description: "",
 		title: "Admin shortcuts"
 	}
 );
@@ -31,9 +31,8 @@ const isOpen = ref(false);
 	<section v-if="session.showAdminTools" class="admin-inline-tools">
 		<div class="admin-inline-tools__header">
 			<div class="admin-inline-tools__copy">
-				<p class="admin-inline-tools__eyebrow">Admin</p>
 				<h2>{{ props.title }}</h2>
-				<p>{{ props.description }}</p>
+				<p v-if="props.description">{{ props.description }}</p>
 			</div>
 			<button type="button" class="admin-inline-tools__toggle" @click="isOpen = !isOpen">
 				{{ isOpen ? "Hide controls" : "Open controls" }}
