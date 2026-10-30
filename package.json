@@ -115,7 +115,7 @@
 		"esbuild@0.28.2": true,
 		"express-rate-limit@8.7.1": false,
 		"fsevents@2.3.3": true,
-		"puppeteer@25.15.0": false,
+		"puppeteer@25.16.0": false,
 		"simple-git-hooks@2.14.0": true,
 		"vue-demi@0.14.10": true
 	}
