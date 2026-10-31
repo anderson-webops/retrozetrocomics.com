@@ -123,7 +123,12 @@ export function searchPublishedContent(
 				(title === phrase ? 100 : title.startsWith(phrase) ? 40 : 0) +
 				terms.reduce((sum, term) => sum + (title.includes(term) ? 10 : 1), 0);
 			const excerpt = entry.text.replace(/\s+/gu, " ").trim();
-			return { ...entry, matches, score, excerpt: excerpt.length > 220 ? `${excerpt.slice(0, 217)}…` : excerpt };
+			return {
+				...entry,
+				matches,
+				score,
+				excerpt: excerpt.length > 220 ? `${excerpt.slice(0, 217)}…` : excerpt
+			};
 		})
 		.filter(entry => entry.matches)
 		.sort((left, right) => right.score - left.score);

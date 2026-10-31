@@ -60,7 +60,9 @@ for (const variableName of [
 try {
 	const child = spawn(
 		process.execPath,
-		[path.join(repositoryRoot, "back-end", "dist", "server.js")],
+		[
+			path.join(repositoryRoot, "back-end", "dist", "server.js")
+		],
 		{
 			cwd: temporaryRoot,
 			env: environment,

@@ -4,22 +4,44 @@ import { fileURLToPath } from "node:url";
 import { parse } from "parse5";
 
 const root = new URL("../", import.meta.url);
-const routes = ["/", "/start", "/search", "/about", "/characters", "/worlds", "/artwork", "/contact", "/creator", "/privacy", "/stories/the-list", "/stories/fall-of-a-dream"];
+const routes = [
+	"/",
+	"/start",
+	"/search",
+	"/about",
+	"/characters",
+	"/worlds",
+	"/artwork",
+	"/contact",
+	"/creator",
+	"/privacy",
+	"/stories/the-list",
+	"/stories/fall-of-a-dream"
+];
 const manifest = JSON.parse(await readFile(new URL("deploy/content/tyler-site-content-v1.json", root), "utf8"));
 const sitemap = await readFile(new URL("front-end/dist/sitemap.xml", root), "utf8");
-const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)].map(match => match[1].trim());
+const sitemapUrls = [
+	...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)
+].map(match => match[1].trim());
 const pages = new Map();
 const titles = new Set();
 const attr = (node, name) => node.attrs?.find(item => item.name === name)?.value;
 function nodes(node) {
-	return [node, ...(node.childNodes || []).flatMap(nodes)];
+	return [
+		node,
+		...(node.childNodes || []).flatMap(nodes)
+	];
 }
 function text(node) {
 	if (["script", "style", "#comment"].includes(node.nodeName)) return "";
-	return node.nodeName === "#text" ? node.value : (node.childNodes || []).map(text).join(" ");
+	return node.nodeName === "#text"
+		? node.value
+		: (node.childNodes || []).map(text).join(" ");
 }
 for (const route of routes) {
-	const htmlPath = new URL(`front-end/dist${route === "/" ? "" : route}/index.html`, root);
+	const htmlPath = new URL(`front-end/dist${route === "/"
+		? ""
+		: route}/index.html`, root);
 	const document = parse(await readFile(htmlPath, "utf8"));
 	const all = nodes(document);
 	const title = all.filter(node => node.tagName === "title");
@@ -57,4 +79,9 @@ for (const route of routes.filter(item => item.startsWith("/stories/"))) {
 	const sections = pages.get(route).filter(node => node.tagName === "section" && attr(node, "id"));
 	assert.equal(sections.length, 7, `${route}: all story sections rendered`);
 }
-console.log(JSON.stringify({ publicHtml: "passed", routes: routes.length, artworkLinks: galleryKeys.length, buildRoot: fileURLToPath(new URL("front-end/dist/", root)) }));
+console.log(JSON.stringify({
+	publicHtml: "passed",
+	routes: routes.length,
+	artworkLinks: galleryKeys.length,
+	buildRoot: fileURLToPath(new URL("front-end/dist/", root))
+}));

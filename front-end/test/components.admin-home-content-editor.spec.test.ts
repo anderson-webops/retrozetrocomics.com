@@ -42,7 +42,9 @@ describe("admin home content editor", () => {
 	it("loads the reviewed highlights and keeps publication behind confirmation", async () => {
 		const wrapper = mount(AdminHomeContentEditor, {
 			global: {
-				provide: { [publishedContentKey as symbol]: createPublishedContent() },
+				provide: {
+					[publishedContentKey as symbol]: createPublishedContent()
+				},
 				stubs: {
 					AdminConfirmDialog: {
 						emits: ["cancel", "confirm"],

@@ -15,7 +15,12 @@ export interface PublishedSnapshot {
 }
 
 function pageState<T>(initial: T, loaded: boolean) {
-	return { content: ref(initial), error: ref(""), isLoaded: ref(loaded), loading: ref(false) };
+	return {
+		content: ref(initial),
+		error: ref(""),
+		isLoaded: ref(loaded),
+		loading: ref(false)
+	};
 }
 
 export function createPublishedContent(snapshot?: PublishedSnapshot) {
@@ -52,5 +57,11 @@ export function usePublishedPage<K extends keyof PublishedSnapshot>(page: K) {
 			current.loading.value = false;
 		}
 	}
-	return { content, error: current.error, loading: current.loading, apply, load };
+	return {
+		content,
+		error: current.error,
+		loading: current.loading,
+		apply,
+		load
+	};
 }

@@ -14,5 +14,9 @@ export async function renderPublishedPage(url: string, snapshot: PublishedSnapsh
 		state[page].isLoaded.value = true;
 	}
 	const html = await renderToString(context.app);
-	return { html, head: await renderSSRHead(context.head), initialState: { publishedContent: snapshot } };
+	return {
+		html,
+		head: await renderSSRHead(context.head),
+		initialState: { publishedContent: snapshot }
+	};
 }

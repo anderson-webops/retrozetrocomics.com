@@ -17,7 +17,10 @@ function publicBootstrapNonce(response, html) {
 	assert.equal(response.headers.get("cache-control"), "no-store", "Published HTML must not be cached.");
 
 	function nodes(node) {
-		return [node, ...(node.childNodes || []).flatMap(nodes)];
+		return [
+			node,
+			...(node.childNodes || []).flatMap(nodes)
+		];
 	}
 	const noncedScripts = nodes(parse(html)).filter(node =>
 		node.tagName === "script" && node.attrs.some(attribute => attribute.name === "nonce")
@@ -82,7 +85,9 @@ const rootResponse = await request("/");
 assert.equal(rootResponse.status, 200, "Public homepage must be available.");
 const rootHtml = await rootResponse.text();
 const firstNonce = publicBootstrapNonce(rootResponse, rootHtml);
-const freshRootResponse = await request("/", { headers: { "Cache-Control": "no-cache" } });
+const freshRootResponse = await request("/", {
+	headers: { "Cache-Control": "no-cache" }
+});
 assert.equal(freshRootResponse.status, 200, "Repeated public requests must remain available.");
 const freshNonce = publicBootstrapNonce(freshRootResponse, await freshRootResponse.text());
 assert.notEqual(freshNonce, firstNonce, "Public responses must use distinct bootstrap nonces.");

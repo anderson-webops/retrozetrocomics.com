@@ -5,12 +5,22 @@ const { renderPublishedPage } = await import(new URL("../back-end/dist/public-re
 const { createDefaultSiteContent } = await import(new URL("../back-end/dist/services/siteContent.js", import.meta.url));
 
 function snapshot() {
-	return Object.fromEntries(["about", "artwork", "characters", "home"].map(page => [page, createDefaultSiteContent(page)]));
+	return Object.fromEntries([
+		"about",
+		"artwork",
+		"characters",
+		"home"
+	].map(page => [
+		page,
+		createDefaultSiteContent(page)
+	]));
 }
 const first = snapshot();
 first.about.storyArcs[0].slug = "new-chapter";
 first.about.storyArcs[0].title = "A new chapter";
-first.about.storyArcs[0].readingSections = [{ id: "opening", heading: "A changed heading", text: "Paragraph one.\n\nParagraph two. <script>alert(\"not executable\")</script>" }];
+first.about.storyArcs[0].readingSections = [
+	{ id: "opening", heading: "A changed heading", text: "Paragraph one.\n\nParagraph two. <script>alert(\"not executable\")</script>" }
+];
 first.artwork.items = [first.artwork.items[83]];
 first.artwork.items[0].caption = "A new gallery caption";
 const second = snapshot();

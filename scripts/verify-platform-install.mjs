@@ -109,7 +109,9 @@ async function verifyTarget(libc) {
 			}
 
 			return dependency.includes("linux-arm64")
-				&& dependency.endsWith(libc === "musl" ? "-musl" : "-gnu");
+				&& dependency.endsWith(libc === "musl"
+					? "-musl"
+					: "-gnu");
 		});
 		const missing = [];
 

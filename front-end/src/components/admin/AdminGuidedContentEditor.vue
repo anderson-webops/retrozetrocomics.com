@@ -138,7 +138,9 @@ const currentItems = computed<any[]>(() => {
 
 const stepLabels = computed(() => {
 	if (editorKind.value === "character") return ["Essentials", "More details", "Preview"];
-	if (editorKind.value === "story") return ["Basics", "Reading sections", "Notes", "Preview"];
+	if (editorKind.value === "story") {
+		return ["Basics", "Reading sections", "Notes", "Preview"];
+	}
 	if (editorKind.value === "artwork") return ["Picture and caption", "Preview"];
 	if (editorKind.value === "world") return ["Basics", "Facts", "Preview"];
 	return [];

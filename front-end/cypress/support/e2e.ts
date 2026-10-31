@@ -22,9 +22,15 @@ import { createDefaultHomePageContent } from "../../src/content/defaultHomePageC
 import "./commands";
 
 beforeEach(() => {
-	cy.intercept("GET", "/api/site-content/artwork", { body: { content: createDefaultArtworkPageContent() } });
+	cy.intercept("GET", "/api/site-content/artwork", {
+		body: {
+			content: createDefaultArtworkPageContent()
+		}
+	});
 	cy.intercept("GET", "/api/site-content/home", {
-		body: { content: createDefaultHomePageContent() },
+		body: {
+			content: createDefaultHomePageContent()
+		},
 		statusCode: 200
 	});
 	cy.intercept("GET", "/api/auth/me", {
@@ -35,11 +41,15 @@ beforeEach(() => {
 		statusCode: 200
 	});
 	cy.intercept("GET", "/api/site-content/about", {
-		body: { content: createDefaultAboutPageContent() },
+		body: {
+			content: createDefaultAboutPageContent()
+		},
 		statusCode: 200
 	});
 	cy.intercept("GET", "/api/site-content/characters", {
-		body: { content: createDefaultCharactersPageContent() },
+		body: {
+			content: createDefaultCharactersPageContent()
+		},
 		statusCode: 200
 	});
 });

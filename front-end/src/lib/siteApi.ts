@@ -145,7 +145,9 @@ export async function restoreContentTrashItem<T extends EditableSiteContent>(tra
 
 export async function fetchMediaAssets(trash = false) {
 	const { data } = await api.get<{ assets: MediaAsset[] }>("/admin/media", {
-		params: { trash: trash ? "1" : undefined }
+		params: {
+			trash: trash ? "1" : undefined
+		}
 	});
 	return data.assets;
 }

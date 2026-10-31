@@ -67,11 +67,7 @@ export default base
 		},
 
 		{
-			files: [
-				"cypress.config.ts",
-				"vite.config.{js,ts,mts}",
-				"uno.config.ts"
-			],
+			files: ["cypress.config.ts", "vite.config.{js,ts,mts}", "uno.config.ts"],
 			languageOptions: {
 				parser: ts.parser,
 				parserOptions: {
@@ -98,14 +94,15 @@ export default base
 
 		// build / config scripts
 		{
-			files: [
-				"**/*.{js,cjs,mjs}",
-				"*.config.js",
-				"vite.config.{js,ts,mts}"
-			],
+			files: ["**/*.{js,cjs,mjs}", "*.config.js", "vite.config.{js,ts,mts}"],
 			languageOptions: { sourceType: "module" }
 		}
 	)
 
 	/* keep Prettier conflict-killer last */
-	.append(ppFlat);
+	.append(ppFlat)
+	.append({
+		rules: {
+			"antfu/reasonable-newline": "off"
+		}
+	});
