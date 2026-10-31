@@ -3,6 +3,8 @@ import { config, library } from "@fortawesome/fontawesome-svg-core";
 import { faFacebook, faGithub, faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { createHead as createClientHead } from "@unhead/vue/client";
+import { createHead as createServerHead } from "@unhead/vue/server";
 import { setupLayouts } from "virtual:generated-layouts";
 import { ViteSSG } from "vite-ssg";
 import { routes } from "vue-router/auto-routes";
@@ -32,6 +34,9 @@ export const createApp = ViteSSG(
 		base: import.meta.env.BASE_URL
 	},
 	ctx => {
+		const head = import.meta.env.SSR ? createServerHead() : createClientHead();
+		ctx.app.use(head);
+		ctx.head = head as unknown as typeof ctx.head;
 		ctx.app.provide(publishedContentKey, createPublishedContent(ctx.initialState.publishedContent));
 		// ctx is the context where you can add global components or plugins
 		ctx.app.component("font-awesome-icon", FontAwesomeIcon);
@@ -57,5 +62,6 @@ export const createApp = ViteSSG(
 		// ctx.app.use(Previewer)
 
 		// If you had specific plugins like a global error handler, i18n, etc., initialize them here
-	}
+	},
+	{ useHead: false }
 );
