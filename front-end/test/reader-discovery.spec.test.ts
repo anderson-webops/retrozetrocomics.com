@@ -33,7 +33,9 @@ describe("reader discovery", () => {
 	});
 	it("uses changed published routes and excludes removed material and private fields", () => {
 		const data = content();
-		Object.assign(data.about, { draftData: { secret: "private-dragon" } });
+		Object.assign(data.about, {
+			draftData: { secret: "private-dragon" }
+		});
 		data.about.storyArcs[0].slug = "new-opening";
 		data.about.storyArcs[0].readingSections = [
 			{ id: "one", heading: "Copper dawn", text: "The copper dawn illuminates the base." }
@@ -55,7 +57,12 @@ describe("reader discovery", () => {
 		for (const raw of [null, "broken", "null", JSON.stringify({ version: 2 }), "x".repeat(513)])
 			expect(parseReadingPlace(raw)).toBeNull();
 		const place = parseReadingPlace(
-			JSON.stringify({ version: 1, storyId: stories[0].id, sectionId: "hook", url: "https://invalid.example" })
+			JSON.stringify({
+				version: 1,
+				storyId: stories[0].id,
+				sectionId: "hook",
+				url: "https://invalid.example"
+			})
 		);
 		expect(resolveReadingPlace(stories, place)?.url).toBe("/stories/the-list#hook");
 		expect(place).not.toHaveProperty("url");

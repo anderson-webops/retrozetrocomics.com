@@ -59,8 +59,13 @@ describe("inline character editor safety", () => {
 
 	it("names the edit action for the exact character", () => {
 		const wrapper = mount(TheCharacters, {
-			props: { inlineEditing: true, items: [character] },
-			global: { stubs: { ResolvedImage: true } }
+			props: {
+				inlineEditing: true,
+				items: [character]
+			},
+			global: {
+				stubs: { ResolvedImage: true }
+			}
 		});
 
 		expect(wrapper.get(".characters-grid__edit").attributes("aria-label")).toBe("Edit Zetro");

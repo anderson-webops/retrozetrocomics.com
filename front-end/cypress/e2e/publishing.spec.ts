@@ -30,11 +30,20 @@ describe("owner publishing workflow with isolated content", () => {
 		cy.intercept("GET", "/api/auth/me", {
 			body: {
 				authenticated: true,
-				account: { id: "owner-test", name: "Owner", role: "admin", email: "owner@example.test" }
+				account: {
+					id: "owner-test",
+					name: "Owner",
+					role: "admin",
+					email: "owner@example.test"
+				}
 			}
 		});
-		cy.intercept("GET", "/api/admin/site-content/trash*", { body: { items: [] } });
-		cy.intercept("GET", "/api/admin/site-content/*/revisions", { body: { revisions: [] } });
+		cy.intercept("GET", "/api/admin/site-content/trash*", {
+			body: { items: [] }
+		});
+		cy.intercept("GET", "/api/admin/site-content/*/revisions", {
+			body: { revisions: [] }
+		});
 		cy.intercept("GET", /\/api\/admin\/site-content\/(about|characters|artwork)$/, req => {
 			const page = req.url.split("/").at(-1)!;
 			req.reply(states[page]);

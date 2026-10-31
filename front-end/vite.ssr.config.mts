@@ -8,7 +8,9 @@ export default defineConfig(context =>
 			outDir: "../back-end/dist/public-renderer",
 			emptyOutDir: true,
 			cssCodeSplit: false,
-			rollupOptions: { output: { entryFileNames: "entry-server.mjs", chunkFileNames: "[name]-[hash].mjs" } }
+			rollupOptions: {
+				output: { entryFileNames: "entry-server.mjs", chunkFileNames: "[name]-[hash].mjs" }
+			}
 		},
 		ssr: { noExternal: true }
 	})

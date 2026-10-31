@@ -101,7 +101,13 @@ try {
 		"--no-audit"
 	]);
 
-	const omitted = ["typescript", "tsx", "esbuild", "vite", "vitest"];
+	const omitted = [
+		"typescript",
+		"tsx",
+		"esbuild",
+		"vite",
+		"vitest"
+	];
 	for (const packageName of omitted) {
 		for (const modulesRoot of [
 			join(temporaryDirectory, "node_modules"),
@@ -134,7 +140,15 @@ try {
 	await import(new URL(`file://${join(temporaryDirectory, "back-end", "dist", "app.js")}`));
 	const renderer = await import(new URL(`file://${join(temporaryDirectory, "back-end", "dist", "public-renderer", "entry-server.mjs")}`));
 	const content = await import(new URL(`file://${join(temporaryDirectory, "back-end", "dist", "services", "siteContent.js")}`));
-	const snapshot = Object.fromEntries(["about", "artwork", "characters", "home"].map(page => [page, content.createDefaultSiteContent(page)]));
+	const snapshot = Object.fromEntries([
+		"about",
+		"artwork",
+		"characters",
+		"home"
+	].map(page => [
+		page,
+		content.createDefaultSiteContent(page)
+	]));
 	const rendered = await renderer.renderPublishedPage("/stories/the-list", snapshot);
 	if (!rendered.html.includes("The List")) throw new Error("Production renderer did not load the story");
 

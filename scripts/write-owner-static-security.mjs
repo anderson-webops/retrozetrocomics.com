@@ -76,7 +76,12 @@ function readContentImageSources() {
 }
 
 function createPolicy(hashes, ownerOnly) {
-	const imageSources = ["'self'", "data:", "blob:", ...readContentImageSources()].join(" ");
+	const imageSources = [
+		"'self'",
+		"data:",
+		"blob:",
+		...readContentImageSources()
+	].join(" ");
 	const connectSources = ownerOnly
 		? "'self'"
 		: "'self' https://analytics.retrozetrocomics.com https://analytics.jacobdanderson.net https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.google.com";

@@ -36,7 +36,9 @@ async function freePort() {
 	assert.equal(typeof address, "object");
 	const port = address.port;
 	await new Promise((resolvePromise, rejectPromise) => {
-		server.close(error => error ? rejectPromise(error) : resolvePromise());
+		server.close(error => error
+			? rejectPromise(error)
+			: resolvePromise());
 	});
 	return port;
 }
@@ -91,7 +93,9 @@ async function createMongoProxy(sourceUri) {
 		async close() {
 			for (const socket of sockets) socket.destroy();
 			await new Promise((resolvePromise, rejectPromise) => {
-				server.close(error => error ? rejectPromise(error) : resolvePromise());
+				server.close(error => error
+					? rejectPromise(error)
+					: resolvePromise());
 			});
 		}
 	};
@@ -124,7 +128,9 @@ function syntheticEnvironment(mongoUri, port) {
 }
 
 function spawnRuntime(env) {
-	const child = spawn(node, [resolve(artifact, "back-end/dist/server.js")], {
+	const child = spawn(node, [
+		resolve(artifact, "back-end/dist/server.js")
+	], {
 		cwd: artifact,
 		env,
 		stdio: ["ignore", "pipe", "pipe"]
@@ -224,7 +230,10 @@ async function testNativeDependencies() {
 }
 
 async function testCompiledAdministratorCli(env) {
-	const child = spawn(node, [resolve(artifact, "back-end/dist/admin-lifecycle.js"), "--help"], {
+	const child = spawn(node, [
+		resolve(artifact, "back-end/dist/admin-lifecycle.js"),
+		"--help"
+	], {
 		cwd: artifact,
 		env,
 		stdio: ["ignore", "pipe", "pipe"]
@@ -245,7 +254,13 @@ async function testCompiledAdministratorCli(env) {
 
 async function testCompleteArtifact() {
 	assert.equal(existsSync(resolve(artifact, "back-end/src")), false);
-	for (const packageName of ["eslint", "tsx", "typescript", "vite", "vitest"]) {
+	for (const packageName of [
+		"eslint",
+		"tsx",
+		"typescript",
+		"vite",
+		"vitest"
+	]) {
 		assert.equal(existsSync(resolve(artifact, "node_modules", packageName)), false);
 	}
 	await testNativeDependencies();

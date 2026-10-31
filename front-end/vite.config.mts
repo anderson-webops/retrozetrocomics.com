@@ -52,7 +52,9 @@ export default defineConfig(({ command }) => ({
 				"@vueuse/core",
 				unheadVueComposablesImports, // supplies useHead / useSeoMeta
 				VueRouterAutoImports,
-				{ "vue-router/auto": ["useLink"] }
+				{
+					"vue-router/auto": ["useLink"]
+				}
 			],
 			eslintrc: {
 				enabled: true,

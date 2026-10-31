@@ -236,7 +236,9 @@ assert.equal(contentManifest.siteContent["artwork-page"].visualPresentation.gall
 assert.equal(contentManifest.siteContent["artwork-page"].visualPresentation.paperToneUse, "artwork-frames-only");
 assert.equal(contentManifest.visualPresentation.adPlaceholders, "commented-out-for-future-reinstatement");
 const layout = await read("front-end/src/layouts/default.vue");
-assert.equal([...layout.matchAll(/<!-- Parked (?:top|left|right) placement\.[\s\S]*?<SiteAdSlot[\s\S]*?-->/g)].length, 3);
+assert.equal([
+	...layout.matchAll(/<!-- Parked (?:top|left|right) placement\.[\s\S]*?<SiteAdSlot[\s\S]*?-->/g)
+].length, 3);
 assert.equal(contentManifest.siteContent["artwork-page"].initialHtmlImages, 85);
 assert.equal(contentManifest.publicRoutes.length, 12);
 assert.equal(contentManifest.visualPresentation.controlRadius, "8px");
@@ -254,7 +256,12 @@ for (const media of contentManifest.referencedMedia) {
 	assert.equal(uniqueArtworkStorageKeys.has(media.storageKey), true);
 }
 
-for (const publicContentSource of [artworkPage, worldEntryPresentation, worldsData, worldsPage]) {
+for (const publicContentSource of [
+	artworkPage,
+	worldEntryPresentation,
+	worldsData,
+	worldsPage
+]) {
 	assert.doesNotMatch(
 		publicContentSource,
 		/working story|source notes|story files|world notes|final canon|open questions|still being developed/i

@@ -28,8 +28,14 @@ useHead(() => ({
 		{ name: "description", content: story.value?.description || "This story is not currently available." },
 		{ property: "og:title", content: `${story.value?.title || "Story unavailable"} | RetroZetro Comics` },
 		{ property: "og:description", content: story.value?.description || "This story is not currently available." },
-		{ property: "og:url", content: toAbsoluteSiteUrl(story.value ? storyPath(story.value) : "/about") },
-		{ name: "robots", content: story.value ? "index,follow" : "noindex,follow" }
+		{
+			property: "og:url",
+			content: toAbsoluteSiteUrl(story.value ? storyPath(story.value) : "/about")
+		},
+		{
+			name: "robots",
+			content: story.value ? "index,follow" : "noindex,follow"
+		}
 	]
 }));
 onMounted(() => void load());

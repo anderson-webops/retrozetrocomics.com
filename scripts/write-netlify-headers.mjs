@@ -69,7 +69,9 @@ const contentImageSources = (process.env.CONTENT_IMAGE_HOSTS || "")
 		}
 		return `https://${host}`;
 	});
-const contentImagePolicy = contentImageSources.length ? ` ${contentImageSources.join(" ")}` : "";
+const contentImagePolicy = contentImageSources.length
+	? ` ${contentImageSources.join(" ")}`
+	: "";
 
 function createContentSecurityPolicy(profile) {
 	const ownerOnly = profile === "owner";

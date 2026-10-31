@@ -17,7 +17,9 @@ describe("story reading", () => {
 	it("respects owner content, including removal of a default story", () => {
 		const content = createDefaultAboutPageContent();
 		content.storyArcs = content.storyArcs.filter(story => story.id !== "arc-the-list");
-		cy.intercept("GET", "/api/site-content/about", { body: { content } }).as("ownerStories");
+		cy.intercept("GET", "/api/site-content/about", {
+			body: { content }
+		}).as("ownerStories");
 		cy.visit("/stories/the-list");
 		cy.wait("@ownerStories");
 		cy.contains("h1", "Story unavailable").should("be.visible");
