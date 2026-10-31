@@ -16,7 +16,7 @@ export async function renderPublishedPage(url: string, snapshot: PublishedSnapsh
 	const html = await renderToString(context.app);
 	return {
 		html,
-		head: await renderSSRHead(context.head),
+		head: await renderSSRHead(context.head as unknown as Parameters<typeof renderSSRHead>[0]),
 		initialState: { publishedContent: snapshot }
 	};
 }

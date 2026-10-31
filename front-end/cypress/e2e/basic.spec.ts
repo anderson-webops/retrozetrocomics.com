@@ -5,6 +5,8 @@ context("Basic", () => {
 
 	it("shows the home page and navigates to Characters", () => {
 		cy.url().should("eq", `${Cypress.config().baseUrl}/`);
+		cy.title().should("eq", "RetroZetro Comics | Stories and Characters");
+		cy.get('link[rel="canonical"]').should("have.attr", "href", "https://retrozetrocomics.com/");
 		cy.contains("RetroZetro Comics").should("exist");
 		cy.contains("Wars, worlds, and heroes").should("exist");
 		cy.get("body").should("not.contain.text", "Tyler's notes");
@@ -12,6 +14,8 @@ context("Basic", () => {
 
 		cy.contains("Characters").click();
 		cy.url().should("eq", `${Cypress.config().baseUrl}/characters`);
+		cy.title().should("eq", "Characters and Factions | RetroZetro Comics");
+		cy.get('link[rel="canonical"]').should("have.attr", "href", "https://retrozetrocomics.com/characters");
 		cy.contains("Heroes, outlaws, and armies").should("exist");
 		cy.contains("Exo Dexus").should("exist");
 		cy.contains("Fazo").should("exist");
