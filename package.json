@@ -1,7 +1,7 @@
 {
 	"name": "retrozetro-monorepo",
 	"type": "module",
-	"version": "2.10.4",
+	"version": "2.10.5",
 	"private": true,
 	"packageManager": "npm@12.2.1",
 	"engines": {
