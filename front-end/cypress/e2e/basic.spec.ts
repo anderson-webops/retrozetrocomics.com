@@ -9,6 +9,11 @@ context("Basic", () => {
 		cy.get('link[rel="canonical"]').should("have.attr", "href", "https://retrozetrocomics.com/");
 		cy.contains("RetroZetro Comics").should("exist");
 		cy.contains("Wars, worlds, and heroes").should("exist");
+		cy.get('a[target="_blank"]').should($links => {
+			for (const link of $links) {
+				expect(link.getAttribute("rel")?.split(/\s+/)).to.include("noopener");
+			}
+		});
 		cy.get("body").should("not.contain.text", "Tyler's notes");
 		cy.get("body").should("not.contain.text", "final canon");
 

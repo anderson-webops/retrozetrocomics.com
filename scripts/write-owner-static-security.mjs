@@ -5,6 +5,7 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { parse, parseFragment, serialize } from "parse5";
+import { verifyOwnerRobots } from "./lib/owner-robots.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputDirectory = path.join(repositoryRoot, "front-end", "dist");
@@ -154,7 +155,7 @@ for (const htmlPath of htmlFiles) {
 	if (ownerOnly) {
 		assert.ok(hashes.length > 0, "The generated owner page must record its inline script hashes.");
 		assert.doesNotMatch(policy, /googlesyndication|doubleclick|analytics\./i);
-		assert.match(hardenedHtml, /content="noindex,nofollow,noarchive,nosnippet" name="robots"/);
+		verifyOwnerRobots(hardenedHtml);
 	}
 	await writeFile(htmlPath, hardenedHtml, "utf8");
 }

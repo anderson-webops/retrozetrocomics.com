@@ -3,14 +3,13 @@ import { config, library } from "@fortawesome/fontawesome-svg-core";
 import { faFacebook, faGithub, faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { createHead as createClientHead } from "@unhead/vue/client";
-import { createHead as createServerHead } from "@unhead/vue/server";
 import { setupLayouts } from "virtual:generated-layouts";
 import { ViteSSG } from "vite-ssg";
 import { routes } from "vue-router/auto-routes";
 
 import App from "./App.vue";
 import { createPublishedContent, publishedContentKey } from "./composables/publishedContent";
+import { installSsgHeadBridge } from "./utils/ssgHead";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 // Assuming you have styles defined in these files
 import "@unocss/reset/tailwind.css";
@@ -34,9 +33,7 @@ export const createApp = ViteSSG(
 		base: import.meta.env.BASE_URL
 	},
 	ctx => {
-		const head = import.meta.env.SSR ? createServerHead() : createClientHead();
-		ctx.app.use(head);
-		ctx.head = head as unknown as typeof ctx.head;
+		installSsgHeadBridge(ctx);
 		ctx.app.provide(publishedContentKey, createPublishedContent(ctx.initialState.publishedContent));
 		// ctx is the context where you can add global components or plugins
 		ctx.app.component("font-awesome-icon", FontAwesomeIcon);

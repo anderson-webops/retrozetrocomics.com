@@ -1,7 +1,7 @@
 {
 	"name": "retrozetro-monorepo",
 	"type": "module",
-	"version": "2.10.5",
+	"version": "2.10.6",
 	"private": true,
 	"packageManager": "npm@12.2.1",
 	"engines": {
@@ -37,7 +37,7 @@
 		"server": "node scripts/run-pinned-npm.mjs run -w back-end server",
 		"server:once": "node scripts/run-pinned-npm.mjs run -w back-end server:once",
 		"serve": "node scripts/run-pinned-npm.mjs run -w front-end serve",
-		"test": "node scripts/run-pinned-npm.mjs run -w front-end test && node scripts/run-pinned-npm.mjs run -w back-end test",
+		"test": "node scripts/run-pinned-npm.mjs run -w front-end test && node scripts/run-pinned-npm.mjs run -w back-end test && vitest run --config scripts/vitest.config.mjs",
 		"test:runtime-artifact": "python3 -B -m unittest scripts/test_runtime_artifact.py",
 		"typecheck": "node scripts/run-pinned-npm.mjs run -w front-end typecheck && node scripts/run-pinned-npm.mjs run -w back-end typecheck",
 		"up": "taze major -I && node scripts/run-pinned-npm.mjs run -w front-end up && node scripts/run-pinned-npm.mjs run -w back-end up",
@@ -49,7 +49,8 @@
 		"verify:platform-install": "node scripts/verify-platform-install.mjs",
 		"verify:production-install": "node scripts/verify-production-install.mjs",
 		"verify:startup-diagnostics": "node scripts/verify-startup-diagnostics.mjs",
-		"verify:publishing": "node scripts/verify-publishing.mjs"
+		"verify:publishing": "node scripts/verify-publishing.mjs",
+		"verify:upstream": "node scripts/verify-upstream.mjs"
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^10.0.0",
@@ -80,42 +81,20 @@
 		]
 	},
 	"overrides": {
-		"defu": "6.1.6",
-		"picomatch": "4.0.4",
-		"anymatch": {
-			"picomatch": "2.3.2"
-		},
-		"micromatch": {
-			"picomatch": "2.3.2"
-		},
-		"readdirp": {
-			"picomatch": "2.3.2"
-		},
-		"vite": "^8.2.0",
-		"vue-router": "^5.0.4",
-		"follow-redirects": "1.16.2",
 		"@cypress/request": {
 			"uuid": "14.0.0",
 			"qs": "6.17.1"
 		},
-		"fast-uri": "3.1.5",
-		"js-yaml": "4.3.2",
-		"postcss": "8.5.26",
-		"shell-quote": "1.10.0",
-		"svgo": "4.0.2",
-		"tar": "7.5.22",
-		"valibot": "1.4.2",
-		"js-beautify": "2.0.3",
 		"tinypool": "2.2.0",
-		"katex": "0.19.0",
-		"glob": "14.0.2",
-		"minimatch": "11.0.1"
+		"katex": "0.19.1",
+		"glob": "14.0.3",
+		"minimatch": "11.0.4"
 	},
 	"allowScripts": {
-		"argon2@0.45.1": true,
+		"argon2@0.45.2": true,
 		"cypress@16.2.1": false,
 		"esbuild@0.28.2": true,
-		"express-rate-limit@8.7.2": false,
+		"express-rate-limit@8.7.3": false,
 		"fsevents@2.3.3": true,
 		"puppeteer@25.16.0": false,
 		"simple-git-hooks@2.14.0": true,

@@ -4,6 +4,7 @@
 		"skipLibCheck": true,
 		"module": "ESNext",
 		"moduleResolution": "bundler",
+		"types": ["node", "vite/client"],
 		"allowSyntheticDefaultImports": true,
 		"allowImportingTsExtensions": true
 	},
@@ -11,6 +12,8 @@
 		"cypress.config.ts",
 		"vite.config.mts",
 		"vite.ssr.config.mts",
-		"uno.config.ts"
+		"uno.config.ts",
+		"scripts/**/*.mts",
+		"src/utils/ssgHead.ts"
 	]
 }
