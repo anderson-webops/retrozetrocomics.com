@@ -44,6 +44,7 @@ jobs:
 
       - name: Dependency and supply-chain gates
         run: |
+          git fetch --no-tags --depth=3 https://github.com/antfu/vitesse a8785264f83c2ebe1b3cf689296775a4949957c8
           npm run verify:upstream
           npm run audit
           npm run audit:production
