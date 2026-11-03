@@ -1,0 +1,24 @@
+{
+  "repository": "https://github.com/antfu/vitesse",
+  "base": "8a01bc9283fedcd63e750af55a75496361789a81",
+  "revision": "a8785264f83c2ebe1b3cf689296775a4949957c8",
+  "compatibilityHolds": [
+    { "dependency": "typescript", "available": "7.0.2", "retained": "6.0.3", "reason": "The maintained @typescript-eslint/typescript-estree peer contract is >=4.8.4 <6.1.0. Reassess TypeScript 7 when the maintained parser supports it; preserve lint and type checks." },
+    { "dependency": "@oxfmt/binding-linux-*", "retained": "0.35.0", "reason": "These bindings belong to the exact Oxfmt 0.35 API required by eslint-plugin-format 2.0.1, not the unrelated 0.76 API. The real formatter CLI regression must pass." },
+    { "dependency": "@oxc-parser/binding-linux-*", "retained": "0.153.0", "reason": "Bindings must match the actual OXC 0.153 parser loaded by the Vite toolchain, rather than a newer incompatible native ABI." }
+  ],
+  "paths": [
+    { "path": ".github/workflows/ci.yml", "status": "already-integrated", "targets": [".github/workflows/ci.yml"], "reason": "Locked npm installs, explicit cached Cypress installation and verification, and production builds already cover both upstream changes." },
+    { "path": "Dockerfile", "status": "retired", "targets": ["deploy/runtime-artifact.json"], "reason": "The application uses the reviewed native runtime contract rather than the starter container." },
+    { "path": "README.md", "status": "site-specific", "targets": ["README.md"], "reason": "Keep this application's content, identity and npm workspace documentation." },
+    { "path": "README.zh-CN.md", "status": "not-applicable", "targets": ["README.md"], "reason": "The untranslated starter README is not application documentation." },
+    { "path": "cypress/e2e/basic.spec.ts", "status": "integrated", "targets": ["front-end/cypress/e2e/basic.spec.ts", "front-end/cypress.config.ts"], "reason": "Exercise real site navigation and external-link opener isolation rather than template demo pages. The supported Vite preprocessor preserves application aliases without deprecated TypeScript baseUrl." },
+    { "path": "package.json", "status": "integrated", "targets": ["package.json", "front-end/package.json", "back-end/package.json"], "reason": "The npm monorepo already uses Vite 8, Pinia 4, VueUse 15 and Node 26. Maintained Unhead 3 and Beasties run through supported rendering bridges; unused Markdown, PWA, macro and devtools packages stay absent." },
+    { "path": "pnpm-lock.yaml", "status": "not-applicable", "targets": ["package-lock.json"], "reason": "The sole authoritative lockfile is the root npm workspace lock." },
+    { "path": "pnpm-workspace.yaml", "status": "not-applicable", "targets": ["package.json"], "reason": "Preserve npm workspace, exact install-script and supply-chain policy rather than introducing another package manager." },
+    { "path": "src/auto-imports.d.ts", "status": "integrated", "targets": ["front-end/src/auto-imports.d.ts"], "reason": "Generate declarations for the real application's enabled integrations, not unused starter macros and devtools." },
+    { "path": "src/route-map.d.ts", "status": "site-specific", "targets": ["front-end/src/route-map.d.ts"], "reason": "Retain the application's generated routes and private studio boundaries." },
+    { "path": "tsconfig.json", "status": "integrated", "targets": ["front-end/tsconfig.json"], "reason": "Use Vue-preserving JSX and explicit relative path aliases without deprecated baseUrl. No macro integration is needed." },
+    { "path": "vite.config.ts", "status": "integrated", "targets": ["front-end/vite.config.mts", "front-end/src/utils/ssgHead.ts"], "reason": "Preserve the native ESM config and monorepo paths. Render current head metadata without cross-major casts; unused Markdown and macros are not restored." }
+  ]
+}

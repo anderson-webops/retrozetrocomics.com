@@ -43,6 +43,7 @@ jobs:
 
       - name: Dependency and supply-chain gates
         run: |
+          npm run verify:upstream
           npm run audit
           npm run audit:production
           npm run audit:signatures
