@@ -1,16 +1,47 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import process from "node:process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { it } from "vitest";
+import { verifyVendoredInputs } from "./build-tools.mjs";
+import { patchRouterGuard } from "./patch-vite-ssg.mjs";
 
 const require = createRequire(import.meta.url);
 const antfu = createRequire(require.resolve("@antfu/eslint-config"));
 const pluginEntry = antfu.resolve("eslint-plugin-n");
 const plugin = createRequire(pluginEntry);
+
+it("the build-tool intake verifies its complete canonical input set and rejects tampering", async () => {
+	const fixtureRoot = new URL("../.ai-work/runs/build-input-integrity/", import.meta.url);
+	await mkdir(fixtureRoot, { recursive: true });
+	const directory = await mkdtemp(join(fileURLToPath(fixtureRoot), "fixture-"));
+	try {
+		await cp(new URL("../vendor/webops-build-tools/", import.meta.url), directory, { recursive: true });
+		assert.equal(Object.keys(verifyVendoredInputs(directory).files).length, 28);
+		const filename = join(directory, "LICENSE");
+		const original = await readFile(filename);
+		await writeFile(filename, "changed");
+		assert.throws(() => verifyVendoredInputs(directory), /Vendored build input differs/);
+		await writeFile(filename, original);
+		await writeFile(join(directory, "unexpected.mjs"), "export default true;");
+		assert.throws(() => verifyVendoredInputs(directory), /Unexpected vendored build inputs/);
+	}
+	finally {
+		await rm(directory, { recursive: true });
+	}
+});
+
+it("the ViteSSG return-based state guard is exact, repeatable and rejects changed upstream bytes", async () => {
+	const patched = await readFile(require.resolve("vite-ssg"), "utf8");
+	const original = patched.replace("router.beforeEach((to) => {", "router.beforeEach((to, from, next) => {")
+		.replace("      return true;", "      next();");
+	assert.equal(patchRouterGuard(original), patched);
+	assert.equal(patchRouterGuard(patched), patched);
+	assert.throws(() => patchRouterGuard(`${original}\n`), /Review the changed ViteSSG runtime/);
+});
 
 it("the actual beautifier CLI handles its upgraded glob dependency", async () => {
 	const root = new URL("../.ai-work/runs/glob-compatibility/", import.meta.url);
@@ -22,7 +53,6 @@ it("the actual beautifier CLI handles its upgraded glob dependency", async () =>
 		const metadata = require("js-beautify/package.json");
 		const binary = join(dirname(require.resolve("js-beautify/package.json")), metadata.bin["js-beautify"]);
 		execFileSync(process.execPath, [binary, "--replace", join(directory, "fixture-*.js")], { timeout: 30_000, maxBuffer: 1024 * 1024 });
-		const { readFile } = await import("node:fs/promises");
 		assert.match(await readFile(filename, "utf8"), /const answer = 42;/u);
 	}
 	finally {

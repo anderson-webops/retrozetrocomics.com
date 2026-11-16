@@ -3,10 +3,10 @@
 	"type": "module",
 	"version": "2.10.6",
 	"private": true,
-	"packageManager": "npm@12.2.1",
+	"packageManager": "npm@12.2.2",
 	"engines": {
-		"node": ">=26.13.0 <27",
-		"npm": ">=12.2.1 <13"
+		"node": ">=26.13.1 <27",
+		"npm": ">=12.2.2 <13"
 	},
 	"description": "Monorepo for retro zetro comics",
 	"author": "Jacob Anderson",
@@ -32,7 +32,7 @@
 		"lint:root": "eslint \"scripts/**/*.mjs\" eslint.config.js",
 		"lint-fix": "node scripts/run-pinned-npm.mjs run -w front-end lint-fix && node scripts/run-pinned-npm.mjs run -w back-end lint-fix",
 		"package:runtime": "bash scripts/package-runtime.sh",
-		"postinstall": "simple-git-hooks",
+		"postinstall": "node scripts/patch-vite-ssg.mjs && simple-git-hooks",
 		"release:metadata": "node scripts/write-release-metadata.mjs",
 		"server": "node scripts/run-pinned-npm.mjs run -w back-end server",
 		"server:once": "node scripts/run-pinned-npm.mjs run -w back-end server:once",
@@ -50,27 +50,30 @@
 		"verify:production-install": "node scripts/verify-production-install.mjs",
 		"verify:startup-diagnostics": "node scripts/verify-startup-diagnostics.mjs",
 		"verify:publishing": "node scripts/verify-publishing.mjs",
-		"verify:upstream": "node scripts/verify-upstream.mjs"
+		"verify:upstream": "node scripts/verify-upstream.mjs",
+		"verify:build-tools": "node scripts/build-tools.mjs --check",
+		"verify:ssg-compatibility": "node scripts/patch-vite-ssg.mjs --check"
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^10.0.0",
 		"@typescript-eslint/eslint-plugin": "^8.72.2",
 		"@typescript-eslint/parser": "^8.72.2",
-		"@unocss/eslint-plugin": "^66.12.0",
+		"@unocss/eslint-plugin": "^66.13.0",
 		"axe-core": "^4.14.0",
-		"eslint": "^10.12.0",
+		"eslint": "^10.15.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-prettier": "^5.5.7",
 		"eslint-plugin-vue": "^10.12.1",
 		"globals": "^17.9.0",
 		"js-beautify": "2.0.3",
-		"lint-staged": "^17.6.0",
+		"lint-staged": "^17.6.1",
 		"parse5": "^8.0.1",
 		"prettier": "^3.10.1",
 		"puppeteer": "^25.17.0",
 		"simple-git-hooks": "^2.14.0",
 		"taze": "^21.3.0",
-		"typescript": "^6.0.3"
+		"typescript": "^6.0.3",
+		"typescript-eslint": "^8.72.2"
 	},
 	"simple-git-hooks": {
 		"pre-commit": "test -x ./node_modules/.bin/lint-staged || { echo 'lint-staged is not installed. Run npm install.'; exit 1; }; ./node_modules/.bin/lint-staged"
@@ -87,14 +90,14 @@
 		},
 		"tinypool": "2.2.0",
 		"katex": "0.19.1",
-		"glob": "14.0.3",
-		"minimatch": "11.0.4"
+		"glob": "14.0.6",
+		"minimatch": "11.0.8"
 	},
 	"allowScripts": {
 		"argon2@0.45.2": true,
 		"cypress@16.3.0": false,
 		"esbuild@0.28.2": true,
-		"express-rate-limit@8.7.3": false,
+		"express-rate-limit@8.7.4": false,
 		"fsevents@2.3.3": true,
 		"puppeteer@25.17.0": false,
 		"simple-git-hooks@2.14.0": true,

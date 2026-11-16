@@ -113,9 +113,24 @@ to the exact browser origin and its hostname.
 
 ## Direct production deployment
 
+### Build tools
+
+Use Node 26.13.1 and select the verified build-only npm 12.2.2 profile with
+`node scripts/build-tools.mjs --print-bin`. The canonical inputs and their exact
+source hashes are recorded in `vendor/webops-build-tools/CANONICAL.json`.
+`--check`, `--audit`, `--audit-production` and `--audit-signatures` validate that
+profile separately from the application dependency graph. Build tools stay out
+of the production archive.
+
+The backend uses TypeScript 7; frontend and lint tooling retain the supported
+TypeScript 6 compiler API. The root lockfile owns both graphs. A hash-bound
+ViteSSG 28.3.0 install patch converts its initial-state router guard to return
+semantics without changing state propagation. Reassess this patch when updating
+ViteSSG; changed upstream bytes fail closed.
+
 The repository contains the complete non-container deployment contract:
 
-- `deploy/systemd/retrozetro.service` runs Node 26.13.0 as the dedicated `retrozetro` account with a read-only system
+- `deploy/systemd/retrozetro.service` runs Node 26.13.1 as the dedicated `retrozetro` account with a read-only system
   view and only the shared upload directory writable.
 - `deploy/nginx/retrozetro.locations.conf` proxies the existing IPv4 and IPv6 TLS listeners to `127.0.0.1:3006` and
   blocks public diagnostics headers and routes.
