@@ -782,8 +782,7 @@ onBeforeRouteUpdate(() => {
 					:key="label"
 					:class="{ 'step-list__current': step === index + 1 }"
 				>
-					<span>{{ index + 1 }}</span
-					>{{ label }}
+					<span>{{ index + 1 }}</span>{{ label }}
 				</li>
 			</ol>
 

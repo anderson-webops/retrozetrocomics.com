@@ -92,11 +92,11 @@
 	},
 	"allowScripts": {
 		"argon2@0.45.2": true,
-		"cypress@16.2.1": false,
+		"cypress@16.3.0": false,
 		"esbuild@0.28.2": true,
 		"express-rate-limit@8.7.3": false,
 		"fsevents@2.3.3": true,
-		"puppeteer@25.16.0": false,
+		"puppeteer@25.17.0": false,
 		"simple-git-hooks@2.14.0": true,
 		"vue-demi@0.14.10": true
 	}
