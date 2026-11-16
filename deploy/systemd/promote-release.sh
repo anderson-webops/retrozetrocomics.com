@@ -29,6 +29,13 @@ When a current artifact release exists, also pass independently retained evidenc
   ROLLBACK_SHA256=<64 lowercase hex characters>
   ROLLBACK_COMMIT=<40 lowercase hex characters>
 
+For a retained release with a different reviewed contract, also supply its
+protected verifier/contract and their independently reviewed SHA-256 digests:
+  ROLLBACK_VERIFIER=/protected/prior/runtime-artifact.py
+  ROLLBACK_CONTRACT=/protected/prior/runtime-artifact.json
+  ROLLBACK_VERIFIER_SHA256=<64 lowercase hex characters>
+  ROLLBACK_CONTRACT_SHA256=<64 lowercase hex characters>
+
 A pre-artifact release must first be sealed by the reviewed host transition
 procedure. This promoter never trusts or mutates a legacy checkout in place.
 USAGE
@@ -115,7 +122,25 @@ previous_target=""
 rollback_archive="${ROLLBACK_ARCHIVE:-}"
 rollback_sha="${ROLLBACK_SHA256:-}"
 rollback_commit="${ROLLBACK_COMMIT:-}"
+rollback_verifier="${ROLLBACK_VERIFIER:-}"
+rollback_contract="${ROLLBACK_CONTRACT:-}"
+rollback_verifier_sha="${ROLLBACK_VERIFIER_SHA256:-}"
+rollback_contract_sha="${ROLLBACK_CONTRACT_SHA256:-}"
+repeat_current=false
 export RETROZETRO_RUNTIME_CONTRACT="$artifact_contract"
+
+verify_rollback() {
+	for control in "$rollback_verifier" "$rollback_contract"; do
+		assert_protected_path "$control" file || return 1
+	done
+	[[ "$(sha256sum "$rollback_verifier" | cut -d ' ' -f 1)" == "$rollback_verifier_sha" ]] \
+		&& [[ "$(sha256sum "$rollback_contract" | cut -d ' ' -f 1)" == "$rollback_contract_sha" ]] \
+		|| { echo "Retained artifact controls differ from their reviewed digests." >&2; return 1; }
+	RETROZETRO_RUNTIME_CONTRACT="$rollback_contract" \
+		/usr/bin/python3 -I "$rollback_verifier" verify "$previous_target" \
+		--archive "$rollback_archive" --sha256 "$rollback_sha" \
+		--commit "$rollback_commit"
+}
 
 if [[ -L "$current_link" ]]; then
 	previous_target="$(readlink -f -- "$current_link" 2>/dev/null || true)"
@@ -131,15 +156,32 @@ if [[ -L "$current_link" ]]; then
 		echo "The current release predates immutable artifacts; seal it with the reviewed host transition before promotion." >&2
 		exit 1
 	fi
-	if [[ -z "$rollback_archive" || ! "$rollback_sha" =~ ^[0-9a-f]{64}$ || ! "$rollback_commit" =~ ^[0-9a-f]{40}$ ]]; then
-		echo "A current release requires ROLLBACK_ARCHIVE, ROLLBACK_SHA256, and ROLLBACK_COMMIT." >&2
-		exit 1
+	installed_commit="$(/usr/bin/python3 -I -c 'import json, sys; print(json.load(open(sys.argv[1]))["commit"])' "$previous_target/runtime-manifest.json")"
+	if [[ "$installed_commit" == "$commit" ]]; then
+		/usr/bin/python3 -I "$artifact_verifier" verify "$previous_target" \
+			--archive "$archive" --sha256 "$archive_sha" --commit "$commit"
+		repeat_current=true
+	else
+		if [[ -z "$rollback_archive" || ! "$rollback_sha" =~ ^[0-9a-f]{64}$ || ! "$rollback_commit" =~ ^[0-9a-f]{40}$ ]]; then
+			echo "A current release requires ROLLBACK_ARCHIVE, ROLLBACK_SHA256, and ROLLBACK_COMMIT." >&2
+			exit 1
+		fi
+		rollback_archive="$(realpath -e -- "$rollback_archive")"
+		assert_protected_path "$rollback_archive" file
+		if [[ -n "$rollback_verifier$rollback_contract$rollback_verifier_sha$rollback_contract_sha" ]]; then
+			if [[ "$rollback_verifier" != /* || "$rollback_contract" != /* \
+				|| ! "$rollback_verifier_sha" =~ ^[0-9a-f]{64}$ || ! "$rollback_contract_sha" =~ ^[0-9a-f]{64}$ ]]; then
+				echo "Retained artifact control overrides require both protected absolute paths and both reviewed digests." >&2
+				exit 1
+			fi
+		else
+			rollback_verifier="$artifact_verifier"
+			rollback_contract="$artifact_contract"
+			rollback_verifier_sha="$(sha256sum "$rollback_verifier" | cut -d ' ' -f 1)"
+			rollback_contract_sha="$(sha256sum "$rollback_contract" | cut -d ' ' -f 1)"
+		fi
+		verify_rollback
 	fi
-	rollback_archive="$(realpath -e -- "$rollback_archive")"
-	assert_protected_path "$rollback_archive" file
-	/usr/bin/python3 -I "$artifact_verifier" verify "$previous_target" \
-		--archive "$rollback_archive" --sha256 "$rollback_sha" \
-		--commit "$rollback_commit"
 	if [[ ! -f "$release_env_dest" ]]; then
 		echo "The current release has no rollback identity environment." >&2
 		exit 1
@@ -177,7 +219,8 @@ write_recovery_record() {
 	/usr/bin/python3 -I - \
 		"$recovery_record" "$state" "$promotion_started_at" \
 		"$candidate" "$archive" "$archive_sha" "$commit" \
-		"$previous_target" "$rollback_archive" "$rollback_sha" "$rollback_commit" <<'PY'
+		"$previous_target" "$rollback_archive" "$rollback_sha" "$rollback_commit" \
+		"$rollback_verifier" "$rollback_verifier_sha" "$rollback_contract" "$rollback_contract_sha" <<'PY'
 import datetime
 import json
 from pathlib import Path
@@ -185,7 +228,8 @@ import sys
 
 (record, state, started_at, candidate_target, candidate_archive,
  candidate_sha, candidate_commit, rollback_target, rollback_archive,
- rollback_sha, rollback_commit) = sys.argv[1:]
+ rollback_sha, rollback_commit, rollback_verifier, rollback_verifier_sha,
+ rollback_contract, rollback_contract_sha) = sys.argv[1:]
 payload = {
     "candidate": {
         "archive": candidate_archive,
@@ -199,6 +243,12 @@ payload = {
         "archiveSha256": rollback_sha,
         "commit": rollback_commit,
         "target": rollback_target,
+        "verification": {
+            "contract": rollback_contract,
+            "contractSha256": rollback_contract_sha,
+            "verifier": rollback_verifier,
+            "verifierSha256": rollback_verifier_sha,
+        },
     },
     "startedAt": started_at,
     "state": state,
@@ -371,12 +421,6 @@ process.stdout.write(JSON.stringify({ ref: "main", inputs: {
 	[[ "$status" == "204" ]]
 }
 
-verify_rollback() {
-	/usr/bin/python3 -I "$artifact_verifier" verify "$previous_target" \
-		--archive "$rollback_archive" --sha256 "$rollback_sha" \
-		--commit "$rollback_commit"
-}
-
 rollback() {
 	local failed=0
 	if [[ -n "$previous_target" ]]; then
@@ -436,6 +480,16 @@ trap 'exit 129' HUP
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
+if [[ "$repeat_current" == true ]]; then
+	if wait_for_target "$previous_target"; then
+		finished=true
+		echo "Verified unchanged immutable release: $previous_target"
+		exit 0
+	fi
+	echo "The unchanged release failed acceptance; existing state remains retained." >&2
+	exit 1
+fi
+
 /usr/bin/python3 -I "$artifact_verifier" unpack "$candidate_stage" \
 	--archive "$archive" --sha256 "$archive_sha" --commit "$commit"
 release="$("$node" -p 'JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).release' "$candidate_stage/.retrozetro-release-prepared.json")"
@@ -445,16 +499,18 @@ if [[ ! "$release" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$ ]]; then
 fi
 candidate="$release_root_real/${release#v}-${commit:0:12}"
 if [[ -e "$candidate" || -L "$candidate" ]]; then
-	echo "Refusing to overwrite existing immutable release: $candidate" >&2
-	exit 1
+	assert_protected_path "$candidate" directory
+	/usr/bin/python3 -I "$artifact_verifier" verify "$candidate" \
+		--archive "$archive" --sha256 "$archive_sha" --commit "$commit"
+else
+	chown -R root:root "$candidate_stage"
+	find "$candidate_stage" -type d -exec chmod 0755 {} +
+	find "$candidate_stage" -type f -exec chmod 0644 {} +
+	/usr/bin/python3 -I "$artifact_verifier" verify "$candidate_stage" \
+		--archive "$archive" --sha256 "$archive_sha" --commit "$commit"
+	mv -T -- "$candidate_stage" "$candidate"
+	candidate_stage=""
 fi
-chown -R root:root "$candidate_stage"
-find "$candidate_stage" -type d -exec chmod 0755 {} +
-find "$candidate_stage" -type f -exec chmod 0644 {} +
-/usr/bin/python3 -I "$artifact_verifier" verify "$candidate_stage" \
-	--archive "$archive" --sha256 "$archive_sha" --commit "$commit"
-mv -T -- "$candidate_stage" "$candidate"
-candidate_stage=""
 assert_protected_path "$candidate" directory
 /usr/bin/python3 -I "$artifact_verifier" verify "$candidate" \
 	--archive "$archive" --sha256 "$archive_sha" --commit "$commit"

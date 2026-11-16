@@ -90,6 +90,23 @@ provide its independently retained archive, SHA-256, and commit. The promoter:
 6. restores the separately verified previous artifact and identity environment
    if any required acceptance step fails.
 
+A retained release with a different contract uses its own root-protected verifier
+and contract, each bound to an independently reviewed SHA-256. Those controls are
+rechecked before initial acceptance and recovery, and their identities remain in
+an unresolved recovery record. Current-artifact verification always retains the
+current contract. An unchanged exact artifact is checked without a service
+restart or identity rewrite; a failed candidate can be retried only after its
+existing immutable tree matches the accepted archive again.
+
+The native ARM64 CI and release jobs exercise this control flow with the genuine
+v2.10.6 archive and the exact candidate. A single disposable lifecycle rehearsal
+covers promotion/repeat, failed activation/retry, and preservation of acknowledged
+synthetic database/upload writes during recovery. Real Nginx and TLS run inside
+private Linux namespaces; only the dedicated synthetic MongoDB fixture is relayed
+into that network. The runtime runs as UID65534 without checkout or development
+dependencies. Post-deploy dispatch uses a synthetic receiver. This qualification
+does not establish production backups, activation, or independent WAN acceptance.
+
 The promoter refuses a mutable pre-artifact checkout. Before the first direct
 artifact promotion, the server operator must use a reviewed, root-only
 transition procedure to seal the currently running release and its exact legacy

@@ -149,6 +149,13 @@ The repository contains the complete non-container deployment contract:
   archive and retained rollback artifact independently, creates a new root-owned immutable release, atomically changes
   `/srv/retrozetro/current`, verifies local readiness and both public address families, dispatches independent GitHub
   post-deploy verification, and restores the prior verified release if any gate or dispatch fails.
+- Retained releases may use their own protected verifier and contract, bound to independently reviewed digests. The
+  current artifact always uses the current controls. Unchanged deployment verifies the exact active archive without
+  restarting it; a retry can reuse an independently verified immutable candidate without overwriting it.
+- Native ARM64 CI and release qualification rehearse the exact promoter with retained v2.10.6 and the new archive.
+  One disposable lifecycle flow covers upgrade/repeat, pre-traffic failure/retry, and acknowledged-write preservation
+  after failure. The fixture uses private network/mount/PID namespaces, real dual-stack TLS Nginx, UID65534 application
+  processes, synthetic MongoDB/uploads and a synthetic post-deploy receiver; production providers remain inaccessible.
 
 The production host currently uses the separately reviewed compatibility layout. Do not replace it with the canonical
 direct-service layout merely to use these controls. A compatibility deployment must consume the same verified archive,

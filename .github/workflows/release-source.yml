@@ -67,7 +67,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install --yes apparmor bubblewrap
+          sudo apt-get install --yes apparmor bubblewrap nginx openssl iproute2
           sudo apparmor_parser --replace .github/apparmor/bwrap-userns-restrict
           sudo -n bwrap \
             --unshare-user --uid 65534 --gid 65534 \
@@ -83,6 +83,14 @@ jobs:
           printf '/.ai-work/\n' >> .git/info/exclude
           mkdir -p .ai-work/runs/release-runtime
           npm run package:runtime -- .ai-work/runs/release-runtime
+
+      - name: Rehearse exact retained-release transition
+        env:
+          RETROZETRO_ARTIFACT_MONGODB_URI: mongodb://artifact_admin:retrozetro-artifact-password-2026@127.0.0.1:27017/retrozetro_artifact_release?authSource=admin
+        run: |
+          output="$PWD/.ai-work/runs/release-runtime"
+          archive=$(node -p 'JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).archive' "$output/acceptance.json")
+          python3 -I -B scripts/test-runtime-transition.py run "$output/transition" "$output/$archive"
 
       - name: Retain reviewed runtime evidence
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
