@@ -117,6 +117,10 @@ if ! flock -n 9; then
 	echo "Another RetroZetro promotion is active." >&2
 	exit 1
 fi
+if find "$recovery_root" -maxdepth 1 -name 'promotion-*' -print -quit | grep -q .; then
+	echo "Protected deployment recovery is pending; reconcile its retained record before promotion." >&2
+	exit 1
+fi
 
 previous_target=""
 rollback_archive="${ROLLBACK_ARCHIVE:-}"

@@ -256,16 +256,11 @@ def service(arguments):
     for name in ["eslint", "tsx", "typescript", "vite", "vitest"]:
         assert not (current / "node_modules" / name).exists()
 
-    def runtime_identity():
-        os.setgroups([])
-        os.setgid(65534)
-        os.setuid(65534)
-
     with Path("/state/runtime.log").open("ab") as log:
         child = subprocess.Popen([
             "/runtime/node", str(current / "back-end/dist/server.js"),
         ], cwd=current, env=environment, stdout=log, stderr=subprocess.STDOUT,
-            preexec_fn=runtime_identity, start_new_session=True)
+            user=65534, group=65534, extra_groups=[], start_new_session=True)
     pid_path.write_text(str(child.pid))
     if Path("/state/ack-after-start").exists():
         wait_ready()
@@ -336,6 +331,11 @@ error_log /state/nginx-error.log;
 events { worker_connections 128; }
 http {
   access_log off;
+  client_body_temp_path /state/nginx-body;
+  proxy_temp_path /state/nginx-proxy;
+  fastcgi_temp_path /state/nginx-fastcgi;
+  uwsgi_temp_path /state/nginx-uwsgi;
+  scgi_temp_path /state/nginx-scgi;
   server {
     listen 127.0.0.1:443 ssl;
     listen [::1]:443 ssl;
@@ -411,6 +411,9 @@ http {
             Path("/state/service.json").write_text(json.dumps({"environment": environment}))
             assert service(["restart", "retrozetro-fixture.service"]) == 0
             wait_ready()
+            status = Path(f'/proc/{Path("/state/service.pid").read_text()}/status').read_text()
+            assert next(line for line in status.splitlines() if line.startswith("Uid:")).split()[1:] == ["65534"] * 4
+            assert int(next(line for line in status.splitlines() if line.startswith("CapEff:")).split()[1], 16) == 0
             before_data = mongo("seed", {"_id": "retained", "value": "before-upgrade"})
             before_env = release_env.read_bytes()
             before_policy = sha256(policy)
@@ -435,6 +438,14 @@ http {
             }
             promote = ["/bin/bash", str(controls / "promote-release.sh"), str(candidate_archive), candidate_sha, candidate_manifest["commit"]]
             if scenario == "upgrade-repeat":
+                recovery = host / ".deployment-recovery"
+                recovery.mkdir(mode=0o700)
+                pending = recovery / "promotion-previous-uncertain"
+                pending.write_text("synthetic unresolved recovery record\n")
+                refused = subprocess.run(promote, env=promote_env, capture_output=True, text=True, timeout=30)
+                assert refused.returncode != 0 and "recovery is pending" in refused.stderr
+                assert pending.read_text() == "synthetic unresolved recovery record\n"
+                pending.unlink()
                 bad_env = dict(promote_env, ROLLBACK_CONTRACT_SHA256="0" * 64)
                 rejected = subprocess.run(promote, env=bad_env, capture_output=True, text=True, timeout=30)
                 assert rejected.returncode != 0 and "reviewed digests" in rejected.stderr
