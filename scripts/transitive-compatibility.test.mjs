@@ -17,7 +17,8 @@ const plugin = createRequire(pluginEntry);
 it("the build-tool intake verifies its complete canonical input set and rejects tampering", async () => {
 	const fixtureRoot = new URL("../.ai-work/runs/build-input-integrity/", import.meta.url);
 	await mkdir(fixtureRoot, { recursive: true });
-	const directory = await mkdtemp(join(fileURLToPath(fixtureRoot), "fixture-"));
+	const root = await mkdtemp(join(fileURLToPath(fixtureRoot), "fixture-"));
+	const directory = join(root, "sdk");
 	try {
 		await cp(new URL("../vendor/webops-build-tools/", import.meta.url), directory, { recursive: true });
 		assert.equal(Object.keys(verifyVendoredInputs(directory).files).length, 28);
@@ -26,11 +27,15 @@ it("the build-tool intake verifies its complete canonical input set and rejects 
 		await writeFile(filename, "changed");
 		assert.throws(() => verifyVendoredInputs(directory), /Vendored build input differs/);
 		await writeFile(filename, original);
+		execFileSync("python3", ["-I", "-B", fileURLToPath(new URL("./test_build_input.py", import.meta.url))], {
+			timeout: 30000,
+			maxBuffer: 1024 * 1024
+		});
 		await writeFile(join(directory, "unexpected.mjs"), "export default true;");
 		assert.throws(() => verifyVendoredInputs(directory), /Unexpected vendored build inputs/);
 	}
 	finally {
-		await rm(directory, { recursive: true });
+		await rm(root, { recursive: true });
 	}
 });
 

@@ -223,6 +223,7 @@ receipt["harnessSha256"] = {
         "scripts/artifact-acceptance.mjs",
         "scripts/write-runtime-identity.mjs",
         "scripts/build-tools.mjs",
+        "scripts/read-build-input.py",
         "scripts/patch-vite-ssg.mjs",
         "vendor/webops-build-tools/CANONICAL.json",
         "deploy/systemd/promote-release.sh",

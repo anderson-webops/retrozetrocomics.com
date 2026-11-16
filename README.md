@@ -115,7 +115,8 @@ to the exact browser origin and its hostname.
 
 ### Build tools
 
-Use Node 26.13.1 and select the verified build-only npm 12.2.2 profile with
+Use Node 26.13.1 and Python 3 with descriptor-relative file access. Select the
+verified build-only npm 12.2.2 profile with
 `node scripts/build-tools.mjs --print-bin`. The canonical inputs and their exact
 source hashes are recorded in `vendor/webops-build-tools/CANONICAL.json`.
 `--check`, `--audit`, `--audit-production` and `--audit-signatures` validate that
