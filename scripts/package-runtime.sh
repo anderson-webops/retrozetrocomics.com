@@ -8,8 +8,8 @@ export RETROZETRO_RUNTIME_CONTRACT="$root/deploy/runtime-artifact.json"
 test "$(id -u)" -ne 0
 test "$(uname -s)" = Linux
 test "$(uname -m)" = aarch64
-test "$(node --version)" = v26.13.0
-test "$(npm --version)" = 12.2.1
+test "$(node --version)" = v26.13.1
+test "$(npm --version)" = 12.2.2
 test -z "$(git status --porcelain)"
 : "${RETROZETRO_ARTIFACT_MONGODB_URI:?Pass a loopback retrozetro_artifact_* MongoDB fixture URI}"
 
@@ -105,6 +105,11 @@ export SOURCE_REVISION="$commit"
 SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)
 
 npm ci --include=dev --include=optional --strict-allow-scripts --no-fund
+npm run verify:ssg-compatibility
+node scripts/build-tools.mjs --check
+node scripts/build-tools.mjs --audit
+node scripts/build-tools.mjs --audit-production
+node scripts/build-tools.mjs --audit-signatures
 npm run audit
 npm run audit:production
 npm run audit:signatures
@@ -193,6 +198,8 @@ receipt["checks"] = [
     "clean locked Linux ARM64 build",
     "full and production dependency audits",
     "registry signatures",
+    "independently verified build-only SDK and compatibility dependency audits",
+    "hash-bound return-based ViteSSG state guard",
     "explicit required paths and complete file hashes",
     "root-lock-backed backend production closure",
     "reviewed Argon2, Sharp, and libvips native inventory",
@@ -215,6 +222,10 @@ receipt["harnessSha256"] = {
         "scripts/test-unpacked-artifact.sh",
         "scripts/artifact-acceptance.mjs",
         "scripts/write-runtime-identity.mjs",
+        "scripts/build-tools.mjs",
+        "scripts/read-build-input.py",
+        "scripts/patch-vite-ssg.mjs",
+        "vendor/webops-build-tools/CANONICAL.json",
         "deploy/systemd/promote-release.sh",
         "deploy/systemd/install-service.sh",
     ]

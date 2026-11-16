@@ -99,8 +99,10 @@ Shared Sites policy (`../AGENTS.md` when available) applies. These essentials al
 
 ## Dependency & Lockfile Discipline
 
-- Keep only the root `package-lock.json` aligned with every workspace manifest; nested locks and pnpm workspaces are unsupported. For dependency changes, review both production and development packages, run a clean root `npm ci` (not an install fallback), full and production audits, and relevant lint, type, test, and build gates. Regenerate and include the lockfile if it drifts.
+- Keep the application workspaces on the sole root `package-lock.json`; nested application locks and pnpm workspaces are unsupported. The independently versioned, build-only SDK under `vendor/webops-build-tools/` retains its exact canonical installation and compatibility-audit locks. Verify its complete `CANONICAL.json` input inventory and run `scripts/build-tools.mjs --check`, `--audit`, `--audit-production` and `--audit-signatures` alongside the application gates. Keep SDK installations and package managers out of production archives.
+- For dependency changes, review production and development packages, run a clean locked application installation and both audits including the workspace root, then the relevant lint, type, test, build and native artifact gates. Regenerate and include the root lockfile when application manifests drift. Each independent SDK graph must also have complete zero-finding full and production audits; an application-only clean result is insufficient.
 
 ## Checked Direct Delivery
 
 - When repository policy requires pre-integration CI or CodeQL checks, validate a candidate on a `codex/` branch, then integrate only the exact validated commit and remove the branch. Revalidate if the default branch advances; never bypass failing required checks.
+- CI and CodeQL run automatically for pull requests and merged `main`. For a direct-delivery candidate without a pull request, dispatch both workflows against its `codex/` branch and verify their exact checked revision before integration. Both workflows retain supported manual dispatch; avoid duplicate branch-push and pull-request runs.

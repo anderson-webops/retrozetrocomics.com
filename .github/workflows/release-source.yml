@@ -14,8 +14,8 @@ concurrency:
 
 env:
   CYPRESS_INSTALL_BINARY: "0"
-  NODE_VERSION: 26.13.0
-  NPM_VERSION: 12.2.1
+  NODE_VERSION: 26.13.1
+  NPM_VERSION: 12.2.2
   PUPPETEER_SKIP_DOWNLOAD: "true"
 
 jobs:
@@ -47,8 +47,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Use the repository npm version
-        run: npm install --global "npm@${NPM_VERSION}"
+      - name: Select verified build-only tools
+        run: node scripts/build-tools.mjs --print-bin >> "$GITHUB_PATH"
 
       - name: Verify annotated source release
         shell: bash
