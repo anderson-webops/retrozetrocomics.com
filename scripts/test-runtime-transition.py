@@ -22,11 +22,12 @@ import urllib.error
 import urllib.request
 
 
-RETAINED_COMMIT = "9e2f5089201fc4d488cda2a16704927f6ecb61a8"
-RETAINED_ARCHIVE = "retrozetro-v2.10.6-9e2f5089201f-linux-arm64.tar.gz"
-RETAINED_DIGEST = "e99bdbcf91600f6e17229d39db1431fd431392ea30def286989c1278a83a0e17"
+RETAINED_TAG = "v2.10.7"
+RETAINED_COMMIT = "1b9da73c5b295f1e71964a765956b96a823768da"
+RETAINED_ARCHIVE = f"retrozetro-{RETAINED_TAG}-{RETAINED_COMMIT[:12]}-linux-arm64.tar.gz"
+RETAINED_DIGEST = "26381fea1112f9357e02648be7dffd4fc0d7661b9f57507884cb1ce9f390149a"
 RETAINED_VERIFIER = "5a7e6bb52458e7885dab5040663f364ce402b9a6f9fd72c021565c58544f414d"
-RETAINED_CONTRACT = "8c9382fcd4ead696b0aabc7d7042ef46ff44173df2fbcf1b295f7392720c71f1"
+RETAINED_CONTRACT = "dd3c339e62edd4fb5fd91b1206a781aeb1823af8ecc66cf67fc8a9b05e78d4a6"
 REPOSITORY = "anderson-webops/retrozetrocomics.com"
 SCRIPT = Path(__file__).resolve()
 
@@ -87,7 +88,7 @@ def run_outer(output, archive):
     output.mkdir(mode=0o755)
     retained = output / "retained"
     retained.mkdir()
-    release_url = f"https://github.com/{REPOSITORY}/releases/download/v2.10.6"
+    release_url = f"https://github.com/{REPOSITORY}/releases/download/{RETAINED_TAG}"
     source_url = f"https://raw.githubusercontent.com/{REPOSITORY}/{RETAINED_COMMIT}"
     download(f"{release_url}/{RETAINED_ARCHIVE}", retained / RETAINED_ARCHIVE, RETAINED_DIGEST)
     download(f"{source_url}/scripts/runtime-artifact.py", retained / "runtime-artifact.py", RETAINED_VERIFIER)
@@ -374,7 +375,7 @@ http {
             host.mkdir()
             releases = host / "releases"
             releases.mkdir()
-            retained = releases / "retained-v2.10.6"
+            retained = releases / f"retained-{RETAINED_TAG}"
             retained.mkdir()
             prior_env = {"RETROZETRO_RUNTIME_CONTRACT": str(prior / "runtime-artifact.json")}
             command([
@@ -388,6 +389,7 @@ http {
                     (Path(directory) / name).chmod(0o644)
             (host / "current").symlink_to(retained)
             marker = json.loads((retained / ".retrozetro-release-prepared.json").read_text())
+            assert marker["release"] == RETAINED_TAG and marker["commitSha"] == RETAINED_COMMIT
             release_env = host / "release.env"
             release_env.write_text(f'RETROZETRO_RELEASE_VERSION={marker["release"]}\nSOURCE_REVISION={RETAINED_COMMIT}\nDEPLOYED_AT={marker["preparedAt"]}\n')
             release_env.chmod(0o600)

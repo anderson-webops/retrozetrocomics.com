@@ -98,8 +98,10 @@ current contract. An unchanged exact artifact is checked without a service
 restart or identity rewrite; a failed candidate can be retried only after its
 existing immutable tree matches the accepted archive again.
 
-The native ARM64 CI and release jobs exercise this control flow with the genuine
-v2.10.6 archive and the exact candidate. A single disposable lifecycle rehearsal
+The native ARM64 CI and release jobs exercise this control flow with the exact
+candidate and the preceding published release pinned by the transition harness.
+Advance that pin with the verified tag, commit, archive, verifier and contract
+when preparing a new release. A single disposable lifecycle rehearsal
 covers promotion/repeat, failed activation/retry, and preservation of acknowledged
 synthetic database/upload writes during recovery. Real Nginx and TLS run inside
 private Linux namespaces; only the dedicated synthetic MongoDB fixture is relayed
