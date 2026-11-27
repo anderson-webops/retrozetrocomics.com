@@ -47,6 +47,9 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
+      - name: Install checksum-verified private Node
+        run: bash scripts/select-ci-node.sh
+
       - name: Select verified build-only tools
         run: node scripts/build-tools.mjs --print-bin >> "$GITHUB_PATH"
 
